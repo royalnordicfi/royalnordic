@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "start": "node server.js",
     "start:prod": "NODE_ENV=production node server.js",
-    "deploy:build": "npm run build && npm run start:prod"
+    "deploy:build": "npm run build && npm run start:prod",
+    "deploy": "npm run build",
+    "vercel-build": "npm run build"
   },
   "dependencies": {
     "react": "^18.2.0",
