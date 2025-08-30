@@ -1,0 +1,136 @@
+/* Royal Nordic Dark Theme for CONVOCORE Chatbot - Black, Gray & White Only */
+
+/* Main chat container */
+.vg-chat-container {
+    background: #000000 !important;
+    border: 2px solid #666666 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Chat header */
+.vg-chat-header {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-radius: 14px 14px 0 0 !important;
+    padding: 16px !important;
+    border-bottom: 2px solid #666666 !important;
+}
+
+/* Chat header title */
+.vg-chat-header h3 {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Chat messages container */
+.vg-chat-messages {
+    background: #000000 !important;
+    border-radius: 0 0 14px 14px !important;
+}
+
+/* User message bubbles */
+.vg-user-message {
+    background: #666666 !important;
+    color: #ffffff !important;
+    border-radius: 18px 18px 4px 18px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Bot message bubbles */
+.vg-bot-message {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+    border-radius: 18px 18px 18px 4px !important;
+    border: 1px solid #333333 !important;
+}
+
+/* Input field */
+.vg-chat-input {
+    background: #333333 !important;
+    border: 2px solid #666666 !important;
+    border-radius: 12px !important;
+    color: #ffffff !important;
+    padding: 12px 16px !important;
+}
+
+.vg-chat-input:focus {
+    border-color: #999999 !important;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1) !important;
+    outline: none !important;
+}
+
+/* Send button */
+.vg-send-button {
+    background: #666666 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    color: #ffffff !important;
+    padding: 12px 20px !important;
+    transition: all 0.3s ease !important;
+}
+
+.vg-send-button:hover {
+    background: #999999 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Chat toggle button */
+.vg-chat-toggle {
+    background: #666666 !important;
+    border: 2px solid #666666 !important;
+    border-radius: 50% !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+    color: #ffffff !important;
+}
+
+.vg-chat-toggle:hover {
+    background: #999999 !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Scrollbar styling */
+.vg-chat-messages::-webkit-scrollbar {
+    width: 8px !important;
+}
+
+.vg-chat-messages::-webkit-scrollbar-track {
+    background: #000000 !important;
+    border-radius: 4px !important;
+}
+
+.vg-chat-messages::-webkit-scrollbar-thumb {
+    background: #666666 !important;
+    border-radius: 4px !important;
+}
+
+.vg-chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #999999 !important;
+}
+
+/* Loading indicators */
+.vg-typing-indicator {
+    background: #1a1a1a !important;
+    border-radius: 12px !important;
+}
+
+.vg-typing-dot {
+    background: #666666 !important;
+}
+
+/* Error messages */
+.vg-error-message {
+    background: #333333 !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+}
+
+/* Success messages */
+.vg-success-message {
+    background: #666666 !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+}

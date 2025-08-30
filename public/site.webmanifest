@@ -1,0 +1,25 @@
+{
+  "name": "ROYAL NORDIC - Premium Lapland Tours",
+  "short_name": "Royal Nordic",
+  "description": "Premium Lapland tours and Northern Lights adventures in Rovaniemi, Finland",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#059669",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/royalnordiclogotransparent.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/royalnordiclogotransparent.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["travel", "tourism", "outdoors"],
+  "lang": "en",
+  "dir": "ltr"
+}

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Royal Nordic - Admin Panel</title>
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .status-pending { background-color: #fef3c7; color: #92400e; }
+        .status-confirmed { background-color: #d1fae5; color: #065f46; }
+        .status-cancelled { background-color: #fee2e2; color: #991b1b; }
+        .secure-key-input { font-family: monospace; letter-spacing: 2px; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Royal Nordic</h1>
+                <p class="text-gray-600">Secure Admin Access</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Email Address *</label>
+                    <input type="email" id="email" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="your-email@royalnordic.fi">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Password *</label>
+                    <input type="password" id="password" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="Your password">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Secure Key *</label>
+                    <input type="password" id="secureKey" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent secure-key-input"
+                           placeholder="••••••••••••••••"
+                           maxlength="16">
+                    <p class="text-xs text-gray-500 mt-1">16-character security key</p>
+                </div>
+                
+                <button type="submit" 
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                    Access Admin Panel
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-xs text-gray-500">
+                    🔒 This is a secure, private admin panel.<br>
+                    Access is restricted to authorized personnel only.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Admin Panel -->
+    <div id="adminPanel" class="hidden min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">Royal Nordic Admin</h1>
+                        <p class="text-sm text-gray-600" id="userInfo"></p>
+                    </div>
+                    <button id="logoutBtn" class="text-red-600 hover:text-red-700 font-medium">Secure Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="p-4">
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-white rounded-xl p-4 shadow-sm border">
+                    <div class="text-2xl font-bold text-blue-600" id="totalBookings">0</div>
+                    <div class="text-sm text-gray-600">Total Bookings</div>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-sm border">
+                    <div class="text-2xl font-bold text-green-600" id="pendingBookings">0</div>
+                    <div class="text-sm text-gray-600">Pending</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings List -->
+        <div class="px-4 pb-6">
+            <div class="bg-white rounded-xl shadow-sm border">
+                <div class="p-4 border-b">
+                    <h2 class="text-lg font-semibold text-gray-900">Recent Bookings</h2>
+                </div>
+                
+                <div id="bookingsList" class="divide-y divide-gray-200">
+                    <!-- Bookings will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Setup Screen (First time only) -->
+    <div id="setupScreen" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Setup Admin Access</h1>
+                <p class="text-gray-600">Create your secure admin account</p>
+            </div>
+            
+            <form id="setupForm" class="space-y-6">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Email Address *</label>
+                    <input type="email" id="setupEmail" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="your-email@royalnordic.fi">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Password *</label>
+                    <input type="password" id="setupPassword" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="Create a strong password">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Secure Key *</label>
+                    <input type="password" id="setupSecureKey" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent secure-key-input"
+                           placeholder="••••••••••••••••"
+                           maxlength="16">
+                    <p class="text-xs text-gray-500 mt-1">Create a 16-character security key (save this securely!)</p>
+                </div>
+                
+                <button type="submit" 
+                        class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                    Create Secure Admin Account
+                </button>
+            </form>
+
+            <div class="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                <p class="text-sm text-yellow-800">
+                    ⚠️ <strong>Important:</strong> Save your secure key somewhere safe!<br>
+                    You'll need it every time you access the admin panel.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = localStorage.getItem('adminToken');
+        let currentUser = null;
+
+        // Check if admin exists, if not show setup
+        async function checkAdminExists() {
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: 'test@test.com', 
+                        password: 'test', 
+                        secureKey: 'test1234567890123' 
+                    })
+                });
+                
+                if (response.status === 401) {
+                    // No admin exists, show setup
+                    document.getElementById('setupScreen').classList.remove('hidden');
+                    document.getElementById('loginScreen').classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Error checking admin:', error);
+            }
+        }
+
+        // Setup admin account
+        document.getElementById('setupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('setupEmail').value;
+            const password = document.getElementById('setupPassword').value;
+            const secureKey = document.getElementById('setupSecureKey').value;
+            
+            if (secureKey.length !== 16) {
+                alert('Secure key must be exactly 16 characters long');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/setup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, secureKey })
+                });
+                
+                if (response.ok) {
+                    alert('Secure admin account created! Save your secure key - you\'ll need it to login.');
+                    document.getElementById('setupScreen').classList.add('hidden');
+                    document.getElementById('loginScreen').classList.remove('hidden');
+                } else {
+                    alert('Error creating admin account');
+                }
+            } catch (error) {
+                alert('Error creating admin account');
+            }
+        });
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const secureKey = document.getElementById('secureKey').value;
+            
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, secureKey })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.token;
+                    currentUser = data.user;
+                    localStorage.setItem('adminToken', authToken);
+                    
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    
+                    document.getElementById('userInfo').textContent = `Logged in as: ${email}`;
+                    
+                    loadBookings();
+                    updateStats();
+                } else {
+                    alert('Invalid credentials. Check your email, password, and secure key.');
+                }
+            } catch (error) {
+                alert('Login error');
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('adminToken');
+            
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            
+            // Clear form fields
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('secureKey').value = '';
+        });
+
+        // Load bookings
+        async function loadBookings() {
+            try {
+                const response = await fetch('/api/admin/bookings', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    const bookings = await response.json();
+                    displayBookings(bookings);
+                    updateStats(bookings);
+                }
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+            }
+        }
+
+        // Display bookings
+        function displayBookings(bookings) {
+            const container = document.getElementById('bookingsList');
+            container.innerHTML = '';
+            
+            if (bookings.length === 0) {
+                container.innerHTML = `
+                    <div class="p-8 text-center text-gray-500">
+                        <div class="text-4xl mb-4">📋</div>
+                        <p class="text-lg font-medium">No bookings yet</p>
+                        <p class="text-sm">When customers start booking tours, they'll appear here</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            bookings.forEach((booking) => {
+                const bookingElement = createBookingElement(booking);
+                container.appendChild(bookingElement);
+            });
+        }
+
+        // Create booking element
+        function createBookingElement(booking) {
+            const div = document.createElement('div');
+            div.className = 'p-4 hover:bg-gray-50 transition-colors';
+            
+            const statusClass = `status-${booking.status.toLowerCase()}`;
+            
+            div.innerHTML = `
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <h3 class="font-semibold text-gray-900">${booking.customer_name}</h3>
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">
+                                ${booking.status}
+                            </span>
+                        </div>
+                        
+                        <div class="text-sm text-gray-600 space-y-1">
+                            <div>📧 ${booking.customer_email}</div>
+                            <div>📞 ${booking.customer_phone || 'No phone'}</div>
+                            <div>👥 ${booking.adults} adults, ${booking.children} children</div>
+                            <div>💰 €${booking.total_price}</div>
+                            <div>📅 ${new Date(booking.tour_date).toLocaleDateString()}</div>
+                            <div>🕒 ${new Date(booking.created_at).toLocaleString()}</div>
+                        </div>
+                        
+                        ${booking.special_requests ? `<div class="mt-2 text-sm text-gray-700">💬 ${booking.special_requests}</div>` : ''}
+                    </div>
+                    
+                    <div class="ml-4">
+                        <select class="status-select border border-gray-300 rounded px-2 py-1 text-sm" 
+                                data-booking-id="${booking.id}" data-current-status="${booking.status}">
+                            <option value="pending" ${booking.status === 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="confirmed" ${booking.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                            <option value="cancelled" ${booking.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            
+            // Add status change handler
+            const statusSelect = div.querySelector('.status-select');
+            statusSelect.addEventListener('change', (e) => {
+                updateBookingStatus(booking.id, e.target.value);
+            });
+            
+            return div;
+        }
+
+        // Update booking status
+        async function updateBookingStatus(bookingId, newStatus) {
+            try {
+                const response = await fetch(`/api/admin/bookings/${bookingId}/status`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                
+                if (response.ok) {
+                    loadBookings(); // Reload to show updated status
+                } else {
+                    alert('Error updating status');
+                }
+            } catch (error) {
+                alert('Error updating status');
+            }
+        }
+
+        // Update stats
+        function updateStats(bookings = []) {
+            const total = bookings.length;
+            const pending = bookings.filter(b => b.status === 'pending').length;
+            
+            document.getElementById('totalBookings').textContent = total;
+            document.getElementById('pendingBookings').textContent = pending;
+        }
+
+        // Initialize
+        if (authToken) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            loadBookings();
+        } else {
+            checkAdminExists();
+        }
+    </script>
+</body>
+</html>
