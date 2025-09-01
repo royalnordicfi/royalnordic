@@ -275,7 +275,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               onClick={goToPreviousMonth}
               className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600"
             >
-              ←
+              ‹
             </button>
             
             <div className="text-center">
@@ -289,7 +289,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               onClick={goToNextMonth}
               className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600"
             >
-              →
+              ›
             </button>
           </div>
           

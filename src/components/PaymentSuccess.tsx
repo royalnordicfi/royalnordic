@@ -160,7 +160,7 @@ const PaymentSuccess: React.FC = () => {
             onClick={() => navigate('/')}
             className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors text-sm"
           >
-            ← Back to Home
+            Back to Home
           </button>
 
         </div>

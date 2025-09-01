@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft } from 'lucide-react';
+
 import { useNavigate } from 'react-router-dom';
 
 const TermsConditions: React.FC = () => {
@@ -7,14 +7,7 @@ const TermsConditions: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black">
-      {/* Back Button */}
-      <button
-        onClick={() => navigate('/')}
-        className="fixed top-24 left-8 z-50 bg-black/80 hover:bg-black/95 text-white p-4 rounded-full transition-all duration-300 shadow-xl hover:shadow-2xl backdrop-blur-md border border-white/30 hover:border-white/50 group"
-        aria-label="Go back to homepage"
-      >
-        <ArrowLeft className="w-7 h-7 group-hover:-translate-x-1 transition-transform duration-300" />
-      </button>
+
 
       <div className="max-w-4xl mx-auto px-4 py-24">
         <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10">
