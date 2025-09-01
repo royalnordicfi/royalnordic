@@ -11,6 +11,8 @@ const Contact = () => {
   });
 
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
@@ -21,6 +23,9 @@ const Contact = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    setIsSubmitting(true);
+    setSubmitError('');
     
     try {
       // Send email using Supabase Edge Function
@@ -38,8 +43,10 @@ const Contact = () => {
         }),
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to send message');
+        throw new Error(result.error || 'Failed to send message');
       }
 
       // Clear form after successful submission
@@ -54,14 +61,16 @@ const Contact = () => {
       // Show success message
       setShowSuccess(true);
       
-      // Hide success message after 3 seconds
+      // Hide success message after 5 seconds
       setTimeout(() => {
         setShowSuccess(false);
-      }, 3000);
+      }, 5000);
 
     } catch (err) {
       console.error('Error sending message:', err);
-      alert('Failed to send message. Please try again or contact us directly.');
+      setSubmitError(err instanceof Error ? err.message : 'Failed to send message. Please try again or contact us directly.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -193,16 +202,36 @@ const Contact = () => {
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white px-6 py-3 rounded-lg font-modern font-semibold text-base transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 shadow-lg hover:shadow-emerald-500/40"
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 disabled:from-emerald-400 disabled:to-emerald-300 text-white px-6 py-3 rounded-lg font-modern font-semibold text-base transition-all duration-300 transform hover:scale-105 disabled:scale-100 flex items-center justify-center space-x-2 shadow-lg hover:shadow-emerald-500/40 disabled:cursor-not-allowed"
               >
-                <span>Send Message</span>
-                <Send className="w-4 h-4" />
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Send Message</span>
+                    <Send className="w-4 h-4" />
+                  </>
+                )}
               </button>
             </form>
 
+            {submitError && (
+              <div className="mt-4 text-center text-red-400 text-sm font-clean bg-red-900/20 border border-red-500/30 rounded-lg p-3">
+                <p className="font-semibold">Error sending message:</p>
+                <p>{submitError}</p>
+                <p className="mt-2 text-xs">Please try again or contact us directly at contact@royalnordic.fi</p>
+              </div>
+            )}
+            
             {showSuccess && (
-              <div className="mt-4 text-center text-green-400 text-sm font-clean transition-all duration-500 ease-out animate-in fade-in slide-in-from-top-2">
-                Message sent successfully! We'll get back to you soon.
+              <div className="mt-4 text-center text-green-400 text-sm font-clean bg-green-900/20 border border-green-500/30 rounded-lg p-3 transition-all duration-500 ease-out animate-in fade-in slide-in-from-top-2">
+                <p className="font-semibold">Message sent successfully!</p>
+                <p>We'll get back to you within 24 hours.</p>
+                <p className="mt-2 text-xs">Check your email for a confirmation message.</p>
               </div>
             )}
           </div>
