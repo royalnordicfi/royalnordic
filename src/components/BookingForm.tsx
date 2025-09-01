@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Calendar, Users, Mail, Phone, MessageSquare, CreditCard } from 'lucide-react'
-import { createBooking } from '../lib/api'
+import { createBooking, getTourAvailability } from '../lib/api'
 import { createCheckoutSession, redirectToCheckout } from '../lib/stripe'
 import type { TourDate } from '../lib/supabase'
 
@@ -40,15 +40,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
   useEffect(() => {
     const loadAvailability = async () => {
       try {
-        // Use Node.js API instead of Supabase
-        const response = await fetch(`http://localhost:3001/api/availability/${tourId}`)
-        if (!response.ok) {
-          throw new Error('Failed to fetch availability')
-        }
-        const data = await response.json()
+        setError('')
+        const data = await getTourAvailability(tourId)
         setAvailability(data)
       } catch (err) {
         setError('Failed to load availability')
+        console.error('Availability error:', err)
       }
     }
 

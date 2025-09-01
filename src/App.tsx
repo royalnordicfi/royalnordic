@@ -12,10 +12,12 @@ import CustomizedTour from './components/CustomizedTour';
 import PaymentSuccess from './components/PaymentSuccess';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsConditions from './components/TermsConditions';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="App bg-black min-h-screen">
         <Header />
         <Routes>
