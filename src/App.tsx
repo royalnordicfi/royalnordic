@@ -22,16 +22,20 @@ function App() {
       <ScrollToTop />
       <div className="App bg-black min-h-screen">
         <Header />
-        <Hero />
         
-        {/* Main page components */}
-        <Tours />
-        <About />
-        <Contact />
-        <Footer />
-        
-        {/* Tour detail pages and routing */}
         <Routes>
+          {/* Homepage */}
+          <Route path="/" element={
+            <>
+              <Hero />
+              <Tours />
+              <About />
+              <Contact />
+              <Footer />
+            </>
+          } />
+          
+          {/* Tour detail pages */}
           <Route path="/northern-lights-tour" element={<NorthernLightsTour />} />
           <Route path="/snowshoe-rental" element={<SnowshoeRental />} />
           <Route path="/customized-tour" element={<CustomizedTour />} />
