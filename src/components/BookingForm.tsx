@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Calendar, Users, Mail, Phone, MessageSquare, CreditCard } from 'lucide-react'
 import { createBooking, getTourAvailability } from '../lib/api'
 import { createCheckoutSession, redirectToCheckout } from '../lib/stripe'
+import { createCryptoCheckout, redirectToCryptoCheckout } from '../lib/crypto'
 import type { TourDate } from '../lib/supabase'
 
 interface BookingFormProps {
@@ -231,6 +232,91 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Booking failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCryptoPayment = async () => {
+    setLoading(true)
+    setError('')
+
+    try {
+      // Validate form data
+      if (!formData.preferredDate) {
+        throw new Error('Please select a date')
+      }
+      if (!formData.fullName || !formData.email) {
+        throw new Error('Please fill in all required fields')
+      }
+
+      // Find the tour date ID for the selected date
+      const selectedDateData = availability.find(d => d.date === formData.preferredDate)
+      if (!selectedDateData) {
+        throw new Error('Selected date not found')
+      }
+
+      // Check availability one more time before proceeding
+      const availableSlots = getAvailableSlots(formData.preferredDate)
+      const requestedSlots = formData.adults + formData.children
+      if (requestedSlots > availableSlots) {
+        throw new Error(`Only ${availableSlots} slots available for this date`)
+      }
+
+      const totalPrice = calculateTotal()
+      const tourDate = (() => {
+        const [year, month, day] = formData.preferredDate.split('-').map(Number)
+        const date = new Date(year, month - 1, day)
+        return date.toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          month: 'long', 
+          day: 'numeric',
+          year: 'numeric'
+        })
+      })()
+
+      // Create Crypto Checkout
+      const cryptoCheckoutData = {
+        amount: totalPrice,
+        currency: 'eur',
+        tour_name: tourName,
+        tour_date: tourDate,
+        metadata: {
+          tour_id: tourId.toString(),
+          tour_date_id: selectedDateData.id.toString(),
+          customer_name: formData.fullName,
+          customer_email: formData.email,
+          adults: formData.adults.toString(),
+          children: formData.children.toString(),
+          total_price: totalPrice.toString(),
+          phone: formData.phone,
+          special_requests: formData.specialRequests
+        }
+      }
+
+      const cryptoResponse = await createCryptoCheckout(cryptoCheckoutData)
+
+      if (!cryptoResponse.success || !cryptoResponse.hosted_url) {
+        throw new Error(cryptoResponse.error || 'Failed to create crypto checkout')
+      }
+
+      // Store booking data in sessionStorage for email confirmation after payment
+      const bookingData = {
+        customer_name: formData.fullName,
+        customer_email: formData.email,
+        adults: formData.adults.toString(),
+        children: formData.children.toString(),
+        total_price: totalPrice.toString(),
+        tour_date: tourDate
+      }
+      
+      sessionStorage.setItem('pendingBooking', JSON.stringify(bookingData))
+
+      // Redirect to Coinbase Commerce Checkout
+      redirectToCryptoCheckout(cryptoResponse.hosted_url)
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Crypto payment failed')
     } finally {
       setLoading(false)
     }
@@ -525,13 +611,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
             type="button"
             disabled={loading || !formData.preferredDate}
             className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
-            onClick={() => {
-              // TODO: Implement crypto payment flow
-              alert('Crypto payments coming soon! 🚀')
-            }}
+            onClick={handleCryptoPayment}
           >
             <svg className="w-6 h-6 mr-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 12a2 2 0 112-2 2 2 0 01-2 2zm4 0a2 2 0 112-2 2 2 0 01-2 2z"/>
+              <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 12a2 2 0 112-2 2 2 0 01-2 2z"/>
             </svg>
             Pay by Crypto
           </button>
