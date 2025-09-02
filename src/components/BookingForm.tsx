@@ -260,7 +260,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         <p className="text-gray-600 text-sm">Select your preferred date and group size</p>
       </div>
       
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form className="space-y-6">
         {/* Date Selection */}
         <div>
           <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Choose a date</h4>
@@ -491,24 +491,51 @@ const BookingForm: React.FC<BookingFormProps> = ({
           </div>
         </div>
 
-        {/* Submit Button */}
-        <button 
-          type="submit"
-          disabled={loading || !formData.preferredDate}
-          className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center"
-        >
-          {loading ? (
-            <>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-              Processing...
-            </>
-          ) : (
-            <>
-              <span className="mr-2">🔒</span>
-              Checkout
-            </>
-          )}
-        </button>
+        {/* Payment Options */}
+        <div className="space-y-3">
+          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Choose Payment Method</h4>
+          
+          {/* Pay by Card/Bank Button */}
+          <button 
+            type="submit"
+            disabled={loading || !formData.preferredDate}
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+            onClick={(e) => {
+              e.preventDefault()
+              handleSubmit(e)
+            }}
+          >
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                Processing...
+              </>
+            ) : (
+              <>
+                <svg className="w-6 h-6 mr-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"/>
+                </svg>
+                Pay by Card / Bank
+              </>
+            )}
+          </button>
+
+          {/* Pay by Crypto Button */}
+          <button 
+            type="button"
+            disabled={loading || !formData.preferredDate}
+            className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+            onClick={() => {
+              // TODO: Implement crypto payment flow
+              alert('Crypto payments coming soon! 🚀')
+            }}
+          >
+            <svg className="w-6 h-6 mr-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 12a2 2 0 112-2 2 2 0 01-2 2zm4 0a2 2 0 112-2 2 2 0 01-2 2z"/>
+            </svg>
+            Pay by Crypto
+          </button>
+        </div>
 
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3">
