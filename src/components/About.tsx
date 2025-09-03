@@ -1,30 +1,9 @@
 import React from 'react';
-import { Award, Shield, Heart, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import ImageSlideshow from './ImageSlideshow';
 
 const About = () => {
-  const values = [
-    {
-      icon: <Award className="w-8 h-8" />,
-      title: "Excellence",
-      description: "We provide only the highest quality experiences with attention to every detail"
-    },
-    {
-      icon: <Shield className="w-8 h-8" />,
-      title: "Safety First",
-      description: "Your safety is our top priority with certified guides and premium equipment"
-    },
-    {
-      icon: <Heart className="w-8 h-8" />,
-      title: "Passion",
-      description: "Our love for the Arctic drives us to share its wonders with you"
-    },
-    {
-      icon: <Users className="w-8 h-8" />,
-      title: "Personal Service",
-      description: "Small groups and personalized attention ensure an unforgettable experience"
-    }
-  ];
+
 
   // Slideshow images for the About section
   const aboutImages = [

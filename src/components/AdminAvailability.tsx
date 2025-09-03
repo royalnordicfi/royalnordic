@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Calendar, Users, Save, Plus, X, RefreshCw } from 'lucide-react'
+import React, { useState, useEffect, useCallback } from 'react'
+import { Save, RefreshCw } from 'lucide-react'
 import { getTourAvailability, updateTourAvailability } from '../lib/api'
 import type { TourDate } from '../lib/supabase'
 
@@ -12,7 +12,7 @@ interface AdminAvailabilityProps {
 const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName, maxCapacity }) => {
   const [availability, setAvailability] = useState<TourDate[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [editingSlots, setEditingSlots] = useState<number>(0)
@@ -21,20 +21,19 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
   // Load availability data
   useEffect(() => {
     loadAvailability()
-  }, [tourId])
+  }, [tourId, loadAvailability])
 
-  const loadAvailability = async () => {
+  const loadAvailability = useCallback(async () => {
     try {
       setLoading(true)
       const data = await getTourAvailability(tourId)
       setAvailability(data)
     } catch (err) {
-      setError('Failed to load availability')
       console.error('Availability error:', err)
     } finally {
       setLoading(false)
     }
-  }
+  }, [tourId])
 
   // Get month name and year
   const getMonthYearString = () => {

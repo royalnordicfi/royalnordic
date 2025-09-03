@@ -1,11 +1,10 @@
 import React from 'react';
-import { CheckCircle, Snowflake, Mountain, Users, Clock, MapPin } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { CheckCircle, Users, Clock, MapPin } from 'lucide-react';
 import ImageSlideshow from './ImageSlideshow';
 import BookingForm from './BookingForm';
 
 const SnowshoeRental: React.FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const features = [
     'Professional snowshoe equipment for all sizes',

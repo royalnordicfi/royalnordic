@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { CheckCircle, Mail, Phone, MapPin, Clock, Users, Star } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { CheckCircle, Mail, MapPin, Clock, Users, Star } from 'lucide-react';
 import ImageSlideshow from './ImageSlideshow';
 
 const CustomizedTour: React.FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',

@@ -1,0 +1,19 @@
+# Supabase Edge Functions (Deno environment)
+supabase/functions/
+supabase/migrations/
+supabase/config.toml
+
+# Build outputs
+dist/
+build/
+
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Logs
+*.log

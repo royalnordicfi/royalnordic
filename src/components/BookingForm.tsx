@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Calendar, Users, Mail, Phone, MessageSquare, CreditCard } from 'lucide-react'
-import { createBooking, getTourAvailability } from '../lib/api'
+// import { Calendar, Users, Mail, Phone, MessageSquare, CreditCard } from 'lucide-react'
+import { getTourAvailability } from '../lib/api'
 import { createCheckoutSession, redirectToCheckout } from '../lib/stripe'
 import { createCryptoCheckout, redirectToCryptoCheckout } from '../lib/crypto'
 import type { TourDate } from '../lib/supabase'
@@ -68,19 +68,19 @@ const BookingForm: React.FC<BookingFormProps> = ({
   }, [])
 
   // Get dates for current month
-  const getCurrentMonthDates = () => {
-    const year = currentMonth.getFullYear()
-    const month = currentMonth.getMonth()
-    const firstDay = new Date(year, month, 1)
-    const lastDay = new Date(year, month + 1, 0)
-    const startDate = new Date(firstDay)
-    const endDate = new Date(lastDay)
-    
-    return availability.filter(date => {
-      const dateObj = new Date(date.date)
-      return dateObj >= startDate && dateObj <= endDate
-    })
-  }
+  // const getCurrentMonthDates = () => {
+  //   const year = currentMonth.getFullYear()
+  //   const month = currentMonth.getMonth()
+  //   const firstDay = new Date(year, month, 1)
+  //   const lastDay = new Date(year, month + 1, 0)
+  //   const startDate = new Date(firstDay)
+  //   const endDate = new Date(lastDay)
+  //   
+  //   return availability.filter(date => {
+  //     const dateObj = new Date(date.date)
+  //     return dateObj >= startDate && dateObj <= endDate
+  //   })
+  // }
 
   // Navigate to previous month
   const goToPreviousMonth = () => {
@@ -174,7 +174,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // 1. It's not in the past
       // 2. It's within the booking season
       // 3. Either it has availability data with slots > 0, OR no availability data exists (default to available)
-      const isAvailable = !isPastDate && isInSeason && (dateData ? dateData.remaining_slots > 0 : true)
+      const isAvailable = !isPastDate && isInSeason && (dateData ? (dateData.remaining_slots || 0) > 0 : true)
       
       // Determine date status:
       // - isPastDate: Past dates (gray)
@@ -205,13 +205,13 @@ const BookingForm: React.FC<BookingFormProps> = ({
     })
   }
 
-  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value) || 0
-    setFormData({
-      ...formData,
-      [e.target.name]: value
-    })
-  }
+  // const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const value = parseInt(e.target.value) || 0
+  //   setFormData({
+  //     ...formData,
+  //     [e.target.name]: value
+  //   })
+  // }
 
   const calculateTotal = () => {
     return (formData.adults * adultPrice) + (formData.children * childPrice)
@@ -222,11 +222,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
     return dateData?.remaining_slots || 0
   }
 
-  const isDateAvailable = (date: string) => {
-    const availableSlots = getAvailableSlots(date)
-    const requestedSlots = formData.adults + formData.children
-    return availableSlots >= requestedSlots
-  }
+  // const isDateAvailable = (date: string) => {
+  //   const availableSlots = getAvailableSlots(date)
+  //   const requestedSlots = formData.adults + formData.children
+  //   return availableSlots >= requestedSlots
+  // }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -417,7 +417,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 return <div key={`empty-${index}`} className="h-12"></div>
               }
               
-              const { day: calendarDay, date, available, remainingSlots, isPastDate, isOutOfSeason, isFullBooked } = day
+              const { day: calendarDay, date, available, remainingSlots, isPastDate, isFullBooked } = day
               const isAvailable = available && remainingSlots >= (formData.adults + formData.children)
               
               return (

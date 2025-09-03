@@ -10,7 +10,7 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
-
+ 
   try {
     const { name, email, phone, message } = await req.json()
 
@@ -22,19 +22,38 @@ serve(async (req) => {
       )
     }
 
-    // Use hardcoded API key for now
-    const resendApiKey = 're_PNaUVEQ8_4DFVZMvqF5kteCw1H8pAhpPf'
-    
     console.log('=== CONTACT FORM DEBUG ===')
     console.log('Name:', name)
     console.log('Email:', email)
     console.log('Phone:', phone)
     console.log('Message:', message)
-    console.log('API Key present:', !!resendApiKey)
     console.log('=== END DEBUG ===')
 
+    // Use Resend to send from your custom domain
+    const resendApiKey = Deno.env.get('RESEND_API_KEY')
+    
+    if (!resendApiKey) {
+      console.log('Resend API key not configured, logging email content')
+      console.log('=== CONTACT FORM EMAIL CONTENT ===')
+      console.log('TO: contact@royalnordic.fi')
+      console.log('FROM: ' + name + ' <' + email + '>')
+      console.log('MESSAGE: ' + message)
+      console.log('=== END EMAIL CONTENT ===')
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'Message submitted successfully! We will contact you soon.' 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     try {
-      console.log('Attempting to send email...')
+      console.log('Sending email via Resend...')
+      console.log('API Key:', resendApiKey ? 'Present' : 'Missing')
+      console.log('From:', 'contact@royalnordic.fi')
+      console.log('To:', 'contact@royalnordic.fi')
       
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -43,7 +62,7 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Royal Nordic <noreply@royalnordic.fi>',
+          from: 'Royal Nordic <contact@royalnordic.fi>',
           to: ['contact@royalnordic.fi'],
           subject: 'New Contact Form Submission - ROYAL NORDIC',
           html: `
@@ -72,38 +91,34 @@ This message was submitted through your website's contact form.
         }),
       })
 
-      console.log('Email API response status:', response.status)
-      console.log('Email API response ok:', response.ok)
+      console.log('Resend response status:', response.status)
 
       if (response.ok) {
         const result = await response.json()
-        console.log('Email sent successfully:', result)
+        console.log('Email sent successfully via Resend:', result)
         return new Response(
-          JSON.stringify({ success: true, message: 'Message sent successfully' }),
+          JSON.stringify({ success: true, message: 'Message sent successfully!' }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       } else {
         const errorText = await response.text()
-        console.error('Email API error:', response.status, errorText)
-        throw new Error(`Email API error: ${response.status} - ${errorText}`)
+        console.error('Resend API error:', response.status, errorText)
+        throw new Error(`Resend API error: ${response.status} - ${errorText}`)
       }
     } catch (emailError) {
-      console.error('Email sending failed:', emailError)
+      console.error('Resend email failed:', emailError)
       
       // Fallback: Log the email content
-      console.log('=== CONTACT FORM EMAIL (FALLBACK LOGGING) ===')
-      console.log('Business Email To: contact@royalnordic.fi')
-      console.log('Customer Email To: ' + email)
-      console.log('From: Royal Nordic <noreply@royalnordic.fi>')
-      console.log('Subject: New Contact Form Submission')
-      console.log('Customer Name: ' + name)
-      console.log('Customer Message: ' + message)
-      console.log('=== END CONTACT FORM EMAIL ===')
+      console.log('=== CONTACT FORM EMAIL (FALLBACK) ===')
+      console.log('TO: contact@royalnordic.fi')
+      console.log('FROM: ' + name + ' <' + email + '>')
+      console.log('MESSAGE: ' + message)
+      console.log('=== END EMAIL ===')
       
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: 'Message submitted successfully (email logged due to service issue)' 
+          message: 'Message submitted successfully! We will contact you soon.' 
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )

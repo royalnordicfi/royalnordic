@@ -1,11 +1,9 @@
-import React from 'react';
-import { Star, Clock, Users, MapPin, CheckCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Clock, Users, MapPin, CheckCircle } from 'lucide-react';
 import ImageSlideshow from './ImageSlideshow';
 import BookingForm from './BookingForm';
 
 const NorthernLightsTour = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const features = [
     'Guaranteed Northern Lights - 100% money back guarantee',
@@ -39,18 +37,18 @@ const NorthernLightsTour = () => {
     }
   ];
 
-  const pricing = [
-    {
-      option: "Adult (15+ years)",
-      price: "€179",
-      includes: ["All equipment", "Professional guide", "Hot drinks & snacks", "Transportation"]
-    },
-    {
-      option: "Child (0-14 years)",
-      price: "€129",
-      includes: ["All equipment", "Professional guide", "Hot drinks & snacks", "Transportation"]
-    }
-  ];
+  // const pricing = [
+  //   {
+  //     option: "Adult (15+ years)",
+  //     price: "€179",
+  //     includes: ["All equipment", "Professional guide", "Hot drinks & snacks", "Transportation"]
+  //   },
+  //   {
+  //     option: "Child (0-14 years)",
+  //     price: "€129",
+  //     includes: ["All equipment", "Professional guide", "Hot drinks & snacks", "Transportation"]
+  //   }
+  // ];
 
   return (
     <div className="min-h-screen bg-black">
