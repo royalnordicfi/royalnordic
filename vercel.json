@@ -57,6 +57,10 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "VITE_SUPABASE_URL": "https://itihdgqgvlphtyidnvkt.supabase.co",
+    "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0aWhkZ3FndmxwaHR5aWRudmt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwNTk2NjQsImV4cCI6MjA3MTYzNTY2NH0.pF02EbMsV2Aj03kiyu8eAGAa0QmQ5jCi5JzncJ5T0Rc",
+    "VITE_STRIPE_PUBLISHABLE_KEY": "pk_test_51OtxyKJaLKgqCUlihnW8deZ1igd8ssjzJKLvUB9DlD6zkyk6Kxws4lboGUOiw4alnDEIEWEgz2OW5Qfg5KQgjB300sytCSagP",
+    "RESEND_API_KEY": "re_PNaUVEQ8_4DFVZMvqF5kteCw1H8pAhpPf"
   }
 }
