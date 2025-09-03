@@ -450,6 +450,55 @@ const AdminPanel: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Tour Availability Management */}
+      <div className="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Tour Availability Management</h2>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Northern Lights Tour */}
+          <div className="border border-gray-200 rounded-lg p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Northern Lights Tour</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Season:</span>
+                <span className="text-sm font-medium">Oct 1 - Apr 15</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Max Capacity:</span>
+                <span className="text-sm font-medium">8 people</span>
+              </div>
+              <button
+                onClick={() => window.open('/admin-availability?tour=1', '_blank')}
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Manage Availability
+              </button>
+            </div>
+          </div>
+
+          {/* Snowshoe Rental */}
+          <div className="border border-gray-200 rounded-lg p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Snowshoe Rental</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Season:</span>
+                <span className="text-sm font-medium">Nov 1 - Apr 1</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Max Capacity:</span>
+                <span className="text-sm font-medium">3 people</span>
+              </div>
+              <button
+                onClick={() => window.open('/admin-availability?tour=2', '_blank')}
+                className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Manage Availability
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

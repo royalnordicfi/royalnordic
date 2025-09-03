@@ -11,6 +11,8 @@ interface BookingFormProps {
   adultPrice: number
   childPrice: number
   maxCapacity: number
+  seasonStart?: string
+  seasonEnd?: string
 }
 
 const BookingForm: React.FC<BookingFormProps> = ({ 
@@ -18,7 +20,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
   tourName, 
   adultPrice, 
   childPrice, 
-  maxCapacity
+  maxCapacity,
+  seasonStart,
+  seasonEnd
 }) => {
   const [formData, setFormData] = useState({
     preferredDate: '',
@@ -53,6 +57,16 @@ const BookingForm: React.FC<BookingFormProps> = ({
     loadAvailability()
   }, [tourId])
 
+  // Update calendar every minute to stay current with Finnish time
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Force re-render to update past dates
+      setCurrentMonth(prev => new Date(prev.getTime()))
+    }, 60000) // Update every minute
+
+    return () => clearInterval(interval)
+  }, [])
+
   // Get dates for current month
   const getCurrentMonthDates = () => {
     const year = currentMonth.getFullYear()
@@ -83,6 +97,28 @@ const BookingForm: React.FC<BookingFormProps> = ({
     return currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
   }
 
+  // Helper to check if a date is within the booking season
+  const isDateInSeason = (date: Date) => {
+    if (!seasonStart || !seasonEnd) return true
+    
+    const currentYear = date.getFullYear()
+    const [startMonth, startDay] = seasonStart.split('-').map(Number)
+    const [endMonth, endDay] = seasonEnd.split('-').map(Number)
+    
+    const seasonStartDate = new Date(currentYear, startMonth - 1, startDay)
+    const seasonEndDate = new Date(currentYear, endMonth - 1, endDay)
+    
+    // Handle season spanning across year (e.g., Nov 1 - Apr 1)
+    if (endMonth < startMonth) {
+      if (date.getMonth() >= startMonth - 1 || date.getMonth() <= endMonth - 1) {
+        return true
+      }
+    } else {
+      return date >= seasonStartDate && date <= seasonEndDate
+    }
+    
+    return false
+  }
 
 
   // Get calendar grid for current month
@@ -104,6 +140,18 @@ const BookingForm: React.FC<BookingFormProps> = ({
     const grid = []
     const firstDayOfWeek = firstDay.getDay()
     const daysInMonth = lastDay.getDate()
+    
+    // Get today's date in Finnish timezone (UTC+2/UTC+3)
+    const now = new Date()
+    const finnishTime = new Date(now.getTime() + (2 * 60 * 60 * 1000)) // UTC+2 (winter time)
+    // Check if it's summer time (March to October)
+    const isSummerTime = finnishTime.getMonth() >= 2 && finnishTime.getMonth() <= 9
+    if (isSummerTime) {
+      finnishTime.setTime(finnishTime.getTime() + (60 * 60 * 1000)) // Add 1 more hour for summer time (UTC+3)
+    }
+    
+    const today = new Date(finnishTime.getFullYear(), finnishTime.getMonth(), finnishTime.getDate())
+    today.setHours(0, 0, 0, 0)
 
     // Add empty cells for days before the first of the month
     for (let i = 0; i < firstDayOfWeek; i++) {
@@ -112,15 +160,38 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
     // Add all days of the month
     for (let day = 1; day <= daysInMonth; day++) {
-      // Fix: Use proper date formatting that matches the database format
       const dateString = new Date(year, month, day).toISOString().split('T')[0]
+      const dateObj = new Date(year, month, day)
       const dateData = monthDates.find(d => d.date === dateString)
+      
+      // Check if date is in the past (before today in Finnish time)
+      const isPastDate = dateObj < today
+      
+      // Check if date is within booking season
+      const isInSeason = isDateInSeason(dateObj)
+      
+      // Date is available if:
+      // 1. It's not in the past
+      // 2. It's within the booking season
+      // 3. Either it has availability data with slots > 0, OR no availability data exists (default to available)
+      const isAvailable = !isPastDate && isInSeason && (dateData ? dateData.remaining_slots > 0 : true)
+      
+      // Determine date status:
+      // - isPastDate: Past dates (gray)
+      // - isOutOfSeason: Dates outside booking season (gray)
+      // - isFullBooked: Dates with 0 remaining slots (red)
+      // - isAvailable: Dates that can be booked (white)
+      const isOutOfSeason = !isInSeason
+      const isFullBooked = dateData && dateData.remaining_slots !== undefined && dateData.remaining_slots === 0
       
       grid.push({
         day,
         date: dateString,
-        available: dateData ? dateData.remaining_slots > 0 : false,
-        remainingSlots: dateData?.remaining_slots || 0
+        available: isAvailable,
+        remainingSlots: dateData?.remaining_slots ?? maxCapacity,
+        isPastDate,
+        isOutOfSeason,
+        isFullBooked
       })
     }
 
@@ -312,7 +383,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 return <div key={`empty-${index}`} className="h-12"></div>
               }
               
-              const { day: calendarDay, date, available, remainingSlots } = day
+              const { day: calendarDay, date, available, remainingSlots, isPastDate, isOutOfSeason, isFullBooked } = day
               const isAvailable = available && remainingSlots >= (formData.adults + formData.children)
               
               return (
@@ -323,6 +394,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
                   className={`h-12 rounded text-sm font-medium transition-colors ${
                     formData.preferredDate === date
                       ? 'bg-blue-600 text-white'
+                      : isPastDate
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : isFullBooked
+                      ? 'bg-red-100 text-red-600 border border-red-200'
                       : isAvailable
                       ? 'bg-white border border-gray-300 hover:bg-blue-50 text-gray-900'
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'

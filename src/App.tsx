@@ -15,28 +15,31 @@ import TermsConditions from './components/TermsConditions';
 import ScrollToTop from './components/ScrollToTop';
 
 function App() {
-  console.log('App component rendering...'); // Debug log
-  
   return (
     <Router>
-      <ScrollToTop />
-      <div className="App bg-black min-h-screen">
+      <div className="App">
+        <ScrollToTop />
         <Header />
         
-        {/* Test with minimal components first */}
         <Routes>
-          {/* Homepage - only essential components */}
+          {/* Homepage */}
           <Route path="/" element={
             <>
               <Hero />
-              <Tours />
-              <About />
-              <Contact />
+              <div id="tours">
+                <Tours />
+              </div>
+              <div id="about">
+                <About />
+              </div>
+              <div id="contact">
+                <Contact />
+              </div>
               <Footer />
             </>
           } />
           
-          {/* Tour detail pages */}
+          {/* Tour Detail Pages */}
           <Route path="/northern-lights-tour" element={<NorthernLightsTour />} />
           <Route path="/snowshoe-rental" element={<SnowshoeRental />} />
           <Route path="/customized-tour" element={<CustomizedTour />} />
@@ -44,8 +47,6 @@ function App() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
         </Routes>
-        
-
       </div>
     </Router>
   );

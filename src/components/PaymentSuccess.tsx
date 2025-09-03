@@ -25,10 +25,11 @@ const PaymentSuccess: React.FC = () => {
 
   const sendConfirmationEmail = async (data: any) => {
     try {
-      const response = await fetch('http://localhost:3001/api/send-stripe-confirmation', {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-tour-booking-notification`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
           customerName: data.customer_name,
@@ -37,7 +38,7 @@ const PaymentSuccess: React.FC = () => {
           children: parseInt(data.children),
           totalPrice: data.total_price,
           tourDate: data.tour_date,
-          tourName: 'Northern Lights Tour'
+          tourName: data.tour_name || 'Tour Booking'
         }),
       })
 

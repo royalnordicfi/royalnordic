@@ -33,6 +33,120 @@ export async function getTourAvailability(tourId: number, startDate?: string, en
   })) || []
 }
 
+// Update tour availability API
+export async function updateTourAvailability(tourId: number, date: string, availableSlots: number) {
+  // Check if date already exists
+  const { data: existingDate, error: checkError } = await supabase
+    .from('tour_dates')
+    .select('id')
+    .eq('tour_id', tourId)
+    .eq('date', date)
+    .single()
+
+  if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows returned
+    throw new Error(checkError.message)
+  }
+
+  if (existingDate) {
+    // Update existing date
+    const { error: updateError } = await supabase
+      .from('tour_dates')
+      .update({ 
+        available_slots: availableSlots,
+        total_booked: 0 // Reset booked slots when updating availability
+      })
+      .eq('id', existingDate.id)
+
+    if (updateError) {
+      throw new Error(updateError.message)
+    }
+  } else {
+    // Create new date
+    const { error: insertError } = await supabase
+      .from('tour_dates')
+      .insert([{
+        tour_id: tourId,
+        date: date,
+        available_slots: availableSlots,
+        total_booked: 0
+      }])
+
+    if (insertError) {
+      throw new Error(insertError.message)
+    }
+  }
+
+  return { success: true }
+}
+
+// Get all tours API
+export async function getAllTours() {
+  const { data, error } = await supabase
+    .from('tours')
+    .select('*')
+    .order('id')
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data || []
+}
+
+// Update tour pricing API
+export async function updateTourPricing(tourId: number, adultPrice: number, childPrice: number, maxCapacity: number) {
+  const { error } = await supabase
+    .from('tours')
+    .update({ 
+      adult_price: adultPrice,
+      child_price: childPrice,
+      max_capacity: maxCapacity
+    })
+    .eq('id', tourId)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return { success: true }
+}
+
+// Get tour statistics API
+export async function getTourStatistics(tourId: number) {
+  const { data: dates, error: datesError } = await supabase
+    .from('tour_dates')
+    .select('available_slots, total_booked')
+    .eq('tour_id', tourId)
+
+  if (datesError) {
+    throw new Error(datesError.message)
+  }
+
+  const { data: bookings, error: bookingsError } = await supabase
+    .from('bookings')
+    .select('total_price, status')
+    .eq('tour_id', tourId)
+
+  if (bookingsError) {
+    throw new Error(bookingsError.message)
+  }
+
+  const totalDates = dates?.length || 0
+  const totalAvailableSlots = dates?.reduce((sum, date) => sum + date.available_slots, 0) || 0
+  const totalBookedSlots = dates?.reduce((sum, date) => sum + date.total_booked, 0) || 0
+  const totalRevenue = bookings?.filter(b => b.status === 'confirmed').reduce((sum, b) => sum + b.total_price, 0) || 0
+  const totalBookings = bookings?.length || 0
+
+  return {
+    totalDates,
+    totalAvailableSlots,
+    totalBookedSlots,
+    totalRevenue,
+    totalBookings,
+    occupancyRate: totalAvailableSlots > 0 ? (totalBookedSlots / totalAvailableSlots) * 100 : 0
+  }
+}
+
 // Create booking API
 export async function createBooking(bookingData: {
   tour_id: number

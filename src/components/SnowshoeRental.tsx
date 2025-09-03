@@ -162,6 +162,8 @@ const SnowshoeRental: React.FC = () => {
                   adultPrice={89}
                   childPrice={69}
                   maxCapacity={3}
+                  seasonStart="11-01"
+                  seasonEnd="04-01"
                 />
               </div>
             </div>

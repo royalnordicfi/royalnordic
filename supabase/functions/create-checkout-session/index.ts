@@ -33,7 +33,7 @@ serve(async (req) => {
     })
 
     const session = await stripe.createCheckoutSession({
-      payment_method_types: ['card'],
+      payment_method_types: ['card', 'sepa_debit', 'pay_by_bank'],
       line_items: [
         {
           price_data: {
