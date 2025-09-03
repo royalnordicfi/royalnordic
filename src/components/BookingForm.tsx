@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Calendar, Users, Mail, Phone, MessageSquare, CreditCard } from 'lucide-react'
 import { createBooking, getTourAvailability } from '../lib/api'
 import { createCheckoutSession, redirectToCheckout } from '../lib/stripe'
-// import { createCryptoCheckout, redirectToCryptoCheckout } from '../lib/crypto'
+import { createCryptoCheckout, redirectToCryptoCheckout } from '../lib/crypto'
 import type { TourDate } from '../lib/supabase'
 
 interface BookingFormProps {
@@ -308,10 +308,44 @@ const BookingForm: React.FC<BookingFormProps> = ({
     }
   }
 
-  // const handleCryptoPayment = async () => {
-  //   // Temporarily disabled for debugging
-  //   alert('Crypto payments temporarily disabled for debugging')
-  // }
+  const handleCryptoPayment = async () => {
+    try {
+      setLoading(true)
+      setError('')
+      
+      // Create crypto checkout
+      const cryptoData = {
+        amount: calculateTotal(),
+        currency: 'eur',
+        tour_name: tourName,
+        tour_date: formData.preferredDate,
+        metadata: {
+          tour_id: tourId.toString(),
+          tour_date_id: '0', // Will be set after availability check
+          customer_name: formData.fullName,
+          customer_email: formData.email,
+          adults: formData.adults.toString(),
+          children: formData.children.toString(),
+          total_price: calculateTotal().toString(),
+          phone: formData.phone,
+          special_requests: formData.specialRequests
+        }
+      }
+      
+      const result = await createCryptoCheckout(cryptoData)
+      
+      if (result.success && result.hosted_url) {
+        redirectToCryptoCheckout(result.hosted_url)
+      } else {
+        throw new Error(result.error || 'Crypto checkout failed')
+      }
+    } catch (error) {
+      console.error('Crypto payment error:', error)
+      setError('Crypto payment failed. Please try card payment instead.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   if (success) {
     return (
@@ -606,7 +640,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
             type="button"
             disabled={loading || !formData.preferredDate}
             className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
-            onClick={() => alert('Crypto payments temporarily disabled for debugging')}
+                            onClick={handleCryptoPayment}
           >
             <svg className="w-6 h-6 mr-3 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 12a2 2 0 112-2 2 2 0 01-2 2z"/>
