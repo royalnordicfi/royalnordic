@@ -23,8 +23,9 @@ function App() {
       <div className="App bg-black min-h-screen">
         <Header />
         
+        {/* Test with minimal components first */}
         <Routes>
-          {/* Homepage */}
+          {/* Homepage - only essential components */}
           <Route path="/" element={
             <>
               <Hero />
@@ -43,6 +44,8 @@ function App() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
         </Routes>
+        
+
       </div>
     </Router>
   );
