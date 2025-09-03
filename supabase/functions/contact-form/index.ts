@@ -62,18 +62,19 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Royal Nordic <contact@royalnordic.fi>',
+          from: 'Royal Nordic <onboarding@resend.dev>',
           to: ['contact@royalnordic.fi'],
+          reply_to: [email],
           subject: 'New Contact Form Submission - ROYAL NORDIC',
           html: `
             <h2>New Contact Form Submission</h2>
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Customer Inquiry From:</strong> ${name} (${email})</p>
             <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
             <p><strong>Message:</strong></p>
             <p>${message}</p>
             <hr>
-            <p><em>This message was submitted through your website's contact form.</em></p>
+            <p><em>This inquiry was submitted through your website's contact form.</em></p>
+            <p><em>To reply to the customer, simply reply to this email - it will go to ${email}</em></p>
           `,
           text: `
 New Contact Form Submission
