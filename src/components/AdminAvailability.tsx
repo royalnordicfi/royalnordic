@@ -25,6 +25,11 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
     loadAvailability()
   }, [tourId, loadAvailability])
 
+  // Auto-refresh availability when month changes
+  useEffect(() => {
+    loadAvailability()
+  }, [currentMonth, loadAvailability])
+
   const loadAvailability = useCallback(async () => {
     try {
       setLoading(true)
@@ -100,12 +105,18 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
       const dateString = new Date(year, month, day).toISOString().split('T')[0]
       const dateData = monthDates.find(d => d.date === dateString)
       
+      // Check if date is in the past
+      const today = new Date()
+      const todayString = today.toISOString().split('T')[0]
+      const isPastDate = dateString < todayString
+      
       grid.push({
         day,
         date: dateString,
         available: dateData ? dateData.remaining_slots > 0 : false,
         remainingSlots: dateData?.remaining_slots || 0,
-        hasData: !!dateData
+        hasData: !!dateData,
+        isPastDate
       })
     }
 
@@ -287,16 +298,19 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
                 return <div key={`empty-${index}`} className="h-16"></div>
               }
               
-              const { day: calendarDay, date, available, remainingSlots, hasData } = day
+              const { day: calendarDay, date, available, remainingSlots, hasData, isPastDate } = day
               
               return (
                 <button
                   key={date} 
                   type="button"
-                  onClick={() => handleDateClick(date, remainingSlots)}
+                  onClick={() => !isPastDate && handleDateClick(date, remainingSlots)}
+                  disabled={isPastDate}
                   className={`h-16 rounded text-sm font-medium transition-colors border ${
                     selectedDate === date
                       ? 'bg-blue-600 text-white border-blue-600'
+                      : isPastDate
+                      ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60'
                       : available
                       ? 'bg-green-50 text-green-900 border-green-200 hover:bg-green-100'
                       : hasData
@@ -306,7 +320,7 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
                 >
                   <div className="text-xs font-bold">{calendarDay}</div>
                   <div className="text-xs">
-                    {hasData ? `${remainingSlots} slots` : 'No data'}
+                    {isPastDate ? 'Past' : hasData ? `${remainingSlots} slots` : 'No data'}
                   </div>
                 </button>
               )
@@ -374,7 +388,7 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
         {/* Legend */}
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Legend</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="flex items-center space-x-3">
               <div className="w-6 h-6 bg-green-50 border border-green-200 rounded"></div>
               <span className="text-sm text-gray-700">Available (has slots)</span>
@@ -386,6 +400,10 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
             <div className="flex items-center space-x-3">
               <div className="w-6 h-6 bg-gray-50 border border-gray-200 rounded"></div>
               <span className="text-sm text-gray-700">No availability data</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="w-6 h-6 bg-gray-100 border border-gray-200 rounded opacity-60"></div>
+              <span className="text-sm text-gray-700">Past dates (read-only)</span>
             </div>
           </div>
         </div>
