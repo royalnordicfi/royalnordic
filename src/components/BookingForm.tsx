@@ -70,6 +70,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
         console.log('Availability data loaded:', transformedData.length, 'dates')
         console.log('First few dates:', transformedData.slice(0, 5))
         console.log('Sample date object:', transformedData[0])
+        console.log('Sample date details:', {
+          id: transformedData[0]?.id,
+          date: transformedData[0]?.date,
+          remaining_slots: transformedData[0]?.remaining_slots,
+          available_slots: transformedData[0]?.available_slots
+        })
         setAvailability(transformedData)
       } catch (err) {
         setError('Failed to load availability')
@@ -197,6 +203,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // 2. Either it has availability data with slots > 0, OR no availability data exists (default to available)
       // Note: Season filtering removed - let database determine available dates
       const isAvailable = !isPastDate && (dateData ? (dateData.remaining_slots || 0) > 0 : true)
+      
+      // Debug logging for September 15th
+      if (dateString === '2025-09-15') {
+        console.log('September 15th debug:', {
+          dateString,
+          dateData,
+          isPastDate,
+          isAvailable,
+          remaining_slots: dateData?.remaining_slots
+        })
+      }
       
       // Determine date status:
       // - isPastDate: Past dates (gray)
