@@ -10,7 +10,6 @@ interface BookingFormProps {
   tourName: string
   adultPrice: number
   childPrice: number
-  maxCapacity: number
   seasonStart?: string
   seasonEnd?: string
 }
@@ -20,7 +19,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
   tourName, 
   adultPrice, 
   childPrice, 
-  maxCapacity,
   seasonStart,
   seasonEnd
 }) => {
@@ -82,11 +80,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
         })
         
         // Debug: Check if September 15th is in the data
-        const sept15 = transformedData.find(d => d.date === '2025-09-15')
+        const sept15 = transformedData.find((d: any) => d.date === '2025-09-15')
         console.log('September 15th in data:', sept15)
         
         // Debug: Check if September 1st is in the data (should NOT be)
-        const sept1 = transformedData.find(d => d.date === '2025-09-01')
+        const sept1 = transformedData.find((d: any) => d.date === '2025-09-01')
         console.log('September 1st in data:', sept1)
         setAvailability(transformedData)
       } catch (err) {
@@ -140,16 +138,18 @@ const BookingForm: React.FC<BookingFormProps> = ({
     return currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
   }
 
-  // Helper to check if a date is within the booking season
-  const isDateInSeason = (date: Date) => {
-    if (!seasonStart || !seasonEnd) return true
+
+
+  // Check if a date is in the tour season
+  const isDateInSeason = (dateString: string) => {
+    if (!seasonStart || !seasonEnd) return true // If no season defined, show all dates
     
-    const currentYear = date.getFullYear()
+    const date = new Date(dateString)
     const [startMonth, startDay] = seasonStart.split('-').map(Number)
     const [endMonth, endDay] = seasonEnd.split('-').map(Number)
     
-    const seasonStartDate = new Date(currentYear, startMonth - 1, startDay)
-    const seasonEndDate = new Date(currentYear, endMonth - 1, endDay)
+    const seasonStartDate = new Date(date.getFullYear(), startMonth - 1, startDay)
+    const seasonEndDate = new Date(date.getFullYear(), endMonth - 1, endDay)
     
     // Handle season spanning across year (e.g., Nov 1 - Apr 1)
     if (endMonth < startMonth) {
@@ -162,7 +162,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
     
     return false
   }
-
 
   // Get calendar grid for current month
   const getCalendarGrid = () => {
@@ -185,7 +184,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
     const daysInMonth = lastDay.getDate()
     
     // Use simple date comparison to avoid timezone issues
-    // For tour booking, we'll consider dates from today onwards as available
     const today = new Date()
     const todayString = today.toISOString().split('T')[0] // Get YYYY-MM-DD format
 
@@ -194,26 +192,23 @@ const BookingForm: React.FC<BookingFormProps> = ({
       grid.push(null)
     }
 
-    // Add all days of the month
+    // Add ALL days of the month (professional approach)
     for (let day = 1; day <= daysInMonth; day++) {
       const dateString = new Date(year, month, day).toISOString().split('T')[0]
-      const dateObj = new Date(year, month, day)
       const dateData = monthDates.find(d => d.date === dateString)
       
       // Check if date is in the past (before today)
       const isPastDate = dateString < todayString
       
-      // CRITICAL FIX: Only show dates that exist in the database
-      // If no availability data exists, don't show the date at all
-      if (!dateData) {
-        // Don't add this date to the calendar - it doesn't exist in the database
-        continue
-      }
+      // Check if date is in season
+      const inSeason = isDateInSeason(dateString)
       
-      // Date is available if:
-      // 1. It's not in the past
-      // 2. It has availability data with slots > 0
-      const isAvailable = !isPastDate && (dateData.remaining_slots || 0) > 0
+      // Determine date status:
+      // - isPastDate: Past dates (gray, disabled)
+      // - !inSeason: Out of season (gray, disabled) 
+      // - isFullBooked: Dates with 0 remaining slots (red, shows authenticity)
+      // - isAvailable: Dates that can be booked (white, clickable)
+      const isAvailable = !isPastDate && inSeason && dateData && (dateData.remaining_slots || 0) > 0
       
       // Debug logging for September 15th
       if (dateString === '2025-09-15') {
@@ -251,18 +246,19 @@ const BookingForm: React.FC<BookingFormProps> = ({
       }
       
       // Determine date status:
-      // - isPastDate: Past dates (gray)
-      // - isFullBooked: Dates with 0 remaining slots (red)
-      // - isAvailable: Dates that can be booked (white)
+      // - isPastDate: Past dates (gray, disabled)
+      // - !inSeason: Out of season (gray, disabled) 
+      // - isFullBooked: Dates with 0 remaining slots (red, shows authenticity)
+      // - isAvailable: Dates that can be booked (white, clickable)
       const isFullBooked = dateData && dateData.remaining_slots !== undefined && dateData.remaining_slots === 0
       
       grid.push({
         day,
         date: dateString,
         available: isAvailable,
-        remainingSlots: dateData?.remaining_slots ?? maxCapacity,
+        remainingSlots: dateData?.remaining_slots ?? 0,
         isPastDate,
-        isOutOfSeason: false, // No longer using season filtering
+        isOutOfSeason: !inSeason,
         isFullBooked
       })
     }
@@ -388,6 +384,15 @@ const BookingForm: React.FC<BookingFormProps> = ({
       setLoading(true)
       setError('')
       
+      // Find the tour date ID for the selected date
+      const selectedDateData = availability.find(d => d.date === formData.preferredDate)
+      if (!selectedDateData) {
+        throw new Error('Selected date not found')
+      }
+      
+      // Use a fallback ID if not provided (for mock data)
+      const tourDateId = selectedDateData.id || Date.now()
+      
       // Create crypto checkout
       const cryptoData = {
         amount: calculateTotal(),
@@ -492,7 +497,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 return <div key={`empty-${index}`} className="h-12"></div>
               }
               
-              const { day: calendarDay, date, available, remainingSlots, isPastDate, isFullBooked } = day
+              const { day: calendarDay, date, available, remainingSlots, isPastDate, isOutOfSeason, isFullBooked } = day
               const isAvailable = available && remainingSlots >= (formData.adults + formData.children)
               
               // Debug logging for September 15th
@@ -503,7 +508,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
                   adults: formData.adults,
                   children: formData.children,
                   totalRequested: formData.adults + formData.children,
-                  isAvailable
+                  isAvailable,
+                  isOutOfSeason,
+                  isFullBooked
                 })
               }
               
@@ -511,14 +518,16 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 <button
                   key={date} 
                   type="button"
-                  onClick={() => setFormData({...formData, preferredDate: date})}
+                  onClick={() => isAvailable && setFormData({...formData, preferredDate: date})}
                   className={`h-12 rounded text-sm font-medium transition-colors ${
                     formData.preferredDate === date
                       ? 'bg-blue-600 text-white'
                       : isPastDate
                       ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : isOutOfSeason
+                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                       : isFullBooked
-                      ? 'bg-red-100 text-red-600 border border-red-200'
+                      ? 'bg-red-100 text-red-600 border border-red-200 cursor-not-allowed'
                       : isAvailable
                       ? 'bg-white border border-gray-300 hover:bg-blue-50 text-gray-900'
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -529,6 +538,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
                   <div className="text-xs text-emerald-600 font-semibold">€{adultPrice}</div>
                   {isAvailable && (
                     <div className="text-xs text-gray-500">{remainingSlots} slots</div>
+                  )}
+                  {isFullBooked && (
+                    <div className="text-xs text-red-600 font-semibold">FULL</div>
+                  )}
+                  {isOutOfSeason && (
+                    <div className="text-xs text-gray-500">Closed</div>
                   )}
                 </button>
               )
