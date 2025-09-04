@@ -113,3 +113,4 @@ This project is private and proprietary to Royal Nordic.
 
 For support, contact the development team or create an issue in the repository.
 # Deployment trigger
+# Trigger Vercel auto-deploy
