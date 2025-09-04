@@ -69,6 +69,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         
         console.log('Availability data loaded:', transformedData.length, 'dates')
         console.log('First few dates:', transformedData.slice(0, 5))
+        console.log('Sample date object:', transformedData[0])
         setAvailability(transformedData)
       } catch (err) {
         setError('Failed to load availability')
@@ -190,9 +191,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
       
       // Check if date is in the past (before today in Finnish time)
       const isPastDate = dateObj < today
-      
-      // Check if date is within booking season
-      const isInSeason = isDateInSeason(dateObj)
       
       // Date is available if:
       // 1. It's not in the past
