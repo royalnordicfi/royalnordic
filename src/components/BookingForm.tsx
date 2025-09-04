@@ -51,6 +51,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
           body: { tourId }
         })
         
+        console.log('Raw API response:', data)
+        
         if (error) {
           throw new Error(error.message)
         }
@@ -66,6 +68,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         }))
         
         console.log('Availability data loaded:', transformedData.length, 'dates')
+        console.log('First few dates:', transformedData.slice(0, 5))
         setAvailability(transformedData)
       } catch (err) {
         setError('Failed to load availability')
