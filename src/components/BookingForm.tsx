@@ -195,19 +195,19 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // 1. It's not in the past
       // 2. Either it has availability data with slots > 0, OR no availability data exists (default to available)
       // Note: Season filtering removed - let database determine available dates
-      const isAvailable = !isPastDate && (dateData ? (dateData.availableSpots || 0) > 0 : true)
+      const isAvailable = !isPastDate && (dateData ? (dateData.remaining_slots || 0) > 0 : true)
       
       // Determine date status:
       // - isPastDate: Past dates (gray)
       // - isFullBooked: Dates with 0 remaining slots (red)
       // - isAvailable: Dates that can be booked (white)
-      const isFullBooked = dateData && dateData.availableSpots !== undefined && dateData.availableSpots === 0
+      const isFullBooked = dateData && dateData.remaining_slots !== undefined && dateData.remaining_slots === 0
       
       grid.push({
         day,
         date: dateString,
         available: isAvailable,
-        remainingSlots: dateData?.availableSpots ?? maxCapacity,
+        remainingSlots: dateData?.remaining_slots ?? maxCapacity,
         isPastDate,
         isOutOfSeason: false, // No longer using season filtering
         isFullBooked
@@ -238,7 +238,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
   const getAvailableSlots = (date: string) => {
     const dateData = availability.find(d => d.date === date)
-    return dateData?.availableSpots || 0
+    return dateData?.remaining_slots || 0
   }
 
   // const isDateAvailable = (date: string) => {
