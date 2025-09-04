@@ -200,7 +200,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // Check if date is in the past (before today)
       const isPastDate = dateString < todayString
       
-      // Check if date is in season
+      // Check if date is in season (for visual display only)
       const inSeason = isDateInSeason(dateString)
       
       // Determine date status:
@@ -208,7 +208,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // - !inSeason: Out of season (gray, disabled) 
       // - isFullBooked: Dates with 0 remaining slots (red, shows authenticity)
       // - isAvailable: Dates that can be booked (white, clickable)
-      const isAvailable = !isPastDate && inSeason && dateData && (dateData.remaining_slots || 0) > 0
+      // CRITICAL: Only use database data for availability, not season filtering
+      const isAvailable = !isPastDate && dateData && (dateData.remaining_slots || 0) > 0
       
       // Debug logging for September 15th
       if (dateString === '2025-09-15') {
