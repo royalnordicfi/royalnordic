@@ -579,12 +579,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
                   {(() => {
                     const [year, month, day] = formData.preferredDate.split('-').map(Number)
                     const date = new Date(year, month - 1, day)
-                    return date.toLocaleDateString('en-US', { 
+                    const dateString = date.toLocaleDateString('en-US', { 
                       weekday: 'long', 
                       year: 'numeric', 
                       month: 'long', 
                       day: 'numeric' 
                     })
+                    // Add start time for Northern Lights tours
+                    if (tourName.includes('Northern Lights')) {
+                      return `${dateString} at 20:00`
+                    }
+                    return dateString
                   })()}
                 </span>
               </div>
