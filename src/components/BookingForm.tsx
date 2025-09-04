@@ -140,28 +140,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
 
 
-  // Check if a date is in the tour season
-  const isDateInSeason = (dateString: string) => {
-    if (!seasonStart || !seasonEnd) return true // If no season defined, show all dates
-    
-    const date = new Date(dateString)
-    const [startMonth, startDay] = seasonStart.split('-').map(Number)
-    const [endMonth, endDay] = seasonEnd.split('-').map(Number)
-    
-    const seasonStartDate = new Date(date.getFullYear(), startMonth - 1, startDay)
-    const seasonEndDate = new Date(date.getFullYear(), endMonth - 1, endDay)
-    
-    // Handle season spanning across year (e.g., Nov 1 - Apr 1)
-    if (endMonth < startMonth) {
-      if (date.getMonth() >= startMonth - 1 || date.getMonth() <= endMonth - 1) {
-        return true
-      }
-    } else {
-      return date >= seasonStartDate && date <= seasonEndDate
-    }
-    
-    return false
-  }
 
   // Get calendar grid for current month
   const getCalendarGrid = () => {
@@ -200,15 +178,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // Check if date is in the past (before today)
       const isPastDate = dateString < todayString
       
-      // Check if date is in season (for visual display only)
-      const inSeason = isDateInSeason(dateString)
-      
       // Determine date status:
       // - isPastDate: Past dates (gray, disabled)
-      // - !inSeason: Out of season (gray, disabled) 
       // - isFullBooked: Dates with 0 remaining slots (red, shows authenticity)
       // - isAvailable: Dates that can be booked (white, clickable)
-      // CRITICAL: Only use database data for availability, not season filtering
+      // CRITICAL: Only use database data for availability - no season filtering
       const isAvailable = !isPastDate && dateData && (dateData.remaining_slots || 0) > 0
       
       // Debug logging for September 15th
@@ -259,7 +233,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         available: isAvailable,
         remainingSlots: dateData?.remaining_slots ?? 0,
         isPastDate,
-        isOutOfSeason: !inSeason,
+        isOutOfSeason: false, // No season filtering - database controls all
         isFullBooked
       })
     }
