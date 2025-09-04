@@ -158,8 +158,8 @@ const SnowshoeRental: React.FC = () => {
                 <BookingForm
                   tourId={2}
                   tourName="Snowshoe Adventure"
-                  adultPrice={89}
-                  childPrice={69}
+                  adultPrice={79}
+                  childPrice={49}
                   maxCapacity={3}
                   seasonStart="11-01"
                   seasonEnd="04-01"

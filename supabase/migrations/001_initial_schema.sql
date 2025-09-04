@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS admin_users (
 INSERT INTO tours (name, description, adult_price, child_price, max_capacity) 
 VALUES 
   ('Northern Lights Tour', 'Guaranteed Northern Lights experience in Lapland', 179.00, 129.00, 8),
-  ('Snowshoe Adventure', 'Explore the pristine Lapland wilderness on snowshoes', 89.00, 69.00, 3),
+  ('Snowshoe Adventure', 'Explore the pristine Lapland wilderness on snowshoes', 79.00, 49.00, 3),
   ('Customized Tour', 'Have a specific Lapland experience in mind? We''ll create a personalized tour just for you', 200.00, 150.00, 8)
 ON CONFLICT (name) DO NOTHING;
 
