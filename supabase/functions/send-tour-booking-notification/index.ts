@@ -51,6 +51,7 @@ serve(async (req) => {
             <h2>New Tour Booking Received</h2>
             <p><strong>Tour:</strong> ${tourName}</p>
             <p><strong>Date:</strong> ${tourDate}</p>
+            ${tourName.includes('Northern Lights') ? '<p><strong>Start Time:</strong> 20:00 (8:00 PM)</p>' : ''}
             <p><strong>Customer Name:</strong> ${name}</p>
             <p><strong>Email:</strong> ${email}</p>
             <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
@@ -66,6 +67,7 @@ New Tour Booking Received
 
 Tour: ${tourName}
 Date: ${tourDate}
+${tourName.includes('Northern Lights') ? 'Start Time: 20:00 (8:00 PM)' : ''}
 Customer: ${name}
 Email: ${email}
 Phone: ${phone || 'Not provided'}
@@ -114,6 +116,7 @@ This booking was submitted through your website.
                   <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 18px;">Booking Details:</h3>
                   <p style="color: #4b5563; margin: 8px 0;"><strong>Tour:</strong> ${tourName}</p>
                   <p style="color: #4b5563; margin: 8px 0;"><strong>Date:</strong> ${tourDate}</p>
+                  ${tourName.includes('Northern Lights') ? '<p style="color: #4b5563; margin: 8px 0;"><strong>Start Time:</strong> 20:00 (8:00 PM)</p>' : ''}
                   <p style="color: #4b5563; margin: 8px 0;"><strong>Adults:</strong> ${adultCount}</p>
                   <p style="color: #4b5563; margin: 8px 0;"><strong>Children:</strong> ${childCount}</p>
                   <p style="color: #4b5563; margin: 8px 0;"><strong>Total Amount:</strong> €${totalAmount}</p>
@@ -177,6 +180,7 @@ Thank you for booking your Lapland adventure with Royal Nordic! We're excited to
 Booking Details:
 - Tour: ${tourName}
 - Date: ${tourDate}
+${tourName.includes('Northern Lights') ? '- Start Time: 20:00 (8:00 PM)' : ''}
 - Adults: ${adultCount}
 - Children: ${childCount}
 - Total Amount: €${totalAmount}
