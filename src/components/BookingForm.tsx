@@ -460,6 +460,18 @@ const BookingForm: React.FC<BookingFormProps> = ({
               const { day: calendarDay, date, available, remainingSlots, isPastDate, isFullBooked } = day
               const isAvailable = available && remainingSlots >= (formData.adults + formData.children)
               
+              // Debug logging for September 15th
+              if (date === '2025-09-15') {
+                console.log('September 15th render debug:', {
+                  available,
+                  remainingSlots,
+                  adults: formData.adults,
+                  children: formData.children,
+                  totalRequested: formData.adults + formData.children,
+                  isAvailable
+                })
+              }
+              
               return (
                 <button
                   key={date} 
