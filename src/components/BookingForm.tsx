@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 // import { Calendar, Users, Mail, Phone, MessageSquare, CreditCard } from 'lucide-react'
-import { getTourAvailability } from '../lib/api'
 import { createCheckoutSession, redirectToCheckout } from '../lib/stripe'
 import { createCryptoCheckout, redirectToCryptoCheckout } from '../lib/crypto'
+import { supabase } from '../lib/supabase'
 import type { TourDate } from '../lib/supabase'
 
 interface BookingFormProps {
@@ -46,8 +46,26 @@ const BookingForm: React.FC<BookingFormProps> = ({
     const loadAvailability = async () => {
       try {
         setError('')
-        const data = await getTourAvailability(tourId)
-        setAvailability(data)
+        // Use the new Supabase function instead of the old API
+        const { data, error } = await supabase.functions.invoke('get-tour-availability', {
+          body: { tourId }
+        })
+        
+        if (error) {
+          throw new Error(error.message)
+        }
+        
+        // Transform the response to match the expected format
+        const transformedData = data.availableDates.map((date: any) => ({
+          id: date.id,
+          tour_id: tourId,
+          date: date.date,
+          available_slots: date.totalSlots,
+          total_booked: date.bookedSlots,
+          remaining_slots: date.availableSpots
+        }))
+        
+        setAvailability(transformedData)
       } catch (err) {
         setError('Failed to load availability')
         console.error('Availability error:', err)
