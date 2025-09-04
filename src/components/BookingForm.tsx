@@ -203,11 +203,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // Check if date is in the past (before today)
       const isPastDate = dateString < todayString
       
+      // CRITICAL FIX: Only show dates that exist in the database
+      // If no availability data exists, don't show the date at all
+      if (!dateData) {
+        // Don't add this date to the calendar - it doesn't exist in the database
+        continue
+      }
+      
       // Date is available if:
       // 1. It's not in the past
       // 2. It has availability data with slots > 0
-      // Note: If no availability data exists, the date is NOT available (database controls all dates)
-      const isAvailable = !isPastDate && dateData && (dateData.remaining_slots || 0) > 0
+      const isAvailable = !isPastDate && (dateData.remaining_slots || 0) > 0
       
       // Debug logging for September 15th
       if (dateString === '2025-09-15') {
