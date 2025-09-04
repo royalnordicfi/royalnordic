@@ -211,13 +211,26 @@ const BookingForm: React.FC<BookingFormProps> = ({
           dateData,
           isPastDate,
           isAvailable,
-          remaining_slots: dateData?.remaining_slots
+          remaining_slots: dateData?.remaining_slots,
+          dateObj: dateObj.toISOString(),
+          today: today.toISOString()
         })
       }
       
       // Debug logging for September 1st (should NOT be available)
       if (dateString === '2025-09-01') {
         console.log('September 1st debug:', {
+          dateString,
+          dateData,
+          isPastDate,
+          isAvailable,
+          remaining_slots: dateData?.remaining_slots
+        })
+      }
+      
+      // Debug logging for April 16th (should NOT be available)
+      if (dateString === '2026-04-16') {
+        console.log('April 16th debug:', {
           dateString,
           dateData,
           isPastDate,
