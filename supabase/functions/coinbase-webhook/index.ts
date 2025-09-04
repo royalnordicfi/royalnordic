@@ -39,21 +39,27 @@ serve(async (req) => {
       const children = parseInt(metadata.children || '0')
       const totalPrice = parseFloat(metadata.total_price || '0')
 
+      // Get tour_id and tour_date_id from metadata
+      const tourId = parseInt(metadata.tour_id || '0')
+      const tourDateId = parseInt(metadata.tour_date_id || '0')
+      
+      if (!tourId || !tourDateId) {
+        throw new Error('Missing tour_id or tour_date_id in metadata')
+      }
+
       // Create booking record
       const { data: booking, error: bookingError } = await supabase
         .from('bookings')
         .insert({
-          tour_name: tourName,
-          tour_date: tourDate,
+          tour_id: tourId,
+          tour_date_id: tourDateId,
           customer_name: customerName,
           customer_email: customerEmail,
           adults,
           children,
-          total_amount: totalPrice,
-          payment_method: 'crypto',
-          payment_status: 'confirmed',
-          crypto_charge_id: charge.id,
-          created_at: new Date().toISOString()
+          total_price: totalPrice,
+          status: 'confirmed',
+          special_requests: metadata.special_requests || ''
         })
         .select()
         .single()

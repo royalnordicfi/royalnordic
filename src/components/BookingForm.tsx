@@ -174,7 +174,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // 1. It's not in the past
       // 2. It's within the booking season
       // 3. Either it has availability data with slots > 0, OR no availability data exists (default to available)
-      const isAvailable = !isPastDate && isInSeason && (dateData ? (dateData.remaining_slots || 0) > 0 : true)
+      const isAvailable = !isPastDate && isInSeason && (dateData ? (dateData.availableSpots || 0) > 0 : true)
       
       // Determine date status:
       // - isPastDate: Past dates (gray)
@@ -182,13 +182,13 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // - isFullBooked: Dates with 0 remaining slots (red)
       // - isAvailable: Dates that can be booked (white)
       const isOutOfSeason = !isInSeason
-      const isFullBooked = dateData && dateData.remaining_slots !== undefined && dateData.remaining_slots === 0
+      const isFullBooked = dateData && dateData.availableSpots !== undefined && dateData.availableSpots === 0
       
       grid.push({
         day,
         date: dateString,
         available: isAvailable,
-        remainingSlots: dateData?.remaining_slots ?? maxCapacity,
+        remainingSlots: dateData?.availableSpots ?? maxCapacity,
         isPastDate,
         isOutOfSeason,
         isFullBooked
@@ -219,7 +219,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
   const getAvailableSlots = (date: string) => {
     const dateData = availability.find(d => d.date === date)
-    return dateData?.remaining_slots || 0
+    return dateData?.availableSpots || 0
   }
 
   // const isDateAvailable = (date: string) => {
@@ -324,7 +324,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         tour_date: formData.preferredDate,
         metadata: {
           tour_id: tourId.toString(),
-          tour_date_id: '0', // Will be set after availability check
+          tour_date_id: tourDateId.toString(), // Use the actual tour date ID
           customer_name: formData.fullName,
           customer_email: formData.email,
           adults: formData.adults.toString(),

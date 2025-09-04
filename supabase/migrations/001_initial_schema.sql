@@ -56,15 +56,15 @@ CREATE TABLE IF NOT EXISTS admin_users (
 INSERT INTO tours (name, description, adult_price, child_price, max_capacity) 
 VALUES 
   ('Northern Lights Tour', 'Guaranteed Northern Lights experience in Lapland', 179.00, 129.00, 8),
-  ('Snowshoe Adventure', 'Explore the pristine Lapland wilderness on snowshoes', 89.00, 69.00, 6),
+  ('Snowshoe Adventure', 'Explore the pristine Lapland wilderness on snowshoes', 89.00, 69.00, 3),
   ('Customized Tour', 'Have a specific Lapland experience in mind? We''ll create a personalized tour just for you', 200.00, 150.00, 8)
 ON CONFLICT (name) DO NOTHING;
 
--- Insert Northern Lights Tour dates for October 2025 - April 2026
+-- Insert Northern Lights Tour dates for September 2025 - April 2026
 DO $$
 DECLARE
   northern_lights_id BIGINT;
-  tour_date DATE := '2025-10-01'::DATE;
+  tour_date DATE := '2025-09-15'::DATE;
   end_date DATE := '2026-04-15'::DATE;
 BEGIN
   SELECT id INTO northern_lights_id FROM tours WHERE name = 'Northern Lights Tour' LIMIT 1;
@@ -83,13 +83,13 @@ DO $$
 DECLARE
   snowshoe_id BIGINT;
   tour_date DATE := '2025-11-01'::DATE;
-  end_date DATE := '2026-04-15'::DATE;
+  end_date DATE := '2026-04-01'::DATE;
 BEGIN
   SELECT id INTO snowshoe_id FROM tours WHERE name = 'Snowshoe Adventure' LIMIT 1;
   
   WHILE tour_date <= end_date LOOP
     INSERT INTO tour_dates (tour_id, date, available_slots) 
-    VALUES (snowshoe_id, tour_date, 6)
+    VALUES (snowshoe_id, tour_date, 3)
     ON CONFLICT (tour_id, date) DO NOTHING;
     
     tour_date := tour_date + INTERVAL '1 day';
