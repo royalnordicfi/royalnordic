@@ -279,7 +279,7 @@ const CustomizedTour: React.FC = () => {
                   
                   {submitStatus === 'success' && (
                     <div className="bg-emerald-500/20 border border-emerald-500/30 rounded-lg p-3 text-emerald-400 text-center text-sm">
-                      Thank you! We'll get back to you within 24 hours to discuss your custom tour.
+                      Thank you! We'll get back to you as soon as possible to discuss your custom tour.
                     </div>
                   )}
 

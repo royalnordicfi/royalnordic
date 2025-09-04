@@ -151,7 +151,7 @@ const PaymentSuccess: React.FC = () => {
             <h3 className="font-semibold text-white mb-2 text-sm">What's Next?</h3>
             <ul className="text-xs text-gray-300 space-y-1">
               <li>• Check your email for instructions</li>
-              <li>• Meeting details 24h before tour</li>
+              <li>• Meeting details sent before tour</li>
               <li>• Contact us with questions</li>
             </ul>
           </div>

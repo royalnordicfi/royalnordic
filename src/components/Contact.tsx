@@ -230,7 +230,7 @@ const Contact = () => {
             {showSuccess && (
               <div className="mt-4 text-center text-green-400 text-sm font-clean bg-green-900/20 border border-green-500/30 rounded-lg p-3 transition-all duration-500 ease-out animate-in fade-in slide-in-from-top-2">
                 <p className="font-semibold">Message sent successfully!</p>
-                <p>We'll get back to you within 24 hours.</p>
+                <p>We'll get back to you as soon as possible.</p>
                 <p className="mt-2 text-xs">Check your email for a confirmation message.</p>
               </div>
             )}
