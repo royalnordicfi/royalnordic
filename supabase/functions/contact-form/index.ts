@@ -32,6 +32,12 @@ serve(async (req) => {
     // Use Resend with your existing setup but send to Gmail
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
     
+    console.log('=== RESEND API KEY CHECK ===')
+    console.log('RESEND_API_KEY exists:', !!resendApiKey)
+    console.log('RESEND_API_KEY length:', resendApiKey ? resendApiKey.length : 0)
+    console.log('RESEND_API_KEY starts with:', resendApiKey ? resendApiKey.substring(0, 10) + '...' : 'N/A')
+    console.log('=== END API KEY CHECK ===')
+    
     if (!resendApiKey) {
       console.log('Resend API key not configured, logging email content')
       console.log('=== CONTACT FORM EMAIL CONTENT ===')
@@ -92,17 +98,20 @@ This message was submitted through your website's contact form.
       })
 
       console.log('Resend response status:', response.status)
+      console.log('Resend response headers:', Object.fromEntries(response.headers.entries()))
 
       if (response.ok) {
         const result = await response.json()
         console.log('Email sent successfully via Resend:', result)
+        console.log('Email ID:', result.id)
         return new Response(
-          JSON.stringify({ success: true, message: 'Message sent successfully!' }),
+          JSON.stringify({ success: true, message: 'Message sent successfully!', emailId: result.id }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       } else {
         const errorText = await response.text()
         console.error('Resend API error:', response.status, errorText)
+        console.error('Full response:', response)
         throw new Error(`Resend API error: ${response.status} - ${errorText}`)
       }
     } catch (emailError) {
