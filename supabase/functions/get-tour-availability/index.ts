@@ -28,6 +28,7 @@ serve(async (req) => {
       availableDates: [
         // September 2025 dates (for Northern Lights Tour - tourId 1)
         {
+          id: 1,
           date: '2025-09-15',
           availableSpots: 8,
           price: tourId === 1 ? 179 : 89

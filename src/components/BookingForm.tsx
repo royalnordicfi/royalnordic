@@ -247,6 +247,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
       if (!selectedDateData) {
         throw new Error('Selected date not found')
       }
+      
+      // Use a fallback ID if not provided (for mock data)
+      const tourDateId = selectedDateData.id || Date.now()
 
       // Check availability one more time before proceeding
       const availableSlots = getAvailableSlots(formData.preferredDate)
@@ -275,7 +278,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         tour_date: tourDate,
         metadata: {
           tour_id: tourId.toString(),
-          tour_date_id: selectedDateData.id.toString(),
+          tour_date_id: tourDateId.toString(),
           customer_name: formData.fullName,
           customer_email: formData.email,
           adults: formData.adults.toString(),
