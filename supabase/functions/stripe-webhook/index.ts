@@ -206,7 +206,7 @@ async function sendBookingNotification({
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Royal Nordic <noreply@royalnordic.fi>',
+        from: 'Royal Nordic <contact@royalnordic.fi>',
         to: [customerEmail],
         subject: `Booking Confirmation - Northern Lights Tour - Royal Nordic`,
         html: `
@@ -364,7 +364,7 @@ Rovaniemi, Finnish Lapland
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Royal Nordic <noreply@royalnordic.fi>',
+        from: 'Royal Nordic <contact@royalnordic.fi>',
         to: ['royalnordicfi@gmail.com'],
         subject: `New Booking Confirmation - ${customerName} - Royal Nordic`,
         html: `

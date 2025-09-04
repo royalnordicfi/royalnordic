@@ -29,13 +29,13 @@ serve(async (req) => {
     console.log('Message:', message)
     console.log('=== END DEBUG ===')
 
-    // Use Resend to send from your custom domain
+    // Use Resend with your existing setup but send to Gmail
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
     
     if (!resendApiKey) {
       console.log('Resend API key not configured, logging email content')
       console.log('=== CONTACT FORM EMAIL CONTENT ===')
-      console.log('TO: contact@royalnordic.fi')
+      console.log('TO: royalnordicfi@gmail.com')
       console.log('FROM: ' + name + ' <' + email + '>')
       console.log('MESSAGE: ' + message)
       console.log('=== END EMAIL CONTENT ===')
@@ -50,10 +50,9 @@ serve(async (req) => {
     }
 
     try {
-      console.log('Sending email via Resend...')
-      console.log('API Key:', resendApiKey ? 'Present' : 'Missing')
-      console.log('From:', 'contact@royalnordic.fi')
-      console.log('To:', 'contact@royalnordic.fi')
+      console.log('Sending email via Resend to Gmail...')
+      console.log('From: Royal Nordic <contact@royalnordic.fi>')
+      console.log('To: royalnordicfi@gmail.com')
       
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -62,9 +61,9 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Royal Nordic <onboarding@resend.dev>',
-          to: ['contact@royalnordic.fi'],
-          reply_to: [email],
+          from: 'Royal Nordic <contact@royalnordic.fi>',
+          to: ['royalnordicfi@gmail.com'],
+          reply_to: email,
           subject: 'New Contact Form Submission - ROYAL NORDIC',
           html: `
             <h2>New Contact Form Submission</h2>
@@ -111,7 +110,7 @@ This message was submitted through your website's contact form.
       
       // Fallback: Log the email content
       console.log('=== CONTACT FORM EMAIL (FALLBACK) ===')
-      console.log('TO: contact@royalnordic.fi')
+      console.log('TO: royalnordicfi@gmail.com')
       console.log('FROM: ' + name + ' <' + email + '>')
       console.log('MESSAGE: ' + message)
       console.log('=== END EMAIL ===')

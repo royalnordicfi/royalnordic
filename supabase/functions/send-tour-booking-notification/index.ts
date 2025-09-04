@@ -45,7 +45,7 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           from: 'Royal Nordic <contact@royalnordic.fi>',
-          to: ['contact@royalnordic.fi'],
+          to: ['royalnordicfi@gmail.com'],
           subject: `New Tour Booking - ${tourName} - ROYAL NORDIC`,
           html: `
             <h2>New Tour Booking Received</h2>
@@ -218,7 +218,7 @@ Rovaniemi, Finnish Lapland
       
       // Fallback: Log the email content
       console.log('=== TOUR BOOKING EMAIL (FALLBACK LOGGING) ===')
-      console.log('Business Email To: contact@royalnordic.fi')
+      console.log('Business Email To: royalnordicfi@gmail.com')
       console.log('Customer Email To: ' + email)
       console.log('From: Royal Nordic <contact@royalnordic.fi>')
       console.log('Subject: Tour Booking Confirmation')

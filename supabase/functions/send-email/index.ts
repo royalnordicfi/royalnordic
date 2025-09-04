@@ -64,7 +64,7 @@ async function sendViaResend(emailData: EmailRequest) {
   }
 
   // Send from your verified domain for better deliverability
-  const fromEmail = 'noreply@royalnordic.fi'
+  const fromEmail = 'contact@royalnordic.fi'
   
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
