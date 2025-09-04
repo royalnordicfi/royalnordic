@@ -200,13 +200,24 @@ const BookingForm: React.FC<BookingFormProps> = ({
       
       // Date is available if:
       // 1. It's not in the past
-      // 2. Either it has availability data with slots > 0, OR no availability data exists (default to available)
-      // Note: Season filtering removed - let database determine available dates
-      const isAvailable = !isPastDate && (dateData ? (dateData.remaining_slots || 0) > 0 : true)
+      // 2. It has availability data with slots > 0
+      // Note: If no availability data exists, the date is NOT available (database controls all dates)
+      const isAvailable = !isPastDate && dateData && (dateData.remaining_slots || 0) > 0
       
       // Debug logging for September 15th
       if (dateString === '2025-09-15') {
         console.log('September 15th debug:', {
+          dateString,
+          dateData,
+          isPastDate,
+          isAvailable,
+          remaining_slots: dateData?.remaining_slots
+        })
+      }
+      
+      // Debug logging for September 1st (should NOT be available)
+      if (dateString === '2025-09-01') {
+        console.log('September 1st debug:', {
           dateString,
           dateData,
           isPastDate,
