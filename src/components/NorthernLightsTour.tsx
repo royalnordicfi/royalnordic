@@ -199,7 +199,7 @@ const NorthernLightsTour = () => {
                   adultPrice={179}
                   childPrice={129}
                   maxCapacity={8}
-                  seasonStart="10-01"
+                  seasonStart="09-15"
                   seasonEnd="04-15"
                 />
               </div>
