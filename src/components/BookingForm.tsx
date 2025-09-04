@@ -65,10 +65,13 @@ const BookingForm: React.FC<BookingFormProps> = ({
           remaining_slots: date.availableSpots
         }))
         
+        console.log('Availability data loaded:', transformedData.length, 'dates')
         setAvailability(transformedData)
       } catch (err) {
         setError('Failed to load availability')
         console.error('Availability error:', err)
+        // Fallback to empty array to prevent white page
+        setAvailability([])
       }
     }
 
