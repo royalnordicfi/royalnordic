@@ -47,8 +47,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
       try {
         setError('')
         // Use the new Supabase function instead of the old API
+        // Add cache-busting parameter to ensure fresh data
         const { data, error } = await supabase.functions.invoke('get-tour-availability', {
-          body: { tourId }
+          body: { 
+            tourId,
+            _cacheBust: Date.now() // Force fresh data
+          }
         })
         
         console.log('Raw API response:', data)
@@ -76,6 +80,14 @@ const BookingForm: React.FC<BookingFormProps> = ({
           remaining_slots: transformedData[0]?.remaining_slots,
           available_slots: transformedData[0]?.available_slots
         })
+        
+        // Debug: Check if September 15th is in the data
+        const sept15 = transformedData.find(d => d.date === '2025-09-15')
+        console.log('September 15th in data:', sept15)
+        
+        // Debug: Check if September 1st is in the data (should NOT be)
+        const sept1 = transformedData.find(d => d.date === '2025-09-01')
+        console.log('September 1st in data:', sept1)
         setAvailability(transformedData)
       } catch (err) {
         setError('Failed to load availability')
