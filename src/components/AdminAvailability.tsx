@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Save, RefreshCw } from 'lucide-react'
-import { getTourAvailability, updateTourAvailability } from '../lib/api'
+import { updateTourAvailability } from '../lib/api'
+import { supabase } from '../lib/supabase'
 import type { TourDate } from '../lib/supabase'
 
 interface AdminAvailabilityProps {
@@ -12,6 +13,7 @@ interface AdminAvailabilityProps {
 const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName, maxCapacity }) => {
   const [availability, setAvailability] = useState<TourDate[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
@@ -26,8 +28,26 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
   const loadAvailability = useCallback(async () => {
     try {
       setLoading(true)
-      const data = await getTourAvailability(tourId)
-      setAvailability(data)
+      // Use the new Supabase function instead of the old API
+      const { data, error } = await supabase.functions.invoke('get-tour-availability', {
+        body: { tourId }
+      })
+      
+      if (error) {
+        throw new Error(error.message)
+      }
+      
+      // Transform the response to match the expected format
+      const transformedData = data.availableDates.map((date: any) => ({
+        id: date.id,
+        tour_id: tourId,
+        date: date.date,
+        available_slots: date.totalSlots,
+        total_booked: date.bookedSlots,
+        remaining_slots: date.availableSpots
+      }))
+      
+      setAvailability(transformedData)
     } catch (err) {
       console.error('Availability error:', err)
     } finally {
@@ -105,14 +125,31 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
 
     try {
       setLoading(true)
-      await updateTourAvailability(tourId, selectedDate, editingSlots)
+      setError('')
+      
+      // Use the new Supabase function
+      const { data, error } = await supabase.functions.invoke('update-tour-availability', {
+        body: { 
+          tourId, 
+          date: selectedDate, 
+          availableSlots: editingSlots 
+        }
+      })
+      
+      if (error) {
+        throw new Error(error.message)
+      }
       
       // Update local state
       const existingIndex = availability.findIndex(d => d.date === selectedDate)
       if (existingIndex >= 0) {
         // Update existing date
         const updated = [...availability]
-        updated[existingIndex] = { ...updated[existingIndex], remaining_slots: editingSlots }
+        updated[existingIndex] = { 
+          ...updated[existingIndex], 
+          available_slots: editingSlots,
+          remaining_slots: editingSlots - (updated[existingIndex].total_booked || 0)
+        }
         setAvailability(updated)
       } else {
         // Add new date
@@ -120,6 +157,8 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
           id: Date.now(), // Temporary ID
           tour_id: tourId,
           date: selectedDate,
+          available_slots: editingSlots,
+          total_booked: 0,
           remaining_slots: editingSlots,
           created_at: new Date().toISOString()
         }
@@ -128,8 +167,8 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
       
       setIsEditing(false)
       setSelectedDate(null)
-    } catch (err) {
-      setError('Failed to update availability')
+    } catch (err: any) {
+      setError(err.message || 'Failed to update availability')
       console.error('Save error:', err)
     } finally {
       setLoading(false)
@@ -140,12 +179,25 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
   const handleDeleteAvailability = async (date: string) => {
     try {
       setLoading(true)
-      await updateTourAvailability(tourId, date, 0)
+      setError('')
+      
+      // Use the new Supabase function to set slots to 0
+      const { data, error } = await supabase.functions.invoke('update-tour-availability', {
+        body: { 
+          tourId, 
+          date: date, 
+          availableSlots: 0 
+        }
+      })
+      
+      if (error) {
+        throw new Error(error.message)
+      }
       
       // Remove from local state
       setAvailability(prev => prev.filter(d => d.date !== date))
-    } catch (err) {
-      setError('Failed to delete availability')
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete availability')
       console.error('Delete error:', err)
     } finally {
       setLoading(false)
@@ -185,6 +237,20 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex">
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Error</h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{error}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Calendar */}
         <div className="bg-white rounded-lg shadow p-6 mb-8">
           <div className="flex items-center justify-between mb-6">
