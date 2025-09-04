@@ -172,17 +172,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
     const firstDayOfWeek = firstDay.getDay()
     const daysInMonth = lastDay.getDate()
     
-    // Get today's date in Finnish timezone (UTC+2/UTC+3)
-    const now = new Date()
-    const finnishTime = new Date(now.getTime() + (2 * 60 * 60 * 1000)) // UTC+2 (winter time)
-    // Check if it's summer time (March to October)
-    const isSummerTime = finnishTime.getMonth() >= 2 && finnishTime.getMonth() <= 9
-    if (isSummerTime) {
-      finnishTime.setTime(finnishTime.getTime() + (60 * 60 * 1000)) // Add 1 more hour for summer time (UTC+3)
-    }
-    
-    const today = new Date(finnishTime.getFullYear(), finnishTime.getMonth(), finnishTime.getDate())
-    today.setHours(0, 0, 0, 0)
+    // Use simple date comparison to avoid timezone issues
+    // For tour booking, we'll consider dates from today onwards as available
+    const today = new Date()
+    const todayString = today.toISOString().split('T')[0] // Get YYYY-MM-DD format
 
     // Add empty cells for days before the first of the month
     for (let i = 0; i < firstDayOfWeek; i++) {
@@ -195,8 +188,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
       const dateObj = new Date(year, month, day)
       const dateData = monthDates.find(d => d.date === dateString)
       
-      // Check if date is in the past (before today in Finnish time)
-      const isPastDate = dateObj < today
+      // Check if date is in the past (before today)
+      const isPastDate = dateString < todayString
       
       // Date is available if:
       // 1. It's not in the past
@@ -212,8 +205,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
           isPastDate,
           isAvailable,
           remaining_slots: dateData?.remaining_slots,
-          dateObj: dateObj.toISOString(),
-          today: today.toISOString()
+          todayString,
+          comparison: `${dateString} < ${todayString} = ${dateString < todayString}`
         })
       }
       
