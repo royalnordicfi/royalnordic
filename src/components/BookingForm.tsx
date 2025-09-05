@@ -46,7 +46,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         setError('')
         // Use the new Supabase function instead of the old API
         // Add cache-busting parameter to ensure fresh data
-        const { data, error } = await supabase.functions.invoke('get-tour-availability', {
+        const { data, error } = await supabase.functions.invoke(`get-tour-availability?t=${Date.now()}`, {
           body: { 
             tourId,
             _cacheBust: Date.now() // Force fresh data
