@@ -155,6 +155,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
       const dateObj = new Date(date.date)
       return dateObj >= startDate && dateObj <= endDate
     })
+    
+    // Create a map for faster lookup
+    const dateMap = new Map()
+    monthDates.forEach(date => {
+      dateMap.set(date.date, date)
+    })
 
     // Create calendar grid
     const grid = []
@@ -173,7 +179,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
     // Add ALL days of the month (professional approach)
     for (let day = 1; day <= daysInMonth; day++) {
       const dateString = new Date(year, month, day).toISOString().split('T')[0]
-      const dateData = monthDates.find(d => d.date === dateString)
+      const dateData = dateMap.get(dateString)
       
       // Check if date is in the past (before today)
       const isPastDate = dateString < todayString

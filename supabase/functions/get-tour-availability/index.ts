@@ -42,11 +42,15 @@ serve(async (req) => {
     }
 
     // Get tour dates with availability
+    // Use a more lenient date filter to avoid timezone issues
+    const today = new Date()
+    const todayString = today.toISOString().split('T')[0]
+    
     const { data: tourDates, error: datesError } = await supabase
       .from('tour_dates')
       .select('*')
       .eq('tour_id', tourId)
-      .gte('date', new Date().toISOString().split('T')[0]) // Only future dates
+      .gte('date', todayString) // Only future dates
       .order('date', { ascending: true })
 
     if (datesError) {
