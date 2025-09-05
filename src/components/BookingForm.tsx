@@ -40,61 +40,66 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
 
   // Load availability data
-  useEffect(() => {
-    const loadAvailability = async () => {
-      try {
-        setError('')
-        // Use the new Supabase function instead of the old API
-        // Add cache-busting parameter to ensure fresh data
-        const { data, error } = await supabase.functions.invoke(`get-tour-availability?t=${Date.now()}`, {
-          body: { 
-            tourId,
-            _cacheBust: Date.now() // Force fresh data
-          }
-        })
-        
-        console.log('Raw API response:', data)
-        
-        if (error) {
-          throw new Error(error.message)
+  const loadAvailability = async () => {
+    try {
+      setError('')
+      // Use the new Supabase function instead of the old API
+      // Add aggressive cache-busting to ensure fresh data
+      const cacheBuster = Date.now() + Math.random()
+      const { data, error } = await supabase.functions.invoke(`get-tour-availability?t=${cacheBuster}`, {
+        body: { 
+          tourId,
+          _cacheBust: cacheBuster, // Force fresh data
+          _timestamp: new Date().toISOString() // Additional cache busting
         }
-        
-        // Transform the response to match the expected format
-        const transformedData = data.availableDates.map((date: any) => ({
-          id: date.id,
-          tour_id: tourId,
-          date: date.date,
-          available_slots: date.totalSlots,
-          total_booked: date.bookedSlots,
-          remaining_slots: date.availableSpots
-        }))
-        
-        console.log('Availability data loaded:', transformedData.length, 'dates')
-        console.log('First few dates:', transformedData.slice(0, 5))
-        console.log('Sample date object:', transformedData[0])
-        console.log('Sample date details:', {
-          id: transformedData[0]?.id,
-          date: transformedData[0]?.date,
-          remaining_slots: transformedData[0]?.remaining_slots,
-          available_slots: transformedData[0]?.available_slots
-        })
-        
-        // Debug: Check if September 15th is in the data
-        const sept15 = transformedData.find((d: any) => d.date === '2025-09-15')
-        console.log('September 15th in data:', sept15)
-        
-        // Debug: Check if September 1st is in the data (should NOT be)
-        const sept1 = transformedData.find((d: any) => d.date === '2025-09-01')
-        console.log('September 1st in data:', sept1)
-        setAvailability(transformedData)
-      } catch (err) {
-        setError('Failed to load availability')
-        console.error('Availability error:', err)
-        // Fallback to empty array to prevent white page
-        setAvailability([])
+      })
+      
+      console.log('Raw API response:', data)
+      
+      if (error) {
+        throw new Error(error.message)
       }
+      
+      // Transform the response to match the expected format
+      const transformedData = data.availableDates.map((date: any) => ({
+        id: date.id,
+        tour_id: tourId,
+        date: date.date,
+        available_slots: date.totalSlots,
+        total_booked: date.bookedSlots,
+        remaining_slots: date.availableSpots
+      }))
+      
+      console.log('Availability data loaded:', transformedData.length, 'dates')
+      console.log('First few dates:', transformedData.slice(0, 5))
+      console.log('Sample date object:', transformedData[0])
+      console.log('Sample date details:', {
+        id: transformedData[0]?.id,
+        date: transformedData[0]?.date,
+        remaining_slots: transformedData[0]?.remaining_slots,
+        available_slots: transformedData[0]?.available_slots
+      })
+      
+      // Debug: Check if September 15th is in the data
+      const sept15 = transformedData.find((d: any) => d.date === '2025-09-15')
+      console.log('September 15th in data:', sept15)
+      
+      // Debug: Check if September 1st is in the data (should NOT be)
+      const sept1 = transformedData.find((d: any) => d.date === '2025-09-01')
+      console.log('September 1st in data:', sept1)
+      setAvailability(transformedData)
+    } catch (err) {
+      setError('Failed to load availability')
+      console.error('Availability error:', err)
+      // Fallback to empty array to prevent white page
+      setAvailability([])
+    } finally {
+      setLoading(false)
     }
+  }
 
+  // Load availability data on component mount
+  useEffect(() => {
     loadAvailability()
   }, [tourId])
 
@@ -126,11 +131,15 @@ const BookingForm: React.FC<BookingFormProps> = ({
   // Navigate to previous month
   const goToPreviousMonth = () => {
     setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))
+    // Force refresh availability data when month changes
+    loadAvailability()
   }
 
   // Navigate to next month
   const goToNextMonth = () => {
     setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))
+    // Force refresh availability data when month changes
+    loadAvailability()
   }
 
   // Get month name and year
