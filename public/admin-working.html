@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Royal Nordic Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm">
+            <h1 class="text-2xl font-bold text-center mb-6">Royal Nordic Admin</h1>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Email</label>
+                    <input type="email" id="email" class="w-full p-3 border rounded-lg" placeholder="admin@royalnordic.fi" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Password</label>
+                    <input type="password" id="password" class="w-full p-3 border rounded-lg" placeholder="Password" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Secure Key</label>
+                    <input type="password" id="secureKey" class="w-full p-3 border rounded-lg" placeholder="Security key" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700">
+                    Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="hidden">
+        <!-- Header -->
+        <div class="bg-blue-600 text-white p-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl font-bold">Royal Nordic Admin</h1>
+                <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6">
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="text-2xl font-bold text-blue-600" id="totalBookings">0</div>
+                    <div class="text-sm text-gray-600">Total Bookings</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="text-2xl font-bold text-green-600" id="confirmedBookings">0</div>
+                    <div class="text-sm text-gray-600">Confirmed</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="text-2xl font-bold text-purple-600" id="totalRevenue">€0</div>
+                    <div class="text-sm text-gray-600">Revenue</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="text-2xl font-bold text-orange-600" id="totalParticipants">0</div>
+                    <div class="text-sm text-gray-600">Participants</div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="bg-white p-4 rounded-lg shadow mb-6">
+                <h2 class="text-lg font-semibold mb-4">Actions</h2>
+                <div class="flex gap-4">
+                    <button onclick="refreshData()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                        Refresh Data
+                    </button>
+                    <button onclick="exportData()" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                        Export CSV
+                    </button>
+                    <button onclick="showTours()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        Tour Info
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bookings -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-4 border-b">
+                    <h2 class="text-lg font-semibold">Bookings</h2>
+                </div>
+                <div id="bookingsList" class="p-4">
+                    <div class="text-center text-gray-500">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const bookings = [
+            {
+                id: 1,
+                name: "Miro Vesterinen",
+                email: "mirov.vesterinen@gmail.com",
+                phone: "+358 40 123 4567",
+                tour: "Northern Lights Tour",
+                date: "2025-09-15",
+                adults: 2,
+                children: 1,
+                price: 507,
+                status: "confirmed",
+                requests: "Vegetarian meals please"
+            },
+            {
+                id: 2,
+                name: "Anna Virtanen",
+                email: "anna.virtanen@example.com",
+                phone: "+358 50 123 4567",
+                tour: "Northern Lights Tour",
+                date: "2025-10-20",
+                adults: 4,
+                children: 0,
+                price: 632,
+                status: "confirmed",
+                requests: "Group celebration"
+            },
+            {
+                id: 3,
+                name: "Erik Johansson",
+                email: "erik.johansson@example.com",
+                phone: "+358 40 555 1234",
+                tour: "Snowshoe Adventure",
+                date: "2025-12-10",
+                adults: 2,
+                children: 3,
+                price: 395,
+                status: "confirmed",
+                requests: "Warm clothing assistance"
+            }
+        ];
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const secureKey = document.getElementById('secureKey').value;
+            
+            if (email === 'admin@royalnordic.fi' && password === 'Rollonortsu8889' && secureKey === '568907') {
+                showAdminPanel();
+            } else {
+                alert('Wrong credentials!');
+            }
+        });
+
+        // Show admin panel
+        function showAdminPanel() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            refreshData();
+        }
+
+        // Logout
+        function logout() {
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        // Refresh data
+        function refreshData() {
+            displayBookings();
+            updateStats();
+        }
+
+        // Display bookings
+        function displayBookings() {
+            const container = document.getElementById('bookingsList');
+            if (bookings.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500">No bookings</div>';
+                return;
+            }
+
+            container.innerHTML = bookings.map(booking => `
+                <div class="border rounded-lg p-4 mb-4">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                <h3 class="font-semibold">${booking.name}</h3>
+                                <span class="px-2 py-1 text-xs rounded ${booking.status === 'confirmed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                    ${booking.status}
+                                </span>
+                                <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+                                    #${booking.id}
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                                <div>
+                                    <div>📧 ${booking.email}</div>
+                                    <div>📞 ${booking.phone}</div>
+                                    <div>👥 ${booking.adults} adults, ${booking.children} children</div>
+                                </div>
+                                <div>
+                                    <div>🎯 ${booking.tour}</div>
+                                    <div>📅 ${new Date(booking.date).toLocaleDateString()}</div>
+                                    <div>💰 €${booking.price}</div>
+                                </div>
+                            </div>
+                            ${booking.requests ? `<div class="mt-2 p-2 bg-yellow-50 rounded text-sm">💬 ${booking.requests}</div>` : ''}
+                        </div>
+                        <div>
+                            <select onchange="updateStatus(${booking.id}, this.value)" class="border rounded px-2 py-1 text-sm">
+                                <option value="confirmed" ${booking.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                                <option value="cancelled" ${booking.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update stats
+        function updateStats() {
+            const total = bookings.length;
+            const confirmed = bookings.filter(b => b.status === 'confirmed').length;
+            const revenue = bookings.filter(b => b.status === 'confirmed').reduce((sum, b) => sum + b.price, 0);
+            const participants = bookings.filter(b => b.status === 'confirmed').reduce((sum, b) => sum + b.adults + b.children, 0);
+
+            document.getElementById('totalBookings').textContent = total;
+            document.getElementById('confirmedBookings').textContent = confirmed;
+            document.getElementById('totalRevenue').textContent = '€' + revenue;
+            document.getElementById('totalParticipants').textContent = participants;
+        }
+
+        // Update status
+        function updateStatus(id, status) {
+            const booking = bookings.find(b => b.id === id);
+            if (booking) {
+                booking.status = status;
+                updateStats();
+                alert(`Booking #${id} updated to ${status}`);
+            }
+        }
+
+        // Export data
+        function exportData() {
+            const csv = [
+                ['ID', 'Name', 'Email', 'Phone', 'Tour', 'Date', 'Adults', 'Children', 'Price', 'Status', 'Requests'],
+                ...bookings.map(b => [b.id, b.name, b.email, b.phone, b.tour, b.date, b.adults, b.children, b.price, b.status, b.requests || ''])
+            ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'bookings.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Show tours
+        function showTours() {
+            alert(`Tour Information:
+
+Northern Lights Tour:
+- Season: Sep 15 - Apr 15
+- Adult: €158, Child: €79
+- Max: 12 people, Duration: 3-4 hours
+
+Snowshoe Adventure:
+- Season: Nov 1 - Apr 1
+- Adult: €95, Child: €48
+- Max: 8 people, Duration: 2-3 hours`);
+        }
+    </script>
+</body>
+</html>

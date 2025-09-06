@@ -79,8 +79,10 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
   const getCalendarGrid = () => {
     const year = currentMonth.getFullYear()
     const month = currentMonth.getMonth()
-    const firstDay = new Date(year, month, 1)
-    const lastDay = new Date(year, month + 1, 0)
+    
+    // Use UTC to avoid timezone offset issues
+    const firstDay = new Date(Date.UTC(year, month, 1))
+    const lastDay = new Date(Date.UTC(year, month + 1, 0))
     const startDate = new Date(firstDay)
     const endDate = new Date(lastDay)
     
@@ -98,8 +100,8 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
 
     // Create calendar grid
     const grid = []
-    const firstDayOfWeek = firstDay.getDay()
-    const daysInMonth = lastDay.getDate()
+    const firstDayOfWeek = firstDay.getUTCDay()
+    const daysInMonth = lastDay.getUTCDate()
 
     // Add empty cells for days before the first of the month
     for (let i = 0; i < firstDayOfWeek; i++) {
@@ -108,7 +110,8 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
 
     // Add ALL days of the month (professional approach)
     for (let day = 1; day <= daysInMonth; day++) {
-      const dateString = new Date(year, month, day).toISOString().split('T')[0]
+      // Use UTC to avoid timezone offset issues
+      const dateString = new Date(Date.UTC(year, month, day)).toISOString().split('T')[0]
       const dateData = dateMap.get(dateString)
       
       // Check if date is in the past

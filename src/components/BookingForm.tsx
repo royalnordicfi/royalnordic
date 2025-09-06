@@ -37,6 +37,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [currentMonth, setCurrentMonth] = useState(new Date())
+  
 
 
   // Load availability data
@@ -61,14 +62,21 @@ const BookingForm: React.FC<BookingFormProps> = ({
       }
       
       // Transform the response to match the expected format
-      const transformedData = data.availableDates.map((date: any) => ({
-        id: date.id,
-        tour_id: tourId,
-        date: date.date,
-        available_slots: date.totalSlots,
-        total_booked: date.bookedSlots,
-        remaining_slots: date.availableSpots
-      }))
+      const transformedData = data.availableDates.map((date: any, index: number) => {
+        // Debug: Log any malformed dates
+        if (!date || !date.date || !date.id) {
+          console.log('Malformed date at index', index, ':', date)
+        }
+        
+        return {
+          id: date.id,
+          tour_id: tourId,
+          date: date.date,
+          available_slots: date.totalSlots,
+          total_booked: date.bookedSlots,
+          remaining_slots: date.availableSpots
+        }
+      }).filter(date => date.id && date.date) // Filter out malformed dates
       
       console.log('Availability data loaded:', transformedData.length, 'dates')
       console.log('First few dates:', transformedData.slice(0, 5))
@@ -87,6 +95,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // Debug: Check if September 1st is in the data (should NOT be)
       const sept1 = transformedData.find((d: any) => d.date === '2025-09-01')
       console.log('September 1st in data:', sept1)
+      
+      // Debug: Check if October 1st is in the data (should be)
+      const oct1 = transformedData.find((d: any) => d.date === '2025-10-01')
+      console.log('October 1st in data:', oct1)
+      
+      // Debug: Check for any empty or malformed dates
+      const malformedDates = transformedData.filter(d => !d.id || !d.date)
+      if (malformedDates.length > 0) {
+        console.log('Malformed dates found:', malformedDates)
+      }
+      
       setAvailability(transformedData)
     } catch (err) {
       setError('Failed to load availability')
@@ -131,15 +150,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
   // Navigate to previous month
   const goToPreviousMonth = () => {
     setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))
-    // Force refresh availability data when month changes
-    loadAvailability()
   }
 
   // Navigate to next month
   const goToNextMonth = () => {
     setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))
-    // Force refresh availability data when month changes
-    loadAvailability()
   }
 
   // Get month name and year
@@ -154,10 +169,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
   const getCalendarGrid = () => {
     const year = currentMonth.getFullYear()
     const month = currentMonth.getMonth()
-    const firstDay = new Date(year, month, 1)
-    const lastDay = new Date(year, month + 1, 0)
+    const firstDay = new Date(Date.UTC(year, month, 1))
+    const lastDay = new Date(Date.UTC(year, month + 1, 0))
     const startDate = new Date(firstDay)
     const endDate = new Date(lastDay)
+    
     
     // Get available dates for this month
     const monthDates = availability.filter(date => {
@@ -170,15 +186,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
     monthDates.forEach(date => {
       dateMap.set(date.date, date)
     })
+    
 
     // Create calendar grid
     const grid = []
-    const firstDayOfWeek = firstDay.getDay()
-    const daysInMonth = lastDay.getDate()
+    const firstDayOfWeek = firstDay.getUTCDay()
+    const daysInMonth = lastDay.getUTCDate()
     
     // Use simple date comparison to avoid timezone issues
     const today = new Date()
     const todayString = today.toISOString().split('T')[0] // Get YYYY-MM-DD format
+    
 
     // Add empty cells for days before the first of the month
     for (let i = 0; i < firstDayOfWeek; i++) {
@@ -187,8 +205,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
     // Add ALL days of the month (professional approach)
     for (let day = 1; day <= daysInMonth; day++) {
-      const dateString = new Date(year, month, day).toISOString().split('T')[0]
+      // Use UTC to avoid timezone offset issues
+      const dateString = new Date(Date.UTC(year, month, day)).toISOString().split('T')[0]
       const dateData = dateMap.get(dateString)
+      
       
       // Check if date is in the past (before today)
       const isPastDate = dateString < todayString
@@ -200,40 +220,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // CRITICAL: Only use database data for availability - no season filtering
       const isAvailable = !isPastDate && dateData && (dateData.remaining_slots || 0) > 0
       
-      // Debug logging for September 15th
-      if (dateString === '2025-09-15') {
-        console.log('September 15th debug:', {
-          dateString,
-          dateData,
-          isPastDate,
-          isAvailable,
-          remaining_slots: dateData?.remaining_slots,
-          todayString,
-          comparison: `${dateString} < ${todayString} = ${dateString < todayString}`
-        })
-      }
-      
-      // Debug logging for September 1st (should NOT be available)
-      if (dateString === '2025-09-01') {
-        console.log('September 1st debug:', {
-          dateString,
-          dateData,
-          isPastDate,
-          isAvailable,
-          remaining_slots: dateData?.remaining_slots
-        })
-      }
-      
-      // Debug logging for April 16th (should NOT be available)
-      if (dateString === '2026-04-16') {
-        console.log('April 16th debug:', {
-          dateString,
-          dateData,
-          isPastDate,
-          isAvailable,
-          remaining_slots: dateData?.remaining_slots
-        })
-      }
       
       // Determine date status:
       // - isPastDate: Past dates (gray, disabled)
@@ -490,19 +476,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
               const { day: calendarDay, date, available, remainingSlots, isPastDate, isOutOfSeason, isFullBooked } = day
               const isAvailable = available && remainingSlots >= (formData.adults + formData.children)
               
-              // Debug logging for September 15th
-              if (date === '2025-09-15') {
-                console.log('September 15th render debug:', {
-                  available,
-                  remainingSlots,
-                  adults: formData.adults,
-                  children: formData.children,
-                  totalRequested: formData.adults + formData.children,
-                  isAvailable,
-                  isOutOfSeason,
-                  isFullBooked
-                })
-              }
               
               return (
                 <button
@@ -519,7 +492,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
                       : isFullBooked
                       ? 'bg-red-100 text-red-600 border border-red-200 cursor-not-allowed'
                       : isAvailable
-                      ? 'bg-white border border-gray-300 hover:bg-blue-50 text-gray-900'
+                      ? 'bg-white border border-gray-300 hover:bg-blue-50 text-gray-900 cursor-pointer'
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   }`}
                   disabled={!isAvailable}

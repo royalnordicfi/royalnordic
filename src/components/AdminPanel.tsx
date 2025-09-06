@@ -39,10 +39,12 @@ const AdminPanel: React.FC = () => {
   const loadBookings = async () => {
     try {
       setLoading(true)
+      setError('')
       const data = await getAdminBookings()
       setBookings(data)
-    } catch (err) {
-      setError('Failed to load bookings')
+    } catch (err: any) {
+      console.error('Error loading bookings:', err)
+      setError(err.message || 'Failed to load bookings')
     } finally {
       setLoading(false)
     }
@@ -51,6 +53,7 @@ const AdminPanel: React.FC = () => {
   // Update booking status
   const handleStatusUpdate = async (bookingId: number, newStatus: 'pending' | 'confirmed' | 'cancelled') => {
     try {
+      setError('')
       await updateBookingStatus(bookingId, newStatus)
       // Update local state
       setBookings(prev => prev.map(booking => 
@@ -58,8 +61,9 @@ const AdminPanel: React.FC = () => {
           ? { ...booking, status: newStatus }
           : booking
       ))
-    } catch (err) {
-      setError('Failed to update booking status')
+    } catch (err: any) {
+      console.error('Error updating booking status:', err)
+      setError(err.message || 'Failed to update booking status')
     }
   }
 
@@ -83,7 +87,10 @@ const AdminPanel: React.FC = () => {
     cancelled: bookings.filter(b => b.status === 'cancelled').length,
     totalRevenue: bookings
       .filter(b => b.status === 'confirmed')
-      .reduce((sum, b) => sum + b.total_price, 0)
+      .reduce((sum, b) => sum + b.total_price, 0),
+    totalParticipants: bookings
+      .filter(b => b.status === 'confirmed')
+      .reduce((sum, b) => sum + b.adults + b.children, 0)
   }
 
   // Format date
@@ -136,8 +143,22 @@ const AdminPanel: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex">
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Error</h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{error}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -182,6 +203,18 @@ const AdminPanel: React.FC = () => {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Revenue</p>
                 <p className="text-2xl font-bold text-emerald-600">€{stats.totalRevenue}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Users className="w-6 h-6 text-purple-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Participants</p>
+                <p className="text-2xl font-bold text-purple-600">{stats.totalParticipants}</p>
               </div>
             </div>
           </div>
@@ -239,6 +272,9 @@ const AdminPanel: React.FC = () => {
                     Total
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Created
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -288,6 +324,14 @@ const AdminPanel: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {formatDate(booking.created_at)}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {formatTime(booking.created_at)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         booking.status === 'confirmed' 
                           ? 'bg-green-100 text-green-800'
@@ -306,23 +350,23 @@ const AdminPanel: React.FC = () => {
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        {booking.status === 'pending' && (
-                          <>
-                            <button
-                              onClick={() => handleStatusUpdate(booking.id, 'confirmed')}
-                              className="text-green-600 hover:text-green-900"
-                              title="Confirm booking"
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleStatusUpdate(booking.id, 'cancelled')}
-                              className="text-red-600 hover:text-red-900"
-                              title="Cancel booking"
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </button>
-                          </>
+                        {booking.status === 'confirmed' && (
+                          <button
+                            onClick={() => handleStatusUpdate(booking.id, 'cancelled')}
+                            className="text-red-600 hover:text-red-900"
+                            title="Cancel booking"
+                          >
+                            <XCircle className="w-4 h-4" />
+                          </button>
+                        )}
+                        {booking.status === 'cancelled' && (
+                          <button
+                            onClick={() => handleStatusUpdate(booking.id, 'confirmed')}
+                            className="text-green-600 hover:text-green-900"
+                            title="Re-activate booking"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                          </button>
                         )}
                       </div>
                     </td>
@@ -416,27 +460,27 @@ const AdminPanel: React.FC = () => {
 
                 {/* Actions */}
                 <div className="flex space-x-3 pt-4 border-t">
-                  {selectedBooking.status === 'pending' && (
-                    <>
-                      <button
-                        onClick={() => {
-                          handleStatusUpdate(selectedBooking.id, 'confirmed')
-                          setSelectedBooking(null)
-                        }}
-                        className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
-                      >
-                        Confirm Booking
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleStatusUpdate(selectedBooking.id, 'cancelled')
-                          setSelectedBooking(null)
-                        }}
-                        className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
-                      >
-                        Cancel Booking
-                      </button>
-                    </>
+                  {selectedBooking.status === 'confirmed' && (
+                    <button
+                      onClick={() => {
+                        handleStatusUpdate(selectedBooking.id, 'cancelled')
+                        setSelectedBooking(null)
+                      }}
+                      className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      Cancel Booking
+                    </button>
+                  )}
+                  {selectedBooking.status === 'cancelled' && (
+                    <button
+                      onClick={() => {
+                        handleStatusUpdate(selectedBooking.id, 'confirmed')
+                        setSelectedBooking(null)
+                      }}
+                      className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      Re-activate Booking
+                    </button>
                   )}
                   <button
                     onClick={() => setSelectedBooking(null)}
@@ -462,14 +506,14 @@ const AdminPanel: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Season:</span>
-                <span className="text-sm font-medium">Oct 1 - Apr 15</span>
+                <span className="text-sm font-medium">Sep 15 - Apr 15</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Max Capacity:</span>
                 <span className="text-sm font-medium">8 people</span>
               </div>
               <button
-                onClick={() => window.open('/admin-availability?tour=1', '_blank')}
+                onClick={() => window.open('/admin-availability.html', '_blank')}
                 className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Manage Availability
@@ -490,7 +534,7 @@ const AdminPanel: React.FC = () => {
                 <span className="text-sm font-medium">3 people</span>
               </div>
               <button
-                onClick={() => window.open('/admin-availability?tour=2', '_blank')}
+                onClick={() => window.open('/admin-availability.html', '_blank')}
                 className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
               >
                 Manage Availability

@@ -178,10 +178,13 @@ export async function createBooking(bookingData: {
     throw new Error(`Only ${remainingSlots} slots available`)
   }
 
-  // Create booking
+  // Create booking with confirmed status (automatic confirmation)
   const { data: booking, error: bookingError } = await supabase
     .from('bookings')
-    .insert([bookingData])
+    .insert([{
+      ...bookingData,
+      status: 'confirmed' // Automatically confirm bookings
+    }])
     .select()
     .single()
 
@@ -226,7 +229,7 @@ export async function createBooking(bookingData: {
         children: bookingData.children,
         totalPrice: bookingData.total_price,
         specialRequests: bookingData.special_requests,
-        paymentStatus: 'pending',
+        paymentStatus: 'confirmed',
         createdAt: new Date().toISOString()
       })
     } catch (error) {
@@ -240,8 +243,6 @@ export async function createBooking(bookingData: {
 
 // Admin API functions
 export async function adminLogin(email: string, password: string, secureKey: string) {
-  // Note: In Supabase, you might want to use built-in auth instead
-  // This is a simplified version for compatibility
   const { data, error } = await supabase
     .from('admin_users')
     .select('*')
@@ -252,8 +253,17 @@ export async function adminLogin(email: string, password: string, secureKey: str
     throw new Error('Invalid credentials')
   }
 
-  // In production, you'd verify password and secure key hashes here
-  // For now, we'll assume they're correct
+  // Check password and secure key
+  if (data.password_hash !== password) {
+    throw new Error('Invalid credentials')
+  }
+
+  // For now, we'll use a simple secure key check
+  // In production, you'd use proper hashing
+  if (secureKey !== 'admin1234567890123') {
+    throw new Error('Invalid credentials')
+  }
+
   return {
     token: 'admin-token', // You'd generate a real JWT here
     user: { id: data.id, email: data.email }
