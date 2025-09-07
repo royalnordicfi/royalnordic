@@ -5,7 +5,6 @@ import { CheckCircle, Mail, Calendar, Users } from 'lucide-react'
 const PaymentSuccess: React.FC = () => {
   const navigate = useNavigate()
   const [emailSent, setEmailSent] = useState(false)
-  const [emailError, setEmailError] = useState('')
   const [bookingData, setBookingData] = useState<any>(null)
 
   useEffect(() => {
@@ -15,45 +14,14 @@ const PaymentSuccess: React.FC = () => {
       const data = JSON.parse(stored)
       setBookingData(data)
       
-      // Send confirmation email
-      sendConfirmationEmail(data)
-      
       // Clear the stored data
       sessionStorage.removeItem('pendingBooking')
+      
+      // Emails are now sent by the Stripe webhook after payment confirmation
+      setEmailSent(true)
     }
   }, [])
 
-  const sendConfirmationEmail = async (data: any) => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-tour-booking-notification`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
-          customerName: data.customer_name,
-          customerEmail: data.customer_email,
-          adults: parseInt(data.adults),
-          children: parseInt(data.children),
-          totalPrice: data.total_price,
-          tourDate: data.tour_date,
-          tourName: data.tour_name || 'Tour Booking'
-        }),
-      })
-
-      if (response.ok) {
-        console.log('Confirmation email sent successfully')
-        setEmailSent(true)
-      } else {
-        console.error('Failed to send confirmation email')
-        setEmailError('Failed to send confirmation email')
-      }
-    } catch (error) {
-      console.error('Error sending confirmation email:', error)
-      setEmailError('Error sending confirmation email')
-    }
-  }
 
   if (!bookingData) {
     return (
@@ -128,22 +96,10 @@ const PaymentSuccess: React.FC = () => {
               <Mail className="w-4 h-4 mr-2 text-green-400" />
               <h3 className="font-semibold text-white text-sm">Confirmation Email</h3>
             </div>
-            {emailSent ? (
-              <div className="text-green-400 text-xs flex items-center">
-                <span className="text-green-500 mr-2">✓</span>
-                Sent to {bookingData.customer_email}
-              </div>
-            ) : emailError ? (
-              <div className="text-red-400 text-xs flex items-center">
-                <span className="text-red-500 mr-2">✗</span>
-                {emailError}
-              </div>
-            ) : (
-              <div className="text-gray-300 text-xs flex items-center">
-                <span className="text-green-500 mr-2">📧</span>
-                Sending confirmation email...
-              </div>
-            )}
+            <div className="text-green-400 text-xs flex items-center">
+              <span className="text-green-500 mr-2">✓</span>
+              Confirmation email will be sent to {bookingData.customer_email}
+            </div>
           </div>
 
           {/* Next Steps */}
