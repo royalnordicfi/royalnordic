@@ -70,6 +70,26 @@ serve(async (req) => {
         stripe_session_id: session.id
       })
 
+      // First, check availability and update slots
+      const { data: dateData, error: dateError } = await supabase
+        .from('tour_dates')
+        .select('available_slots, total_booked')
+        .eq('id', parseInt(tour_date_id))
+        .single()
+
+      if (dateError) {
+        console.error('Error fetching date data:', dateError)
+        throw new Error('Date not found')
+      }
+
+      const remainingSlots = dateData.available_slots - dateData.total_booked
+      const requestedSlots = parseInt(adults) + parseInt(children)
+
+      if (requestedSlots > remainingSlots) {
+        console.error('Not enough slots available')
+        throw new Error(`Only ${remainingSlots} slots available`)
+      }
+
       // Create booking record
       const { data: booking, error: bookingError } = await supabase
         .from('bookings')
@@ -82,7 +102,7 @@ serve(async (req) => {
           children: parseInt(children),
           total_price: parseFloat(total_price),
           status: 'confirmed',
-          payment_intent_id: session.payment_intent,
+          stripe_payment_intent_id: session.payment_intent,
           stripe_session_id: session.id
         })
         .select()
@@ -90,39 +110,56 @@ serve(async (req) => {
 
       if (bookingError) {
         console.error('Error creating booking:', bookingError)
-        // Don't throw error, just log it and continue
-        console.log('Booking creation failed, but continuing with email...')
-        
-        // Create a dummy booking ID for email
-        const dummyBookingId = Date.now()
-        
-        // Send booking confirmation email anyway
-        await sendBookingNotification({
-          customerName: customer_name,
-          customerEmail: customer_email,
-          adults: parseInt(adults),
-          children: parseInt(children),
-          totalPrice: total_price,
-          tourDate: session.metadata.tour_date,
-          bookingId: dummyBookingId
-        })
-
-        return new Response(
-          JSON.stringify({ success: true, booking_error: bookingError.message, email_sent: true }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
+        throw new Error(bookingError.message)
       }
 
-      // Send booking confirmation email
-      await sendBookingNotification({
-        customerName: customer_name,
-        customerEmail: customer_email,
-        adults: parseInt(adults),
-        children: parseInt(children),
-        totalPrice: total_price,
-        tourDate: session.metadata.tour_date,
-        bookingId: booking.id
-      })
+      // Update available slots
+      const { error: updateError } = await supabase
+        .from('tour_dates')
+        .update({ total_booked: dateData.total_booked + requestedSlots })
+        .eq('id', parseInt(tour_date_id))
+
+      if (updateError) {
+        console.error('Error updating slots:', updateError)
+        // Don't fail the booking if slot update fails
+      }
+
+      // Get tour and date information for email
+      const { data: tourData } = await supabase
+        .from('tours')
+        .select('name')
+        .eq('id', parseInt(tour_id))
+        .single()
+
+      const { data: dateDataForEmail } = await supabase
+        .from('tour_dates')
+        .select('date')
+        .eq('id', parseInt(tour_date_id))
+        .single()
+
+      // Send booking confirmation emails
+      if (tourData && dateDataForEmail) {
+        const emailData = {
+          bookingId: booking.id,
+          customerName: customer_name,
+          customerEmail: customer_email,
+          customerPhone: '',
+          tourName: tourData.name,
+          tourDate: dateDataForEmail.date,
+          adults: parseInt(adults),
+          children: parseInt(children),
+          totalPrice: parseFloat(total_price),
+          specialRequests: '',
+          paymentStatus: 'confirmed' as const,
+          createdAt: new Date().toISOString()
+        }
+
+        // Send notification to Royal Nordic staff
+        await sendBookingNotification(emailData)
+        
+        // Send confirmation to customer
+        await sendCustomerConfirmation(emailData)
+      }
 
       return new Response(
         JSON.stringify({ success: true, booking_id: booking.id }),
@@ -164,42 +201,16 @@ class Stripe {
   }
 }
 
-// Send booking confirmation email using Resend
-async function sendBookingNotification({
-  customerName,
-  customerEmail,
-  adults,
-  children,
-  totalPrice,
-  tourDate,
-  bookingId
-}: {
-  customerName: string
-  customerEmail: string
-  adults: number
-  children: number
-  totalPrice: string
-  tourDate: string
-  bookingId: number
-}) {
+// Send booking notification to Royal Nordic staff
+async function sendBookingNotification(bookingData: any) {
+  const resendApiKey = Deno.env.get('RESEND_API_KEY')
+  if (!resendApiKey) {
+    console.log('Resend API key missing, cannot send email')
+    return
+  }
+
   try {
-    // Get Resend API key
-    const resendApiKey = Deno.env.get('RESEND_API_KEY')
-    
-    if (!resendApiKey) {
-      console.log('Resend API key missing, cannot send confirmation email')
-      return
-    }
-
-    // Calculate price breakdown
-    const adultPrice = 179
-    const childPrice = 149
-    const adultTotal = adultPrice * adults
-    const childTotal = childPrice * children
-    const totalPriceNum = parseFloat(totalPrice)
-
-    // Send confirmation email to customer
-    const customerResponse = await fetch('https://api.resend.com/emails', {
+    const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${resendApiKey}`,
@@ -207,80 +218,138 @@ async function sendBookingNotification({
       },
       body: JSON.stringify({
         from: 'Royal Nordic <contact@royalnordic.fi>',
-        to: [customerEmail],
-        subject: `Booking Confirmation - Northern Lights Tour - Royal Nordic`,
+        to: ['royalnordicfi@gmail.com', 'contact@royalnordic.fi'],
+        subject: `New Booking: ${bookingData.tourName} - ${bookingData.customerName}`,
+        html: `
+          <h2>🌟 New Booking Alert</h2>
+          <h3>📋 Booking Details</h3>
+          <p><strong>Booking ID:</strong> #${bookingData.bookingId}</p>
+          <p><strong>Tour:</strong> ${bookingData.tourName}</p>
+          <p><strong>Date:</strong> ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}</p>
+          <p><strong>Status:</strong> ${bookingData.paymentStatus.toUpperCase()}</p>
+          
+          <h3>👥 Customer Information</h3>
+          <p><strong>Name:</strong> ${bookingData.customerName}</p>
+          <p><strong>Email:</strong> ${bookingData.customerEmail}</p>
+          <p><strong>Phone:</strong> ${bookingData.customerPhone || 'Not provided'}</p>
+          
+          <h3>💰 Pricing</h3>
+          <p><strong>Adults:</strong> ${bookingData.adults}</p>
+          <p><strong>Children:</strong> ${bookingData.children}</p>
+          <p><strong>Total:</strong> €${bookingData.totalPrice}</p>
+          
+          ${bookingData.specialRequests ? `
+          <h3>📝 Special Requests</h3>
+          <p>${bookingData.specialRequests}</p>
+          ` : ''}
+          
+          <p><strong>⏰ Booking Time:</strong> ${new Date(bookingData.createdAt).toLocaleString('fi-FI')}</p>
+        `,
+        text: `
+New Booking Alert - Royal Nordic Tours
+
+📋 Booking Details:
+- Booking ID: #${bookingData.bookingId}
+- Tour: ${bookingData.tourName}
+- Date: ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}
+- Status: ${bookingData.paymentStatus.toUpperCase()}
+
+👥 Customer Information:
+- Name: ${bookingData.customerName}
+- Email: ${bookingData.customerEmail}
+- Phone: ${bookingData.customerPhone || 'Not provided'}
+
+💰 Pricing:
+- Adults: ${bookingData.adults}
+- Children: ${bookingData.children}
+- Total: €${bookingData.totalPrice}
+
+${bookingData.specialRequests ? `
+📝 Special Requests:
+${bookingData.specialRequests}
+` : ''}
+
+⏰ Booking Time: ${new Date(bookingData.createdAt).toLocaleString('fi-FI')}
+        `,
+      }),
+    })
+
+    if (response.ok) {
+      console.log('Admin notification email sent successfully')
+    } else {
+      console.error('Failed to send admin notification:', response.status, response.statusText)
+    }
+  } catch (error) {
+    console.error('Error sending admin notification:', error)
+  }
+}
+
+// Send booking confirmation to customer
+async function sendCustomerConfirmation(bookingData: any) {
+  const resendApiKey = Deno.env.get('RESEND_API_KEY')
+  if (!resendApiKey) {
+    console.log('Resend API key missing, cannot send email')
+    return
+  }
+
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Royal Nordic <contact@royalnordic.fi>',
+        to: [bookingData.customerEmail],
+        subject: `Booking Confirmed: ${bookingData.tourName} - Royal Nordic`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f9fa;">
-            <!-- Header with Company Name -->
             <div style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #1f2937 0%, #374151 100%);">
               <h1 style="color: white; margin: 0 0 10px 0; font-size: 36px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">Royal Nordic</h1>
               <p style="color: #9ca3af; margin: 0; font-size: 16px; font-style: italic;">Finnish Lapland Adventures</p>
             </div>
             
-            <!-- Main Content -->
             <div style="background-color: white; padding: 40px 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
               <h1 style="color: #1f2937; margin-bottom: 25px; font-size: 28px; text-align: center;">Booking Confirmed! 🎉</h1>
               
               <p style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px;">
-                Dear <strong>${customerName}</strong>,
+                Dear <strong>${bookingData.customerName}</strong>,
               </p>
               
               <p style="color: #4b5563; line-height: 1.7; margin-bottom: 30px; font-size: 16px;">
                 Thank you for booking with Royal Nordic! Your Lapland adventure is confirmed and we're excited to show you the magic of the Northern Lights.
               </p>
               
-              <!-- Tour Details -->
               <div style="background-color: #f3f4f6; padding: 25px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #059669;">
-                <h3 style="color: #1f2937; margin-bottom: 20px; font-size: 20px;">Tour Details</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                  <div>
-                    <p style="margin: 8px 0; font-size: 14px;"><strong>Tour:</strong> Northern Lights Tour</p>
-                    <p style="margin: 8px 0; font-size: 14px;"><strong>Date:</strong> ${tourDate}</p>
-                    <p style="margin: 8px 0; font-size: 14px;"><strong>Adults:</strong> ${adults}</p>
-                    <p style="margin: 8px 0; font-size: 14px;"><strong>Children:</strong> ${children}</p>
-                  </div>
-                  <div>
-                    <p style="margin: 8px 0; font-size: 14px;"><strong>Booking ID:</strong> #${bookingId}</p>
-                    <p style="margin: 8px 0; font-size: 14px;"><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">Confirmed</span></p>
-                  </div>
-                </div>
+                <h3 style="color: #1f2937; margin-bottom: 20px; font-size: 20px;">📋 Your Booking Details</h3>
+                <p><strong>Booking ID:</strong> #${bookingData.bookingId}</p>
+                <p><strong>Tour:</strong> ${bookingData.tourName}</p>
+                <p><strong>Date:</strong> ${new Date(bookingData.tourDate).toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</p>
+                <p><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">CONFIRMED</span></p>
               </div>
               
-              <!-- Price Breakdown -->
-              <div style="background-color: #ecfdf5; padding: 25px; border-radius: 8px; margin: 25px 0; border: 1px solid #a7f3d0;">
-                <h3 style="color: #1f2937; margin-bottom: 20px; font-size: 20px;">Price Breakdown</h3>
-                <div style="display: grid; grid-template-columns: 1fr auto; gap: 15px; font-size: 14px;">
-                  <div>
-                    <p style="margin: 8px 0;">${adults} × Adult (€${adultPrice})</p>
-                    <p style="margin: 8px 0;">${children} × Child (€${childPrice})</p>
-                  </div>
-                  <div style="text-align: right;">
-                    <p style="margin: 8px 0;">€${adultTotal.toFixed(2)}</p>
-                    <p style="margin: 8px 0;">€${childTotal.toFixed(2)}</p>
-                  </div>
-                </div>
-                <hr style="border: none; border-top: 1px solid #d1fae5; margin: 15px 0;">
-                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 16px;">
-                  <span>Total:</span>
-                  <span>€${totalPriceNum.toFixed(2)}</span>
-                </div>
+              <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 10px 0;">
+                <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 18px;">👥 Your Group</h3>
+                <p><strong>Adults:</strong> ${bookingData.adults}</p>
+                <p><strong>Children:</strong> ${bookingData.children}</p>
+                <p><strong>Total Amount:</strong> €${bookingData.totalPrice}</p>
               </div>
               
               <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 25px 0; border: 1px solid #f59e0b;">
-                <h3 style="color: #92400e; margin-bottom: 15px; font-size: 18px;">📋 What to Expect</h3>
+                <h3 style="color: #92400e; margin-bottom: 15px; font-size: 18px;">🎯 What's Next?</h3>
                 <ul style="color: #92400e; margin: 0; padding-left: 20px; font-size: 14px;">
-                  <li>Professional Northern Lights hunting experience</li>
-                  <li>Expert local guides with years of experience</li>
-                  <li>All necessary equipment provided</li>
-                  <li>Hot drinks and snacks included</li>
-                  <li>Professional photography assistance</li>
-                  <li>Guaranteed Northern Lights or free return trip</li>
+                  <li>You will receive a reminder email 24 hours before your tour</li>
+                  <li>Please arrive 15 minutes before your scheduled time</li>
+                  <li>Dress warmly for Arctic conditions</li>
+                  <li>Contact us if you have any questions</li>
                 </ul>
               </div>
-              
-              <p style="color: #4b5563; line-height: 1.7; margin-bottom: 30px; font-size: 16px;">
-                We'll send you detailed meeting instructions and what to bring 24 hours before your tour. If you have any questions, don't hesitate to contact us!
-              </p>
               
               <p style="color: #4b5563; line-height: 1.7; margin-bottom: 30px; font-size: 16px;">
                 Best regards,<br>
@@ -288,120 +357,55 @@ async function sendBookingNotification({
               </p>
             </div>
             
-            <!-- Footer -->
             <div style="text-align: center; padding: 30px 20px; background-color: #1f2937; color: white;">
               <h3 style="margin-bottom: 20px; font-size: 18px;">Contact Information</h3>
-              <div style="display: inline-block; text-align: left;">
-                <p style="margin: 8px 0; font-size: 14px;">
-                  📧 <a href="mailto:contact@royalnordic.fi" style="color: #10b981; text-decoration: none;">contact@royalnordic.fi</a>
-                </p>
-                <p style="margin: 8px 0; font-size: 14px;">
-                  📞 <a href="tel:+3584578345138" style="color: #10b981; text-decoration: none;">+358 45 78345138</a>
-                </p>
-                <p style="margin: 8px 0; font-size: 14px;">
-                  🌍 <a href="https://royalnordic.fi" style="color: #10b981; text-decoration: none;">royalnordic.fi</a>
-                </p>
-              </div>
-              <p style="margin: 20px 0 0 0; font-size: 12px; color: #9ca3af;">
-                Rovaniemi, Finnish Lapland
-              </p>
+              <p style="margin: 8px 0; font-size: 14px;">📧 contact@royalnordic.fi</p>
+              <p style="margin: 8px 0; font-size: 14px;">📞 +358 45 78345138</p>
+              <p style="margin: 8px 0; font-size: 14px;">🌍 royalnordic.fi</p>
             </div>
           </div>
         `,
         text: `
-Booking Confirmation - Northern Lights Tour - Royal Nordic
+Booking Confirmed - Royal Nordic Tours
 
-Dear ${customerName},
+Thank you for your booking, ${bookingData.customerName}!
 
-Thank you for booking with Royal Nordic! Your Lapland adventure is confirmed and we're excited to show you the magic of the Northern Lights.
+Your tour has been successfully confirmed. We're excited to show you the magic of Lapland!
 
-Tour Details:
-- Tour: Northern Lights Tour
-- Date: ${tourDate}
-- Adults: ${adults}
-- Children: ${children}
-- Booking ID: #${bookingId}
-- Status: Confirmed
+📋 Your Booking Details:
+- Booking ID: #${bookingData.bookingId}
+- Tour: ${bookingData.tourName}
+- Date: ${new Date(bookingData.tourDate).toLocaleDateString('en-US', { 
+  weekday: 'long', 
+  year: 'numeric', 
+  month: 'long', 
+  day: 'numeric' 
+})}
+- Status: CONFIRMED
 
-Price Breakdown:
-${adults} × Adult (€${adultPrice}): €${adultTotal.toFixed(2)}
-${children} × Child (€${childPrice}): €${childTotal.toFixed(2)}
-Total: €${totalPriceNum.toFixed(2)}
+👥 Your Group:
+- Adults: ${bookingData.adults}
+- Children: ${bookingData.children}
+- Total Amount: €${bookingData.totalPrice}
 
-What to Expect:
-- Professional Northern Lights hunting experience
-- Expert local guides with years of experience
-- All necessary equipment provided
-- Hot drinks and snacks included
-- Professional photography assistance
-- Guaranteed Northern Lights or free return trip
+🎯 What's Next?
+• You will receive a reminder email 24 hours before your tour
+• Please arrive 15 minutes before your scheduled time
+• Dress warmly for Arctic conditions
+• Contact us if you have any questions
 
-We'll send you detailed meeting instructions and what to bring 24 hours before your tour. If you have any questions, don't hesitate to contact us!
-
-Best regards,
-The Royal Nordic Team
-
-Contact Information:
-📧 contact@royalnordic.fi
-📞 +358 45 78345138
-🌍 royalnordic.fi
-Rovaniemi, Finnish Lapland
+Thank you for choosing Royal Nordic Tours!
+Booking ID: #${bookingData.bookingId}
         `,
       }),
-    });
+    })
 
-    if (customerResponse.ok) {
-      console.log('Booking confirmation email sent successfully to:', customerEmail);
+    if (response.ok) {
+      console.log('Customer confirmation email sent successfully to:', bookingData.customerEmail)
     } else {
-      console.error('Failed to send confirmation email:', customerResponse.status, customerResponse.statusText);
+      console.error('Failed to send customer confirmation:', response.status, response.statusText)
     }
-
-    // Send notification email to business
-    const businessResponse = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'Royal Nordic <contact@royalnordic.fi>',
-        to: ['royalnordicfi@gmail.com'],
-        subject: `New Booking Confirmation - ${customerName} - Royal Nordic`,
-        html: `
-          <h2>New Booking Confirmation</h2>
-          <p><strong>Customer:</strong> ${customerName}</p>
-          <p><strong>Email:</strong> ${customerEmail}</p>
-          <p><strong>Adults:</strong> ${adults}</p>
-          <p><strong>Children:</strong> ${children}</p>
-          <p><strong>Total Price:</strong> €${totalPrice}</p>
-          <p><strong>Tour Date:</strong> ${tourDate}</p>
-          <p><strong>Booking ID:</strong> #${bookingId}</p>
-          <hr>
-          <p><em>This booking was confirmed through Stripe payment.</em></p>
-        `,
-        text: `
-New Booking Confirmation
-
-Customer: ${customerName}
-Email: ${customerEmail}
-Adults: ${adults}
-Children: ${children}
-Total Price: €${totalPrice}
-Tour Date: ${tourDate}
-Booking ID: #${bookingId}
-
-This booking was confirmed through Stripe payment.
-        `,
-      }),
-    });
-
-    if (businessResponse.ok) {
-      console.log('Business notification email sent successfully');
-    } else {
-      console.error('Failed to send business notification:', businessResponse.status, businessResponse.statusText);
-    }
-    
   } catch (error) {
-    console.error('Error sending booking confirmation email:', error);
+    console.error('Error sending customer confirmation:', error)
   }
 }
