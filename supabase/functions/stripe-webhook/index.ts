@@ -13,30 +13,8 @@ serve(async (req) => {
   }
 
   try {
-    // Get the raw body for signature verification
-    const body = await req.text()
-    const signature = req.headers.get('stripe-signature')
-    
-    // Get environment variables
-    const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY')
-    const stripeWebhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
-    
-    if (!stripeSecretKey || !stripeWebhookSecret) {
-      throw new Error('Missing Stripe environment variables')
-    }
-
-    // Parse the event
-    let event
-    try {
-      event = JSON.parse(body)
-    } catch (err) {
-      throw new Error('Invalid JSON payload')
-    }
-
-    // Verify webhook signature (simplified for now)
-    if (!signature) {
-      console.log('No signature provided, but continuing...')
-    }
+    const event = await parseWebhookPayload(req)
+    console.log('Received webhook event:', event.type)
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object
@@ -114,7 +92,7 @@ serve(async (req) => {
 
       if (bookingError) {
         console.error('Error creating booking:', bookingError)
-        throw new Error(bookingError.message)
+        throw new Error('Failed to create booking')
       }
 
       // Update available slots
@@ -159,10 +137,10 @@ serve(async (req) => {
         }
 
         // Send notification to Royal Nordic staff
-        await sendBookingNotification(emailData)
+        await sendEmailNotification(emailData, 'admin')
         
         // Send confirmation to customer
-        await sendCustomerConfirmation(emailData)
+        await sendEmailNotification(emailData, 'customer')
       }
 
       return new Response(
@@ -185,42 +163,33 @@ serve(async (req) => {
   }
 })
 
-// Stripe class for Deno
-class Stripe {
-  private secretKey: string
-  private baseURL = 'https://api.stripe.com/v1'
-
-  constructor(secretKey: string) {
-    this.secretKey = secretKey
-  }
-
-  verifyWebhook(payload: string, secret: string) {
-    // Simple webhook verification - in production, use proper crypto verification
-    try {
-      const event = JSON.parse(payload)
-      return event
-    } catch (error) {
-      throw new Error('Invalid webhook payload')
-    }
+// Parse webhook payload
+async function parseWebhookPayload(req: Request) {
+  const payload = await req.text()
+  
+  try {
+    const event = JSON.parse(payload)
+    return event
+  } catch (error) {
+    throw new Error('Invalid webhook payload')
   }
 }
 
-// Send booking notification to Royal Nordic staff
-async function sendBookingNotification(bookingData: any) {
+// Unified email sending function
+async function sendEmailNotification(bookingData: any, type: 'admin' | 'customer') {
   const resendApiKey = Deno.env.get('RESEND_API_KEY')
+  console.log(`Resend API key found for ${type} email:`, resendApiKey ? 'YES' : 'NO')
+  
   if (!resendApiKey) {
     console.log('Resend API key missing, cannot send email')
     return
   }
 
   try {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    let emailData: any = {}
+
+    if (type === 'admin') {
+      emailData = {
         from: 'Royal Nordic <contact@royalnordic.fi>',
         to: ['royalnordicfi@gmail.com', 'contact@royalnordic.fi'],
         subject: `New Booking: ${bookingData.tourName} - ${bookingData.customerName}`,
@@ -268,42 +237,13 @@ New Booking Alert - Royal Nordic Tours
 - Children: ${bookingData.children}
 - Total: €${bookingData.totalPrice}
 
-${bookingData.specialRequests ? `
-📝 Special Requests:
-${bookingData.specialRequests}
-` : ''}
+${bookingData.specialRequests ? `📝 Special Requests: ${bookingData.specialRequests}` : ''}
 
 ⏰ Booking Time: ${new Date(bookingData.createdAt).toLocaleString('fi-FI')}
-        `,
-      }),
-    })
-
-    if (response.ok) {
-      console.log('Admin notification email sent successfully')
+        `
+      }
     } else {
-      console.error('Failed to send admin notification:', response.status, response.statusText)
-    }
-  } catch (error) {
-    console.error('Error sending admin notification:', error)
-  }
-}
-
-// Send booking confirmation to customer
-async function sendCustomerConfirmation(bookingData: any) {
-  const resendApiKey = Deno.env.get('RESEND_API_KEY')
-  if (!resendApiKey) {
-    console.log('Resend API key missing, cannot send email')
-    return
-  }
-
-  try {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+      emailData = {
         from: 'Royal Nordic <contact@royalnordic.fi>',
         to: [bookingData.customerEmail],
         subject: `Booking Confirmed: ${bookingData.tourName} - Royal Nordic`,
@@ -321,39 +261,41 @@ async function sendCustomerConfirmation(bookingData: any) {
                 Dear <strong>${bookingData.customerName}</strong>,
               </p>
               
-              <p style="color: #4b5563; line-height: 1.7; margin-bottom: 30px; font-size: 16px;">
-                Thank you for booking with Royal Nordic! Your Lapland adventure is confirmed and we're excited to show you the magic of the Northern Lights.
+              <p style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px;">
+                Thank you for booking your Lapland adventure with Royal Nordic! We're excited to welcome you to the magical world of Finnish Lapland.
               </p>
               
               <div style="background-color: #f3f4f6; padding: 25px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #059669;">
-                <h3 style="color: #1f2937; margin-bottom: 20px; font-size: 20px;">📋 Your Booking Details</h3>
-                <p><strong>Booking ID:</strong> #${bookingData.bookingId}</p>
-                <p><strong>Tour:</strong> ${bookingData.tourName}</p>
-                <p><strong>Date:</strong> ${new Date(bookingData.tourDate).toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}</p>
-                <p><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">CONFIRMED</span></p>
+                <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 18px;">Your Booking Details:</h3>
+                <p style="color: #4b5563; margin: 8px 0;"><strong>Booking ID:</strong> #${bookingData.bookingId}</p>
+                <p style="color: #4b5563; margin: 8px 0;"><strong>Tour:</strong> ${bookingData.tourName}</p>
+                <p style="color: #4b5563; margin: 8px 0;"><strong>Date:</strong> ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}</p>
+                <p style="color: #4b5563; margin: 8px 0;"><strong>Adults:</strong> ${bookingData.adults}</p>
+                <p style="color: #4b5563; margin: 8px 0;"><strong>Children:</strong> ${bookingData.children}</p>
+                <p style="color: #4b5563; margin: 8px 0;"><strong>Total Amount:</strong> €${bookingData.totalPrice}</p>
+                ${bookingData.specialRequests ? `<p style="color: #4b5563; margin: 8px 0;"><strong>Special Requests:</strong> ${bookingData.specialRequests}</p>` : ''}
               </div>
               
-              <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 10px 0;">
-                <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 18px;">👥 Your Group</h3>
-                <p><strong>Adults:</strong> ${bookingData.adults}</p>
-                <p><strong>Children:</strong> ${bookingData.children}</p>
-                <p><strong>Total Amount:</strong> €${bookingData.totalPrice}</p>
+              <div style="background-color: #ecfdf5; padding: 20px; border-radius: 8px; margin: 25px 0; border: 1px solid #a7f3d0;">
+                <p style="color: #065f46; margin: 0; font-size: 16px; text-align: center;">
+                  <strong>✅ Your booking is confirmed!</strong>
+                </p>
               </div>
               
-              <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 25px 0; border: 1px solid #f59e0b;">
-                <h3 style="color: #92400e; margin-bottom: 15px; font-size: 18px;">🎯 What's Next?</h3>
-                <ul style="color: #92400e; margin: 0; padding-left: 20px; font-size: 14px;">
-                  <li>You will receive a reminder email 24 hours before your tour</li>
-                  <li>Please arrive 15 minutes before your scheduled time</li>
-                  <li>Dress warmly for Arctic conditions</li>
-                  <li>Contact us if you have any questions</li>
-                </ul>
-              </div>
+              <p style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px;">
+                <strong>What happens next?</strong>
+              </p>
+              
+              <ul style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px; padding-left: 20px;">
+                <li>You'll receive detailed tour information 24 hours before your adventure</li>
+                <li>Meet your guide at the designated location</li>
+                <li>All equipment and safety gear will be provided</li>
+                <li>Enjoy your unforgettable Lapland experience!</li>
+              </ul>
+              
+              <p style="color: #4b5563; line-height: 1.7; margin-bottom: 30px; font-size: 16px;">
+                If you have any questions or need to make changes, please contact us at <a href="mailto:contact@royalnordic.fi" style="color: #059669; text-decoration: none; font-weight: 600;">contact@royalnordic.fi</a> or call +358 45 78345138.
+              </p>
               
               <p style="color: #4b5563; line-height: 1.7; margin-bottom: 30px; font-size: 16px;">
                 Best regards,<br>
@@ -363,53 +305,77 @@ async function sendCustomerConfirmation(bookingData: any) {
             
             <div style="text-align: center; padding: 30px 20px; background-color: #1f2937; color: white;">
               <h3 style="margin-bottom: 20px; font-size: 18px;">Contact Information</h3>
-              <p style="margin: 8px 0; font-size: 14px;">📧 contact@royalnordic.fi</p>
-              <p style="margin: 8px 0; font-size: 14px;">📞 +358 45 78345138</p>
-              <p style="margin: 8px 0; font-size: 14px;">🌍 royalnordic.fi</p>
+              <div style="display: inline-block; text-align: left;">
+                <p style="margin: 8px 0; font-size: 14px;">
+                  📧 <a href="mailto:contact@royalnordic.fi" style="color: #10b981; text-decoration: none;">contact@royalnordic.fi</a>
+                </p>
+                <p style="margin: 8px 0; font-size: 14px;">
+                  📞 <a href="tel:+3584578345138" style="color: #10b981; text-decoration: none;">+358 45 78345138</a>
+                </p>
+                <p style="margin: 8px 0; font-size: 14px;">
+                  🌍 <a href="https://royalnordic.fi" style="color: #10b981; text-decoration: none;">royalnordic.fi</a>
+                </p>
+              </div>
+              <p style="margin: 20px 0 0 0; font-size: 12px; color: #9ca3af;">
+                Rovaniemi, Finnish Lapland
+              </p>
             </div>
           </div>
         `,
         text: `
 Booking Confirmed - Royal Nordic Tours
 
-Thank you for your booking, ${bookingData.customerName}!
+Dear ${bookingData.customerName},
 
-Your tour has been successfully confirmed. We're excited to show you the magic of Lapland!
+Thank you for booking your Lapland adventure with Royal Nordic! We're excited to welcome you to the magical world of Finnish Lapland.
 
-📋 Your Booking Details:
+Your Booking Details:
 - Booking ID: #${bookingData.bookingId}
 - Tour: ${bookingData.tourName}
-- Date: ${new Date(bookingData.tourDate).toLocaleDateString('en-US', { 
-  weekday: 'long', 
-  year: 'numeric', 
-  month: 'long', 
-  day: 'numeric' 
-})}
-- Status: CONFIRMED
-
-👥 Your Group:
+- Date: ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}
 - Adults: ${bookingData.adults}
 - Children: ${bookingData.children}
 - Total Amount: €${bookingData.totalPrice}
+${bookingData.specialRequests ? `- Special Requests: ${bookingData.specialRequests}` : ''}
 
-🎯 What's Next?
-• You will receive a reminder email 24 hours before your tour
-• Please arrive 15 minutes before your scheduled time
-• Dress warmly for Arctic conditions
-• Contact us if you have any questions
+✅ Your booking is confirmed!
 
-Thank you for choosing Royal Nordic Tours!
-Booking ID: #${bookingData.bookingId}
-        `,
-      }),
+What happens next?
+- You'll receive detailed tour information 24 hours before your adventure
+- Meet your guide at the designated location
+- All equipment and safety gear will be provided
+- Enjoy your unforgettable Lapland experience!
+
+If you have any questions or need to make changes, please contact us at contact@royalnordic.fi or call +358 45 78345138.
+
+Best regards,
+The Royal Nordic Team
+
+Contact Information:
+📧 contact@royalnordic.fi
+📞 +358 45 78345138
+🌍 royalnordic.fi
+Rovaniemi, Finnish Lapland
+        `
+      }
+    }
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(emailData),
     })
 
-    if (response.ok) {
-      console.log('Customer confirmation email sent successfully to:', bookingData.customerEmail)
+    if (!response.ok) {
+      const error = await response.text()
+      console.error(`Failed to send ${type} email:`, error)
     } else {
-      console.error('Failed to send customer confirmation:', response.status, response.statusText)
+      console.log(`${type} email sent successfully`)
     }
   } catch (error) {
-    console.error('Error sending customer confirmation:', error)
+    console.error(`Error sending ${type} email:`, error)
   }
 }
