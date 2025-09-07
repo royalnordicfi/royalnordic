@@ -49,8 +49,12 @@ serve(async (req) => {
         customer_email,
         adults,
         children,
-        total_price
+        total_price,
+        phone,
+        special_requests
       } = session.metadata
+
+      console.log('Received metadata:', session.metadata)
 
       // Create Supabase client
       const supabaseUrl = Deno.env.get('SUPABASE_URL')!
@@ -98,10 +102,12 @@ serve(async (req) => {
           tour_date_id: parseInt(tour_date_id),
           customer_name,
           customer_email,
+          customer_phone: phone || '',
           adults: parseInt(adults),
           children: parseInt(children),
           total_price: parseFloat(total_price),
           status: 'confirmed',
+          special_requests: special_requests || '',
           stripe_payment_intent_id: session.payment_intent,
           stripe_session_id: session.id
         })
@@ -143,13 +149,13 @@ serve(async (req) => {
           bookingId: booking.id,
           customerName: customer_name,
           customerEmail: customer_email,
-          customerPhone: '',
+          customerPhone: phone || '',
           tourName: tourData.name,
           tourDate: dateDataForEmail.date,
           adults: parseInt(adults),
           children: parseInt(children),
           totalPrice: parseFloat(total_price),
-          specialRequests: '',
+          specialRequests: special_requests || '',
           paymentStatus: 'confirmed' as const,
           createdAt: new Date().toISOString()
         }

@@ -328,7 +328,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
           customer_email: formData.email,
           adults: formData.adults.toString(),
           children: formData.children.toString(),
-          total_price: totalPrice.toString()
+          total_price: totalPrice.toString(),
+          phone: formData.phone,
+          special_requests: formData.specialRequests
         }
       }
 
