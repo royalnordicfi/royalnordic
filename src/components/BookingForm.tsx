@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 // import { Calendar, Users, Mail, Phone, MessageSquare, CreditCard } from 'lucide-react'
 import { createCheckoutSession, redirectToCheckout } from '../lib/stripe'
 import { createCryptoCheckout, redirectToCryptoCheckout } from '../lib/crypto'
-import { sendBookingNotification, sendCustomerConfirmation } from '../lib/email'
 import { supabase } from '../lib/supabase'
 import type { TourDate } from '../lib/supabase'
 
@@ -267,36 +266,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
     return dateData?.remaining_slots || 0
   }
 
-  // Send booking confirmation emails immediately
-  const sendBookingEmails = async (bookingData: any) => {
-    try {
-      const emailData = {
-        bookingId: Date.now(), // Temporary ID for email
-        customerName: bookingData.customer_name,
-        customerEmail: bookingData.customer_email,
-        customerPhone: bookingData.phone || '',
-        tourName: tourName,
-        tourDate: bookingData.tour_date,
-        adults: parseInt(bookingData.adults),
-        children: parseInt(bookingData.children),
-        totalPrice: parseFloat(bookingData.total_price),
-        specialRequests: bookingData.special_requests || '',
-        paymentStatus: 'confirmed' as const,
-        createdAt: new Date().toISOString()
-      }
-
-      // Send notification to Royal Nordic staff
-      await sendBookingNotification(emailData)
-      
-      // Send confirmation to customer
-      await sendCustomerConfirmation(emailData)
-      
-      console.log('Booking confirmation emails sent successfully')
-    } catch (error) {
-      console.error('Error sending booking emails:', error)
-      // Don't fail the booking if email fails
-    }
-  }
 
   // const isDateAvailable = (date: string) => {
   //   const availableSlots = getAvailableSlots(date)
@@ -379,9 +348,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
       
       sessionStorage.setItem('pendingBooking', JSON.stringify(bookingData))
 
-      // Send booking confirmation emails immediately
-      await sendBookingEmails(bookingData)
-
       // Redirect to Stripe Checkout
       await redirectToCheckout(sessionId)
 
@@ -428,7 +394,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
       const result = await createCryptoCheckout(cryptoData)
       
       if (result.success && result.hosted_url) {
-        // Send booking confirmation emails immediately for crypto payments
+        // Store booking data for crypto payment
         const bookingData = {
           customer_name: formData.fullName,
           customer_email: formData.email,
@@ -440,7 +406,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           special_requests: formData.specialRequests
         }
         
-        await sendBookingEmails(bookingData)
+        sessionStorage.setItem('pendingBooking', JSON.stringify(bookingData))
         
         redirectToCryptoCheckout(result.hosted_url)
       } else {

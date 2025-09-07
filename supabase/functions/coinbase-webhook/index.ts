@@ -47,6 +47,26 @@ serve(async (req) => {
         throw new Error('Missing tour_id or tour_date_id in metadata')
       }
 
+      // First, check and update tour availability
+      const { data: tourDateData, error: tourDateError } = await supabase
+        .from('tour_dates')
+        .select('available_slots, total_booked')
+        .eq('id', tourDateId)
+        .single()
+
+      if (tourDateError) {
+        console.error('Error fetching tour date:', tourDateError)
+        throw new Error('Failed to fetch tour date data')
+      }
+
+      const requestedSlots = adults + children
+      const availableSlots = tourDateData.available_slots
+      const currentBooked = tourDateData.total_booked
+
+      if (currentBooked + requestedSlots > availableSlots) {
+        throw new Error('Not enough available slots for this booking')
+      }
+
       // Create booking record
       const { data: booking, error: bookingError } = await supabase
         .from('bookings')
@@ -59,7 +79,8 @@ serve(async (req) => {
           children,
           total_price: totalPrice,
           status: 'confirmed',
-          special_requests: metadata.special_requests || ''
+          special_requests: metadata.special_requests || '',
+          phone: metadata.phone || ''
         })
         .select()
         .single()
@@ -69,29 +90,67 @@ serve(async (req) => {
         throw new Error('Failed to create booking record')
       }
 
-      // Send email notification
+      // Update tour_dates to reflect the new booking
+      const { error: updateError } = await supabase
+        .from('tour_dates')
+        .update({ total_booked: currentBooked + requestedSlots })
+        .eq('id', tourDateId)
+
+      if (updateError) {
+        console.error('Error updating tour availability:', updateError)
+        // Don't fail the booking if availability update fails
+      }
+
+      // Send email notifications using the new email system
       try {
-        await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-tour-booking-notification`, {
+        const emailData = {
+          bookingId: booking.id,
+          customerName,
+          customerEmail,
+          customerPhone: metadata.phone || '',
+          tourName,
+          tourDate,
+          adults,
+          children,
+          totalPrice,
+          specialRequests: metadata.special_requests || '',
+          paymentStatus: 'confirmed' as const,
+          createdAt: new Date().toISOString()
+        }
+
+        // Send admin notification
+        await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            name: customerName,
-            email: customerEmail,
-            phone: metadata.phone || '',
-            tourName,
-            tourDate,
-            adultCount: adults,
-            childCount: children,
-            totalAmount: totalPrice,
-            specialRequests: metadata.special_requests || '',
-            paymentMethod: 'Crypto'
+            to: 'admin@royalnordic.fi',
+            subject: `New Booking Confirmation - ${tourName}`,
+            type: 'booking_notification',
+            data: emailData
           })
         })
+
+        // Send customer confirmation
+        await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            to: customerEmail,
+            subject: `Booking Confirmation - ${tourName}`,
+            type: 'customer_confirmation',
+            data: emailData
+          })
+        })
+
+        console.log('Email notifications sent successfully')
       } catch (emailError) {
-        console.error('Error sending email notification:', emailError)
+        console.error('Error sending email notifications:', emailError)
         // Don't fail the webhook if email fails
       }
 
