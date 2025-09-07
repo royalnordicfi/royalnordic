@@ -70,8 +70,7 @@ serve(async (req) => {
         children: parseInt(children),
         total_price: parseFloat(total_price),
         status: 'confirmed',
-        payment_intent_id: session.payment_intent,
-        stripe_session_id: session.id
+        stripe_payment_intent_id: session.payment_intent
       })
 
       // First, check availability and update slots
@@ -108,8 +107,7 @@ serve(async (req) => {
           total_price: parseFloat(total_price),
           status: 'confirmed',
           special_requests: special_requests || '',
-          stripe_payment_intent_id: session.payment_intent,
-          stripe_session_id: session.id
+          stripe_payment_intent_id: session.payment_intent
         })
         .select()
         .single()
