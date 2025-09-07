@@ -1,10 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckCircle, Users, Clock, MapPin } from 'lucide-react';
 import ImageSlideshow from './ImageSlideshow';
 import BookingForm from './BookingForm';
+import { getAllTours } from '../lib/api';
 
 const SnowshoeRental: React.FC = () => {
   // const navigate = useNavigate();
+  const [tourData, setTourData] = useState({
+    adult_price: 79,
+    child_price: 49,
+    max_capacity: 3
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadTourData = async () => {
+      try {
+        const tours = await getAllTours();
+        const snowshoeTour = tours.find(tour => tour.id === 2);
+        if (snowshoeTour) {
+          setTourData({
+            adult_price: snowshoeTour.adult_price,
+            child_price: snowshoeTour.child_price,
+            max_capacity: snowshoeTour.max_capacity
+          });
+        }
+      } catch (error) {
+        console.error('Error loading tour data:', error);
+        // Keep default values if loading fails
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTourData();
+  }, []);
 
   const features = [
     'Professional snowshoe equipment for all sizes',
@@ -83,7 +113,7 @@ const SnowshoeRental: React.FC = () => {
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Group Size</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">Max 3 people</p>
+            <p className="text-gray-300 text-sm sm:text-base">Max {tourData.max_capacity} people</p>
           </div>
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
@@ -155,15 +185,19 @@ const SnowshoeRental: React.FC = () => {
             <div className="sticky top-6">
               <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
                 <h2 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4 sm:mb-6 text-center">Book Your Adventure</h2>
-                <BookingForm
-                  tourId={2}
-                  tourName="Snowshoe Adventure"
-                  adultPrice={79}
-                  childPrice={49}
-                  maxCapacity={3}
-                  seasonStart="11-01"
-                  seasonEnd="04-01"
-                />
+                {loading ? (
+                  <div className="text-center text-white">Loading tour data...</div>
+                ) : (
+                  <BookingForm
+                    tourId={2}
+                    tourName="Snowshoe Adventure"
+                    adultPrice={tourData.adult_price}
+                    childPrice={tourData.child_price}
+                    maxCapacity={tourData.max_capacity}
+                    seasonStart="11-01"
+                    seasonEnd="04-01"
+                  />
+                )}
               </div>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import { sendBookingNotification } from './email'
+import { sendBookingNotification, sendCustomerConfirmation } from './email'
 import type { Tour, TourDate, Booking } from './supabase'
 
 // Tour availability API
@@ -215,26 +215,35 @@ export async function createBooking(bookingData: {
     .eq('id', bookingData.tour_date_id)
     .single()
 
-  // Send email notification to Royal Nordic staff
+  // Send email notifications
   if (tourData && dateDataForEmail) {
+    const emailData = {
+      bookingId: booking.id,
+      customerName: bookingData.customer_name,
+      customerEmail: bookingData.customer_email,
+      customerPhone: bookingData.customer_phone || '',
+      tourName: tourData.name,
+      tourDate: dateDataForEmail.date,
+      adults: bookingData.adults,
+      children: bookingData.children,
+      totalPrice: bookingData.total_price,
+      specialRequests: bookingData.special_requests,
+      paymentStatus: 'confirmed' as const,
+      createdAt: new Date().toISOString()
+    }
+
     try {
-      await sendBookingNotification({
-        bookingId: booking.id,
-        customerName: bookingData.customer_name,
-        customerEmail: bookingData.customer_email,
-        customerPhone: bookingData.customer_phone || '',
-        tourName: tourData.name,
-        tourDate: dateDataForEmail.date,
-        adults: bookingData.adults,
-        children: bookingData.children,
-        totalPrice: bookingData.total_price,
-        specialRequests: bookingData.special_requests,
-        paymentStatus: 'confirmed',
-        createdAt: new Date().toISOString()
-      })
+      // Send notification to Royal Nordic staff
+      await sendBookingNotification(emailData)
     } catch (error) {
-      console.error('Failed to send email notification:', error)
-      // Don't fail the booking if email fails
+      console.error('Failed to send admin email notification:', error)
+    }
+
+    try {
+      // Send confirmation to customer
+      await sendCustomerConfirmation(emailData)
+    } catch (error) {
+      console.error('Failed to send customer confirmation:', error)
     }
   }
 

@@ -53,6 +53,38 @@ export async function sendBookingNotification(bookingData: BookingNotificationDa
   }
 }
 
+// Send booking confirmation to customer
+export async function sendCustomerConfirmation(bookingData: BookingNotificationData) {
+  const confirmation: EmailNotification = {
+    to: [bookingData.customerEmail],
+    subject: `Booking Confirmed: ${bookingData.tourName} - Royal Nordic`,
+    html: generateCustomerConfirmationHTML(bookingData),
+    text: generateCustomerConfirmationText(bookingData)
+  }
+
+  try {
+    // Send via Supabase Edge Function
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify(confirmation),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to send customer confirmation')
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error('Error sending customer confirmation:', error)
+    // Don't throw error - email failure shouldn't break the booking
+    return null
+  }
+}
+
 // Generate HTML email content
 function generateBookingEmailHTML(booking: BookingNotificationData): string {
   return `
@@ -177,4 +209,129 @@ function getChildPrice(tourName: string): number {
     'Customized Tour': 150
   }
   return prices[tourName] || 0
+}
+
+// Generate customer confirmation HTML
+function generateCustomerConfirmationHTML(booking: BookingNotificationData): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .header { background: #1f2937; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; }
+        .booking-details { background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9; }
+        .highlight { background: #f9fafb; padding: 15px; border-radius: 6px; margin: 10px 0; }
+        .footer { background: #f3f4f6; padding: 20px; text-align: center; color: #6b7280; }
+        .status-confirmed { color: #059669; font-weight: bold; }
+        .contact-info { background: #fef3c7; padding: 15px; border-radius: 6px; margin: 10px 0; }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>🌟 Booking Confirmed!</h1>
+        <p>Royal Nordic Tours</p>
+      </div>
+      
+      <div class="content">
+        <h2>Thank you for your booking, ${booking.customerName}!</h2>
+        <p>Your tour has been successfully confirmed. We're excited to show you the magic of Lapland!</p>
+        
+        <div class="booking-details">
+          <h3>📋 Your Booking Details</h3>
+          <p><strong>Booking ID:</strong> #${booking.bookingId}</p>
+          <p><strong>Tour:</strong> ${booking.tourName}</p>
+          <p><strong>Date:</strong> ${new Date(booking.tourDate).toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}</p>
+          <p><strong>Status:</strong> <span class="status-confirmed">CONFIRMED</span></p>
+        </div>
+        
+        <div class="highlight">
+          <h3>👥 Your Group</h3>
+          <p><strong>Adults:</strong> ${booking.adults}</p>
+          <p><strong>Children:</strong> ${booking.children}</p>
+          <p><strong>Total Amount:</strong> €${booking.totalPrice}</p>
+        </div>
+        
+        ${booking.specialRequests ? `
+        <div class="highlight">
+          <h3>📝 Your Special Requests</h3>
+          <p>${booking.specialRequests}</p>
+        </div>
+        ` : ''}
+        
+        <div class="contact-info">
+          <h3>📞 Contact Information</h3>
+          <p><strong>Email:</strong> contact@royalnordic.fi</p>
+          <p><strong>Phone:</strong> +358 40 123 4567</p>
+          <p><strong>Website:</strong> royalnordic.fi</p>
+        </div>
+        
+        <div class="highlight">
+          <h3>🎯 What's Next?</h3>
+          <p>• You will receive a reminder email 24 hours before your tour</p>
+          <p>• Please arrive 15 minutes before your scheduled time</p>
+          <p>• Dress warmly for Arctic conditions</p>
+          <p>• Contact us if you have any questions</p>
+        </div>
+      </div>
+      
+      <div class="footer">
+        <p>Thank you for choosing Royal Nordic Tours!</p>
+        <p>Booking ID: #${booking.bookingId}</p>
+      </div>
+    </body>
+    </html>
+  `
+}
+
+// Generate customer confirmation text
+function generateCustomerConfirmationText(booking: BookingNotificationData): string {
+  return `
+Booking Confirmed - Royal Nordic Tours
+
+Thank you for your booking, ${booking.customerName}!
+
+Your tour has been successfully confirmed. We're excited to show you the magic of Lapland!
+
+📋 Your Booking Details:
+- Booking ID: #${booking.bookingId}
+- Tour: ${booking.tourName}
+- Date: ${new Date(booking.tourDate).toLocaleDateString('en-US', { 
+  weekday: 'long', 
+  year: 'numeric', 
+  month: 'long', 
+  day: 'numeric' 
+})}
+- Status: CONFIRMED
+
+👥 Your Group:
+- Adults: ${booking.adults}
+- Children: ${booking.children}
+- Total Amount: €${booking.totalPrice}
+
+${booking.specialRequests ? `
+📝 Your Special Requests:
+${booking.specialRequests}
+` : ''}
+
+📞 Contact Information:
+- Email: contact@royalnordic.fi
+- Phone: +358 40 123 4567
+- Website: royalnordic.fi
+
+🎯 What's Next?
+• You will receive a reminder email 24 hours before your tour
+• Please arrive 15 minutes before your scheduled time
+• Dress warmly for Arctic conditions
+• Contact us if you have any questions
+
+Thank you for choosing Royal Nordic Tours!
+Booking ID: #${booking.bookingId}
+  `
 }

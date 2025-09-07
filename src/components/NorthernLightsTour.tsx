@@ -1,9 +1,40 @@
 import { Clock, Users, MapPin, CheckCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import ImageSlideshow from './ImageSlideshow';
 import BookingForm from './BookingForm';
+import { getAllTours } from '../lib/api';
 
 const NorthernLightsTour = () => {
   // const navigate = useNavigate();
+  const [tourData, setTourData] = useState({
+    adult_price: 179,
+    child_price: 129,
+    max_capacity: 8
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadTourData = async () => {
+      try {
+        const tours = await getAllTours();
+        const northernLightsTour = tours.find(tour => tour.id === 1);
+        if (northernLightsTour) {
+          setTourData({
+            adult_price: northernLightsTour.adult_price,
+            child_price: northernLightsTour.child_price,
+            max_capacity: northernLightsTour.max_capacity
+          });
+        }
+      } catch (error) {
+        console.error('Error loading tour data:', error);
+        // Keep default values if loading fails
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTourData();
+  }, []);
 
   const features = [
     'Guaranteed Northern Lights - 100% money back guarantee',
@@ -96,7 +127,7 @@ const NorthernLightsTour = () => {
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Group Size</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">Max 8 people</p>
+            <p className="text-gray-300 text-sm sm:text-base">Max {tourData.max_capacity} people</p>
           </div>
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
@@ -193,15 +224,19 @@ const NorthernLightsTour = () => {
             <div className="sticky top-6">
               <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
                 <h2 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4 sm:mb-6 text-center">Book Your Tour</h2>
-                <BookingForm
-                  tourId={1}
-                  tourName="Guaranteed Northern Lights Tour"
-                  adultPrice={179}
-                  childPrice={129}
-                  maxCapacity={8}
-                  seasonStart="09-15"
-                  seasonEnd="04-15"
-                />
+                {loading ? (
+                  <div className="text-center text-white">Loading tour data...</div>
+                ) : (
+                  <BookingForm
+                    tourId={1}
+                    tourName="Guaranteed Northern Lights Tour"
+                    adultPrice={tourData.adult_price}
+                    childPrice={tourData.child_price}
+                    maxCapacity={tourData.max_capacity}
+                    seasonStart="09-15"
+                    seasonEnd="04-15"
+                  />
+                )}
               </div>
             </div>
           </div>

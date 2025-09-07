@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Royal Nordic Admin - Debug</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm">
+            <h1 class="text-2xl font-bold text-center mb-6">Royal Nordic Admin - Debug</h1>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Email</label>
+                    <input type="email" id="email" class="w-full p-3 border rounded-lg" placeholder="admin@royalnordic.fi" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Password</label>
+                    <input type="password" id="password" class="w-full p-3 border rounded-lg" placeholder="Password" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Secure Key</label>
+                    <input type="password" id="secureKey" class="w-full p-3 border rounded-lg" placeholder="Security key" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700">
+                    Login
+                </button>
+            </form>
+            <div id="result" class="mt-4 text-center"></div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🚀 JavaScript is running!');
+        console.log('📧 Email field:', document.getElementById('email'));
+        console.log('🔑 Password field:', document.getElementById('password'));
+        console.log('🔐 Secure key field:', document.getElementById('secureKey'));
+        console.log('📝 Form:', document.getElementById('loginForm'));
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            console.log('🎯 Form submitted!');
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const secureKey = document.getElementById('secureKey').value;
+            
+            console.log('📊 Values:', { email, password, secureKey });
+            
+            if (email === 'admin@royalnordic.fi' && password === 'Rollonortsu8889' && secureKey === '568907') {
+                console.log('✅ SUCCESS!');
+                document.getElementById('result').innerHTML = '<div class="text-green-600 font-bold">✅ LOGIN SUCCESSFUL!</div>';
+            } else {
+                console.log('❌ FAILED!');
+                document.getElementById('result').innerHTML = '<div class="text-red-600 font-bold">❌ LOGIN FAILED!</div>';
+            }
+        });
+
+        console.log('🎉 All JavaScript loaded!');
+    </script>
+</body>
+</html>

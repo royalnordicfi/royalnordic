@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, Clock, Users, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ImageSlideshow from './ImageSlideshow';
 import { Link } from 'react-router-dom';
+import { getAllTours } from '../lib/api';
 
 const Tours = () => {
   const navigate = useNavigate();
-  
-  const tours = [
+  const [tours, setTours] = useState([
     {
       id: 1,
       title: "Guaranteed Northern Lights Tour",
@@ -24,9 +24,9 @@ const Tours = () => {
       id: 2,
       title: "Quality Snowshoe Rental",
       description: "Explore the pristine Lapland wilderness on snowshoes.",
-      price: "Starting from 59€",
+      price: "Starting from 89€",
       duration: "Custom time",
-      groupSize: "Max 3 people",
+      groupSize: "Max 6 people",
       location: "Rovaniemi",
       features: ["Quality snowshoe equipment", "Instructions for how to use the equipment", "Safety briefing", "Hot drinks"],
       images: ["/snowshoe1.jpg", "/snowshoe2.jpg"],
@@ -44,7 +44,33 @@ const Tours = () => {
       images: ["/slideshow3.jpg", "https://images.pexels.com/photos/1054289/pexels-photo-1054289.jpeg?auto=compress&cs=tinysrgb&w=800", "https://images.pexels.com/photos/1287145/pexels-photo-1287145.jpeg?auto=compress&cs=tinysrgb&w=800"],
       route: "/customized-tour"
     }
-  ];
+  ]);
+
+  useEffect(() => {
+    const loadTourData = async () => {
+      try {
+        const dbTours = await getAllTours();
+        setTours(prevTours => 
+          prevTours.map(tour => {
+            const dbTour = dbTours.find(t => t.id === tour.id);
+            if (dbTour) {
+              return {
+                ...tour,
+                price: `Starting from ${dbTour.adult_price}€`,
+                groupSize: `Max ${dbTour.max_capacity} people`
+              };
+            }
+            return tour;
+          })
+        );
+      } catch (error) {
+        console.error('Error loading tour data:', error);
+        // Keep default values if loading fails
+      }
+    };
+
+    loadTourData();
+  }, []);
 
   const handleTourClick = (route: string) => {
     navigate(route);
