@@ -833,11 +833,27 @@
                     // Calculate slots to free up
                     const slotsToFree = bookingData.adults + bookingData.children;
                     
+                    // First, get the current total_booked value
+                    const { data: currentDateData, error: fetchDateError } = await supabase
+                        .from('tour_dates')
+                        .select('total_booked')
+                        .eq('id', bookingData.tour_date_id)
+                        .single();
+                    
+                    if (fetchDateError) {
+                        console.error('Error fetching current date data:', fetchDateError);
+                        alert('Booking cancelled but calendar slots not updated');
+                        return;
+                    }
+                    
+                    // Calculate new total_booked value
+                    const newTotalBooked = Math.max(0, currentDateData.total_booked - slotsToFree);
+                    
                     // Update tour_dates to reduce total_booked
                     const { error: dateError } = await supabase
                         .from('tour_dates')
                         .update({ 
-                            total_booked: supabase.raw(`total_booked - ${slotsToFree}`)
+                            total_booked: newTotalBooked
                         })
                         .eq('id', bookingData.tour_date_id);
                     
@@ -870,11 +886,27 @@
                     // Calculate slots to reserve
                     const slotsToReserve = bookingData.adults + bookingData.children;
                     
+                    // First, get the current total_booked value
+                    const { data: currentDateData, error: fetchDateError } = await supabase
+                        .from('tour_dates')
+                        .select('total_booked')
+                        .eq('id', bookingData.tour_date_id)
+                        .single();
+                    
+                    if (fetchDateError) {
+                        console.error('Error fetching current date data:', fetchDateError);
+                        alert('Booking confirmed but calendar slots not updated');
+                        return;
+                    }
+                    
+                    // Calculate new total_booked value
+                    const newTotalBooked = currentDateData.total_booked + slotsToReserve;
+                    
                     // Update tour_dates to increase total_booked
                     const { error: dateError } = await supabase
                         .from('tour_dates')
                         .update({ 
-                            total_booked: supabase.raw(`total_booked + ${slotsToReserve}`)
+                            total_booked: newTotalBooked
                         })
                         .eq('id', bookingData.tour_date_id);
                     
@@ -949,11 +981,27 @@
                     // Calculate slots to free up
                     const slotsToFree = bookingData.adults + bookingData.children;
                     
+                    // First, get the current total_booked value
+                    const { data: currentDateData, error: fetchDateError } = await supabase
+                        .from('tour_dates')
+                        .select('total_booked')
+                        .eq('id', bookingData.tour_date_id)
+                        .single();
+                    
+                    if (fetchDateError) {
+                        console.error('Error fetching current date data:', fetchDateError);
+                        alert('Error fetching current date data');
+                        return;
+                    }
+                    
+                    // Calculate new total_booked value
+                    const newTotalBooked = Math.max(0, currentDateData.total_booked - slotsToFree);
+                    
                     // Update tour_dates to reduce total_booked
                     const { error: dateError } = await supabase
                         .from('tour_dates')
                         .update({ 
-                            total_booked: supabase.raw(`total_booked - ${slotsToFree}`)
+                            total_booked: newTotalBooked
                         })
                         .eq('id', bookingData.tour_date_id);
                     
