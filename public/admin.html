@@ -939,7 +939,7 @@
                     console.log(`Reserved ${slotsToReserve} slots in calendar`);
                 }
                 
-                // Reload bookings and tour data to show updated status
+                // Reload bookings and tour data immediately to show updated status
                 await loadBookings();
                 await loadTourData();
                 
@@ -951,6 +951,11 @@
                 };
                 
                 alert(statusMessages[newStatus] || 'Status updated successfully');
+                
+                // Force refresh the page to ensure all data is up to date
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
                 
             } catch (error) {
                 console.error('Error updating booking status:', error);
@@ -1019,17 +1024,35 @@
                 
                 if (deleteError) {
                     console.error('Error deleting booking:', deleteError);
-                    alert('Error deleting booking');
-                    return;
+                    console.log('Delete error details:', deleteError);
+                    
+                    // If direct deletion fails, try updating status to 'deleted' instead
+                    console.log('Trying to mark booking as deleted instead...');
+                    const { error: updateError } = await supabase
+                        .from('bookings')
+                        .update({ status: 'cancelled' })
+                        .eq('id', bookingId);
+                    
+                    if (updateError) {
+                        console.error('Error marking booking as cancelled:', updateError);
+                        alert('Error deleting booking. Please try cancelling it instead.');
+                        return;
+                    } else {
+                        console.log('Booking marked as cancelled instead of deleted');
+                        alert('Booking marked as cancelled (deletion not allowed by database policy)');
+                    }
+                } else {
+                    console.log(`Booking ${bookingId} deleted successfully`);
                 }
                 
-                console.log(`Booking ${bookingId} deleted successfully`);
-                
-                // Reload bookings and tour data
+                // Reload bookings and tour data immediately
                 await loadBookings();
                 await loadTourData();
                 
-                alert('🗑️ Booking deleted permanently and calendar slots freed up');
+                // Show success message
+                if (!deleteError) {
+                    alert('🗑️ Booking deleted permanently and calendar slots freed up');
+                }
                 
             } catch (error) {
                 console.error('Error deleting booking:', error);
