@@ -1,6 +1,8 @@
 import { loadStripe } from '@stripe/stripe-js'
 
 // Load Stripe only if API key is available
+console.log('Environment variables:', import.meta.env)
+console.log('Stripe publishable key from env:', import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
 const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY 
   ? loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
   : null
