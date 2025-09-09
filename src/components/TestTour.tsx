@@ -65,7 +65,13 @@ const TestTour: React.FC = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Side - Images */}
             <div className="order-2 lg:order-1">
-              <ImageSlideshow />
+              <ImageSlideshow 
+                images={["/lights1.jpg", "/lights2.jpg", "/lights3.jpg"]}
+                alt="Test Tour Images"
+                className="w-full h-full object-cover"
+                interval={4000}
+                showCounter={false}
+              />
             </div>
 
             {/* Right Side - Content */}
