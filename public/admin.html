@@ -985,7 +985,7 @@
                         console.error('Error marking booking as cancelled:', updateError);
                         alert('Error deleting booking. Please try cancelling it instead.');
                         return;
-                    } else {
+                } else {
                         console.log('Booking marked as cancelled instead of deleted');
                         alert('Booking marked as cancelled (deletion not allowed by database policy)');
                     }
