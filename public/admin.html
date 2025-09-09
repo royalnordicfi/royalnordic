@@ -927,6 +927,8 @@
                     return;
                 }
                 
+                console.log('Current booking found:', currentBooking);
+                
                 // If it's a confirmed booking, free up calendar slots first
                 if (currentBooking.status === 'confirmed') {
                     console.log('Freeing up calendar slots for deleted booking');
@@ -965,6 +967,7 @@
                 }
                 
                 // Delete the booking from database
+                console.log('Attempting to delete booking from database...');
                 const { error: deleteError } = await supabase
                     .from('bookings')
                     .delete()
@@ -1004,7 +1007,7 @@
                 
             } catch (error) {
                 console.error('Error deleting booking:', error);
-                alert('Error deleting booking');
+                alert('Error deleting booking: ' + error.message);
             }
         }
 
