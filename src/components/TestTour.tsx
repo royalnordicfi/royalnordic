@@ -1,39 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { CheckCircle, Users, MapPin, Clock, AlertTriangle } from 'lucide-react';
 import ImageSlideshow from './ImageSlideshow';
 import BookingForm from './BookingForm';
-import { getAllTours } from '../lib/api';
 
 const TestTour: React.FC = () => {
-  const [tourData, setTourData] = useState({
+  // Use hardcoded values for now to avoid API issues
+  const tourData = {
     adult_price: 0.10,
     child_price: 0.10,
     max_capacity: 10
-  });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadTourData = async () => {
-      try {
-        const tours = await getAllTours();
-        const testTour = tours.find(tour => tour.id === 3); // Assuming test tour is ID 3
-        if (testTour) {
-          setTourData({
-            adult_price: testTour.adult_price,
-            child_price: testTour.child_price,
-            max_capacity: testTour.max_capacity
-          });
-        }
-      } catch (error) {
-        console.error('Error loading tour data:', error);
-        // Keep default values if loading fails
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadTourData();
-  }, []);
+  };
 
   const features = [
     'Live payment testing with real Stripe',
@@ -205,16 +181,12 @@ const TestTour: React.FC = () => {
 
             {/* Right Side - Booking Form */}
             <div className="lg:sticky lg:top-8">
-              {loading ? (
-                <div className="text-center text-white">Loading test tour data...</div>
-              ) : (
-                <BookingForm
-                  tourId={3}
-                  tourName="TEST TOUR - Live Payment Testing"
-                  adultPrice={tourData.adult_price}
-                  childPrice={tourData.child_price}
-                />
-              )}
+              <BookingForm
+                tourId={3}
+                tourName="TEST TOUR - Live Payment Testing"
+                adultPrice={tourData.adult_price}
+                childPrice={tourData.child_price}
+              />
             </div>
           </div>
         </div>
