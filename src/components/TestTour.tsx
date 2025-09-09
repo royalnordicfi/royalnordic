@@ -4,6 +4,8 @@ import ImageSlideshow from './ImageSlideshow';
 import BookingForm from './BookingForm';
 
 const TestTour: React.FC = () => {
+  console.log('TestTour component is rendering!');
+  
   // Use hardcoded values for now to avoid API issues
   const tourData = {
     adult_price: 0.10,
@@ -50,6 +52,11 @@ const TestTour: React.FC = () => {
       {/* Test Warning Banner */}
       <div className="bg-red-600 text-white py-2 px-4 text-center font-bold">
         ⚠️ TEST TOUR - LIVE PAYMENT TESTING - WILL BE REMOVED IN PRODUCTION ⚠️
+      </div>
+      
+      {/* Debug Test */}
+      <div className="bg-green-600 text-white py-2 px-4 text-center font-bold">
+        🐛 DEBUG: TestTour component is rendering!
       </div>
 
       {/* Hero Section */}
