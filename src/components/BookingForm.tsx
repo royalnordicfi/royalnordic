@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { useNavigate } from 'react-router-dom'
 // import { Calendar, Users, Mail, Phone, MessageSquare, CreditCard } from 'lucide-react'
 import { createCheckoutSession, redirectToCheckout } from '../lib/stripe'
 import { createCryptoCheckout, redirectToCryptoCheckout } from '../lib/crypto'
@@ -15,7 +16,7 @@ interface BookingFormProps {
   seasonEnd?: string
 }
 
-const BookingForm: React.FC<BookingFormProps> = ({ 
+const BookingForm: React.FC<BookingFormProps> = ({
   tourId,
   tourName, 
   adultPrice, 
@@ -23,6 +24,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
   seasonStart,
   seasonEnd
 }) => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     preferredDate: '',
     adults: 1,
@@ -36,7 +38,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
   const [availability, setAvailability] = useState<TourDate[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [showCryptoModal, setShowCryptoModal] = useState(false)
   const [cryptoFormData, setCryptoFormData] = useState({
@@ -464,9 +465,24 @@ const BookingForm: React.FC<BookingFormProps> = ({
       const result = await response.json()
       
       if (result.success) {
-        // Close modal and show success
+        // Store booking data in sessionStorage for success page
+        const bookingData = {
+          customer_name: cryptoFormData.fullName,
+          customer_email: formData.email,
+          customer_phone: formData.phone,
+          adults: formData.adults.toString(),
+          children: formData.children.toString(),
+          total_price: totalPrice.toString(),
+          tour_date: tourDate,
+          crypto_type: cryptoFormData.cryptoType,
+          special_requests: cryptoFormData.specialRequests
+        }
+        
+        sessionStorage.setItem('cryptoBooking', JSON.stringify(bookingData))
+        
+        // Close modal and redirect to crypto success page
         setShowCryptoModal(false)
-        setSuccess(true)
+        navigate('/crypto-payment-success')
       } else {
         throw new Error(result.error || 'Crypto booking failed')
       }
@@ -478,23 +494,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
     }
   }
 
-  if (success) {
-    return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-        <div className="text-green-600 text-2xl mb-4">✓</div>
-        <h3 className="text-green-800 text-xl font-semibold mb-2">Booking Successful!</h3>
-        <p className="text-green-700 mb-4">
-          Thank you for your booking! You'll be redirected to Stripe to complete your payment.
-        </p>
-        <button
-          onClick={() => setSuccess(false)}
-          className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
-        >
-          Make Another Booking
-        </button>
-      </div>
-    )
-  }
 
   return (
     <div className="bg-white rounded-xl shadow-xl p-6 max-w-lg mx-auto lg:mx-0">
@@ -808,14 +807,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
           </div>
         )}
 
-        {success && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-            <div className="flex items-center">
-              <div className="text-green-500 mr-2">✅</div>
-              <p className="text-green-700 text-sm font-medium">Booking submitted successfully! Redirecting to payment...</p>
-            </div>
-          </div>
-        )}
       </form>
 
       {/* Crypto Payment Modal - Rendered as Portal */}

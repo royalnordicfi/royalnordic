@@ -10,6 +10,7 @@ import NorthernLightsTour from './components/NorthernLightsTour';
 import SnowshoeRental from './components/SnowshoeRental';
 import CustomizedTour from './components/CustomizedTour';
 import PaymentSuccess from './components/PaymentSuccess';
+import CryptoPaymentSuccess from './components/CryptoPaymentSuccess';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsConditions from './components/TermsConditions';
 import ScrollToTop from './components/ScrollToTop';
@@ -44,6 +45,7 @@ function App() {
           <Route path="/snowshoe-rental" element={<SnowshoeRental />} />
           <Route path="/customized-tour" element={<CustomizedTour />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/crypto-payment-success" element={<CryptoPaymentSuccess />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
         </Routes>
