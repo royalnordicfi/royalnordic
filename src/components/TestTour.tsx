@@ -8,8 +8,8 @@ const TestTour: React.FC = () => {
   
   // Use hardcoded values for now to avoid API issues
   const tourData = {
-    adult_price: 0.10,
-    child_price: 0.10,
+    adult_price: 0.50,
+    child_price: 0.50,
     max_capacity: 10
   };
 
@@ -100,12 +100,12 @@ const TestTour: React.FC = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-2xl font-bold text-white">Test Pricing</h3>
                   <div className="text-right">
-                    <div className="text-3xl font-bold text-green-400">€0.10</div>
+                    <div className="text-3xl font-bold text-green-400">€0.50</div>
                     <div className="text-sm text-gray-400">per person</div>
                   </div>
                 </div>
                 <p className="text-gray-300 text-sm">
-                  This is a test price for live payment verification. 
+                  This is a test price for live payment verification (Stripe minimum). 
                   Real tours are priced at €79-179 per person.
                 </p>
               </div>
