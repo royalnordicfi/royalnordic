@@ -824,6 +824,10 @@
                                 class="text-blue-600 hover:text-blue-800 text-sm font-medium">
                             👁️ View Details
                         </button>
+                        <button onclick="deleteBooking(${booking.id})" 
+                                class="text-red-600 hover:text-red-800 text-sm font-medium">
+                            🗑️ Delete
+                        </button>
                     </div>
                 </div>
             `;
@@ -840,22 +844,196 @@
         // Update booking status
         async function updateBookingStatus(bookingId, newStatus) {
             try {
-                const response = await fetch(`/api/admin/bookings/${bookingId}/status`, {
-                    method: 'PUT',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authToken}`
-                    },
-                    body: JSON.stringify({ status: newStatus })
-                });
+                console.log(`Updating booking ${bookingId} to status: ${newStatus}`);
                 
-                if (response.ok) {
-                    loadBookings(); // Reload to show updated status
-                } else {
-                    alert('Error updating status');
+                // Get the current booking to check if we need to update calendar slots
+                const currentBooking = currentBookings.find(b => b.id === bookingId);
+                if (!currentBooking) {
+                    alert('Booking not found');
+                    return;
                 }
+                
+                // Update booking status in Supabase
+                const { error: bookingError } = await supabase
+                    .from('bookings')
+                    .update({ status: newStatus })
+                    .eq('id', bookingId);
+                
+                if (bookingError) {
+                    console.error('Error updating booking status:', bookingError);
+                    alert('Error updating booking status');
+                    return;
+                }
+                
+                // If cancelling a confirmed booking, free up calendar slots
+                if (currentBooking.status === 'confirmed' && newStatus === 'cancelled') {
+                    console.log('Freeing up calendar slots for cancelled booking');
+                    
+                    // Get tour_date_id from the booking
+                    const { data: bookingData, error: fetchError } = await supabase
+                        .from('bookings')
+                        .select('tour_date_id, adults, children')
+                        .eq('id', bookingId)
+                        .single();
+                    
+                    if (fetchError) {
+                        console.error('Error fetching booking data:', fetchError);
+                        alert('Booking cancelled but calendar slots not updated');
+                        return;
+                    }
+                    
+                    // Calculate slots to free up
+                    const slotsToFree = bookingData.adults + bookingData.children;
+                    
+                    // Update tour_dates to reduce total_booked
+                    const { error: dateError } = await supabase
+                        .from('tour_dates')
+                        .update({ 
+                            total_booked: supabase.raw(`total_booked - ${slotsToFree}`)
+                        })
+                        .eq('id', bookingData.tour_date_id);
+                    
+                    if (dateError) {
+                        console.error('Error updating calendar slots:', dateError);
+                        alert('Booking cancelled but calendar slots not updated');
+                        return;
+                    }
+                    
+                    console.log(`Freed up ${slotsToFree} slots from calendar`);
+                }
+                
+                // If confirming a cancelled booking, reserve calendar slots
+                if (currentBooking.status === 'cancelled' && newStatus === 'confirmed') {
+                    console.log('Reserving calendar slots for confirmed booking');
+                    
+                    // Get tour_date_id from the booking
+                    const { data: bookingData, error: fetchError } = await supabase
+                        .from('bookings')
+                        .select('tour_date_id, adults, children')
+                        .eq('id', bookingId)
+                        .single();
+                    
+                    if (fetchError) {
+                        console.error('Error fetching booking data:', fetchError);
+                        alert('Booking confirmed but calendar slots not updated');
+                        return;
+                    }
+                    
+                    // Calculate slots to reserve
+                    const slotsToReserve = bookingData.adults + bookingData.children;
+                    
+                    // Update tour_dates to increase total_booked
+                    const { error: dateError } = await supabase
+                        .from('tour_dates')
+                        .update({ 
+                            total_booked: supabase.raw(`total_booked + ${slotsToReserve}`)
+                        })
+                        .eq('id', bookingData.tour_date_id);
+                    
+                    if (dateError) {
+                        console.error('Error updating calendar slots:', dateError);
+                        alert('Booking confirmed but calendar slots not updated');
+                        return;
+                    }
+                    
+                    console.log(`Reserved ${slotsToReserve} slots in calendar`);
+                }
+                
+                // Reload bookings and tour data to show updated status
+                await loadBookings();
+                await loadTourData();
+                
+                // Show success message
+                const statusMessages = {
+                    'confirmed': '✅ Booking confirmed and calendar slots reserved',
+                    'cancelled': '❌ Booking cancelled and calendar slots freed up',
+                    'pending_crypto_payment': '🪙 Booking marked as pending crypto payment'
+                };
+                
+                alert(statusMessages[newStatus] || 'Status updated successfully');
+                
             } catch (error) {
-                alert('Error updating status');
+                console.error('Error updating booking status:', error);
+                alert('Error updating booking status');
+            }
+        }
+
+        // Delete booking permanently
+        async function deleteBooking(bookingId) {
+            try {
+                // Confirm deletion
+                const confirmed = confirm('⚠️ Are you sure you want to PERMANENTLY DELETE this booking?\n\nThis action cannot be undone and will free up calendar slots.');
+                if (!confirmed) return;
+                
+                console.log(`Deleting booking ${bookingId}`);
+                
+                // Get the current booking to check if we need to free up calendar slots
+                const currentBooking = currentBookings.find(b => b.id === bookingId);
+                if (!currentBooking) {
+                    alert('Booking not found');
+                    return;
+                }
+                
+                // If it's a confirmed booking, free up calendar slots first
+                if (currentBooking.status === 'confirmed') {
+                    console.log('Freeing up calendar slots for deleted booking');
+                    
+                    // Get tour_date_id from the booking
+                    const { data: bookingData, error: fetchError } = await supabase
+                        .from('bookings')
+                        .select('tour_date_id, adults, children')
+                        .eq('id', bookingId)
+                        .single();
+                    
+                    if (fetchError) {
+                        console.error('Error fetching booking data:', fetchError);
+                        alert('Error fetching booking data for deletion');
+                        return;
+                    }
+                    
+                    // Calculate slots to free up
+                    const slotsToFree = bookingData.adults + bookingData.children;
+                    
+                    // Update tour_dates to reduce total_booked
+                    const { error: dateError } = await supabase
+                        .from('tour_dates')
+                        .update({ 
+                            total_booked: supabase.raw(`total_booked - ${slotsToFree}`)
+                        })
+                        .eq('id', bookingData.tour_date_id);
+                    
+                    if (dateError) {
+                        console.error('Error updating calendar slots:', dateError);
+                        alert('Error updating calendar slots');
+                        return;
+                    }
+                    
+                    console.log(`Freed up ${slotsToFree} slots from calendar`);
+                }
+                
+                // Delete the booking from database
+                const { error: deleteError } = await supabase
+                    .from('bookings')
+                    .delete()
+                    .eq('id', bookingId);
+                
+                if (deleteError) {
+                    console.error('Error deleting booking:', deleteError);
+                    alert('Error deleting booking');
+                    return;
+                }
+                
+                console.log(`Booking ${bookingId} deleted successfully`);
+                
+                // Reload bookings and tour data
+                await loadBookings();
+                await loadTourData();
+                
+                alert('🗑️ Booking deleted permanently and calendar slots freed up');
+                
+            } catch (error) {
+                console.error('Error deleting booking:', error);
+                alert('Error deleting booking');
             }
         }
 
