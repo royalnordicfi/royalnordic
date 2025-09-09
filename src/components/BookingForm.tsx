@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 // import { Calendar, Users, Mail, Phone, MessageSquare, CreditCard } from 'lucide-react'
 import { createCheckoutSession, redirectToCheckout } from '../lib/stripe'
 import { createCryptoCheckout, redirectToCryptoCheckout } from '../lib/crypto'
@@ -817,159 +818,187 @@ const BookingForm: React.FC<BookingFormProps> = ({
         )}
       </form>
 
-      {/* Crypto Payment Modal - Full Page Overlay */}
-      {showCryptoModal && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4"
-          style={{ 
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            overflow: 'hidden'
-          }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setShowCryptoModal(false)
-            }
-          }}
-        >
-          <div 
-            className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-auto"
-            style={{
-              maxHeight: '90vh',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column'
-            }}
+      {/* Crypto Payment Modal - Rendered as Portal */}
+      <CryptoPaymentModal
+        isOpen={showCryptoModal}
+        onClose={() => setShowCryptoModal(false)}
+        onSubmit={handleCryptoSubmit}
+        loading={loading}
+        tourName={tourName}
+        formData={formData}
+        cryptoFormData={cryptoFormData}
+        setCryptoFormData={setCryptoFormData}
+        calculateTotal={calculateTotal}
+      />
+    </div>
+  );
+}
+
+// Crypto Payment Modal Component - Rendered as Portal
+const CryptoPaymentModal: React.FC<{
+  isOpen: boolean
+  onClose: () => void
+  onSubmit: () => void
+  loading: boolean
+  tourName: string
+  formData: any
+  cryptoFormData: any
+  setCryptoFormData: (data: any) => void
+  calculateTotal: () => number
+}> = ({ isOpen, onClose, onSubmit, loading, tourName, formData, cryptoFormData, setCryptoFormData, calculateTotal }) => {
+  if (!isOpen) return null
+
+  return createPortal(
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[9999] p-4"
+      style={{ 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        overflow: 'hidden'
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose()
+        }
+      }}
+    >
+      <div 
+        className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-auto"
+        style={{
+          maxHeight: '90vh',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+        {/* Modal Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h3 className="text-xl font-bold text-gray-900">Pay with Cryptocurrency</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
           >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900">Pay with Cryptocurrency</h3>
-              <button
-                onClick={() => setShowCryptoModal(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
-            {/* Modal Content - Scrollable */}
-            <div 
-              className="flex-1 overflow-y-auto p-6"
-              style={{ maxHeight: 'calc(90vh - 140px)' }}
-            >
-              <div className="space-y-4">
-                {/* Booking Summary */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-900 mb-2">Booking Summary</h4>
-                  <div className="text-sm text-gray-600 space-y-1">
-                    <p><strong>Tour:</strong> {tourName}</p>
-                    <p><strong>Date:</strong> {formData.preferredDate ? (() => {
-                      const [year, month, day] = formData.preferredDate.split('-').map(Number)
-                      const date = new Date(year, month - 1, day)
-                      return date.toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        month: 'long', 
-                        day: 'numeric',
-                        year: 'numeric'
-                      })
-                    })() : 'Not selected'}</p>
-                    <p><strong>Participants:</strong> {formData.adults} adults, {formData.children} children</p>
-                    <p><strong>Total:</strong> €{calculateTotal()}</p>
-                  </div>
-                </div>
-
-                {/* Crypto Form */}
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                    <input
-                      type="text"
-                      value={cryptoFormData.fullName}
-                      onChange={(e) => setCryptoFormData({...cryptoFormData, fullName: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      placeholder="Enter your full name"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Cryptocurrency</label>
-                    <select
-                      value={cryptoFormData.cryptoType}
-                      onChange={(e) => setCryptoFormData({...cryptoFormData, cryptoType: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    >
-                      <option value="bitcoin">Bitcoin (BTC)</option>
-                      <option value="ethereum">Ethereum (ETH)</option>
-                      <option value="usdc">USD Coin (USDC)</option>
-                      <option value="usdt">Tether (USDT)</option>
-                      <option value="other">Other (specify in requests)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Additional Requests</label>
-                    <textarea
-                      value={cryptoFormData.specialRequests}
-                      onChange={(e) => setCryptoFormData({...cryptoFormData, specialRequests: e.target.value})}
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
-                      placeholder="Any additional requests or notes..."
-                    />
-                  </div>
-                </div>
-
-                {/* Information Box */}
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                  <div className="flex items-start">
-                    <div className="text-emerald-500 mr-3 mt-0.5">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <div className="text-sm text-emerald-700">
-                      <p className="font-medium mb-1">Payment Process:</p>
-                      <p>After confirming your booking, you will receive an email from Royal Nordic with the wallet address and payment instructions for your chosen cryptocurrency.</p>
-                    </div>
-                  </div>
-                </div>
+        {/* Modal Content - Scrollable */}
+        <div 
+          className="flex-1 overflow-y-auto p-6"
+          style={{ maxHeight: 'calc(90vh - 140px)' }}
+        >
+          <div className="space-y-4">
+            {/* Booking Summary */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h4 className="font-semibold text-gray-900 mb-2">Booking Summary</h4>
+              <div className="text-sm text-gray-600 space-y-1">
+                <p><strong>Tour:</strong> {tourName}</p>
+                <p><strong>Date:</strong> {formData.preferredDate ? (() => {
+                  const [year, month, day] = formData.preferredDate.split('-').map(Number)
+                  const date = new Date(year, month - 1, day)
+                  return date.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    month: 'long', 
+                    day: 'numeric',
+                    year: 'numeric'
+                  })
+                })() : 'Not selected'}</p>
+                <p><strong>Participants:</strong> {formData.adults} adults, {formData.children} children</p>
+                <p><strong>Total:</strong> €{calculateTotal()}</p>
               </div>
             </div>
 
-            {/* Modal Footer - Fixed */}
-            <div className="border-t border-gray-200 p-6">
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => setShowCryptoModal(false)}
-                  className="flex-1 bg-gray-200 text-gray-800 font-semibold py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors"
+            {/* Crypto Form */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <input
+                  type="text"
+                  value={cryptoFormData.fullName}
+                  onChange={(e) => setCryptoFormData({...cryptoFormData, fullName: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  placeholder="Enter your full name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Cryptocurrency</label>
+                <select
+                  value={cryptoFormData.cryptoType}
+                  onChange={(e) => setCryptoFormData({...cryptoFormData, cryptoType: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleCryptoSubmit}
-                  disabled={loading || !cryptoFormData.fullName}
-                  className="flex-1 bg-emerald-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                >
-                  {loading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Processing...
-                    </>
-                  ) : (
-                    'Confirm Crypto Booking'
-                  )}
-                </button>
+                  <option value="bitcoin">Bitcoin (BTC)</option>
+                  <option value="ethereum">Ethereum (ETH)</option>
+                  <option value="usdc">USD Coin (USDC)</option>
+                  <option value="usdt">Tether (USDT)</option>
+                  <option value="other">Other (specify in requests)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Additional Requests</label>
+                <textarea
+                  value={cryptoFormData.specialRequests}
+                  onChange={(e) => setCryptoFormData({...cryptoFormData, specialRequests: e.target.value})}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
+                  placeholder="Any additional requests or notes..."
+                />
+              </div>
+            </div>
+
+            {/* Information Box */}
+            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+              <div className="flex items-start">
+                <div className="text-emerald-500 mr-3 mt-0.5">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="text-sm text-emerald-700">
+                  <p className="font-medium mb-1">Payment Process:</p>
+                  <p>After confirming your booking, you will receive an email from Royal Nordic with the wallet address and payment instructions for your chosen cryptocurrency.</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      )}
-    </div>
-  );
+
+        {/* Modal Footer - Fixed */}
+        <div className="border-t border-gray-200 p-6">
+          <div className="flex space-x-3">
+            <button
+              onClick={onClose}
+              className="flex-1 bg-gray-200 text-gray-800 font-semibold py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onSubmit}
+              disabled={loading || !cryptoFormData.fullName}
+              className="flex-1 bg-emerald-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Processing...
+                </>
+              ) : (
+                'Confirm Crypto Booking'
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body
+  )
 }
 
 export default BookingForm
