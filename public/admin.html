@@ -813,111 +813,11 @@
                     return;
                 }
                 
-                // If cancelling a confirmed booking, free up calendar slots
-                if (currentBooking.status === 'confirmed' && newStatus === 'cancelled') {
-                    console.log('Freeing up calendar slots for cancelled booking');
-                    
-                    // Get tour_date_id from the booking
-                    const { data: bookingData, error: fetchError } = await supabase
-                        .from('bookings')
-                        .select('tour_date_id, adults, children')
-                        .eq('id', bookingId)
-                        .single();
-                    
-                    if (fetchError) {
-                        console.error('Error fetching booking data:', fetchError);
-                        alert('Booking cancelled but calendar slots not updated');
-                        return;
-                    }
-                    
-                    // Calculate slots to free up
-                    const slotsToFree = bookingData.adults + bookingData.children;
-                    
-                    // First, get the current total_booked value
-                    const { data: currentDateData, error: fetchDateError } = await supabase
-                        .from('tour_dates')
-                        .select('total_booked')
-                        .eq('id', bookingData.tour_date_id)
-                        .single();
-                    
-                    if (fetchDateError) {
-                        console.error('Error fetching current date data:', fetchDateError);
-                        alert('Booking cancelled but calendar slots not updated');
-                        return;
-                    }
-                    
-                    // Calculate new total_booked value
-                    const newTotalBooked = Math.max(0, currentDateData.total_booked - slotsToFree);
-                    
-                    // Update tour_dates to reduce total_booked
-                    const { error: dateError } = await supabase
-                        .from('tour_dates')
-                        .update({ 
-                            total_booked: newTotalBooked
-                        })
-                        .eq('id', bookingData.tour_date_id);
-                    
-                    if (dateError) {
-                        console.error('Error updating calendar slots:', dateError);
-                        alert('Booking cancelled but calendar slots not updated');
-                        return;
-                    }
-                    
-                    console.log(`Freed up ${slotsToFree} slots from calendar`);
-                }
+                // Note: Calendar slots are automatically managed by database triggers
+                // No manual slot management needed here
                 
-                // If confirming a cancelled booking, reserve calendar slots
-                if (currentBooking.status === 'cancelled' && newStatus === 'confirmed') {
-                    console.log('Reserving calendar slots for confirmed booking');
-                    
-                    // Get tour_date_id from the booking
-                    const { data: bookingData, error: fetchError } = await supabase
-                        .from('bookings')
-                        .select('tour_date_id, adults, children')
-                        .eq('id', bookingId)
-                        .single();
-                    
-                    if (fetchError) {
-                        console.error('Error fetching booking data:', fetchError);
-                        alert('Booking confirmed but calendar slots not updated');
-                        return;
-                    }
-                    
-                    // Calculate slots to reserve
-                    const slotsToReserve = bookingData.adults + bookingData.children;
-                    
-                    // First, get the current total_booked value
-                    const { data: currentDateData, error: fetchDateError } = await supabase
-                        .from('tour_dates')
-                        .select('total_booked')
-                        .eq('id', bookingData.tour_date_id)
-                        .single();
-                    
-                    if (fetchDateError) {
-                        console.error('Error fetching current date data:', fetchDateError);
-                        alert('Booking confirmed but calendar slots not updated');
-                        return;
-                    }
-                    
-                    // Calculate new total_booked value
-                    const newTotalBooked = currentDateData.total_booked + slotsToReserve;
-                    
-                    // Update tour_dates to increase total_booked
-                    const { error: dateError } = await supabase
-                        .from('tour_dates')
-                        .update({ 
-                            total_booked: newTotalBooked
-                        })
-                        .eq('id', bookingData.tour_date_id);
-                    
-                    if (dateError) {
-                        console.error('Error updating calendar slots:', dateError);
-                        alert('Booking confirmed but calendar slots not updated');
-                        return;
-                    }
-                    
-                    console.log(`Reserved ${slotsToReserve} slots in calendar`);
-                }
+                // Note: Calendar slots are automatically managed by database triggers
+                // No manual slot management needed here
                 
                 // Reload bookings and tour data immediately to show updated status
                 await loadBookings();
@@ -961,58 +861,8 @@
                 
                 console.log('Current booking found:', currentBooking);
                 
-                // If it's a confirmed booking, free up calendar slots first
-                if (currentBooking.status === 'confirmed') {
-                    console.log('Freeing up calendar slots for deleted booking');
-                    
-                    // Get tour_date_id from the booking
-                    const { data: bookingData, error: fetchError } = await supabase
-                        .from('bookings')
-                        .select('tour_date_id, adults, children')
-                        .eq('id', bookingId)
-                        .single();
-                    
-                    if (fetchError) {
-                        console.error('Error fetching booking data:', fetchError);
-                        alert('Error fetching booking data for deletion');
-                        return;
-                    }
-                    
-                    // Calculate slots to free up
-                    const slotsToFree = bookingData.adults + bookingData.children;
-                    
-                    // First, get the current total_booked value
-                    const { data: currentDateData, error: fetchDateError } = await supabase
-                        .from('tour_dates')
-                        .select('total_booked')
-                        .eq('id', bookingData.tour_date_id)
-                        .single();
-                    
-                    if (fetchDateError) {
-                        console.error('Error fetching current date data:', fetchDateError);
-                        alert('Error fetching current date data');
-                        return;
-                    }
-                    
-                    // Calculate new total_booked value
-                    const newTotalBooked = Math.max(0, currentDateData.total_booked - slotsToFree);
-                    
-                    // Update tour_dates to reduce total_booked
-                    const { error: dateError } = await supabase
-                        .from('tour_dates')
-                        .update({ 
-                            total_booked: newTotalBooked
-                        })
-                        .eq('id', bookingData.tour_date_id);
-                    
-                    if (dateError) {
-                        console.error('Error updating calendar slots:', dateError);
-                        alert('Error updating calendar slots');
-                        return;
-                    }
-                    
-                    console.log(`Freed up ${slotsToFree} slots from calendar`);
-                }
+                // Note: Calendar slots are automatically managed by database triggers
+                // No manual slot management needed here
                 
                 // Delete the booking from database
                 console.log('Attempting to delete booking from database...');
