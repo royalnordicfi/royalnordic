@@ -598,6 +598,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
       {/* Participants Section */}
         <div>
           <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Participants</h4>
+          {!formData.preferredDate && (
+            <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded p-3 mb-4">
+              <strong>Please select a date first</strong> to choose the number of participants
+            </div>
+          )}
         <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Adult</label>

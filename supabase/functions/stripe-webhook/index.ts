@@ -301,7 +301,6 @@ ${bookingData.specialRequests ? `📝 Special Requests: ${bookingData.specialReq
               <ul style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px; padding-left: 20px;">
                 <li>You'll receive detailed tour information 24 hours before your adventure</li>
                 <li>Meet your guide at the designated location</li>
-                <li>All equipment and safety gear will be provided</li>
                 <li>Enjoy your unforgettable Lapland experience!</li>
               </ul>
               
@@ -355,7 +354,6 @@ ${bookingData.specialRequests ? `- Special Requests: ${bookingData.specialReques
 What happens next?
 - You'll receive detailed tour information 24 hours before your adventure
 - Meet your guide at the designated location
-- All equipment and safety gear will be provided
 - Enjoy your unforgettable Lapland experience!
 
 If you have any questions or need to make changes, please contact us at contact@royalnordic.fi or call +358 45 78345138.
