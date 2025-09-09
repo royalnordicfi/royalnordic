@@ -70,6 +70,9 @@ const CryptoPaymentSuccess: React.FC = () => {
             <h3 className="font-semibold text-white mb-3 text-sm">Booking Details</h3>
             <div className="space-y-2 text-xs">
               <div className="flex items-center">
+                <span className="text-gray-300 font-medium">Tour: {bookingData.tour_name || 'Tour'}</span>
+              </div>
+              <div className="flex items-center">
                 <Calendar className="w-3 h-3 mr-2 text-green-400" />
                 <span className="text-gray-300">Date: {bookingData.tour_date}</span>
               </div>

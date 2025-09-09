@@ -366,6 +366,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         children: formData.children.toString(),
         total_price: totalPrice.toString(),
         tour_date: tourDate,
+        tour_name: tourName,
         phone: formData.phone,
         special_requests: formData.specialRequests
       }
@@ -376,7 +377,25 @@ const BookingForm: React.FC<BookingFormProps> = ({
       await redirectToCheckout(sessionId)
 
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Booking failed')
+      console.error('Booking error:', err)
+      // Clean up Stripe error messages
+      let errorMessage = 'Booking failed'
+      if (err instanceof Error) {
+        if (err.message.includes('email_invalid')) {
+          errorMessage = 'Invalid email address'
+        } else if (err.message.includes('card_declined')) {
+          errorMessage = 'Payment was declined'
+        } else if (err.message.includes('insufficient_funds')) {
+          errorMessage = 'Insufficient funds'
+        } else if (err.message.includes('expired_card')) {
+          errorMessage = 'Card has expired'
+        } else if (err.message.includes('incorrect_cvc')) {
+          errorMessage = 'Incorrect CVC code'
+        } else {
+          errorMessage = err.message
+        }
+      }
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -474,6 +493,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           children: formData.children.toString(),
           total_price: totalPrice.toString(),
           tour_date: tourDate,
+          tour_name: tourName,
           crypto_type: cryptoFormData.cryptoType,
           special_requests: cryptoFormData.specialRequests
         }

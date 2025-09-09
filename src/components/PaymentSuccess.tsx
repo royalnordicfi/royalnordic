@@ -69,7 +69,7 @@ const PaymentSuccess: React.FC = () => {
               <CheckCircle className="w-6 h-6 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-2">Payment Successful!</h1>
-            <p className="text-gray-300 text-sm">Your Northern Lights Tour is confirmed!</p>
+            <p className="text-gray-300 text-sm">Your {bookingData.tour_name || 'Tour'} is confirmed!</p>
           </div>
 
           {/* Booking Details */}
