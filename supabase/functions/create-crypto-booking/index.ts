@@ -289,7 +289,7 @@ This is a crypto payment booking! You need to contact the customer to provide wa
                 <li>Complete your crypto payment as instructed</li>
                 <li>You'll receive detailed tour information 24 hours before your adventure</li>
                 <li>Meet your guide at the designated location</li>
-                <li>All equipment and safety gear will be provided</li>
+                ${bookingData.tourName.includes('Snowshoe') ? '<li>All equipment and safety gear will be provided</li>' : ''}
                 <li>Enjoy your unforgettable Lapland experience!</li>
               </ul>
               
@@ -354,7 +354,7 @@ What happens next?
 - Complete your crypto payment as instructed
 - You'll receive detailed tour information 24 hours before your adventure
 - Meet your guide at the designated location
-- All equipment and safety gear will be provided
+${bookingData.tourName.includes('Snowshoe') ? '- All equipment and safety gear will be provided' : ''}
 - Enjoy your unforgettable Lapland experience!
 
 If you have any questions or need to make changes, please contact us at contact@royalnordic.fi or call +358 45 78345138.
