@@ -40,16 +40,10 @@
                 </div>
 
 
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <input type="checkbox" id="rememberMe" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                        <label for="rememberMe" class="ml-2 block text-sm text-gray-700">
-                            Remember me
-                        </label>
-                    </div>
-                    <button type="button" onclick="clearSavedCredentials()" class="text-sm text-blue-600 hover:text-blue-800">
-                        Clear saved data
-                    </button>
+                <div class="text-center">
+                    <p class="text-sm text-gray-500">
+                        🔒 Secure admin access - no data stored locally
+                    </p>
                 </div>
                 
                 <button type="submit" 
@@ -491,7 +485,7 @@
 
 
     <script>
-        let authToken = localStorage.getItem('adminToken');
+        let authToken = null;
         let currentUser = null;
 
         // Check if admin exists, if not show setup
@@ -522,48 +516,10 @@
             );
         }
 
-        // Load saved credentials on page load
+        // Initialize admin panel on page load
         document.addEventListener('DOMContentLoaded', function() {
-            loadSavedCredentials();
+            initializeAdmin();
         });
-
-        // Load saved credentials from localStorage
-        function loadSavedCredentials() {
-            const savedEmail = localStorage.getItem('royalnordic_admin_email');
-            const savedPassword = localStorage.getItem('royalnordic_admin_password');
-            const rememberMe = localStorage.getItem('royalnordic_admin_remember') === 'true';
-
-            if (rememberMe && savedEmail && savedPassword) {
-                document.getElementById('email').value = savedEmail;
-                document.getElementById('password').value = savedPassword;
-                document.getElementById('rememberMe').checked = true;
-            }
-        }
-
-        // Save credentials to localStorage
-        function saveCredentials(email, password, remember) {
-            if (remember) {
-                localStorage.setItem('royalnordic_admin_email', email);
-                localStorage.setItem('royalnordic_admin_password', password);
-                localStorage.setItem('royalnordic_admin_remember', 'true');
-                } else {
-                clearSavedCredentials();
-            }
-        }
-
-        // Clear saved credentials
-        function clearSavedCredentials() {
-            localStorage.removeItem('royalnordic_admin_email');
-            localStorage.removeItem('royalnordic_admin_password');
-            localStorage.removeItem('royalnordic_admin_remember');
-            
-            // Clear form
-            document.getElementById('email').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('rememberMe').checked = false;
-            
-            alert('Saved credentials cleared!');
-        }
 
         // Login with security checks
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -571,16 +527,11 @@
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const rememberMe = document.getElementById('rememberMe').checked;
             
             // Security: Check if user is authorized
             if (isAuthorizedUser(email, password)) {
-                // Save credentials if "Remember me" is checked
-                saveCredentials(email, password, rememberMe);
-                
                 authToken = 'admin-token';
                 currentUser = { id: 1, email: email };
-                    localStorage.setItem('adminToken', authToken);
                     
                 // Show success message
                 showLoginSuccess();
@@ -616,7 +567,6 @@
         document.getElementById('logoutBtn').addEventListener('click', () => {
             authToken = null;
             currentUser = null;
-            localStorage.removeItem('adminToken');
             
             document.getElementById('adminPanel').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
