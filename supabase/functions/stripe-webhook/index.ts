@@ -419,3 +419,111 @@ async function sendViaGmail(emailData: any, type: string) {
     console.error(`Error sending ${type} email via Gmail:`, error)
   }
 }
+
+// Main function
+Deno.serve(async (req) => {
+  // Handle CORS
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders })
+  }
+
+  try {
+    const body = await req.text()
+    const signature = req.headers.get('stripe-signature')
+    
+    if (!signature) {
+      throw new Error('Missing stripe-signature header')
+    }
+
+    // Verify webhook signature
+    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
+    if (!webhookSecret) {
+      throw new Error('Missing STRIPE_WEBHOOK_SECRET')
+    }
+
+    const event = JSON.parse(body)
+    
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object
+      
+      if (session.payment_status === 'paid') {
+        const metadata = session.metadata
+        
+        if (!metadata.tour_id || !metadata.tour_date_id) {
+          throw new Error('Missing required metadata')
+        }
+
+        // Create booking
+        const { data: booking, error: bookingError } = await supabase
+          .from('bookings')
+          .insert({
+            tour_id: parseInt(metadata.tour_id),
+            tour_date_id: parseInt(metadata.tour_date_id),
+            customer_name: metadata.customer_name,
+            customer_email: session.customer_email,
+            customer_phone: metadata.customer_phone || '',
+            adults: parseInt(metadata.adults),
+            children: parseInt(metadata.children),
+            total_price: session.amount_total / 100,
+            stripe_payment_intent_id: session.payment_intent,
+            status: 'confirmed',
+            special_requests: metadata.special_requests || ''
+          })
+          .select()
+          .single()
+
+        if (bookingError) {
+          throw new Error(`Failed to create booking: ${bookingError.message}`)
+        }
+
+        // Get tour and date info for email
+        const { data: tourData } = await supabase
+          .from('tours')
+          .select('name, adult_price, child_price')
+          .eq('id', metadata.tour_id)
+          .single()
+
+        const { data: dateData } = await supabase
+          .from('tour_dates')
+          .select('date')
+          .eq('id', metadata.tour_date_id)
+          .single()
+
+        // Prepare email data
+        const emailData = {
+          bookingId: booking.id,
+          tourName: tourData?.name || 'Tour',
+          customerName: metadata.customer_name,
+          customerEmail: session.customer_email,
+          tourDate: dateData?.date || metadata.tour_date,
+          adults: parseInt(metadata.adults),
+          children: parseInt(metadata.children),
+          totalPrice: session.amount_total / 100,
+          specialRequests: metadata.special_requests || '',
+          paymentStatus: 'confirmed' as const,
+          createdAt: new Date().toISOString()
+        }
+
+        // Send notification to Royal Nordic staff
+        await sendEmailNotification(emailData, 'admin')
+        
+        // Send confirmation to customer
+        await sendEmailNotification(emailData, 'customer')
+      }
+    }
+
+    return new Response(
+      JSON.stringify({ success: true }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  } catch (error) {
+    console.error('Webhook error:', error)
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { 
+        status: 400, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    )
+  }
+})
