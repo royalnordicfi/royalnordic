@@ -43,6 +43,20 @@ const BookingForm: React.FC<BookingFormProps> = ({
     cryptoType: 'bitcoin',
     specialRequests: ''
   })
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (showCryptoModal) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [showCryptoModal])
   
 
 
@@ -384,7 +398,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
       specialRequests: formData.specialRequests
     })
     
-    // Show crypto modal
+    // Show crypto modal (NO booking created yet)
     setShowCryptoModal(true)
     setError('')
   }
@@ -803,23 +817,51 @@ const BookingForm: React.FC<BookingFormProps> = ({
         )}
       </form>
 
-      {/* Crypto Payment Modal */}
+      {/* Crypto Payment Modal - Full Page Overlay */}
       {showCryptoModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Pay with Cryptocurrency</h3>
-                <button
-                  onClick={() => setShowCryptoModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4"
+          style={{ 
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            overflow: 'hidden'
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowCryptoModal(false)
+            }
+          }}
+        >
+          <div 
+            className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-auto"
+            style={{
+              maxHeight: '90vh',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-xl font-bold text-gray-900">Pay with Cryptocurrency</h3>
+              <button
+                onClick={() => setShowCryptoModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
+            {/* Modal Content - Scrollable */}
+            <div 
+              className="flex-1 overflow-y-auto p-6"
+              style={{ maxHeight: 'calc(90vh - 140px)' }}
+            >
               <div className="space-y-4">
                 {/* Booking Summary */}
                 <div className="bg-gray-50 rounded-lg p-4">
@@ -895,30 +937,32 @@ const BookingForm: React.FC<BookingFormProps> = ({
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                {/* Action Buttons */}
-                <div className="flex space-x-3 pt-4">
-                  <button
-                    onClick={() => setShowCryptoModal(false)}
-                    className="flex-1 bg-gray-200 text-gray-800 font-semibold py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleCryptoSubmit}
-                    disabled={loading || !cryptoFormData.fullName}
-                    className="flex-1 bg-emerald-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                  >
-                    {loading ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Processing...
-                      </>
-                    ) : (
-                      'Confirm Crypto Booking'
-                    )}
-                  </button>
-                </div>
+            {/* Modal Footer - Fixed */}
+            <div className="border-t border-gray-200 p-6">
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setShowCryptoModal(false)}
+                  className="flex-1 bg-gray-200 text-gray-800 font-semibold py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCryptoSubmit}
+                  disabled={loading || !cryptoFormData.fullName}
+                  className="flex-1 bg-emerald-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  {loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    'Confirm Crypto Booking'
+                  )}
+                </button>
               </div>
             </div>
           </div>
