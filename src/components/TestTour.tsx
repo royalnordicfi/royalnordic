@@ -5,6 +5,7 @@ import BookingForm from './BookingForm';
 
 const TestTour: React.FC = () => {
   console.log('TestTour component is rendering!');
+  console.log('Stripe publishable key:', import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
   
   // Use hardcoded values for now to avoid API issues
   const tourData = {
