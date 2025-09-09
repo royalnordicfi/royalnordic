@@ -198,6 +198,55 @@ const Tours = () => {
             </div>
           </Link>
 
+          {/* Test Tour */}
+          <Link to="/test-tour" className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-orange-800/95 to-red-900/95 backdrop-blur-sm border border-orange-600/50 hover:border-orange-500/70 transition-all duration-500 hover:scale-105 cursor-pointer flex flex-col shadow-xl hover:shadow-orange-900/50">
+            <div className="relative h-44 sm:h-48 overflow-hidden">
+              <img
+                src="/lights1.jpg"
+                alt="Test Tour for Live Payment Testing"
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+              {/* TEST Badge */}
+              <div className="absolute top-3 right-3 bg-orange-500/95 backdrop-blur-sm rounded-lg px-3 py-1 flex items-center space-x-1 shadow-lg">
+                <span className="text-xs font-bold text-white uppercase tracking-wider">TEST</span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-5 flex flex-col flex-grow">
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-400 bg-clip-text text-transparent">TEST TOUR - Live Payment Testing</h3>
+              <p className="text-gray-300 text-sm sm:text-base mb-4 leading-relaxed">
+                This is a test tour for live payment testing. Price: 10 cents. Will be removed in production.
+              </p>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-4 text-sm text-white">
+                  <span className="flex items-center font-medium">
+                    <Clock className="w-4 h-4 mr-1 text-orange-400" />
+                    Test Mode
+                  </span>
+                  <span className="flex items-center font-medium">
+                    <Users className="w-4 h-4 mr-1 text-orange-400" />
+                    Max 10 people
+                  </span>
+                </div>
+                <div className="text-2xl font-bold text-white">€0.10</div>
+              </div>
+              <div className="mb-4">
+                <p className="text-orange-400 text-sm font-semibold flex items-center">
+                  <span className="w-2 h-2 bg-orange-400 rounded-full mr-2"></span>
+                  Live Payment Testing Only
+                </p>
+              </div>
+              <div className="mt-auto flex justify-end">
+                <div
+                  className="inline-block w-1/2 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white text-center py-3 px-4 rounded-lg font-bold transition-all duration-300 uppercase tracking-wide shadow-lg hover:shadow-xl"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Test Now
+                </div>
+              </div>
+            </div>
+          </Link>
+
           {/* Customized Tours */}
           <Link to="/customized-tour" className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800/95 to-gray-900/95 backdrop-blur-sm border border-gray-600/50 hover:border-gray-500/70 transition-all duration-500 hover:scale-105 cursor-pointer flex flex-col shadow-xl hover:shadow-gray-900/50">
             <div className="relative h-44 sm:h-48 overflow-hidden">

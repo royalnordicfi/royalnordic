@@ -9,6 +9,7 @@ import Footer from './components/Footer';
 import NorthernLightsTour from './components/NorthernLightsTour';
 import SnowshoeRental from './components/SnowshoeRental';
 import CustomizedTour from './components/CustomizedTour';
+import TestTour from './components/TestTour';
 import PaymentSuccess from './components/PaymentSuccess';
 import CryptoPaymentSuccess from './components/CryptoPaymentSuccess';
 import PrivacyPolicy from './components/PrivacyPolicy';
@@ -44,6 +45,7 @@ function App() {
           <Route path="/northern-lights-tour" element={<NorthernLightsTour />} />
           <Route path="/snowshoe-rental" element={<SnowshoeRental />} />
           <Route path="/customized-tour" element={<CustomizedTour />} />
+          <Route path="/test-tour" element={<TestTour />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/crypto-payment-success" element={<CryptoPaymentSuccess />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
