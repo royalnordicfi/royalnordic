@@ -74,7 +74,7 @@ const CustomizedTour: React.FC = () => {
       <div className="relative">
         <ImageSlideshow 
           images={["/snowyscene.png", "/slideshow3.jpg"]}
-          className="h-80 sm:h-96 md:h-[500px]"
+          className="h-96 sm:h-[28rem] md:h-[32rem] lg:h-[36rem]"
           alt="Customized Tours Images"
         />
         
@@ -92,8 +92,8 @@ const CustomizedTour: React.FC = () => {
           </div>
         </div>
         
-        {/* Bottom transition overlay for smooth flow to content */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/90 via-black/60 to-transparent z-10"></div>
+        {/* Bottom transition overlay for smooth flow to content - positioned lower to give more space for text */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 sm:h-36 md:h-40 bg-gradient-to-t from-black via-black/80 to-transparent z-10"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8 lg:py-12">
