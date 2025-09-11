@@ -33,7 +33,19 @@ serve(async (req) => {
     })
 
     const session = await stripe.createCheckoutSession({
-      payment_method_types: ['card', 'sepa_debit', 'pay_by_bank'],
+      payment_method_types: [
+        'card', 
+        'sepa_debit', 
+        'pay_by_bank',
+        'klarna',
+        'afterpay_clearpay',
+        'ideal',
+        'bancontact',
+        'eps',
+        'giropay',
+        'p24',
+        'sofort'
+      ],
       line_items: [
         {
           price_data: {
