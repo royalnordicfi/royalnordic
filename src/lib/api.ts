@@ -208,6 +208,7 @@ export async function createBooking(bookingData: {
     .select('name')
     .eq('id', bookingData.tour_id)
     .single()
+    .single()
 
   const { data: dateDataForEmail } = await supabase
     .from('tour_dates')
