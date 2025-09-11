@@ -210,7 +210,7 @@ async function sendEmailNotification(bookingData: any, type: 'admin' | 'customer
           <h3>📋 Booking Details</h3>
           <p><strong>Booking ID:</strong> #${bookingData.bookingId}</p>
           <p><strong>Tour:</strong> ${bookingData.tourName}</p>
-          <p><strong>Date:</strong> ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}</p>
+          <p><strong>Date:</strong> ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}${bookingData.tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}</p>
           <p><strong>Status:</strong> ${bookingData.paymentStatus.toUpperCase()}</p>
           
           <h3>👥 Customer Information</h3>
@@ -236,7 +236,7 @@ New Booking Alert - Royal Nordic Tours
 📋 Booking Details:
 - Booking ID: #${bookingData.bookingId}
 - Tour: ${bookingData.tourName}
-- Date: ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}
+- Date: ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}${bookingData.tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}
 - Status: ${bookingData.paymentStatus.toUpperCase()}
 
 👥 Customer Information:
@@ -281,7 +281,7 @@ ${bookingData.specialRequests ? `📝 Special Requests: ${bookingData.specialReq
                 <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 18px;">Your Booking Details:</h3>
                 <p style="color: #4b5563; margin: 8px 0;"><strong>Booking ID:</strong> #${bookingData.bookingId}</p>
                 <p style="color: #4b5563; margin: 8px 0;"><strong>Tour:</strong> ${bookingData.tourName}</p>
-                <p style="color: #4b5563; margin: 8px 0;"><strong>Date:</strong> ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}</p>
+                <p style="color: #4b5563; margin: 8px 0;"><strong>Date:</strong> ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}${bookingData.tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}</p>
                 <p style="color: #4b5563; margin: 8px 0;"><strong>Adults:</strong> ${bookingData.adults}</p>
                 <p style="color: #4b5563; margin: 8px 0;"><strong>Children:</strong> ${bookingData.children}</p>
                 <p style="color: #4b5563; margin: 8px 0;"><strong>Total Amount:</strong> €${bookingData.totalPrice}</p>
@@ -343,7 +343,7 @@ Thank you for booking your Lapland adventure with Royal Nordic! We're excited to
 Your Booking Details:
 - Booking ID: #${bookingData.bookingId}
 - Tour: ${bookingData.tourName}
-- Date: ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}
+- Date: ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}${bookingData.tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}
 - Adults: ${bookingData.adults}
 - Children: ${bookingData.children}
 - Total Amount: €${bookingData.totalPrice}

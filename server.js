@@ -475,7 +475,7 @@ app.post('/api/admin/setup', (req, res) => {
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                       <div>
                         <p style="margin: 8px 0; font-size: 14px;"><strong>Tour:</strong> ${tourData.tour_name}</p>
-                        <p style="margin: 8px 0; font-size: 14px;"><strong>Date:</strong> ${formattedDate}</p>
+                        <p style="margin: 8px 0; font-size: 14px;"><strong>Date:</strong> ${formattedDate}${tourData.tour_name === 'Northern Lights Tour' ? ' at 20:00' : ''}</p>
                         <p style="margin: 8px 0; font-size: 14px;"><strong>Adults:</strong> ${bookingDetails.adults}</p>
                         <p style="margin: 8px 0; font-size: 14px;"><strong>Children:</strong> ${bookingDetails.children}</p>
                       </div>
@@ -557,7 +557,7 @@ Thank you for booking with Royal Nordic! Your Lapland adventure is confirmed and
 
 Tour Details:
 - Tour: ${tourData.tour_name}
-- Date: ${formattedDate}
+- Date: ${formattedDate}${tourData.tour_name === 'Northern Lights Tour' ? ' at 20:00' : ''}
 - Adults: ${bookingDetails.adults}
 - Children: ${bookingDetails.children}
 - Booking ID: #${bookingDetails.bookingId}
@@ -661,7 +661,7 @@ app.post('/api/send-stripe-confirmation', async (req, res) => {
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                   <div>
                     <p style="margin: 8px 0; font-size: 14px;"><strong>Tour:</strong> ${tourName}</p>
-                    <p style="margin: 8px 0; font-size: 14px;"><strong>Date:</strong> ${tourDate}</p>
+                    <p style="margin: 8px 0; font-size: 14px;"><strong>Date:</strong> ${tourDate}${tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}</p>
                     <p style="margin: 8px 0; font-size: 14px;"><strong>Adults:</strong> ${adults}</p>
                     <p style="margin: 8px 0; font-size: 14px;"><strong>Children:</strong> ${children}</p>
                   </div>

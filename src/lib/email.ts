@@ -247,7 +247,7 @@ function generateCustomerConfirmationHTML(booking: BookingNotificationData): str
             year: 'numeric', 
             month: 'long', 
             day: 'numeric' 
-          })}</p>
+          })}${booking.tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}</p>
           <p><strong>Status:</strong> <span class="status-confirmed">CONFIRMED</span></p>
         </div>
         
@@ -307,7 +307,7 @@ Your tour has been successfully confirmed. We're excited to show you the magic o
   year: 'numeric', 
   month: 'long', 
   day: 'numeric' 
-})}
+})}${booking.tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}
 - Status: CONFIRMED
 
 👥 Your Group:
