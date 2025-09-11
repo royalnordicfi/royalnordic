@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Email Preview - Northern Lights Tour Confirmation</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #f0f0f0; 
+        }
+        .email-container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background-color: white; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .header { 
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%); 
+            color: white; 
+            padding: 40px 20px; 
+            text-align: center; 
+        }
+        .content { 
+            padding: 40px 30px; 
+        }
+        .booking-details { 
+            background-color: #f3f4f6; 
+            padding: 25px; 
+            border-radius: 8px; 
+            margin: 25px 0; 
+            border-left: 4px solid #059669; 
+        }
+        .highlight { 
+            background-color: #f9fafb; 
+            padding: 15px; 
+            border-radius: 6px; 
+            margin: 10px 0; 
+        }
+        .footer { 
+            background-color: #f3f4f6; 
+            padding: 20px; 
+            text-align: center; 
+            color: #6b7280; 
+        }
+        .status-confirmed { 
+            color: #059669; 
+            font-weight: bold; 
+        }
+        .contact-info { 
+            background-color: #fef3c7; 
+            padding: 15px; 
+            border-radius: 6px; 
+            margin: 10px 0; 
+        }
+        .time-highlight {
+            background-color: #dbeafe;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1 style="color: white; margin: 0 0 10px 0; font-size: 36px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">Royal Nordic</h1>
+            <p style="color: #9ca3af; margin: 0; font-size: 16px; font-style: italic;">Finnish Lapland Adventures</p>
+        </div>
+        
+        <div class="content">
+            <h1 style="color: #1f2937; margin-bottom: 25px; font-size: 28px; text-align: center;">Booking Confirmed! 🎉</h1>
+            
+            <p style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px;">
+                Dear <strong>Miro Vesterinen</strong>,
+            </p>
+            
+            <p style="color: #4b5563; line-height: 1.7; margin-bottom: 30px; font-size: 16px;">
+                Thank you for booking with Royal Nordic! Your Lapland adventure is confirmed and we're excited to show you the magic of the Northern Lights.
+            </p>
+            
+            <div class="booking-details">
+                <h3 style="color: #1f2937; margin-bottom: 20px; font-size: 20px;">📋 Your Booking Details</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <p style="margin: 8px 0; font-size: 14px;"><strong>Tour:</strong> Northern Lights Tour</p>
+                        <p style="margin: 8px 0; font-size: 14px;"><strong>Date:</strong> Monday, September 15, 2025 <span class="time-highlight">at 20:00</span></p>
+                        <p style="margin: 8px 0; font-size: 14px;"><strong>Adults:</strong> 2</p>
+                        <p style="margin: 8px 0; font-size: 14px;"><strong>Children:</strong> 1</p>
+                    </div>
+                    <div>
+                        <p style="margin: 8px 0; font-size: 14px;"><strong>Booking ID:</strong> #TEST123</p>
+                        <p style="margin: 8px 0; font-size: 14px;"><strong>Status:</strong> <span class="status-confirmed">CONFIRMED</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="highlight">
+                <h3>👥 Your Group</h3>
+                <p><strong>Adults:</strong> 2</p>
+                <p><strong>Children:</strong> 1</p>
+                <p><strong>Total Amount:</strong> €507</p>
+            </div>
+            
+            <div class="contact-info">
+                <h3>📞 Contact Information</h3>
+                <p><strong>Email:</strong> contact@royalnordic.fi</p>
+                <p><strong>Phone:</strong> +358 45 78345138</p>
+                <p><strong>Website:</strong> royalnordic.fi</p>
+            </div>
+            
+            <div class="highlight">
+                <h3>🎯 What's Next?</h3>
+                <p>• You will receive a reminder email 24 hours before your tour</p>
+                <p>• Please arrive 15 minutes before your scheduled time</p>
+                <p>• Dress warmly for Arctic conditions</p>
+                <p>• Contact us if you have any questions</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Thank you for choosing Royal Nordic Tours!</p>
+            <p>Booking ID: #TEST123</p>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 20px; color: #666;">
+        <h3>📧 Email Preview</h3>
+        <p>This shows how the Northern Lights tour confirmation email will look with the new starting time.</p>
+        <p><strong>Key Change:</strong> The date now shows <span class="time-highlight">"at 20:00"</span> for Northern Lights tours!</p>
+    </div>
+</body>
+</html>
