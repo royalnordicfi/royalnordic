@@ -2,6 +2,7 @@ import { Clock, Users, MapPin, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import ImageSlideshow from './ImageSlideshow';
 import BookingForm from './BookingForm';
+import Footer from './Footer';
 import { getAllTours } from '../lib/api';
 
 const NorthernLightsTour = () => {
@@ -107,8 +108,8 @@ const NorthernLightsTour = () => {
           </div>
         </div>
         
-        {/* Bottom transition overlay for smooth flow to content */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/90 via-black/60 to-transparent z-10"></div>
+        {/* Bottom transition overlay for smooth flow to content - adjusted for mobile without harsh line */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 sm:h-28 md:h-32 bg-gradient-to-t from-black via-black/80 to-transparent z-10"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8 lg:py-12">
@@ -242,6 +243,9 @@ const NorthernLightsTour = () => {
           </div>
         </div>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
