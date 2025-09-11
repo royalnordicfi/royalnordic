@@ -6,23 +6,29 @@ const WhatsAppWidget = () => {
 
   // Your WhatsApp direct link
   const whatsappUrl = 'https://wa.me/message/32DREESZC5QUB1';
-  const message = 'Hi! I\'m interested in booking a tour with Royal Nordic. Can you help me?';
 
   const handleWhatsAppClick = () => {
     console.log('WhatsApp button clicked, opening:', whatsappUrl);
-    try {
-      window.open(whatsappUrl, '_blank');
-      setIsOpen(false);
-    } catch (error) {
-      console.error('Error opening WhatsApp:', error);
-      // Fallback: try to navigate directly
+    // Try multiple methods to ensure it works
+    if (window.open) {
+      const newWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      if (!newWindow) {
+        // Popup blocked, try direct navigation
+        window.location.href = whatsappUrl;
+      }
+    } else {
+      // Fallback for older browsers
       window.location.href = whatsappUrl;
     }
+    setIsOpen(false);
   };
 
   const handleClose = () => {
     setIsOpen(false);
   };
+
+  // Test if component is rendering
+  console.log('WhatsAppWidget component rendered');
 
   return (
     <>
@@ -38,6 +44,17 @@ const WhatsAppWidget = () => {
         
         {/* Pulse animation ring */}
         <div className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-20"></div>
+      </div>
+
+      {/* Test Button - Direct WhatsApp Link */}
+      <div className="fixed bottom-6 left-6 z-[9999]">
+        <button
+          onClick={handleWhatsAppClick}
+          className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+          aria-label="Test WhatsApp direct link"
+        >
+          Test WA
+        </button>
       </div>
 
       {/* WhatsApp Chat Modal */}
