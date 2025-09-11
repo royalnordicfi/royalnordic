@@ -90,7 +90,7 @@ const NorthernLightsTour = () => {
       <div className="relative">
         <ImageSlideshow 
           images={["/lights1.jpg", "/lights2.jpg", "/lights3.jpg"]}
-          className="h-96 sm:h-[28rem] md:h-[32rem] lg:h-[36rem]"
+          className="h-[28rem] sm:h-[32rem] md:h-[36rem] lg:h-[40rem]"
           alt="Northern Lights Tour Images"
         />
         
@@ -108,8 +108,8 @@ const NorthernLightsTour = () => {
           </div>
         </div>
         
-        {/* Bottom transition overlay for smooth flow to content - positioned lower to give more space for text */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 sm:h-36 md:h-40 bg-gradient-to-t from-black via-black/80 to-transparent z-10"></div>
+        {/* Bottom transition overlay for smooth flow to content - positioned much lower to give more space for text */}
+        <div className="absolute bottom-0 left-0 right-0 h-20 sm:h-24 md:h-28 bg-gradient-to-t from-black via-black/90 to-transparent z-10"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8 lg:py-12">
