@@ -4,13 +4,11 @@ import { MessageCircle, X } from 'lucide-react';
 const WhatsAppWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Your WhatsApp number (replace with your actual number)
-  const whatsappNumber = '+3584578345138'; // Your number from the contact info
+  // Your WhatsApp direct link
+  const whatsappUrl = 'https://wa.me/message/32DREESZC5QUB1';
   const message = 'Hi! I\'m interested in booking a tour with Royal Nordic. Can you help me?';
 
   const handleWhatsAppClick = () => {
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
     setIsOpen(false);
   };
