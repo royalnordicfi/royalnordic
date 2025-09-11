@@ -9,8 +9,15 @@ const WhatsAppWidget = () => {
   const message = 'Hi! I\'m interested in booking a tour with Royal Nordic. Can you help me?';
 
   const handleWhatsAppClick = () => {
-    window.open(whatsappUrl, '_blank');
-    setIsOpen(false);
+    console.log('WhatsApp button clicked, opening:', whatsappUrl);
+    try {
+      window.open(whatsappUrl, '_blank');
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Error opening WhatsApp:', error);
+      // Fallback: try to navigate directly
+      window.location.href = whatsappUrl;
+    }
   };
 
   const handleClose = () => {
@@ -20,7 +27,7 @@ const WhatsAppWidget = () => {
   return (
     <>
       {/* WhatsApp Button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-6 right-6 z-[9999]">
         <button
           onClick={() => setIsOpen(true)}
           className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 group"
@@ -35,7 +42,7 @@ const WhatsAppWidget = () => {
 
       {/* WhatsApp Chat Modal */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300 scale-100">
             {/* Header */}
             <div className="bg-green-500 text-white p-4 rounded-t-2xl flex items-center justify-between">
