@@ -14,6 +14,7 @@ import CryptoPaymentSuccess from './components/CryptoPaymentSuccess';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsConditions from './components/TermsConditions';
 import ScrollToTop from './components/ScrollToTop';
+import WhatsAppWidget from './components/WhatsAppWidget';
 
 function App() {
   return (
@@ -49,6 +50,9 @@ function App() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
         </Routes>
+        
+        {/* WhatsApp Widget - appears on all pages */}
+        <WhatsAppWidget />
       </div>
     </Router>
   );
