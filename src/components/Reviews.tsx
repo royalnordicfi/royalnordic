@@ -90,7 +90,7 @@ const Reviews = () => {
 
         {/* Reviews Carousel */}
         <div className="relative overflow-hidden">
-          <div className="flex animate-scroll-faster">
+          <div className="flex animate-infinite-scroll">
             {/* First set of reviews */}
             {reviews.map((review) => (
               <div
@@ -196,7 +196,7 @@ const Reviews = () => {
 
       {/* Custom CSS for infinite scroll animation */}
       <style jsx>{`
-        @keyframes scroll-faster {
+        @keyframes infinite-scroll {
           0% {
             transform: translateX(0);
           }
@@ -205,12 +205,13 @@ const Reviews = () => {
           }
         }
         
-        .animate-scroll-faster {
-          animation: scroll-faster 25s linear infinite;
+        .animate-infinite-scroll {
+          animation: infinite-scroll 20s linear infinite;
+          will-change: transform;
         }
         
-        .animate-scroll-faster:hover {
-          animation-play-state: paused;
+        .animate-infinite-scroll:hover {
+          animation-play-state: running;
         }
       `}</style>
     </section>
