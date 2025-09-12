@@ -76,7 +76,7 @@ const Reviews = () => {
   };
 
   return (
-    <section className="py-16 bg-gradient-to-b from-gray-900 to-black">
+    <section className="py-16 bg-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -90,33 +90,33 @@ const Reviews = () => {
 
         {/* Reviews Carousel */}
         <div className="relative overflow-hidden">
-          <div className="flex animate-scroll">
+          <div className="flex animate-scroll-faster">
             {/* First set of reviews */}
             {reviews.map((review) => (
               <div
                 key={`first-${review.id}`}
-                className="flex-shrink-0 w-80 sm:w-96 mx-4"
+                className="flex-shrink-0 w-64 sm:w-72 mx-3"
               >
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 h-full border border-white/20 hover:bg-white/15 transition-all duration-300">
+                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 h-full border border-white/10 hover:bg-white/10 transition-all duration-300">
                   {/* Stars */}
-                  <div className="flex items-center mb-4">
+                  <div className="flex items-center mb-3">
                     {renderStars(review.rating)}
                   </div>
                   
                   {/* Review Text */}
-                  <p className="text-gray-200 text-sm sm:text-base leading-relaxed mb-6 italic">
+                  <p className="text-gray-200 text-xs sm:text-sm leading-relaxed mb-4 italic">
                     "{review.review}"
                   </p>
                   
                   {/* Author Info */}
-                  <div className="border-t border-white/20 pt-4">
+                  <div className="border-t border-white/10 pt-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="font-semibold text-white text-sm sm:text-base">
+                        <h4 className="font-semibold text-white text-xs sm:text-sm">
                           {review.name}
                         </h4>
                         {review.location && (
-                          <p className="text-gray-400 text-xs sm:text-sm">
+                          <p className="text-gray-400 text-xs">
                             {review.location}
                           </p>
                         )}
@@ -136,28 +136,28 @@ const Reviews = () => {
             {reviews.map((review) => (
               <div
                 key={`second-${review.id}`}
-                className="flex-shrink-0 w-80 sm:w-96 mx-4"
+                className="flex-shrink-0 w-64 sm:w-72 mx-3"
               >
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 h-full border border-white/20 hover:bg-white/15 transition-all duration-300">
+                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 h-full border border-white/10 hover:bg-white/10 transition-all duration-300">
                   {/* Stars */}
-                  <div className="flex items-center mb-4">
+                  <div className="flex items-center mb-3">
                     {renderStars(review.rating)}
                   </div>
                   
                   {/* Review Text */}
-                  <p className="text-gray-200 text-sm sm:text-base leading-relaxed mb-6 italic">
+                  <p className="text-gray-200 text-xs sm:text-sm leading-relaxed mb-4 italic">
                     "{review.review}"
                   </p>
                   
                   {/* Author Info */}
-                  <div className="border-t border-white/20 pt-4">
+                  <div className="border-t border-white/10 pt-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="font-semibold text-white text-sm sm:text-base">
+                        <h4 className="font-semibold text-white text-xs sm:text-sm">
                           {review.name}
                         </h4>
                         {review.location && (
-                          <p className="text-gray-400 text-xs sm:text-sm">
+                          <p className="text-gray-400 text-xs">
                             {review.location}
                           </p>
                         )}
@@ -196,7 +196,7 @@ const Reviews = () => {
 
       {/* Custom CSS for infinite scroll animation */}
       <style jsx>{`
-        @keyframes scroll {
+        @keyframes scroll-faster {
           0% {
             transform: translateX(0);
           }
@@ -205,11 +205,11 @@ const Reviews = () => {
           }
         }
         
-        .animate-scroll {
-          animation: scroll 60s linear infinite;
+        .animate-scroll-faster {
+          animation: scroll-faster 25s linear infinite;
         }
         
-        .animate-scroll:hover {
+        .animate-scroll-faster:hover {
           animation-play-state: paused;
         }
       `}</style>
