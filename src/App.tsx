@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Tours from './components/Tours';
+import Reviews from './components/Reviews';
 import About from './components/About';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
@@ -31,6 +32,7 @@ function App() {
               <div id="tours">
                 <Tours />
               </div>
+              <Reviews />
               <div id="about">
                 <About />
               </div>
