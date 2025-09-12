@@ -13,6 +13,15 @@ const WhatsAppWidget = () => {
     e.stopPropagation();
     console.log('WhatsApp button clicked!', whatsappUrl);
     
+    // Prevent multiple clicks
+    if (e.target.disabled) return;
+    e.target.disabled = true;
+    
+    // Re-enable after a short delay
+    setTimeout(() => {
+      e.target.disabled = false;
+    }, 1000);
+    
     // Try multiple methods to ensure it works
     try {
       if (window.open) {
@@ -39,8 +48,6 @@ const WhatsAppWidget = () => {
       <div className="fixed bottom-6 right-6 z-[9999] pointer-events-auto">
         <button
           onClick={handleWhatsAppClick}
-          onMouseDown={handleWhatsAppClick}
-          onTouchStart={handleWhatsAppClick}
           className="bg-green-500 hover:bg-green-600 active:bg-green-700 text-white p-5 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 active:scale-95 group cursor-pointer select-none relative"
           style={{ 
             minWidth: '60px', 
