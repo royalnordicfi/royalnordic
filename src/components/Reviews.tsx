@@ -90,7 +90,7 @@ const Reviews = () => {
 
         {/* Reviews Carousel */}
         <div className="relative overflow-hidden">
-          <div className="flex">
+          <div className="flex animate-reviews-scroll">
             {/* First set of reviews */}
             {reviews.map((review) => (
               <div
@@ -172,47 +172,6 @@ const Reviews = () => {
                 </div>
               </div>
             ))}
-            
-            {/* Third set for seamless loop */}
-            {reviews.map((review) => (
-              <div
-                key={`third-${review.id}`}
-                className="flex-shrink-0 w-64 sm:w-72 mx-3"
-              >
-                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 h-full border border-white/10 hover:bg-white/10 transition-all duration-300">
-                  {/* Stars */}
-                  <div className="flex items-center mb-3">
-                    {renderStars(review.rating)}
-                  </div>
-                  
-                  {/* Review Text */}
-                  <p className="text-gray-200 text-xs sm:text-sm leading-relaxed mb-4 italic">
-                    "{review.review}"
-                  </p>
-                  
-                  {/* Author Info */}
-                  <div className="border-t border-white/10 pt-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-semibold text-white text-xs sm:text-sm">
-                          {review.name}
-                        </h4>
-                        {review.location && (
-                          <p className="text-gray-400 text-xs">
-                            {review.location}
-                          </p>
-                        )}
-                      </div>
-                      {review.date && (
-                        <span className="text-gray-400 text-xs">
-                          {review.date}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
 
@@ -237,21 +196,21 @@ const Reviews = () => {
 
       {/* Custom CSS for infinite scroll animation */}
       <style jsx>{`
-        @keyframes seamless-marquee {
+        @keyframes reviews-scroll {
           0% {
             transform: translateX(0%);
           }
           100% {
-            transform: translateX(-33.333%);
+            transform: translateX(-50%);
           }
         }
         
-        .flex {
-          animation: seamless-marquee 45s linear infinite;
-          width: 300%;
+        .animate-reviews-scroll {
+          animation: reviews-scroll 30s linear infinite;
+          will-change: transform;
         }
         
-        .flex:hover {
+        .animate-reviews-scroll:hover {
           animation-play-state: running;
         }
       `}</style>
