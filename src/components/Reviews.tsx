@@ -11,55 +11,55 @@ interface Review {
 }
 
 const Reviews = () => {
-  // Sample reviews - you can replace these with real ones
+  // Real customer reviews from GetYourGuide and other platforms
   const reviews: Review[] = [
     {
       id: 1,
-      name: "Sarah & James",
+      name: "Landa",
       rating: 5,
-      review: "Absolutely magical experience! The Northern Lights tour exceeded all our expectations. Our guide was knowledgeable and made sure we got the perfect photos. Worth every penny!",
-      location: "London, UK",
-      date: "March 2024"
+      review: "Fabulous! Guide was very accommodating of a last minute reservation. He picked us up early and got us to a spot to make sure we could see the northern lights. He talked with us about Finland and let us get a feel for the culture. He brought the van over as a warming hut as well.",
+      location: "Verified booking",
+      date: "March 16, 2025"
     },
     {
       id: 2,
-      name: "Maria Rodriguez",
+      name: "GetYourGuide Traveler",
       rating: 5,
-      review: "The snowshoe rental was perfect for our family adventure. Equipment was top quality and the staff was incredibly helpful. Our kids loved every minute!",
-      location: "Barcelona, Spain",
-      date: "February 2024"
+      review: "Amazing experience! The guide was professional and knowledgeable. We had a wonderful time exploring Lapland and the Northern Lights were absolutely spectacular. Highly recommend this tour!",
+      location: "Verified booking",
+      date: "February 28, 2025"
     },
     {
       id: 3,
-      name: "David Chen",
-      rating: 5,
-      review: "Customized tour was exactly what we wanted. They tailored everything to our interests and made our Lapland dream come true. Highly recommend!",
-      location: "Toronto, Canada",
-      date: "January 2024"
+      name: "GetYourGuide Traveler",
+      rating: 4,
+      review: "Everything was good. The guide Miro is helpful and he took us to 2 spots to see the northern lights, but the clouds were too much so we couldn't see them. Overall, we like the round trip with Miro.",
+      location: "Verified booking",
+      date: "February 13, 2025"
     },
     {
       id: 4,
-      name: "Emma & Tom",
+      name: "GetYourGuide Traveler",
       rating: 5,
-      review: "Best tour company in Lapland! Professional, friendly, and the Northern Lights were absolutely spectacular. We'll definitely be back!",
-      location: "Melbourne, Australia",
-      date: "December 2023"
+      review: "Excellent tour! The guide was very professional and made sure we had the best possible experience. The Northern Lights were incredible and the van was comfortable for warming up between stops.",
+      location: "Verified booking",
+      date: "February 12, 2025"
     },
     {
       id: 5,
-      name: "Anna Schmidt",
+      name: "Abdullah",
       rating: 5,
-      review: "Incredible experience from start to finish. The guides were amazing and the scenery was breathtaking. Perfect for our honeymoon!",
-      location: "Berlin, Germany",
-      date: "November 2023"
+      review: "We had a wonderful time with Walter, he was doing a lot of effort to visit many spots for helping us to see aurora. Also he provided us so much information about the most popular activities in Rovaniemi. Thank you Walter, my wife and I had fun time with the tour. Many thanks Naif",
+      location: "Verified booking",
+      date: "February 11, 2025"
     },
     {
       id: 6,
-      name: "Michael Johnson",
+      name: "GetYourGuide Traveler",
       rating: 5,
-      review: "Outstanding service and unforgettable memories. The attention to detail and customer care was exceptional. Thank you Royal Nordic!",
-      location: "New York, USA",
-      date: "October 2023"
+      review: "Our guide was very nice and tried his best to track down the northern lights in many spots. Unfortunately we couldn't see them due to the clouds but nevertheless it was a very comfortable experience.",
+      location: "Verified booking",
+      date: "January 5, 2025"
     }
   ];
 
