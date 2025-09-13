@@ -213,6 +213,129 @@ const Reviews = () => {
                 </div>
               </div>
             ))}
+            
+            {/* Fourth set for seamless loop */}
+            {reviews.map((review) => (
+              <div
+                key={`fourth-${review.id}`}
+                className="flex-shrink-0 w-64 sm:w-72 mx-3"
+              >
+                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 h-full border border-white/10 hover:bg-white/10 transition-all duration-300">
+                  {/* Stars */}
+                  <div className="flex items-center mb-3">
+                    {renderStars(review.rating)}
+                  </div>
+                  
+                  {/* Review Text */}
+                  <p className="text-gray-200 text-xs sm:text-sm leading-relaxed mb-4 italic">
+                    "{review.review}"
+                  </p>
+                  
+                  {/* Author Info */}
+                  <div className="border-t border-white/10 pt-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-semibold text-white text-xs sm:text-sm">
+                          {review.name}
+                        </h4>
+                        {review.location && (
+                          <p className="text-gray-400 text-xs">
+                            {review.location}
+                          </p>
+                        )}
+                      </div>
+                      {review.date && (
+                        <span className="text-gray-400 text-xs">
+                          {review.date}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {/* Fifth set for seamless loop */}
+            {reviews.map((review) => (
+              <div
+                key={`fifth-${review.id}`}
+                className="flex-shrink-0 w-64 sm:w-72 mx-3"
+              >
+                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 h-full border border-white/10 hover:bg-white/10 transition-all duration-300">
+                  {/* Stars */}
+                  <div className="flex items-center mb-3">
+                    {renderStars(review.rating)}
+                  </div>
+                  
+                  {/* Review Text */}
+                  <p className="text-gray-200 text-xs sm:text-sm leading-relaxed mb-4 italic">
+                    "{review.review}"
+                  </p>
+                  
+                  {/* Author Info */}
+                  <div className="border-t border-white/10 pt-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-semibold text-white text-xs sm:text-sm">
+                          {review.name}
+                        </h4>
+                        {review.location && (
+                          <p className="text-gray-400 text-xs">
+                            {review.location}
+                          </p>
+                        )}
+                      </div>
+                      {review.date && (
+                        <span className="text-gray-400 text-xs">
+                          {review.date}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {/* Sixth set for seamless loop */}
+            {reviews.map((review) => (
+              <div
+                key={`sixth-${review.id}`}
+                className="flex-shrink-0 w-64 sm:w-72 mx-3"
+              >
+                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 h-full border border-white/10 hover:bg-white/10 transition-all duration-300">
+                  {/* Stars */}
+                  <div className="flex items-center mb-3">
+                    {renderStars(review.rating)}
+                  </div>
+                  
+                  {/* Review Text */}
+                  <p className="text-gray-200 text-xs sm:text-sm leading-relaxed mb-4 italic">
+                    "{review.review}"
+                  </p>
+                  
+                  {/* Author Info */}
+                  <div className="border-t border-white/10 pt-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-semibold text-white text-xs sm:text-sm">
+                          {review.name}
+                        </h4>
+                        {review.location && (
+                          <p className="text-gray-400 text-xs">
+                            {review.location}
+                          </p>
+                        )}
+                      </div>
+                      {review.date && (
+                        <span className="text-gray-400 text-xs">
+                          {review.date}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -242,14 +365,14 @@ const Reviews = () => {
             transform: translateX(0%);
           }
           100% {
-            transform: translateX(-33.333%);
+            transform: translateX(-16.666%);
           }
         }
         
         .animate-seamless-marquee {
-          animation: seamless-marquee 20s linear infinite;
+          animation: seamless-marquee 30s linear infinite;
           will-change: transform;
-          width: 300%;
+          width: 600%;
         }
         
         .animate-seamless-marquee:hover {
