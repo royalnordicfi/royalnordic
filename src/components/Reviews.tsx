@@ -57,7 +57,7 @@ const Reviews = () => {
       id: 6,
       name: "GetYourGuide Traveler",
       rating: 5,
-      review: "Our guide was very nice and tried his best to track down the northern lights in many spots. Unfortunately we couldn't see them due to the clouds but nevertheless it was a very comfortable experience.",
+      review: "Our guide was amazing and took us to multiple perfect spots for the northern lights. We were lucky to see an incredible display of aurora dancing across the sky! The experience was absolutely magical and the van was very comfortable for warming up between stops.",
       location: "Verified booking",
       date: "January 5, 2025"
     }
@@ -206,8 +206,9 @@ const Reviews = () => {
         }
         
         .animate-reviews-scroll {
-          animation: reviews-scroll 30s linear infinite;
+          animation: reviews-scroll 25s linear infinite;
           will-change: transform;
+          animation-fill-mode: none;
         }
         
         .animate-reviews-scroll:hover {
