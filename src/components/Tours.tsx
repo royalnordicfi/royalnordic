@@ -174,7 +174,7 @@ const Tours = () => {
               </div>
             </div>
             <div className="p-4 sm:p-5 flex flex-col flex-grow">
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight">Snowshoe Adventure</h3>
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight">Snowshoe Rental</h3>
               <p className="text-gray-300 text-sm sm:text-base mb-4 leading-relaxed">
                 Explore pristine Lapland wilderness on traditional snowshoes. Perfect for families and nature lovers seeking authentic Arctic experiences.
               </p>
