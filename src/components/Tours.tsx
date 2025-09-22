@@ -16,7 +16,7 @@ const Tours = () => {
       duration: "1-10 hours",
       groupSize: "Max 8 people",
       location: "Rovaniemi",
-      features: ["Guaranteed Northern Lights", "Pick up and drop off", "Professional guide", "Hot drinks & snacks"],
+      features: ["Guaranteed Northern Lights", "Pick up and drop off", "Professional guide", "Multiple viewing locations"],
       images: ["/lights1.jpg", "/lights2.jpg", "/lights3.jpg"],
       route: "/northern-lights-tour"
     },
@@ -122,7 +122,7 @@ const Tours = () => {
             <div className="p-4 sm:p-5 flex flex-col flex-grow">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight bg-gradient-to-r from-green-400 via-emerald-400 to-cyan-400 bg-clip-text text-transparent">Guaranteed Northern Lights</h3>
               <p className="text-gray-300 text-sm sm:text-base mb-4 leading-relaxed">
-                Experience the magical Aurora Borealis with our guaranteed tour. Expert guides, warm clothing, and the best viewing locations in Lapland.
+                Experience the magical Aurora Borealis with our guaranteed tour. Expert guides and the best viewing locations in Lapland.
               </p>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-4 text-sm text-white">
