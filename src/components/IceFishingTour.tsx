@@ -167,10 +167,6 @@ const IceFishingTour = () => {
                   <div className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0 text-xl font-bold">×</div>
                   <span className="text-gray-300 text-sm sm:text-base">Clothing</span>
                 </div>
-                <div className="flex items-start">
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0 text-xl font-bold">×</div>
-                  <span className="text-gray-300 text-sm sm:text-base">Bad vibes</span>
-                </div>
               </div>
               <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                 <p className="text-amber-300 text-sm font-medium">
