@@ -9,6 +9,7 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import NorthernLightsTour from './components/NorthernLightsTour';
 import SnowshoeRental from './components/SnowshoeRental';
+import IceFishingTour from './components/IceFishingTour';
 import CustomizedTour from './components/CustomizedTour';
 import PaymentSuccess from './components/PaymentSuccess';
 import CryptoPaymentSuccess from './components/CryptoPaymentSuccess';
@@ -46,6 +47,7 @@ function App() {
           {/* Tour Detail Pages */}
           <Route path="/northern-lights-tour" element={<NorthernLightsTour />} />
           <Route path="/snowshoe-rental" element={<SnowshoeRental />} />
+          <Route path="/ice-fishing" element={<IceFishingTour />} />
           <Route path="/customized-tour" element={<CustomizedTour />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/crypto-payment-success" element={<CryptoPaymentSuccess />} />
