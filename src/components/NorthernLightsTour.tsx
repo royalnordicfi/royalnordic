@@ -42,6 +42,7 @@ const NorthernLightsTour = () => {
     'Small group experience (max 8 people)',
     'Expert guides with experience',
     'Pick up and drop off from your accommodation',
+    'Warm drinks and snacks',
     'Unlimited miles and time',
     'Tips for Northern Lights viewing',
     'Sightseeing of Lapland',
@@ -177,10 +178,6 @@ const NorthernLightsTour = () => {
             <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">What's Not Included</h2>
               <div className="space-y-2">
-                <div className="flex items-start">
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0 text-xl font-bold">×</div>
-                  <span className="text-gray-300 text-sm sm:text-base">Food and drinks</span>
-                </div>
                 <div className="flex items-start">
                   <div className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0 text-xl font-bold">×</div>
                   <span className="text-gray-300 text-sm sm:text-base">Clothing and personal equipment</span>
