@@ -214,20 +214,11 @@ const Tours = () => {
           <Link to="/ice-fishing" className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800/95 to-gray-900/95 backdrop-blur-sm border border-gray-600/50 hover:border-gray-500/70 transition-all duration-500 hover:scale-105 cursor-pointer flex flex-col shadow-xl hover:shadow-gray-900/50">
             <div className="relative h-44 sm:h-48 overflow-hidden">
               <img
-                src="/icefishing1.jpg"
+                src="/icefishing2.jpg"
                 alt="Ice Fishing Experience in Lapland"
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-              {/* GetYourGuide Badge */}
-              <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center space-x-1 shadow-lg">
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <span className="text-xs font-semibold text-gray-800">GetYourGuide</span>
-              </div>
             </div>
             <div className="p-4 sm:p-5 flex flex-col flex-grow">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight">Ice Fishing Experience</h3>
