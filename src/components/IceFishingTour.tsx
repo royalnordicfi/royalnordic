@@ -77,7 +77,7 @@ const IceFishingTour = () => {
       {/* Header */}
       <div className="relative">
         <ImageSlideshow 
-          images={["/icefishing1.jpg", "/icefishing2.jpg", "/icefishing3.jpg"]}
+          images={["/icefishing.jpeg", "/icefishing2.jpg", "/icefishing3.jpg"]}
           className="h-[28rem] sm:h-[32rem] md:h-[36rem] lg:h-[40rem]"
           alt="Ice Fishing Tour Images"
         />

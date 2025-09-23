@@ -41,7 +41,7 @@ const Tours = () => {
       groupSize: "Max 8 people",
       location: "Rovaniemi",
       features: ["Professional equipment", "Expert guide", "Pick up and drop off", "Hot drinks & snacks"],
-      images: ["/icefishing1.jpg", "/icefishing2.jpg", "/icefishing3.jpg"],
+      images: ["/icefishing2.jpg"],
       route: "/ice-fishing"
     },
     {
