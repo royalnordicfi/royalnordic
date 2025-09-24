@@ -88,7 +88,7 @@ const RanuaZooTour = () => {
       {/* Header */}
       <div className="relative">
         <ImageSlideshow 
-          images={["/ranua1.jpg", "/ranua2.jpg", "/ranua3.jpg"]}
+          images={["/ranua1.jpg", "/ranua2.jpeg", "/ranua3.jpeg", "/ranua4.jpeg", "/ranua5.jpeg"]}
           className="h-[28rem] sm:h-[32rem] md:h-[36rem] lg:h-[40rem]"
           alt="Ranua Zoo Tour Images"
         />
