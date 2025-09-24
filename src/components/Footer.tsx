@@ -6,7 +6,7 @@ const Footer: React.FC = () => {
   return (
     <footer className="bg-black text-white py-8 sm:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
             <div className="flex items-center mb-4">
@@ -52,6 +52,33 @@ const Footer: React.FC = () => {
               <li>
                 <Link to="/#contact" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
                   Contact
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Blog Links */}
+          <div>
+            <h4 className="text-lg font-semibold mb-4">Travel Guide</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/blog/best-time-northern-lights-lapland-2025" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
+                  Best Time for Northern Lights
+                </Link>
+              </li>
+              <li>
+                <Link to="/blog/what-to-pack-lapland-winter-adventure" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
+                  What to Pack for Lapland
+                </Link>
+              </li>
+              <li>
+                <Link to="/blog/northern-lights-photography-tips-beginners" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
+                  Northern Lights Photography
+                </Link>
+              </li>
+              <li>
+                <Link to="/blog/lapland-wildlife-animals-ranua-zoo" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
+                  Lapland Wildlife Guide
                 </Link>
               </li>
             </ul>

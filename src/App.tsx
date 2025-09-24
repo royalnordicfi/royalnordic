@@ -12,6 +12,8 @@ import SnowshoeRental from './components/SnowshoeRental';
 import IceFishingTour from './components/IceFishingTour';
 import RanuaZooTour from './components/RanuaZooTour';
 import CustomizedTour from './components/CustomizedTour';
+import Blog from './components/Blog';
+import BestTimeNorthernLights from './components/blog/BestTimeNorthernLights';
 import PaymentSuccess from './components/PaymentSuccess';
 import CryptoPaymentSuccess from './components/CryptoPaymentSuccess';
 import PrivacyPolicy from './components/PrivacyPolicy';
@@ -51,6 +53,11 @@ function App() {
           <Route path="/ice-fishing" element={<IceFishingTour />} />
           <Route path="/ranua-zoo" element={<RanuaZooTour />} />
           <Route path="/customized-tour" element={<CustomizedTour />} />
+          
+          {/* Blog Routes */}
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/best-time-northern-lights-lapland-2025" element={<BestTimeNorthernLights />} />
+          
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/crypto-payment-success" element={<CryptoPaymentSuccess />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
