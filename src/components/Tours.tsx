@@ -46,6 +46,18 @@ const Tours = () => {
     },
     {
       id: 4,
+      title: "Nordic Animals of Ranua Zoo",
+      description: "Discover the incredible wildlife of Finland at Ranua Zoo, home to bears, wolves, lynx, and many other Nordic animals.",
+      price: "Starting from 99€",
+      duration: "5 hours",
+      groupSize: "Max 8 people",
+      location: "Ranua Zoo",
+      features: ["Zoo tickets included", "Expert guide", "Pick up and drop off", "Educational experience"],
+      images: ["/ranua1.jpg"],
+      route: "/ranua-zoo"
+    },
+    {
+      id: 5,
       title: "Customized Tour",
       description: "Have a specific Lapland experience in mind? We'll create a personalized tour just for you.",
       price: "Custom pricing",
@@ -237,6 +249,45 @@ const Tours = () => {
                   </span>
                 </div>
                 <div className="text-2xl font-bold text-white">€119</div>
+              </div>
+              <div className="mt-auto flex justify-end">
+                <div
+                  className="inline-block w-1/2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white text-center py-3 px-4 rounded-lg font-bold transition-all duration-300 uppercase tracking-wide shadow-lg hover:shadow-xl"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Book Now
+                </div>
+              </div>
+            </div>
+          </Link>
+
+          {/* Nordic Animals of Ranua Zoo */}
+          <Link to="/ranua-zoo" className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800/95 to-gray-900/95 backdrop-blur-sm border border-gray-600/50 hover:border-gray-500/70 transition-all duration-500 hover:scale-105 cursor-pointer flex flex-col shadow-xl hover:shadow-gray-900/50">
+            <div className="relative h-44 sm:h-48 overflow-hidden">
+              <img
+                src="/ranua1.jpg"
+                alt="Nordic Animals of Ranua Zoo"
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+            </div>
+            <div className="p-4 sm:p-5 flex flex-col flex-grow">
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight">Nordic Animals of Ranua Zoo</h3>
+              <p className="text-gray-300 text-sm sm:text-base mb-4 leading-relaxed">
+                Discover the incredible wildlife of Finland at Ranua Zoo, home to bears, wolves, lynx, and many other Nordic animals.
+              </p>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-4 text-sm text-white">
+                  <span className="flex items-center font-medium">
+                    <Clock className="w-4 h-4 mr-1 text-green-400" />
+                    5 hours
+                  </span>
+                  <span className="flex items-center font-medium">
+                    <Users className="w-4 h-4 mr-1 text-green-400" />
+                    Max 8 people
+                  </span>
+                </div>
+                <div className="text-2xl font-bold text-white">€99</div>
               </div>
               <div className="mt-auto flex justify-end">
                 <div
