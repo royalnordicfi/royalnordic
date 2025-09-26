@@ -21,66 +21,68 @@ const BlogPost: React.FC<BlogPostProps> = ({ post }) => {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Hero Section */}
-      <div className="relative h-[40rem] sm:h-[45rem] md:h-[50rem] overflow-hidden">
+      <div className="relative h-[32rem] sm:h-[40rem] md:h-[45rem] lg:h-[50rem] overflow-hidden">
         <img
           src="/lights1.jpg"
           alt="Northern Lights in Lapland"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/40"></div>
         
         {/* Hero Content */}
-        <div className="absolute inset-0 flex items-center justify-center z-10 pt-20 sm:pt-0">
-          <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+        <div className="absolute inset-0 flex items-center justify-center z-10 pt-16 sm:pt-20 md:pt-0">
+          <div className="text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
             <Link 
               to="/blog" 
-              className="inline-flex items-center text-emerald-400 hover:text-emerald-300 mb-8 transition-colors text-sm sm:text-base"
+              className="inline-flex items-center text-emerald-400 hover:text-emerald-300 mb-4 sm:mb-6 transition-colors text-xs sm:text-sm md:text-base"
             >
-              <ArrowLeft size={20} className="mr-2" />
+              <ArrowLeft size={16} className="mr-1 sm:mr-2" />
               Back
             </Link>
             
-            <div className="mb-6">
-              <span className="inline-block bg-emerald-600/20 text-emerald-400 text-sm font-medium px-3 py-1 rounded-full">
+            <div className="mb-4 sm:mb-6">
+              <span className="inline-block bg-emerald-600/20 text-emerald-400 text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded-full">
                 {post.category}
               </span>
             </div>
             
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-luxury font-bold mb-6 leading-tight drop-shadow-2xl">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-luxury font-bold mb-4 sm:mb-6 leading-tight drop-shadow-2xl px-2">
               <span className="bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent drop-shadow-2xl">
                 {post.title}
               </span>
             </h1>
             
-            <div className="flex items-center justify-center space-x-6 text-gray-300 text-sm sm:text-base">
+            <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4 lg:space-x-6 text-gray-300 text-xs sm:text-sm md:text-base px-4">
               <div className="flex items-center">
-                <Calendar size={16} className="mr-2" />
-                {new Date(post.date).toLocaleDateString('en-US', { 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
+                <Calendar size={14} className="mr-1 sm:mr-2" />
+                <span className="text-center">
+                  {new Date(post.date).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </span>
               </div>
               <div className="flex items-center">
-                <Clock size={16} className="mr-2" />
-                {post.readTime}
+                <Clock size={14} className="mr-1 sm:mr-2" />
+                <span>{post.readTime}</span>
               </div>
               <div className="flex items-center">
-                <Tag size={16} className="mr-2" />
-                {post.author}
+                <Tag size={14} className="mr-1 sm:mr-2" />
+                <span>{post.author}</span>
               </div>
             </div>
           </div>
         </div>
         
         {/* Bottom transition overlay */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 sm:h-24 md:h-28 bg-gradient-to-t from-black via-black/90 to-transparent z-10"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-20 md:h-24 lg:h-28 bg-gradient-to-t from-black via-black/90 to-transparent z-10"></div>
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
         <div 
-          className="prose prose-invert prose-lg max-w-none font-clean"
+          className="prose prose-invert prose-sm sm:prose-base md:prose-lg max-w-none font-clean prose-headings:text-white prose-p:text-gray-300 prose-strong:text-white prose-a:text-emerald-400 prose-ul:text-gray-300 prose-ol:text-gray-300 prose-li:text-gray-300"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
       </div>
