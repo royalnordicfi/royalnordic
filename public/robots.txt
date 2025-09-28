@@ -1,6 +1,10 @@
 User-agent: *
 Allow: /
 
+# Favicon
+Allow: /favicon-google.ico
+Allow: /favicon-google.png
+
 # Sitemap
 Sitemap: https://royalnordic.fi/sitemap.xml
 
