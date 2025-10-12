@@ -10,7 +10,9 @@ const About = () => {
     "/slideshow1.jpg",
     "/slideshow2.jpg", 
     "/slideshow3.jpg",
-    "/slideshow4.jpg"
+    "/slideshow4.jpg",
+    "/lights4.jpg",
+    "/lights5.jpg"
   ];
 
   return (

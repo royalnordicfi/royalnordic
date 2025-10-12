@@ -90,7 +90,7 @@ const NorthernLightsTour = () => {
       {/* Header */}
       <div className="relative">
         <ImageSlideshow 
-          images={["/lights1.jpg", "/lights2.jpg", "/lights3.jpg"]}
+          images={["/lights1.jpg", "/lights4.jpg", "/lights5.jpg"]}
           className="h-[28rem] sm:h-[32rem] md:h-[36rem] lg:h-[40rem]"
           alt="Northern Lights Tour Images"
         />
