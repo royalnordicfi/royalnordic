@@ -41,6 +41,15 @@ const Hero = () => {
 
       {/* Content */}
       <div className="relative z-20 text-center px-3 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+        {/* Logo */}
+        <div className="flex justify-center mb-6 sm:mb-8">
+          <img 
+            src="/logo.png" 
+            alt="Royal Nordic Logo" 
+            className="h-16 sm:h-20 md:h-24 w-auto object-contain"
+          />
+        </div>
+        
         <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-luxury font-bold mb-4 sm:mb-6 leading-tight">
           <span className="block bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
             ROYAL NORDIC

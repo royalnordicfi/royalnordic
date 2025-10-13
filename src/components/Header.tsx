@@ -60,21 +60,6 @@ const Header = () => {
     }`}>
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex justify-between items-center h-20">
-          {/* Logo */}
-          <div className="flex-shrink-0 flex flex-col items-start space-y-1 -ml-4">
-            <img 
-              src="/logo.png" 
-              alt="Royal Nordic Logo" 
-              className="h-10 w-auto object-contain"
-            />
-            <button
-              onClick={handleLogoClick}
-              className="text-lg font-termes font-bold text-white italic cursor-pointer hover:text-emerald-300 transition-all duration-300"
-            >
-              ROYAL NORDIC
-            </button>
-          </div>
-
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-3 lg:space-x-5">
             <button 
@@ -110,7 +95,7 @@ const Header = () => {
           </nav>
 
           {/* Contact Info */}
-          <div className="hidden xl:flex items-center space-x-6 mr-4">
+          <div className="hidden xl:flex items-center space-x-6 mr-8">
             {/* Email and Phone - Stacked Vertically */}
             <div className="flex flex-col space-y-2 text-xs text-gray-300 font-clean">
               <div className="flex items-center space-x-2">
@@ -124,7 +109,7 @@ const Header = () => {
             </div>
             
             {/* Social Media Icons */}
-            <div className="flex items-center space-x-5">
+            <div className="flex items-center space-x-6">
               <a
                 href="https://www.instagram.com/royalnordicfi/"
                 target="_blank"
