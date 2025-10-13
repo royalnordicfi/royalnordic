@@ -26,6 +26,7 @@ const RentingEquipment: React.FC = () => {
         style={{ backgroundImage: 'url(/snowshoe2.jpg)' }}
       >
         <div className="absolute inset-0 bg-black/60"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black"></div>
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 pt-16 sm:pt-20">
           <Link 
             to="/"
