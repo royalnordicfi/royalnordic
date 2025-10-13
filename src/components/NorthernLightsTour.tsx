@@ -243,7 +243,7 @@ const NorthernLightsTour = () => {
         {/* Photo Gallery Section */}
         <div className="mt-12 sm:mt-16 lg:mt-20">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-luxury font-bold text-white mb-6 sm:mb-8 text-center bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
-            Tour Gallery
+            Aurora Gallery
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
             <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
