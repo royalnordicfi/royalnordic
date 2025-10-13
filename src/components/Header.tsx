@@ -61,7 +61,7 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center space-x-3">
+          <div className="flex-shrink-0 flex items-center space-x-3 ml-0">
             <img 
               src="/logo.png" 
               alt="Royal Nordic Logo" 
@@ -94,6 +94,12 @@ const Header = () => {
               className="text-white hover:text-emerald-400 transition-colors duration-200 font-luxury font-bold text-sm lg:text-base tracking-wider uppercase whitespace-nowrap"
             >
               CUSTOMIZED
+            </button>
+            <button 
+              onClick={() => scrollToSection('transportation')}
+              className="text-white hover:text-emerald-400 transition-colors duration-200 font-luxury font-bold text-sm lg:text-base tracking-wider uppercase whitespace-nowrap"
+            >
+              TRANSPORTATION
             </button>
             <button 
               onClick={() => scrollToSection('contact')}
@@ -177,6 +183,12 @@ const Header = () => {
               className="block px-3 py-2 text-white hover:text-emerald-400 transition-colors duration-200 font-luxury font-bold text-lg tracking-wider uppercase w-full text-left"
             >
               CUSTOMIZED EXPERIENCE
+            </button>
+            <button 
+              onClick={() => scrollToSection('transportation')}
+              className="block px-3 py-2 text-white hover:text-emerald-400 transition-colors duration-200 font-luxury font-bold text-lg tracking-wider uppercase w-full text-left"
+            >
+              TRANSPORTATION
             </button>
             <button 
               onClick={() => scrollToSection('contact')}
