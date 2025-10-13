@@ -62,6 +62,11 @@ const Footer: React.FC = () => {
             <h4 className="text-lg font-semibold mb-4">Travel Guide</h4>
             <ul className="space-y-2">
               <li>
+                <Link to="/blog" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
+                  Blog
+                </Link>
+              </li>
+              <li>
                 <Link to="/blog/best-time-northern-lights-lapland-2025" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
                   Best Time for Northern Lights
                 </Link>
