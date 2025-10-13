@@ -17,6 +17,8 @@ import BestTimeNorthernLights from './components/blog/BestTimeNorthernLights';
 import WhatToPackLapland from './components/blog/WhatToPackLapland';
 import NorthernLightsPhotography from './components/blog/NorthernLightsPhotography';
 import LaplandWildlife from './components/blog/LaplandWildlife';
+import TraditionalIceFishing from './components/blog/TraditionalIceFishing';
+import SnowshoeAdventure from './components/blog/SnowshoeAdventure';
 import PaymentSuccess from './components/PaymentSuccess';
 import CryptoPaymentSuccess from './components/CryptoPaymentSuccess';
 import PrivacyPolicy from './components/PrivacyPolicy';
@@ -63,6 +65,8 @@ function App() {
           <Route path="/blog/what-to-pack-lapland-winter-adventure" element={<WhatToPackLapland />} />
           <Route path="/blog/northern-lights-photography-tips-beginners" element={<NorthernLightsPhotography />} />
           <Route path="/blog/lapland-wildlife-animals-ranua-zoo" element={<LaplandWildlife />} />
+          <Route path="/blog/traditional-ice-fishing-finnish-lapland" element={<TraditionalIceFishing />} />
+          <Route path="/blog/snowshoe-adventure-exploring-lapland-wilderness" element={<SnowshoeAdventure />} />
           
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/crypto-payment-success" element={<CryptoPaymentSuccess />} />
