@@ -95,20 +95,19 @@ const Blog: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {blogPosts.map((post) => (
-            <article key={post.id} className="bg-black/60 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-white/20 hover:border-emerald-400/50 transition-all duration-300 hover:bg-black/70">
+            <Link 
+              key={post.id}
+              to={`/blog/${post.slug}`}
+              className="block bg-black/60 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-white/20 hover:border-emerald-400/50 transition-all duration-300 hover:bg-black/70 hover:scale-105 cursor-pointer group"
+            >
               <div className="mb-3">
                 <span className="inline-block bg-emerald-600/20 text-emerald-400 text-xs font-medium px-2 py-1 rounded-full">
                   {post.category}
                 </span>
               </div>
               
-              <h3 className="text-lg sm:text-xl font-semibold mb-3 text-white leading-tight">
-                <Link 
-                  to={`/blog/${post.slug}`}
-                  className="hover:text-emerald-400 transition-colors"
-                >
-                  {post.title}
-                </Link>
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 text-white leading-tight group-hover:text-emerald-400 transition-colors">
+                {post.title}
               </h3>
               
               <p className="text-gray-300 text-sm sm:text-base mb-4 font-clean leading-relaxed">
@@ -119,17 +118,8 @@ const Blog: React.FC = () => {
                 <span>{post.date}</span>
                 <span>{post.readTime}</span>
               </div>
-            </article>
+            </Link>
           ))}
-        </div>
-
-        <div className="text-center mt-12">
-          <Link 
-            to="/blog"
-            className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-          >
-            View All Articles
-          </Link>
         </div>
         </div>
       </div>
