@@ -58,25 +58,25 @@ const Header = () => {
     <header className={`fixed w-full z-50 transition-all duration-500 ${
       isScrolled ? 'bg-black/95 backdrop-blur-xl shadow-2xl border-b border-gray-700' : 'bg-transparent'
     }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center space-x-3 ml-0">
+          <div className="flex-shrink-0 flex flex-col items-start space-y-1 -ml-4">
             <img 
               src="/logo.png" 
               alt="Royal Nordic Logo" 
-              className="h-12 w-auto object-contain"
+              className="h-10 w-auto object-contain"
             />
             <button
               onClick={handleLogoClick}
-              className="text-2xl font-termes font-bold text-white italic cursor-pointer hover:text-emerald-300 transition-all duration-300"
+              className="text-lg font-termes font-bold text-white italic cursor-pointer hover:text-emerald-300 transition-all duration-300"
             >
               ROYAL NORDIC
             </button>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-4 lg:space-x-6">
+          <nav className="hidden md:flex items-center space-x-3 lg:space-x-5">
             <button 
               onClick={() => scrollToSection('home')}
               className="text-white hover:text-emerald-400 transition-colors duration-200 font-luxury font-bold text-sm lg:text-base tracking-wider uppercase whitespace-nowrap"
@@ -110,18 +110,21 @@ const Header = () => {
           </nav>
 
           {/* Contact Info */}
-          <div className="hidden xl:flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-xs text-gray-300 font-clean">
-              <Phone size={14} />
-              <span>+358 45 78345138</span>
-            </div>
-            <div className="flex items-center space-x-2 text-xs text-gray-300 font-clean">
-              <Mail size={14} />
-              <span>contact@royalnordic.fi</span>
+          <div className="hidden xl:flex items-center space-x-6 mr-4">
+            {/* Email and Phone - Stacked Vertically */}
+            <div className="flex flex-col space-y-2 text-xs text-gray-300 font-clean">
+              <div className="flex items-center space-x-2">
+                <Mail size={12} />
+                <span>contact@royalnordic.fi</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Phone size={12} />
+                <span>+358 45 78345138</span>
+              </div>
             </div>
             
             {/* Social Media Icons */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-5">
               <a
                 href="https://www.instagram.com/royalnordicfi/"
                 target="_blank"
@@ -197,8 +200,20 @@ const Header = () => {
               CONTACT
             </button>
             
+            {/* Mobile Contact Info */}
+            <div className="pt-4 border-t border-gray-700 space-y-3">
+              <div className="flex items-center justify-center space-x-2 text-sm text-gray-300">
+                <Phone size={16} />
+                <span>+358 45 78345138</span>
+              </div>
+              <div className="flex items-center justify-center space-x-2 text-sm text-gray-300">
+                <Mail size={16} />
+                <span>contact@royalnordic.fi</span>
+              </div>
+            </div>
+            
             {/* Mobile Social Media Icons */}
-            <div className="flex items-center justify-center space-x-4 pt-4 border-t border-gray-700">
+            <div className="flex items-center justify-center space-x-8 pt-4">
               <a
                 href="https://www.instagram.com/royalnordicfi/"
                 target="_blank"
