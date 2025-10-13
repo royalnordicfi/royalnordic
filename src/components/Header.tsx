@@ -90,6 +90,12 @@ const Header = () => {
               TOURS
             </button>
             <button 
+              onClick={() => navigate('/customized-tour')}
+              className="text-white hover:text-emerald-400 transition-colors duration-200 font-luxury font-bold text-lg tracking-wider uppercase"
+            >
+              CUSTOMIZED EXPERIENCE
+            </button>
+            <button 
               onClick={() => scrollToSection('contact')}
               className="text-white hover:text-emerald-400 transition-colors duration-200 font-luxury font-bold text-lg tracking-wider uppercase"
             >
@@ -162,6 +168,15 @@ const Header = () => {
               className="block px-3 py-2 text-white hover:text-emerald-400 transition-colors duration-200 font-luxury font-bold text-lg tracking-wider uppercase w-full text-left"
             >
               TOURS
+            </button>
+            <button 
+              onClick={() => {
+                navigate('/customized-tour');
+                setIsMobileMenuOpen(false);
+              }}
+              className="block px-3 py-2 text-white hover:text-emerald-400 transition-colors duration-200 font-luxury font-bold text-lg tracking-wider uppercase w-full text-left"
+            >
+              CUSTOMIZED EXPERIENCE
             </button>
             <button 
               onClick={() => scrollToSection('contact')}
