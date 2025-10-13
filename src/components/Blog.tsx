@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 const Blog: React.FC = () => {
   const blogPosts = [
@@ -60,20 +61,41 @@ const Blog: React.FC = () => {
   ];
 
   return (
-    <div className="bg-black text-white py-8 sm:py-12 pt-32 sm:pt-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl font-luxury font-bold mb-4">
-            Lapland Travel Guide & Tips
-          </h2>
-          <p className="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto font-clean">
-            Discover everything you need to know about visiting Lapland, from Northern Lights viewing to Arctic adventures.
-          </p>
-        </div>
+    <div className="relative min-h-screen">
+      {/* Background Image with Dark Overlay */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url(/lights5.jpg)' }}
+      >
+        <div className="absolute inset-0 bg-black/70"></div>
+      </div>
+      
+      {/* Content */}
+      <div className="relative z-10 text-white py-8 sm:py-12 pt-40 sm:pt-48">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Back to Home Button */}
+          <div className="mb-8">
+            <Link 
+              to="/"
+              className="inline-flex items-center text-emerald-400 hover:text-emerald-300 transition-colors font-medium"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Home
+            </Link>
+          </div>
+          
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-luxury font-bold mb-6 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
+              Lapland Travel Guide & Tips
+            </h2>
+            <p className="text-gray-300 text-lg sm:text-xl max-w-3xl mx-auto font-clean leading-relaxed">
+              Discover everything you need to know about visiting Lapland, from Northern Lights viewing to Arctic adventures.
+            </p>
+          </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {blogPosts.map((post) => (
-            <article key={post.id} className="bg-gray-900/50 rounded-lg p-4 sm:p-6 border border-gray-800 hover:border-gray-700 transition-colors">
+            <article key={post.id} className="bg-black/60 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-white/20 hover:border-emerald-400/50 transition-all duration-300 hover:bg-black/70">
               <div className="mb-3">
                 <span className="inline-block bg-emerald-600/20 text-emerald-400 text-xs font-medium px-2 py-1 rounded-full">
                   {post.category}
@@ -101,13 +123,14 @@ const Blog: React.FC = () => {
           ))}
         </div>
 
-        <div className="text-center mt-8">
+        <div className="text-center mt-12">
           <Link 
             to="/blog"
             className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
           >
             View All Articles
           </Link>
+        </div>
         </div>
       </div>
     </div>
