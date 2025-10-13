@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import Footer from './Footer';
 
 const Blog: React.FC = () => {
   const blogPosts = [
@@ -123,6 +124,9 @@ const Blog: React.FC = () => {
         </div>
         </div>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
