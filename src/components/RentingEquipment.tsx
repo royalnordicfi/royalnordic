@@ -29,7 +29,7 @@ const RentingEquipment: React.FC = () => {
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
           <Link 
             to="/"
-            className="absolute top-24 sm:top-28 left-4 sm:left-8 inline-flex items-center border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-medium px-4 py-2 rounded-lg"
+            className="inline-flex items-center border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-8"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
@@ -46,15 +46,15 @@ const RentingEquipment: React.FC = () => {
 
       {/* Rentals Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
           {rentals.map((rental) => (
             <Link
               key={rental.id}
               to={rental.route}
-              className="group bg-gray-900/50 rounded-2xl overflow-hidden border border-gray-800 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/20"
+              className="group bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/20"
             >
               {/* Image */}
-              <div className="relative h-64 sm:h-72 lg:h-80 overflow-hidden">
+              <div className="relative h-48 sm:h-56 overflow-hidden">
                 <img
                   src={rental.image}
                   alt={rental.name}
@@ -65,8 +65,8 @@ const RentingEquipment: React.FC = () => {
               </div>
 
               {/* Content */}
-              <div className="p-6 sm:p-8">
-                <h3 className="text-2xl sm:text-3xl font-luxury font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">
+              <div className="p-4 sm:p-5">
+                <h3 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">
                   {rental.name}
                 </h3>
                 
