@@ -13,6 +13,9 @@ import SnowshoeRental from './components/SnowshoeRental';
 import IceFishingTour from './components/IceFishingTour';
 import RanuaZooTour from './components/RanuaZooTour';
 import CustomizedTour from './components/CustomizedTour';
+import NorthernLightsTours from './components/NorthernLightsTours';
+import RentingEquipment from './components/RentingEquipment';
+import DaytimeExperiences from './components/DaytimeExperiences';
 import Blog from './components/Blog';
 import BestTimeNorthernLights from './components/blog/BestTimeNorthernLights';
 import WhatToPackLapland from './components/blog/WhatToPackLapland';
@@ -20,6 +23,12 @@ import NorthernLightsPhotography from './components/blog/NorthernLightsPhotograp
 import LaplandWildlife from './components/blog/LaplandWildlife';
 import TraditionalIceFishing from './components/blog/TraditionalIceFishing';
 import SnowshoeAdventure from './components/blog/SnowshoeAdventure';
+import LaplandWinterActivities from './components/blog/LaplandWinterActivities';
+import WhatToWearLapland from './components/blog/WhatToWearLapland';
+import BestTimeVisitLapland from './components/blog/BestTimeVisitLapland';
+import LaplandHotelsGuide from './components/blog/LaplandHotelsGuide';
+import GlassIglooGuide from './components/blog/GlassIglooGuide';
+import LaplandCabinsGuide from './components/blog/LaplandCabinsGuide';
 import TransportationRovaniemiLevi from './components/TransportationRovaniemiLevi';
 import TransportationCustomized from './components/TransportationCustomized';
 import PaymentSuccess from './components/PaymentSuccess';
@@ -56,6 +65,11 @@ function App() {
             </>
           } />
           
+          {/* Tour Category Pages */}
+          <Route path="/northern-lights-tours" element={<NorthernLightsTours />} />
+          <Route path="/renting-equipment" element={<RentingEquipment />} />
+          <Route path="/daytime-experiences" element={<DaytimeExperiences />} />
+          
           {/* Tour Detail Pages */}
           <Route path="/northern-lights-tour" element={<NorthernLightsTour />} />
           <Route path="/snowshoe-rental" element={<SnowshoeRental />} />
@@ -71,6 +85,12 @@ function App() {
           <Route path="/blog/lapland-wildlife-animals-ranua-zoo" element={<LaplandWildlife />} />
           <Route path="/blog/traditional-ice-fishing-finnish-lapland" element={<TraditionalIceFishing />} />
           <Route path="/blog/snowshoe-adventure-exploring-lapland-wilderness" element={<SnowshoeAdventure />} />
+          <Route path="/blog/lapland-winter-activities-complete-guide" element={<LaplandWinterActivities />} />
+          <Route path="/blog/what-to-wear-lapland-winter-clothing-guide" element={<WhatToWearLapland />} />
+          <Route path="/blog/best-time-visit-lapland-seasonal-guide" element={<BestTimeVisitLapland />} />
+          <Route path="/blog/where-to-stay-lapland-accommodation-guide" element={<LaplandHotelsGuide />} />
+          <Route path="/blog/glass-igloos-lapland-complete-guide" element={<GlassIglooGuide />} />
+          <Route path="/blog/finnish-cabins-lapland-authentic-guide" element={<LaplandCabinsGuide />} />
           
           {/* Transportation Routes */}
           <Route path="/transportation-rovaniemi-levi" element={<TransportationRovaniemiLevi />} />

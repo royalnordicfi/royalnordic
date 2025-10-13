@@ -51,7 +51,7 @@ const TransportationRovaniemiLevi = () => {
       {/* Header */}
       <div className="relative">
         <ImageSlideshow 
-          images={["/slideshow1.jpg", "/slideshow2.jpg", "/slideshow3.jpg"]}
+          images={["/transportation1.jpg", "/transportation3.jpg"]}
           className="h-[28rem] sm:h-[32rem] md:h-[36rem] lg:h-[40rem]"
           alt="Transportation Rovaniemi to Levi"
         />

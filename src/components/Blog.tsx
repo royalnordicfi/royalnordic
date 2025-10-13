@@ -58,11 +58,65 @@ const Blog: React.FC = () => {
       date: "2025-09-20",
       readTime: "4 min read",
       category: "Adventure"
+    },
+    {
+      id: 7,
+      title: "Lapland Winter Activities: Complete Guide to Arctic Adventures",
+      slug: "lapland-winter-activities-complete-guide",
+      excerpt: "Discover the best winter activities in Finnish Lapland. From Northern Lights hunting to snowshoeing, ice fishing, and more - your complete guide to Arctic adventures.",
+      date: "October 13, 2025",
+      readTime: "8 min read",
+      category: "Travel Guide"
+    },
+    {
+      id: 8,
+      title: "What to Wear in Lapland: Complete Winter Clothing Guide",
+      slug: "what-to-wear-lapland-winter-clothing-guide",
+      excerpt: "Complete guide to dressing for Lapland's Arctic winter. Learn the layering system, essential gear, and what to pack for temperatures down to -30°C.",
+      date: "October 13, 2025",
+      readTime: "7 min read",
+      category: "Travel Guide"
+    },
+    {
+      id: 9,
+      title: "Best Time to Visit Lapland: Seasonal Guide for Every Traveler",
+      slug: "best-time-visit-lapland-seasonal-guide",
+      excerpt: "When should you visit Lapland? Complete month-by-month guide covering Northern Lights, activities, weather, crowds, and pricing for every season.",
+      date: "October 13, 2025",
+      readTime: "9 min read",
+      category: "Travel Guide"
+    },
+    {
+      id: 10,
+      title: "Where to Stay in Lapland: Complete Accommodation Guide",
+      slug: "where-to-stay-lapland-accommodation-guide",
+      excerpt: "Complete guide to Lapland accommodations - from luxury hotels to cozy cabins. Find the perfect place to stay for your Arctic adventure in Rovaniemi and beyond.",
+      date: "October 13, 2025",
+      readTime: "10 min read",
+      category: "Accommodation"
+    },
+    {
+      id: 11,
+      title: "Glass Igloos in Lapland: Complete Guide to Sleeping Under Northern Lights",
+      slug: "glass-igloos-lapland-complete-guide",
+      excerpt: "Everything you need to know about staying in a glass igloo in Lapland. Compare resorts, prices, booking tips, and what to expect from this iconic Arctic experience.",
+      date: "October 13, 2025",
+      readTime: "8 min read",
+      category: "Accommodation"
+    },
+    {
+      id: 12,
+      title: "Traditional Finnish Cabins in Lapland: Your Guide to Authentic Arctic Stays",
+      slug: "finnish-cabins-lapland-authentic-guide",
+      excerpt: "Discover the charm of traditional Finnish log cabins in Lapland. Complete guide to cabin types, what's included, best locations, and booking tips for an authentic Arctic experience.",
+      date: "October 13, 2025",
+      readTime: "7 min read",
+      category: "Accommodation"
     }
   ];
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative">
       {/* Background Image with Dark Overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -72,7 +126,7 @@ const Blog: React.FC = () => {
       </div>
       
       {/* Content */}
-      <div className="relative z-10 text-white py-8 sm:py-12 pt-40 sm:pt-48">
+      <div className="relative z-10 text-white py-8 sm:py-12 pt-40 sm:pt-48 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back to Home Button */}
           <div className="mb-8 text-center">

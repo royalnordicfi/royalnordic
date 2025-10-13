@@ -108,7 +108,7 @@ The silence of the snow-covered forests, the crisp Arctic air, and the opportuni
   };
 
   return (
-    <BlogPost content={content} />
+    <BlogPost post={content} />
   );
 };
 

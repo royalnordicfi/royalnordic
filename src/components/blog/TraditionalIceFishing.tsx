@@ -84,7 +84,7 @@ The practice of ice fishing in Finland dates back to the Stone Age, when early i
   };
 
   return (
-    <BlogPost content={content} />
+    <BlogPost post={content} />
   );
 };
 

@@ -53,7 +53,7 @@ const TransportationCustomized = () => {
       {/* Header */}
       <div className="relative">
         <ImageSlideshow 
-          images={["/slideshow4.jpg", "/slideshow1.jpg", "/slideshow2.jpg"]}
+          images={["/transportation2.jpg"]}
           className="h-[28rem] sm:h-[32rem] md:h-[36rem] lg:h-[40rem]"
           alt="Customized Transportation Service"
         />
