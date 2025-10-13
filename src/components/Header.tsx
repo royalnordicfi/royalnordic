@@ -60,6 +60,21 @@ const Header = () => {
     }`}>
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex justify-between items-center h-20">
+          {/* Logo */}
+          <div className="flex-shrink-0 flex flex-col items-center space-y-1 -ml-4">
+            <img 
+              src="/logo.png" 
+              alt="Royal Nordic Logo" 
+              className="h-10 w-auto object-contain"
+            />
+            <button
+              onClick={handleLogoClick}
+              className="text-lg font-termes font-bold text-white italic cursor-pointer hover:text-emerald-300 transition-all duration-300"
+            >
+              ROYAL NORDIC
+            </button>
+          </div>
+
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-3 lg:space-x-5">
             <button 
