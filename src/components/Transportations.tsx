@@ -13,7 +13,7 @@ const Transportations = () => {
       groupSize: "Up to 8 people",
       location: "Rovaniemi to Levi/Kittilä",
       features: ["Private vehicle", "Professional driver", "Comfortable seating", "Flexible timing"],
-      images: ["/slideshow1.jpg", "/slideshow2.jpg", "/slideshow3.jpg"],
+      images: ["/transportation1.jpg", "/transportation3.jpg"],
       route: "/transportation-rovaniemi-levi"
     },
     {
@@ -25,7 +25,7 @@ const Transportations = () => {
       groupSize: "Up to 8 people",
       location: "Lapland, Finland",
       features: ["Custom routes", "Flexible scheduling", "Professional driver", "Personalized service"],
-      images: ["/slideshow4.jpg", "/slideshow1.jpg", "/slideshow2.jpg"],
+      images: ["/transportation2.jpg"],
       route: "/transportation-customized"
     }
   ];
@@ -36,7 +36,7 @@ const Transportations = () => {
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-luxury font-bold mb-6 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
-            Transportation Services
+            Transportation services
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed font-clean">
             Travel comfortably and safely throughout Lapland with our professional transportation services.
@@ -44,11 +44,11 @@ const Transportations = () => {
         </div>
 
         {/* Transportation Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
           {transportations.map((transportation) => (
-            <div key={transportation.id} className="bg-gray-900/50 rounded-2xl overflow-hidden border border-gray-800 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/20 group">
+            <div key={transportation.id} className="bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/20 group">
               {/* Image */}
-              <div className="relative h-64 overflow-hidden">
+              <div className="relative h-48 sm:h-56 overflow-hidden">
                 <img
                   src={transportation.images[0]}
                   alt={transportation.title}
@@ -65,7 +65,7 @@ const Transportations = () => {
               </div>
 
               {/* Content */}
-              <div className="p-6">
+              <div className="p-4 sm:p-5">
                 <h3 className="text-xl font-luxury font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">
                   {transportation.title}
                 </h3>
