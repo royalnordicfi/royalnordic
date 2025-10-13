@@ -130,7 +130,7 @@ const CryptoPaymentSuccess: React.FC = () => {
           {/* Back Button */}
           <button
             onClick={() => navigate('/')}
-            className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors text-sm"
+            className="w-full border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-semibold py-3 px-4 rounded-lg text-sm"
           >
             Back to Home
           </button>

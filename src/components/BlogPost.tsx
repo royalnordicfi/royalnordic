@@ -34,7 +34,7 @@ const BlogPost: React.FC<BlogPostProps> = ({ post }) => {
           <div className="text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
             <Link 
               to="/blog" 
-              className="inline-flex items-center text-emerald-400 hover:text-emerald-300 mb-4 sm:mb-6 transition-colors text-xs sm:text-sm md:text-base"
+              className="inline-flex items-center border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-medium px-3 py-1.5 rounded-lg mb-4 sm:mb-6 text-xs sm:text-sm md:text-base"
             >
               <ArrowLeft size={16} className="mr-1 sm:mr-2" />
               Back

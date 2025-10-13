@@ -75,10 +75,10 @@ const Blog: React.FC = () => {
       <div className="relative z-10 text-white py-8 sm:py-12 pt-40 sm:pt-48">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back to Home Button */}
-          <div className="mb-8">
+          <div className="mb-8 text-center">
             <Link 
               to="/"
-              className="inline-flex items-center text-emerald-400 hover:text-emerald-300 transition-colors font-medium"
+              className="inline-flex items-center border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-medium px-4 py-2 rounded-lg"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Home
