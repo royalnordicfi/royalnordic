@@ -26,10 +26,10 @@ const RentingEquipment: React.FC = () => {
         style={{ backgroundImage: 'url(/snowshoe2.jpg)' }}
       >
         <div className="absolute inset-0 bg-black/60"></div>
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 pt-16 sm:pt-20">
           <Link 
             to="/"
-            className="inline-flex items-center border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-8"
+            className="inline-flex items-center border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-12"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home

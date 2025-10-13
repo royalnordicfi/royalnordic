@@ -8,7 +8,7 @@ const NorthernLightsTours: React.FC = () => {
     {
       id: 1,
       name: "Guaranteed Northern Lights Tour",
-      description: "Chase the Aurora Borealis with our expert guides. We guarantee you'll see the lights or get a free rebooking!",
+      description: "Chase the Aurora Borealis with our expert guides. We guarantee you'll see the lights or get a full refund!",
       image: "/lights1.jpg",
       duration: "1-10 hours",
       groupSize: "Up to 8 people",
@@ -39,10 +39,10 @@ const NorthernLightsTours: React.FC = () => {
         style={{ backgroundImage: 'url(/lights5.jpg)' }}
       >
         <div className="absolute inset-0 bg-black/60"></div>
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 pt-16 sm:pt-20">
           <Link 
             to="/"
-            className="inline-flex items-center border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-8"
+            className="inline-flex items-center border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-12"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
@@ -150,7 +150,7 @@ const NorthernLightsTours: React.FC = () => {
             </div>
             <div className="flex items-start">
               <span className="text-emerald-400 mr-2">✓</span>
-              <span>Free rebooking if Northern Lights don't appear</span>
+              <span>Full refund if Northern Lights don't appear</span>
             </div>
             <div className="flex items-start">
               <span className="text-emerald-400 mr-2">✓</span>

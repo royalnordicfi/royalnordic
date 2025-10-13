@@ -106,7 +106,7 @@ const Tours = () => {
             to="/customized-tour"
             className="inline-block bg-emerald-500 hover:bg-emerald-600 text-black font-semibold px-8 py-3 rounded-lg transition-all duration-300 hover:scale-105"
           >
-            Create Custom Tour
+            Request Custom Tour
           </Link>
         </div>
       </div>
