@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Tours from './components/Tours';
+import Transportations from './components/Transportations';
 import Reviews from './components/Reviews';
 import About from './components/About';
 import Contact from './components/Contact';
@@ -19,6 +20,8 @@ import NorthernLightsPhotography from './components/blog/NorthernLightsPhotograp
 import LaplandWildlife from './components/blog/LaplandWildlife';
 import TraditionalIceFishing from './components/blog/TraditionalIceFishing';
 import SnowshoeAdventure from './components/blog/SnowshoeAdventure';
+import TransportationRovaniemiLevi from './components/TransportationRovaniemiLevi';
+import TransportationCustomized from './components/TransportationCustomized';
 import PaymentSuccess from './components/PaymentSuccess';
 import CryptoPaymentSuccess from './components/CryptoPaymentSuccess';
 import PrivacyPolicy from './components/PrivacyPolicy';
@@ -41,6 +44,7 @@ function App() {
               <div id="tours">
                 <Tours />
               </div>
+              <Transportations />
               <Reviews />
               <div id="about">
                 <About />
@@ -67,6 +71,10 @@ function App() {
           <Route path="/blog/lapland-wildlife-animals-ranua-zoo" element={<LaplandWildlife />} />
           <Route path="/blog/traditional-ice-fishing-finnish-lapland" element={<TraditionalIceFishing />} />
           <Route path="/blog/snowshoe-adventure-exploring-lapland-wilderness" element={<SnowshoeAdventure />} />
+          
+          {/* Transportation Routes */}
+          <Route path="/transportation-rovaniemi-levi" element={<TransportationRovaniemiLevi />} />
+          <Route path="/transportation-customized" element={<TransportationCustomized />} />
           
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/crypto-payment-success" element={<CryptoPaymentSuccess />} />
