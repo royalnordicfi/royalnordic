@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CheckCircle, Mail, MapPin, Clock, Users, Star } from 'lucide-react';
 import ImageSlideshow from './ImageSlideshow';
+import Footer from './Footer';
 
 const CustomizedTour: React.FC = () => {
   // const navigate = useNavigate();
@@ -124,62 +125,6 @@ const CustomizedTour: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile: Contact Form First */}
-        <div className="block lg:hidden mb-6 sm:mb-8">
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
-            <h2 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4 sm:mb-6 text-center">Request Your Custom Tour</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                placeholder="Your full name"
-              />
-              <input
-                type="email"
-                required
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                placeholder="your.email@example.com"
-              />
-              <input
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                placeholder="+358 45 1234567"
-              />
-              <textarea
-                required
-                rows={4}
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
-                placeholder="Describe your ideal Lapland experience..."
-              />
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white px-6 py-3 rounded-lg font-modern font-semibold text-base transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 shadow-lg hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    <span>Sending Request...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Send Custom Tour Request</span>
-                    <Mail className="w-5 h-5" />
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
-        </div>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8">
@@ -312,6 +257,9 @@ const CustomizedTour: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
