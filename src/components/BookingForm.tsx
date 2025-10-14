@@ -207,13 +207,27 @@ const BookingForm: React.FC<BookingFormProps> = ({
     let filteredDates = monthDates
     if (seasonStart && seasonEnd) {
       const currentYear = new Date().getFullYear()
+      // Create proper date objects for the season
       const seasonStartDate = new Date(`${currentYear}-${seasonStart}`)
       const seasonEndDate = new Date(`${currentYear + 1}-${seasonEnd}`)
       
+      // Debug logging
+      console.log('Season filtering:', {
+        seasonStart,
+        seasonEnd,
+        seasonStartDate: seasonStartDate.toISOString(),
+        seasonEndDate: seasonEndDate.toISOString(),
+        monthDates: monthDates.length
+      })
+      
       filteredDates = monthDates.filter(date => {
         const dateObj = new Date(date.date)
-        return dateObj >= seasonStartDate && dateObj <= seasonEndDate
+        const isInSeason = dateObj >= seasonStartDate && dateObj <= seasonEndDate
+        console.log('Date check:', date.date, dateObj.toISOString(), isInSeason)
+        return isInSeason
       })
+      
+      console.log('Filtered dates:', filteredDates.length)
     }
     
     // Create a map for faster lookup
