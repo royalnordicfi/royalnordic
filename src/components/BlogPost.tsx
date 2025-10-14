@@ -17,6 +17,31 @@ interface BlogPostProps {
   };
 }
 
+// Simple markdown to HTML converter
+const markdownToHtml = (markdown: string): string => {
+  return markdown
+    // Headers
+    .replace(/^### (.*$)/gim, '<h3 class="text-xl font-semibold text-white mb-3 mt-6">$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-bold text-white mb-4 mt-8">$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold text-white mb-6 mt-8">$1</h1>')
+    // Bold text
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>')
+    // Lists
+    .replace(/^- (.*$)/gim, '<li class="text-gray-300 mb-2">$1</li>')
+    .replace(/(<li.*<\/li>)/gs, '<ul class="list-disc list-inside text-gray-300 mb-6 space-y-2">$1</ul>')
+    // Line breaks
+    .replace(/\n\n/g, '</p><p class="text-gray-300 mb-6 leading-relaxed">')
+    // Wrap in paragraphs
+    .replace(/^(?!<[h|u|l])/gm, '<p class="text-gray-300 mb-6 leading-relaxed">')
+    .replace(/(?<!>)$/gm, '</p>')
+    // Clean up nested paragraphs
+    .replace(/<p class="text-gray-300 mb-6 leading-relaxed"><\/p>/g, '')
+    .replace(/<p class="text-gray-300 mb-6 leading-relaxed">(<h[1-6])/g, '$1')
+    .replace(/(<\/h[1-6]>)<\/p>/g, '$1')
+    .replace(/<p class="text-gray-300 mb-6 leading-relaxed">(<ul)/g, '$1')
+    .replace(/(<\/ul>)<\/p>/g, '$1');
+};
+
 const BlogPost: React.FC<BlogPostProps> = ({ post }) => {
   return (
     <div className="min-h-screen bg-black text-white">
@@ -83,7 +108,7 @@ const BlogPost: React.FC<BlogPostProps> = ({ post }) => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
         <div 
           className="prose prose-invert prose-sm sm:prose-base md:prose-lg max-w-none font-clean prose-headings:text-white prose-p:text-gray-300 prose-strong:text-white prose-a:text-emerald-400 prose-ul:text-gray-300 prose-ol:text-gray-300 prose-li:text-gray-300"
-          dangerouslySetInnerHTML={{ __html: post.content }}
+          dangerouslySetInnerHTML={{ __html: markdownToHtml(post.content) }}
         />
       </div>
       
