@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Clock, Users, MapPin, Star, CheckCircle, XCircle, Calendar, Euro } from 'lucide-react';
 import ImageSlideshow from './ImageSlideshow';
 import Footer from './Footer';
+import BookingForm from './BookingForm';
 
 const FamilyFriendlyNorthernLights: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState('');
@@ -146,63 +147,75 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
               </div>
             </div>
 
+            {/* Itinerary Section */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">Tour Itinerary</h2>
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                    1
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold text-sm sm:text-base mb-1">21:00 - Pick-up</h3>
+                    <p className="text-gray-300 text-xs sm:text-sm">We'll pick you up from your accommodation in Rovaniemi. Our family-friendly guide will welcome you and explain the evening's activities.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                    2
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold text-sm sm:text-base mb-1">21:15 - Drive to Viewing Location</h3>
+                    <p className="text-gray-300 text-xs sm:text-sm">Comfortable drive to our selected Northern Lights viewing spot, with warm drinks and snacks provided for the family.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                    3
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold text-sm sm:text-base mb-1">21:30 - Aurora Hunting</h3>
+                    <p className="text-gray-300 text-xs sm:text-sm">Search for the Northern Lights with family-friendly activities and games to keep children engaged while waiting for the Aurora.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                    4
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold text-sm sm:text-base mb-1">22:30 - Photography & Return</h3>
+                    <p className="text-gray-300 text-xs sm:text-sm">Family Northern Lights photography session and warm drinks before heading back to Rovaniemi.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                    5
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold text-sm sm:text-base mb-1">23:00 - Drop-off</h3>
+                    <p className="text-gray-300 text-xs sm:text-sm">Return to your accommodation with unforgettable family memories of the Northern Lights.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           {/* Right Column - Booking Form */}
           <div className="lg:col-span-1">
             <div className="sticky top-6">
-              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
-                <h2 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4 sm:mb-6 text-center">Book Your Tour</h2>
-                
-                <div className="space-y-4 mb-6">
-                  <div className="text-center">
-                    <p className="text-gray-300 text-sm mb-2">Available from</p>
-                    <p className="text-emerald-400 font-semibold">October 16, 2025 - April 15, 2026</p>
-                  </div>
-                  
-                  <div className="text-center">
-                    <p className="text-gray-300 text-sm mb-2">Tour Time</p>
-                    <p className="text-white font-semibold">21:00 - 23:00</p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-emerald-600/10 border border-emerald-600/20 rounded-lg p-3 text-center">
-                      <p className="text-white font-semibold text-sm">Adult</p>
-                      <p className="text-emerald-400 font-bold text-lg">79€</p>
-                      <p className="text-gray-300 text-xs">(incl. VAT)</p>
-                    </div>
-                    <div className="bg-emerald-600/10 border border-emerald-600/20 rounded-lg p-3 text-center">
-                      <p className="text-white font-semibold text-sm">Child</p>
-                      <p className="text-emerald-400 font-bold text-lg">59€</p>
-                      <p className="text-gray-300 text-xs">(incl. VAT)</p>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleBooking}
-                  disabled={isBooking}
-                  className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white px-6 py-3 rounded-lg font-modern font-semibold text-base transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 shadow-lg hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isBooking ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      <span>Processing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Book Family Tour</span>
-                      <Star className="w-5 h-5" />
-                    </>
-                  )}
-                </button>
-
-                <div className="mt-4 text-center">
-                  <p className="text-gray-400 text-xs">
-                    Confirmation email sent to both parties
-                  </p>
-                </div>
-              </div>
+              <BookingForm
+                tourId={2}
+                tourName="Family-Friendly Northern Lights Tour"
+                adultPrice={79}
+                childPrice={59}
+                seasonStart="10-16"
+                seasonEnd="04-15"
+              />
             </div>
           </div>
         </div>
