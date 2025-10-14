@@ -152,7 +152,7 @@ const NorthernLightsPhotography: React.FC = () => {
           Join our Northern Lights photography tour where our expert guides will help you find the 
           best locations and provide photography tips while you chase the Aurora Borealis.
         </p>
-        <a href="/northern-lights-tour" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+        <a href="/northern-lights-tour" class="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105">
           Book Photography Tour
         </a>
       </div>

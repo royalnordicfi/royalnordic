@@ -119,12 +119,14 @@ const WhatToPackLapland: React.FC = () => {
           will ensure you have an unforgettable Arctic experience, whether you're chasing the Northern Lights 
           or exploring the winter wilderness.
         </p>
-        <a href="/northern-lights-tour" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors mr-4">
-          Book Northern Lights Tour
-        </a>
-        <a href="/snowshoe-rental" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-          Book Snowshoe Adventure
-        </a>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a href="/northern-lights-tour" class="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105">
+            Book Northern Lights Tour
+          </a>
+          <a href="/snowshoe-rental" class="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105">
+            Book Snowshoe Adventure
+          </a>
+        </div>
       </div>
     `,
     date: "2025-09-24",

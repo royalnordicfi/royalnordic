@@ -92,7 +92,7 @@ const BestTimeNorthernLights: React.FC = () => {
           Join our guaranteed Northern Lights tour and let our expert guides take you to the best 
           viewing locations in Lapland. With our 100% guarantee, you'll see the Aurora or get your money back.
         </p>
-        <a href="/northern-lights-tour" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+        <a href="/northern-lights-tour" class="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105">
           Book Your Northern Lights Tour
         </a>
       </div>
