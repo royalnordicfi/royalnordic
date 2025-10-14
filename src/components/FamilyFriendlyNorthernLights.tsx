@@ -166,34 +166,14 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
                     2
                   </div>
                   <div>
-                    <h3 className="text-white font-semibold text-sm sm:text-base mb-1">21:15 - Drive to Viewing Location</h3>
-                    <p className="text-gray-300 text-xs sm:text-sm">Comfortable drive to our selected Northern Lights viewing spot, with warm drinks and snacks provided for the family.</p>
+                    <h3 className="text-white font-semibold text-sm sm:text-base mb-1">21:15 - 22:45 - Aurora Hunting</h3>
+                    <p className="text-gray-300 text-xs sm:text-sm">Trying to catch the Northern Lights and enjoying warm drinks and snacks. Family-friendly activities and games to keep children engaged while waiting for the Aurora.</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
                   <div className="flex-shrink-0 w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
                     3
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold text-sm sm:text-base mb-1">21:30 - Aurora Hunting</h3>
-                    <p className="text-gray-300 text-xs sm:text-sm">Search for the Northern Lights with family-friendly activities and games to keep children engaged while waiting for the Aurora.</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
-                    4
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold text-sm sm:text-base mb-1">22:30 - Photography & Return</h3>
-                    <p className="text-gray-300 text-xs sm:text-sm">Family Northern Lights photography session and warm drinks before heading back to Rovaniemi.</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
-                    5
                   </div>
                   <div>
                     <h3 className="text-white font-semibold text-sm sm:text-base mb-1">23:00 - Drop-off</h3>
