@@ -22,11 +22,11 @@ const NorthernLightsTours: React.FC = () => {
       name: "Family-Friendly Northern Lights Tour",
       description: "Perfect for families with children! Shorter duration and kid-friendly activities while hunting the Aurora.",
       image: "/lights4.jpg",
-      duration: "3-4 hours",
-      groupSize: "Up to 8 people",
+      duration: "2 hours (21:00-23:00)",
+      groupSize: "Max 16 people",
       location: "Rovaniemi, Lapland",
-      features: ["Family-friendly guide", "Hotel pickup", "Hot chocolate", "Shorter duration for kids"],
-      route: "/family-northern-lights",
+      features: ["Family-friendly guide", "Hotel pickup", "Warm drinks & snacks", "Shorter duration for kids"],
+      route: "/family-friendly-northern-lights",
       badge: "Family Favorite"
     }
   ];

@@ -16,6 +16,7 @@ import CustomizedTour from './components/CustomizedTour';
 import NorthernLightsTours from './components/NorthernLightsTours';
 import RentingEquipment from './components/RentingEquipment';
 import DaytimeExperiences from './components/DaytimeExperiences';
+import FamilyFriendlyNorthernLights from './components/FamilyFriendlyNorthernLights';
 import Blog from './components/Blog';
 import BestTimeNorthernLights from './components/blog/BestTimeNorthernLights';
 import WhatToPackLapland from './components/blog/WhatToPackLapland';
@@ -66,9 +67,10 @@ function App() {
           } />
           
           {/* Tour Category Pages */}
-          <Route path="/northern-lights-tours" element={<NorthernLightsTours />} />
-          <Route path="/renting-equipment" element={<RentingEquipment />} />
-          <Route path="/daytime-experiences" element={<DaytimeExperiences />} />
+            <Route path="/northern-lights-tours" element={<NorthernLightsTours />} />
+            <Route path="/renting-equipment" element={<RentingEquipment />} />
+            <Route path="/daytime-experiences" element={<DaytimeExperiences />} />
+            <Route path="/family-friendly-northern-lights" element={<FamilyFriendlyNorthernLights />} />
           
           {/* Tour Detail Pages */}
           <Route path="/northern-lights-tour" element={<NorthernLightsTour />} />
