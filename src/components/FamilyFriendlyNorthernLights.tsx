@@ -27,7 +27,7 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
       <div className="relative">
         <ImageSlideshow 
           images={tourImages}
-          className="h-[40vh] sm:h-[50vh]"
+          className="h-[60vh] sm:h-[70vh] lg:h-[80vh]"
           alt="Family-Friendly Northern Lights Tour"
         />
         
@@ -59,7 +59,7 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8 lg:py-12">
         {/* Quick Info */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-12">
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
@@ -82,14 +82,6 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
               <h3 className="text-white font-semibold text-sm sm:text-base">Location</h3>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Rovaniemi, Lapland</p>
-          </div>
-
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-            <div className="flex items-center mb-2 sm:mb-3">
-              <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Season</h3>
-            </div>
-            <p className="text-gray-300 text-sm sm:text-base">Oct 16 - Apr 15</p>
           </div>
         </div>
 
@@ -154,31 +146,9 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
               </div>
             </div>
 
-            {/* Pricing */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">Pricing</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-emerald-600/10 border border-emerald-600/20 rounded-lg p-4">
-                  <div className="flex items-center mb-2">
-                    <Euro className="w-5 h-5 text-emerald-400 mr-2" />
-                    <h3 className="text-white font-semibold text-lg">Adult</h3>
-                  </div>
-                  <p className="text-2xl font-bold text-emerald-400">79€</p>
-                  <p className="text-gray-300 text-sm">(incl. VAT)</p>
-                </div>
-                <div className="bg-emerald-600/10 border border-emerald-600/20 rounded-lg p-4">
-                  <div className="flex items-center mb-2">
-                    <Euro className="w-5 h-5 text-emerald-400 mr-2" />
-                    <h3 className="text-white font-semibold text-lg">Child</h3>
-                  </div>
-                  <p className="text-2xl font-bold text-emerald-400">59€</p>
-                  <p className="text-gray-300 text-sm">(incl. VAT)</p>
-                </div>
-              </div>
-            </div>
           </div>
 
-          {/* Right Column - Booking */}
+          {/* Right Column - Booking Form */}
           <div className="lg:col-span-1">
             <div className="sticky top-6">
               <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
@@ -193,6 +163,19 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
                   <div className="text-center">
                     <p className="text-gray-300 text-sm mb-2">Tour Time</p>
                     <p className="text-white font-semibold">21:00 - 23:00</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-emerald-600/10 border border-emerald-600/20 rounded-lg p-3 text-center">
+                      <p className="text-white font-semibold text-sm">Adult</p>
+                      <p className="text-emerald-400 font-bold text-lg">79€</p>
+                      <p className="text-gray-300 text-xs">(incl. VAT)</p>
+                    </div>
+                    <div className="bg-emerald-600/10 border border-emerald-600/20 rounded-lg p-3 text-center">
+                      <p className="text-white font-semibold text-sm">Child</p>
+                      <p className="text-emerald-400 font-bold text-lg">59€</p>
+                      <p className="text-gray-300 text-xs">(incl. VAT)</p>
+                    </div>
                   </div>
                 </div>
 
