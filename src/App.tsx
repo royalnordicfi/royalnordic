@@ -32,6 +32,7 @@ import GlassIglooGuide from './components/blog/GlassIglooGuide';
 import LaplandCabinsGuide from './components/blog/LaplandCabinsGuide';
 import TransportationRovaniemiLevi from './components/TransportationRovaniemiLevi';
 import TransportationCustomized from './components/TransportationCustomized';
+import TransportationCategory from './components/TransportationCategory';
 import PaymentSuccess from './components/PaymentSuccess';
 import CryptoPaymentSuccess from './components/CryptoPaymentSuccess';
 import PrivacyPolicy from './components/PrivacyPolicy';
@@ -95,6 +96,7 @@ function App() {
           <Route path="/blog/finnish-cabins-lapland-authentic-guide" element={<LaplandCabinsGuide />} />
           
           {/* Transportation Routes */}
+          <Route path="/transportation" element={<TransportationCategory />} />
           <Route path="/transportation-rovaniemi-levi" element={<TransportationRovaniemiLevi />} />
           <Route path="/transportation-customized" element={<TransportationCustomized />} />
           
