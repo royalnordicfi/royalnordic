@@ -87,27 +87,24 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 sm:gap-8">
           {/* Left Column - Tour Details */}
-          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+          <div className="lg:col-span-3 space-y-4 sm:space-y-6">
             {/* About Section */}
             <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">About This Tour</h2>
-              <p className="text-gray-300 text-sm sm:text-base mb-3 sm:mb-4 font-clean">
-                Our Family-Friendly Northern Lights Tour is specially designed for families with children. We provide a comfortable, warm environment where kids can enjoy the magic of the Aurora Borealis without the long waits and cold temperatures of traditional tours.
-              </p>
               <p className="text-gray-300 text-sm sm:text-base font-clean">
-                With shorter duration, warm drinks, and family-oriented activities, this tour ensures everyone in your family can experience the wonder of the Northern Lights in a safe, enjoyable setting.
+                Our Family-Friendly Northern Lights Tour is specially designed for families with children. We provide a comfortable, warm environment where kids can enjoy the magic of the Aurora Borealis without the long waits and cold temperatures of traditional tours. With shorter duration, warm drinks, and family-oriented activities, this tour ensures everyone in your family can experience the wonder of the Northern Lights in a safe, enjoyable setting.
               </p>
             </div>
 
             {/* What's Included */}
             <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">What's Included</h2>
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 <div className="flex items-start">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-300 text-sm sm:text-base">Pick-up and drop-off from your accommodation</span>
+                  <span className="text-gray-300 text-sm sm:text-base">Pick-up & Drop-off</span>
                 </div>
                 <div className="flex items-start">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
@@ -115,15 +112,15 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
                 </div>
                 <div className="flex items-start">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-300 text-sm sm:text-base">Family-friendly atmosphere and activities</span>
+                  <span className="text-gray-300 text-sm sm:text-base">Family-friendly activities</span>
                 </div>
                 <div className="flex items-start">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-300 text-sm sm:text-base">Expert guide with family experience</span>
+                  <span className="text-gray-300 text-sm sm:text-base">Expert family guide</span>
                 </div>
                 <div className="flex items-start">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-300 text-sm sm:text-base">Northern Lights photography tips</span>
+                  <span className="text-gray-300 text-sm sm:text-base">Photography tips</span>
                 </div>
               </div>
             </div>
@@ -131,10 +128,10 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
             {/* What's Not Included */}
             <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">What's Not Included</h2>
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 <div className="flex items-start">
                   <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-300 text-sm sm:text-base">Warm clothing (please dress warmly)</span>
+                  <span className="text-gray-300 text-sm sm:text-base">Warm clothing (dress warmly)</span>
                 </div>
                 <div className="flex items-start">
                   <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
@@ -186,7 +183,7 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
           </div>
 
           {/* Right Column - Booking Form */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-2">
             <div className="sticky top-6">
               <BookingForm
                 tourId={8}
