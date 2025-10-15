@@ -779,7 +779,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
                       day: 'numeric' 
                     })
                     // Add start time for Northern Lights tours
-                    if (tourName.includes('Northern Lights')) {
+                    if (tourName.includes('Family-Friendly Northern Lights')) {
+                      return `${dateString} at 21:00`
+                    } else if (tourName.includes('Northern Lights')) {
                       return `${dateString} at 20:00`
                     }
                     return dateString
