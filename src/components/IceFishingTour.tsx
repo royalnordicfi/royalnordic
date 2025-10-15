@@ -1,5 +1,6 @@
-import { Clock, Users, MapPin, CheckCircle } from 'lucide-react';
+import { Clock, Users, MapPin, CheckCircle, ArrowLeft } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import ImageSlideshow from './ImageSlideshow';
 import BookingForm from './BookingForm';
 import Footer from './Footer';
@@ -85,6 +86,13 @@ const IceFishingTour = () => {
         {/* Hero Content */}
         <div className="absolute inset-0 flex items-center justify-center z-10 pt-20 sm:pt-0">
           <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+            <Link 
+              to="/daytime-experiences" 
+              className="inline-flex items-center border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-12"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Daytime Experiences
+            </Link>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-luxury font-bold mb-4 sm:mb-6 leading-tight drop-shadow-2xl">
               <span className="bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent drop-shadow-2xl">
                 Ice Fishing Experience

@@ -28,7 +28,7 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
       <div className="relative">
         <ImageSlideshow 
           images={tourImages}
-          className="h-[60vh] sm:h-[70vh] lg:h-[80vh]"
+          className="h-[70vh] sm:h-[80vh] lg:h-[90vh]"
           alt="Family-Friendly Northern Lights Tour"
         />
         
