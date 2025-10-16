@@ -49,9 +49,13 @@ const TransportationCustomized = () => {
         setSubmitStatus('success');
         setFormData({ name: '', email: '', destination: '', additionalInfo: '' });
       } else {
+        console.error('Response not ok:', response.status, response.statusText);
+        const errorData = await response.text();
+        console.error('Error response:', errorData);
         setSubmitStatus('error');
       }
     } catch (error) {
+      console.error('Request failed:', error);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
