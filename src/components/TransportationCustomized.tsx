@@ -1,22 +1,71 @@
-import { Car, Clock, Users, MapPin, CheckCircle, ArrowLeft } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Car, Clock, Users, MapPin, CheckCircle, ArrowLeft, Mail, User, MessageSquare } from 'lucide-react';
+import { useState } from 'react';
 import ImageSlideshow from './ImageSlideshow';
-import BookingForm from './BookingForm';
 import Footer from './Footer';
 import { Link } from 'react-router-dom';
 
 const TransportationCustomized = () => {
-  const [transportationData, setTransportationData] = useState({
-    adult_price: 299,
-    child_price: 199,
-    max_capacity: 8
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    destination: '',
+    additionalInfo: ''
   });
-  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState('');
 
-  useEffect(() => {
-    // Simulate loading transportation data
-    setLoading(false);
-  }, []);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus('');
+
+    try {
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: 'contact@royalnordic.fi',
+          subject: 'Custom Transportation Request',
+          html: `
+            <h2>Custom Transportation Request</h2>
+            <p><strong>Name:</strong> ${formData.name}</p>
+            <p><strong>Email:</strong> ${formData.email}</p>
+            <p><strong>Destination:</strong> ${formData.destination}</p>
+            <p><strong>Additional Information:</strong></p>
+            <p>${formData.additionalInfo}</p>
+          `,
+          text: `
+            Custom Transportation Request
+            Name: ${formData.name}
+            Email: ${formData.email}
+            Destination: ${formData.destination}
+            Additional Information: ${formData.additionalInfo}
+          `
+        }),
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setFormData({ name: '', email: '', destination: '', additionalInfo: '' });
+      } else {
+        setSubmitStatus('error');
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const features = [
     'Custom routes throughout Lapland',
@@ -26,7 +75,6 @@ const TransportationCustomized = () => {
     'Airport transfers available',
     'Hotel pickup and drop-off',
     'Luggage assistance included',
-    'WiFi and charging ports available',
     'Child safety seats upon request',
     'Multi-stop itineraries possible',
     'Scenic route options available'
@@ -100,7 +148,7 @@ const TransportationCustomized = () => {
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Capacity</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">Up to 8 people</p>
+            <p className="text-gray-300 text-sm sm:text-base">Flexible</p>
           </div>
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
@@ -108,7 +156,7 @@ const TransportationCustomized = () => {
               <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Coverage</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">All of Lapland</p>
+            <p className="text-gray-300 text-sm sm:text-base">Finland</p>
           </div>
         </div>
 
@@ -176,24 +224,121 @@ const TransportationCustomized = () => {
             </div>
           </div>
 
-          {/* Right Column - Booking Form */}
+          {/* Right Column - Contact Form */}
           <div className="lg:col-span-2">
             <div className="sticky top-6">
               <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
-                <h2 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4 sm:mb-6 text-center">Book Custom Transportation</h2>
-                {loading ? (
-                  <div className="text-center text-white">Loading service data...</div>
-                ) : (
-                  <BookingForm
-                    tourId={7}
-                    tourName="Private Customized Transportation"
-                    adultPrice={transportationData.adult_price}
-                    childPrice={transportationData.child_price}
-                    maxCapacity={transportationData.max_capacity}
-                    seasonStart="01-01"
-                    seasonEnd="12-31"
-                  />
-                )}
+                <h2 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4 sm:mb-6 text-center">Request Custom Transportation</h2>
+                
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Name Field */}
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-white mb-2">
+                      <User className="w-4 h-4 inline mr-2" />
+                      Your Name *
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+
+                  {/* Email Field */}
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
+                      <Mail className="w-4 h-4 inline mr-2" />
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="your.email@example.com"
+                    />
+                  </div>
+
+                  {/* Destination Field */}
+                  <div>
+                    <label htmlFor="destination" className="block text-sm font-medium text-white mb-2">
+                      <MapPin className="w-4 h-4 inline mr-2" />
+                      Where do you need transportation? *
+                    </label>
+                    <input
+                      type="text"
+                      id="destination"
+                      name="destination"
+                      value={formData.destination}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="e.g., Rovaniemi Airport to Levi, or custom route"
+                    />
+                  </div>
+
+                  {/* Additional Information */}
+                  <div>
+                    <label htmlFor="additionalInfo" className="block text-sm font-medium text-white mb-2">
+                      <MessageSquare className="w-4 h-4 inline mr-2" />
+                      Additional Information
+                    </label>
+                    <textarea
+                      id="additionalInfo"
+                      name="additionalInfo"
+                      value={formData.additionalInfo}
+                      onChange={handleInputChange}
+                      rows={4}
+                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
+                      placeholder="Tell us about your specific needs: dates, times, group size, child seats, special requirements, etc."
+                    />
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Sending Request...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="w-4 h-4 mr-2" />
+                        Send Transportation Request
+                      </>
+                    )}
+                  </button>
+
+                  {/* Status Messages */}
+                  {submitStatus === 'success' && (
+                    <div className="text-green-400 text-sm text-center">
+                      ✓ Request sent successfully! We'll contact you soon.
+                    </div>
+                  )}
+                  {submitStatus === 'error' && (
+                    <div className="text-red-400 text-sm text-center">
+                      ✗ Failed to send request. Please try again or contact us directly.
+                    </div>
+                  )}
+                </form>
+
+                <div className="mt-4 text-center">
+                  <p className="text-gray-400 text-sm">
+                    We'll respond within 24 hours with a personalized quote.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
