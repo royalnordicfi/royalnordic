@@ -60,6 +60,14 @@ const Reviews = () => {
       review: "Our guide was amazing and took us to multiple perfect spots for the northern lights. We were lucky to see an incredible display of aurora dancing across the sky! The experience was absolutely magical and the van was very comfortable for warming up between stops.",
       location: "Verified booking",
       date: "January 5, 2025"
+    },
+    {
+      id: 7,
+      name: "Tyler",
+      rating: 5,
+      review: "Miro is a wonderful guy and a great guide, he showed us the Northern Lights after a bit of driving, wonderful experience! RECOMMENDED✨",
+      location: "Finland",
+      date: "October 16, 2025"
     }
   ];
 
