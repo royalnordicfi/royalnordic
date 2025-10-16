@@ -33,7 +33,7 @@ const TransportationRovaniemiLevi = () => {
     setSubmitStatus('');
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-customized-tour-request`, {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-transportation-request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,10 +42,9 @@ const TransportationRovaniemiLevi = () => {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          phone: '', // Not required for transportation
-          message: `Transportation Request: Rovaniemi to Levi/Kittilä
-Destination: ${formData.destination}
-Additional Information: ${formData.additionalInfo}`,
+          destination: formData.destination,
+          additionalInfo: formData.additionalInfo,
+          serviceType: 'Private Transportation: Rovaniemi - Levi/Kittilä',
           to: ['royalnordicfi@gmail.com', 'contact@royalnordic.fi'],
           subject: 'Transportation Request: Rovaniemi to Levi/Kittilä - ROYAL NORDIC'
         }),

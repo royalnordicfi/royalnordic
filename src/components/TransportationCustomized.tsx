@@ -28,7 +28,7 @@ const TransportationCustomized = () => {
     setSubmitStatus('');
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-customized-tour-request`, {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-transportation-request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,10 +37,9 @@ const TransportationCustomized = () => {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          phone: '', // Not required for transportation
-          message: `Transportation Request Details:
-Destination: ${formData.destination}
-Additional Information: ${formData.additionalInfo}`,
+          destination: formData.destination,
+          additionalInfo: formData.additionalInfo,
+          serviceType: 'Private Customized Transportation',
           to: ['royalnordicfi@gmail.com', 'contact@royalnordic.fi'],
           subject: 'Custom Transportation Request - ROYAL NORDIC'
         }),
