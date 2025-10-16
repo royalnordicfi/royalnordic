@@ -40,7 +40,7 @@ const NorthernLightsTours: React.FC = () => {
       >
         <div className="absolute inset-0 bg-black/60"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black"></div>
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 pt-48 sm:pt-52">
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 pt-40 sm:pt-44 md:pt-48">
           <Link 
             to="/"
             className="inline-flex items-center border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-12"

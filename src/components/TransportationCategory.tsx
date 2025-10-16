@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Car, Clock, Users, MapPin } from 'lucide-react';
+import Footer from './Footer';
 
 const TransportationCategory = () => {
   const transportations = [
@@ -46,7 +47,7 @@ const TransportationCategory = () => {
         </div>
         
         {/* Hero Content */}
-        <div className="absolute inset-0 flex items-center justify-center z-10 pt-32 sm:pt-36">
+        <div className="absolute inset-0 flex items-center justify-center z-10 pt-40 sm:pt-44 md:pt-48">
           <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
             <Link 
               to="/"
@@ -157,6 +158,9 @@ const TransportationCategory = () => {
         </div>
         </div>
       </section>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
