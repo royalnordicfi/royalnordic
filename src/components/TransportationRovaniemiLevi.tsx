@@ -156,6 +156,14 @@ const TransportationRovaniemiLevi = () => {
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
+              <Car className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
+              <h3 className="text-white font-semibold text-sm sm:text-base">Price</h3>
+            </div>
+            <p className="text-emerald-400 font-bold text-lg sm:text-xl">399€</p>
+          </div>
+          
+          <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
+            <div className="flex items-center mb-2 sm:mb-3">
               <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Route</h3>
             </div>
@@ -191,23 +199,6 @@ const TransportationRovaniemiLevi = () => {
               </div>
             </div>
 
-            {/* Pricing */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">Pricing</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3 sm:p-4">
-                  <h3 className="text-emerald-400 font-semibold text-sm sm:text-base mb-1">Adult (15+ years)</h3>
-                  <p className="text-white font-bold text-lg sm:text-xl">399€</p>
-                </div>
-                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3 sm:p-4">
-                  <h3 className="text-emerald-400 font-semibold text-sm sm:text-base mb-1">Child (3-14 years)</h3>
-                  <p className="text-white font-bold text-lg sm:text-xl">299€</p>
-                </div>
-              </div>
-              <p className="text-gray-400 text-xs sm:text-sm mt-3">
-                Prices include VAT. All transportation services are private for your group only.
-              </p>
-            </div>
 
             {/* Itinerary */}
             <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
