@@ -8,7 +8,7 @@ const TransportationCategory = () => {
       id: 1,
       title: "Private Transportation: Rovaniemi - Levi/Kittilä",
       description: "Comfortable private transportation service between Rovaniemi and the popular ski resorts of Levi and Kittilä.",
-      price: "Starting from 199€",
+      price: "Contact for pricing",
       duration: "2-3 hours",
       groupSize: "Up to 8 people",
       location: "Rovaniemi to Levi/Kittilä",

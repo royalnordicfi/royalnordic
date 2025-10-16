@@ -58,7 +58,6 @@ const Transportations = () => {
 
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-emerald-400 font-bold text-lg">Starting from 199€</p>
                   <p className="text-gray-400 text-sm">2 services available</p>
                 </div>
                 <div className="text-emerald-400 group-hover:text-white transition-colors">

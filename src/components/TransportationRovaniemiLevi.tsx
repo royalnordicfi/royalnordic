@@ -11,6 +11,11 @@ const TransportationRovaniemiLevi = () => {
     destination: '',
     additionalInfo: ''
   });
+  
+  const pricing = {
+    adult: 399,
+    child: 299
+  };
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('');
 
@@ -184,6 +189,24 @@ const TransportationRovaniemiLevi = () => {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Pricing */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">Pricing</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3 sm:p-4">
+                  <h3 className="text-emerald-400 font-semibold text-sm sm:text-base mb-1">Adult (15+ years)</h3>
+                  <p className="text-white font-bold text-lg sm:text-xl">399€</p>
+                </div>
+                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3 sm:p-4">
+                  <h3 className="text-emerald-400 font-semibold text-sm sm:text-base mb-1">Child (3-14 years)</h3>
+                  <p className="text-white font-bold text-lg sm:text-xl">299€</p>
+                </div>
+              </div>
+              <p className="text-gray-400 text-xs sm:text-sm mt-3">
+                Prices include VAT. All transportation services are private for your group only.
+              </p>
             </div>
 
             {/* Itinerary */}
