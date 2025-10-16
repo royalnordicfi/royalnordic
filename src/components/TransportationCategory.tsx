@@ -72,10 +72,14 @@ const TransportationCategory = () => {
         {/* Background fade effect */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black"></div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Transportation Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
-            {transportations.map((transportation) => (
-              <div key={transportation.id} className="bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/20 group">
+        {/* Transportation Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
+          {transportations.map((transportation) => (
+            <Link
+              key={transportation.id}
+              to={transportation.route}
+              className="bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/20 group block"
+            >
                 {/* Image */}
                 <div className="relative h-48 sm:h-56 overflow-hidden">
                   <img
@@ -136,22 +140,21 @@ const TransportationCategory = () => {
                     </div>
                   </div>
 
-                  {/* Price and Button */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-emerald-400 font-bold text-lg">{transportation.price}</p>
-                    </div>
-                    <Link
-                      to={transportation.route}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors text-sm"
-                    >
-                      Learn More
-                    </Link>
+                {/* Price */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-emerald-400 font-bold text-lg">{transportation.price}</p>
+                  </div>
+                  <div className="text-emerald-400 group-hover:text-white transition-colors">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </Link>
+          ))}
+        </div>
         </div>
       </section>
     </div>
