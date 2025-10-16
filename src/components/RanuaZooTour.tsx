@@ -90,12 +90,12 @@ const RanuaZooTour = () => {
       <div className="relative">
         <ImageSlideshow 
           images={["/ranua1.jpg", "/ranua2.jpeg", "/ranua3.jpeg", "/ranua4.jpeg", "/ranua5.jpeg"]}
-          className="h-[28rem] sm:h-[32rem] md:h-[36rem] lg:h-[40rem]"
+          className="h-[35rem] sm:h-[40rem] md:h-[45rem] lg:h-[50rem]"
           alt="Ranua Zoo Tour Images"
         />
         
         {/* Hero Content */}
-        <div className="absolute inset-0 flex items-center justify-center z-10 pt-40 sm:pt-44 md:pt-48">
+        <div className="absolute inset-0 flex items-center justify-center z-10 pt-32 sm:pt-36 md:pt-40">
           <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
             <Link 
               to="/daytime-experiences" 
