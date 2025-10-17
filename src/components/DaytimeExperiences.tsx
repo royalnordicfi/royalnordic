@@ -42,16 +42,16 @@ const DaytimeExperiences: React.FC = () => {
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 pt-40 sm:pt-44 md:pt-48">
           <Link 
             to="/"
-            className="inline-flex items-center border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-12"
+            className="inline-flex items-center bg-emerald-500 text-white hover:bg-emerald-600 transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-8 sm:mb-12"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Link>
           
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-luxury font-bold mb-4 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-luxury font-bold mb-4 sm:mb-6 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
             Daytime Experiences
           </h1>
-          <p className="text-lg sm:text-xl text-gray-300 max-w-3xl font-clean">
+          <p className="text-sm sm:text-lg md:text-xl text-gray-300 max-w-2xl sm:max-w-3xl mx-auto leading-relaxed font-clean px-2">
             Discover authentic Arctic activities and wildlife during the day
           </p>
         </div>

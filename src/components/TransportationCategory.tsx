@@ -51,17 +51,17 @@ const TransportationCategory = () => {
           <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
             <Link 
               to="/"
-              className="inline-flex items-center border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-12"
+              className="inline-flex items-center bg-emerald-500 text-white hover:bg-emerald-600 transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-8 sm:mb-12"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Home
             </Link>
             
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-luxury font-bold mb-6 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-luxury font-bold mb-4 sm:mb-6 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
               Transportation Services
             </h1>
             
-            <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed font-clean">
+            <p className="text-sm sm:text-lg md:text-xl text-gray-300 max-w-2xl sm:max-w-3xl mx-auto leading-relaxed font-clean px-2">
               Travel comfortably and safely throughout Lapland with our professional transportation services.
             </p>
           </div>

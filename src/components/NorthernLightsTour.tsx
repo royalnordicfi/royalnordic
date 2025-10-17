@@ -97,21 +97,21 @@ const NorthernLightsTour = () => {
         />
         
         {/* Hero Content */}
-        <div className="absolute inset-0 flex items-center justify-center z-10 pt-32 sm:pt-36 md:pt-40">
+        <div className="absolute inset-0 flex items-center justify-center z-10 pt-32 sm:pt-36 md:pt-32 lg:pt-28 xl:pt-24">
           <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
             <Link 
               to="/northern-lights-tours" 
-              className="inline-flex items-center border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-12"
+              className="inline-flex items-center bg-emerald-500 text-white hover:bg-emerald-600 transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-8 sm:mb-12"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Northern Lights Tours
             </Link>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-luxury font-bold mb-4 sm:mb-6 leading-tight drop-shadow-2xl">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-luxury font-bold mb-4 sm:mb-6 leading-tight drop-shadow-2xl">
               <span className="bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent drop-shadow-2xl">
                 Guaranteed Northern Lights Tour
               </span>
             </h1>
-            <p className="text-lg sm:text-xl md:text-2xl text-white font-clean max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-2xl">
+            <p className="text-sm sm:text-lg md:text-xl lg:text-2xl text-white font-clean max-w-2xl sm:max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-2xl px-2">
               Experience the magical Aurora Borealis in the pristine Lapland wilderness with our expert guides.
             </p>
           </div>

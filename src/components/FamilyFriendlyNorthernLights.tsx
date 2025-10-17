@@ -33,11 +33,11 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
         />
         
         {/* Hero Content */}
-        <div className="absolute inset-0 flex items-center justify-center z-10 pt-40 sm:pt-44 md:pt-48">
+        <div className="absolute inset-0 flex items-center justify-center z-10 pt-32 sm:pt-36 md:pt-32 lg:pt-28 xl:pt-24">
           <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
             <Link 
               to="/northern-lights-tours"
-              className="inline-flex items-center border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-12"
+              className="inline-flex items-center bg-emerald-500 text-white hover:bg-emerald-600 transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-8 sm:mb-12"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Northern Lights Tours

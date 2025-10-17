@@ -99,7 +99,7 @@ const TransportationRovaniemiLevi = () => {
       {/* Header */}
       <div className="relative">
         <ImageSlideshow 
-          images={["/transportation1.jpg", "/transportation3.jpg"]}
+          images={["/transportation1.jpg"]}
           className="h-[28rem] sm:h-[32rem] md:h-[36rem] lg:h-[40rem]"
           alt="Transportation Rovaniemi to Levi"
         />
@@ -109,7 +109,7 @@ const TransportationRovaniemiLevi = () => {
           <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
             <Link 
               to="/" 
-              className="inline-flex items-center border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-medium px-3 py-1.5 rounded-lg mb-4 sm:mb-6 text-xs sm:text-sm md:text-base"
+              className="inline-flex items-center bg-emerald-500 text-white hover:bg-emerald-600 transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-8 sm:mb-12"
             >
               <ArrowLeft size={16} className="mr-1 sm:mr-2" />
               Back to Home
