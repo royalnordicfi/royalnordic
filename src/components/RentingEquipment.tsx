@@ -22,7 +22,7 @@ const RentingEquipment: React.FC = () => {
     <div className="min-h-screen bg-black">
       {/* Hero Section */}
       <div 
-        className="relative h-[40vh] sm:h-[50vh] bg-cover bg-center"
+        className="relative h-[50vh] sm:h-[60vh] md:h-[65vh] lg:h-[70vh] bg-cover bg-center"
         style={{ backgroundImage: 'url(/snowshoe2.jpg)' }}
       >
         <div className="absolute inset-0 bg-black/30"></div>
