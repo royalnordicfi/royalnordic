@@ -46,6 +46,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
     specialRequests: ''
   })
 
+  // Check if Stripe is configured
+  const isStripeConfigured = !!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (showCryptoModal) {
@@ -408,7 +411,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // Clean up Stripe error messages
       let errorMessage = 'Booking failed'
       if (err instanceof Error) {
-        if (err.message.includes('email_invalid')) {
+        if (err.message.includes('Stripe is not configured')) {
+          errorMessage = 'Card payments are currently unavailable. Please use crypto payment or contact us directly at contact@royalnordic.fi'
+        } else if (err.message.includes('email_invalid')) {
           errorMessage = 'Invalid email address'
         } else if (err.message.includes('card_declined')) {
           errorMessage = 'Payment was declined'
@@ -814,12 +819,27 @@ const BookingForm: React.FC<BookingFormProps> = ({
           <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Choose Payment Method</h4>
           
           {/* Pay by Card/Bank Button */}
+          {!isStripeConfigured && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
+              <div className="flex items-start">
+                <div className="text-yellow-600 mr-2 text-lg">⚠️</div>
+                <div className="flex-1">
+                  <p className="text-yellow-800 text-sm font-medium mb-1">Card payments temporarily unavailable</p>
+                  <p className="text-yellow-700 text-xs">Please use crypto payment or contact us directly to complete your booking.</p>
+                </div>
+              </div>
+            </div>
+          )}
           <button 
             type="submit"
-            disabled={loading || !formData.preferredDate}
+            disabled={loading || !formData.preferredDate || !isStripeConfigured}
             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
             onClick={(e) => {
               e.preventDefault()
+              if (!isStripeConfigured) {
+                setError('Card payments are currently unavailable. Please use crypto payment or contact us directly.')
+                return
+              }
               handleSubmit(e)
             }}
           >
