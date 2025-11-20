@@ -8,8 +8,8 @@ import { getAllTours } from '../lib/api';
 
 const RanuaZooTour = () => {
   const [tourData, setTourData] = useState({
-    adult_price: 99,
-    child_price: 79,
+    adult_price: 1, // Temporarily set to 1€ for Stripe testing
+    child_price: 1,
     max_capacity: 8
   });
   const [loading, setLoading] = useState(true);
