@@ -21,10 +21,16 @@ const RanuaZooTour = () => {
         const ranuaZooTour = tours.find(tour => tour.id === 5);
         if (ranuaZooTour) {
           setTourData({
-            adult_price: ranuaZooTour.adult_price,
-            child_price: ranuaZooTour.child_price,
+            adult_price: 1, // Keep temporary Stripe-testing price regardless of DB value
+            child_price: 1,
             max_capacity: ranuaZooTour.max_capacity
           });
+        } else {
+          setTourData(prev => ({
+            ...prev,
+            adult_price: 1,
+            child_price: 1
+          }));
         }
       } catch (error) {
         console.error('Error loading tour data:', error);
