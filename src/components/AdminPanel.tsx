@@ -13,9 +13,10 @@ import {
   XCircle,
   RefreshCw,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  Trash2
 } from 'lucide-react'
-import { getAdminBookings, updateBookingStatus } from '../lib/api'
+import { getAdminBookings, updateBookingStatus, sendManualConfirmationEmail, deleteBooking } from '../lib/api'
 import type { Booking } from '../lib/supabase'
 
 interface AdminBooking extends Booking {
@@ -30,6 +31,10 @@ const AdminPanel: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'confirmed' | 'cancelled'>('all')
   const [selectedBooking, setSelectedBooking] = useState<AdminBooking | null>(null)
+  const [sendingEmail, setSendingEmail] = useState(false)
+  const [emailMessage, setEmailMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const [deletingBookingId, setDeletingBookingId] = useState<number | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ bookingId: number, customerName: string } | null>(null)
 
   // Load bookings
   useEffect(() => {
@@ -64,6 +69,53 @@ const AdminPanel: React.FC = () => {
     } catch (err: any) {
       console.error('Error updating booking status:', err)
       setError(err.message || 'Failed to update booking status')
+    }
+  }
+
+  // Send manual confirmation email
+  const handleSendConfirmationEmail = async (booking: AdminBooking) => {
+    try {
+      setSendingEmail(true)
+      setEmailMessage(null)
+      setError('')
+      
+      await sendManualConfirmationEmail(booking)
+      
+      setEmailMessage({ type: 'success', text: 'Confirmation email sent successfully!' })
+      
+      // Clear message after 3 seconds
+      setTimeout(() => {
+        setEmailMessage(null)
+      }, 3000)
+    } catch (err: any) {
+      console.error('Error sending confirmation email:', err)
+      setEmailMessage({ type: 'error', text: err.message || 'Failed to send confirmation email' })
+    } finally {
+      setSendingEmail(false)
+    }
+  }
+
+  // Delete booking
+  const handleDeleteBooking = async (bookingId: number) => {
+    try {
+      setDeletingBookingId(bookingId)
+      setError('')
+      
+      await deleteBooking(bookingId)
+      
+      // Remove from local state
+      setBookings(prev => prev.filter(booking => booking.id !== bookingId))
+      setDeleteConfirm(null)
+      
+      // If deleted booking was selected, clear selection
+      if (selectedBooking?.id === bookingId) {
+        setSelectedBooking(null)
+      }
+    } catch (err: any) {
+      console.error('Error deleting booking:', err)
+      setError(err.message || 'Failed to delete booking')
+    } finally {
+      setDeletingBookingId(null)
     }
   }
 
@@ -347,6 +399,7 @@ const AdminPanel: React.FC = () => {
                         <button
                           onClick={() => setSelectedBooking(booking)}
                           className="text-blue-600 hover:text-blue-900"
+                          title="View details"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -368,6 +421,14 @@ const AdminPanel: React.FC = () => {
                             <CheckCircle className="w-4 h-4" />
                           </button>
                         )}
+                        <button
+                          onClick={() => setDeleteConfirm({ bookingId: booking.id, customerName: booking.customer_name })}
+                          className="text-red-600 hover:text-red-900"
+                          title="Delete booking"
+                          disabled={deletingBookingId === booking.id}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -458,37 +519,133 @@ const AdminPanel: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Email Status Message */}
+                {emailMessage && (
+                  <div className={`rounded-lg p-4 mb-4 ${
+                    emailMessage.type === 'success' 
+                      ? 'bg-green-50 border border-green-200 text-green-800' 
+                      : 'bg-red-50 border border-red-200 text-red-800'
+                  }`}>
+                    <div className="flex items-center">
+                      {emailMessage.type === 'success' ? (
+                        <CheckCircle className="w-5 h-5 mr-2" />
+                      ) : (
+                        <AlertCircle className="w-5 h-5 mr-2" />
+                      )}
+                      <p className="font-medium">{emailMessage.text}</p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Actions */}
-                <div className="flex space-x-3 pt-4 border-t">
-                  {selectedBooking.status === 'confirmed' && (
-                    <button
-                      onClick={() => {
-                        handleStatusUpdate(selectedBooking.id, 'cancelled')
-                        setSelectedBooking(null)
-                      }}
-                      className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
-                    >
-                      Cancel Booking
-                    </button>
-                  )}
-                  {selectedBooking.status === 'cancelled' && (
-                    <button
-                      onClick={() => {
-                        handleStatusUpdate(selectedBooking.id, 'confirmed')
-                        setSelectedBooking(null)
-                      }}
-                      className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                      Re-activate Booking
-                    </button>
-                  )}
+                <div className="flex flex-col space-y-3 pt-4 border-t">
                   <button
-                    onClick={() => setSelectedBooking(null)}
-                    className="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors"
+                    onClick={() => handleSendConfirmationEmail(selectedBooking)}
+                    disabled={sendingEmail}
+                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
-                    Close
+                    {sendingEmail ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="w-4 h-4 mr-2" />
+                        Send Confirmation Email
+                      </>
+                    )}
                   </button>
+                  
+                  <div className="flex space-x-3">
+                    {selectedBooking.status === 'confirmed' && (
+                      <button
+                        onClick={() => {
+                          handleStatusUpdate(selectedBooking.id, 'cancelled')
+                          setSelectedBooking(null)
+                        }}
+                        className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
+                      >
+                        Cancel Booking
+                      </button>
+                    )}
+                    {selectedBooking.status === 'cancelled' && (
+                      <button
+                        onClick={() => {
+                          handleStatusUpdate(selectedBooking.id, 'confirmed')
+                          setSelectedBooking(null)
+                        }}
+                        className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        Re-activate Booking
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        setSelectedBooking(null)
+                        setEmailMessage(null)
+                      }}
+                      className="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors"
+                    >
+                      Close
+                    </button>
+                  </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-900">Delete Booking</h2>
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <XCircle className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-gray-700 mb-2">
+                  Are you sure you want to delete the booking for <strong>{deleteConfirm.customerName}</strong>?
+                </p>
+                <p className="text-sm text-red-600 font-medium">
+                  ⚠️ This action cannot be undone. The booking will be permanently deleted.
+                </p>
+              </div>
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => handleDeleteBooking(deleteConfirm.bookingId)}
+                  disabled={deletingBookingId === deleteConfirm.bookingId}
+                  className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  {deletingBookingId === deleteConfirm.bookingId ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete Booking
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  disabled={deletingBookingId === deleteConfirm.bookingId}
+                  className="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>

@@ -299,10 +299,16 @@ export async function getAdminBookings() {
     .order('created_at', { ascending: false })
 
   if (error) {
-    throw new Error(error.message)
+    console.error('Error fetching admin bookings:', error)
+    throw new Error(error.message || 'Failed to load bookings')
   }
 
-  return data
+  // Ensure data structure is correct
+  return (data || []).map((booking: any) => ({
+    ...booking,
+    tours: booking.tours || { name: 'Unknown Tour' },
+    tour_dates: booking.tour_dates || { date: new Date().toISOString() }
+  }))
 }
 
 export async function updateBookingStatus(bookingId: number, status: 'pending' | 'confirmed' | 'cancelled') {
@@ -318,6 +324,57 @@ export async function updateBookingStatus(bookingId: number, status: 'pending' |
   }
 
   return data
+}
+
+// Delete booking API
+export async function deleteBooking(bookingId: number) {
+  const { error } = await supabase
+    .from('bookings')
+    .delete()
+    .eq('id', bookingId)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return { success: true }
+}
+
+// Send manual confirmation email to customer
+export async function sendManualConfirmationEmail(booking: {
+  id: number
+  customer_name: string
+  customer_email: string
+  customer_phone?: string
+  adults: number
+  children: number
+  total_price: number
+  special_requests?: string
+  created_at: string
+  tours: { name: string }
+  tour_dates: { date: string }
+}) {
+  const emailData = {
+    bookingId: booking.id,
+    customerName: booking.customer_name,
+    customerEmail: booking.customer_email,
+    customerPhone: booking.customer_phone || '',
+    tourName: booking.tours.name,
+    tourDate: booking.tour_dates.date,
+    adults: booking.adults,
+    children: booking.children,
+    totalPrice: booking.total_price,
+    specialRequests: booking.special_requests,
+    paymentStatus: 'confirmed' as const,
+    createdAt: booking.created_at
+  }
+
+  try {
+    await sendCustomerConfirmation(emailData)
+    return { success: true, message: 'Confirmation email sent successfully' }
+  } catch (error: any) {
+    throw new Error(error.message || 'Failed to send confirmation email')
+  }
 }
 
 // Get all tours
