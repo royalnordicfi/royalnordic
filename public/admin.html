@@ -482,6 +482,21 @@
                         
                         <div class="grid grid-cols-2 gap-4">
                             <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Pickup Time</label>
+                                <input type="time" id="manualPickupTime" 
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                                       placeholder="e.g., 20:00">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Pickup Place</label>
+                                <input type="text" id="manualPickupPlace" 
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                                       placeholder="e.g., Hotel address or location">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Adults *</label>
                                 <input type="number" id="manualAdults" required min="0" 
                                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
@@ -502,7 +517,13 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Special Requests</label>
                             <textarea id="manualSpecialRequests" rows="3" 
-                                      class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
+                                      class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                                      placeholder="Any special requests or notes..."></textarea>
+                        </div>
+                        
+                        <div class="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-800">
+                            <p class="font-medium mb-1">ℹ️ Note:</p>
+                            <p>Pickup time and place are optional. If not provided, default times will be used (20:00 for Northern Lights, 21:00 for Family-Friendly).</p>
                         </div>
                         
                         <div class="flex space-x-3 pt-4">
@@ -1149,6 +1170,8 @@ Booking ID: #${booking.id}`;
             // Set today's date as default
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('manualTourDate').value = today;
+            // Set default pickup time to 20:00
+            document.getElementById('manualPickupTime').value = '20:00';
         }
 
         // Close manual booking form
@@ -1167,6 +1190,8 @@ Booking ID: #${booking.id}`;
                 customer_phone: document.getElementById('manualCustomerPhone').value || '',
                 tour_name: document.getElementById('manualTourName').value,
                 tour_date: document.getElementById('manualTourDate').value,
+                pickup_time: document.getElementById('manualPickupTime').value || '',
+                pickup_place: document.getElementById('manualPickupPlace').value || '',
                 adults: parseInt(document.getElementById('manualAdults').value),
                 children: parseInt(document.getElementById('manualChildren').value),
                 total_price: parseFloat(document.getElementById('manualTotalPrice').value),
@@ -1215,8 +1240,15 @@ Booking ID: #${booking.id}`;
                 month: 'long', 
                 day: 'numeric' 
             });
-            const pickupTime = booking.tour_name === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : 
-                             booking.tour_name === 'Northern Lights Tour' ? ' at 20:00' : '';
+            // Use manual pickup time if provided, otherwise use defaults
+            let pickupTime = '';
+            if (booking.pickup_time) {
+                const [hours, minutes] = booking.pickup_time.split(':');
+                pickupTime = ` at ${hours}:${minutes}`;
+            } else {
+                pickupTime = booking.tour_name === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : 
+                           booking.tour_name === 'Northern Lights Tour' ? ' at 20:00' : '';
+            }
             
             return `
 <!DOCTYPE html>
@@ -1245,6 +1277,7 @@ Booking ID: #${booking.id}`;
       <h3>📋 Your Booking Details</h3>
       <p><strong>Tour:</strong> ${booking.tour_name}</p>
       <p><strong>Date:</strong> ${tourDate}${pickupTime}</p>
+      ${booking.pickup_place ? `<p><strong>Pickup Location:</strong> ${booking.pickup_place}</p>` : ''}
       <p><strong>Status:</strong> <span class="status-confirmed">CONFIRMED</span></p>
     </div>
     <div class="highlight">
@@ -1288,8 +1321,15 @@ Booking ID: #${booking.id}`;
                 month: 'long', 
                 day: 'numeric' 
             });
-            const pickupTime = booking.tour_name === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : 
-                             booking.tour_name === 'Northern Lights Tour' ? ' at 20:00' : '';
+            // Use manual pickup time if provided, otherwise use defaults
+            let pickupTime = '';
+            if (booking.pickup_time) {
+                const [hours, minutes] = booking.pickup_time.split(':');
+                pickupTime = ` at ${hours}:${minutes}`;
+            } else {
+                pickupTime = booking.tour_name === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : 
+                           booking.tour_name === 'Northern Lights Tour' ? ' at 20:00' : '';
+            }
             
             return `
 Booking Confirmed - Royal Nordic Tours
@@ -1301,7 +1341,7 @@ Your tour has been successfully confirmed. We're excited to show you the magic o
 📋 Your Booking Details:
 - Tour: ${booking.tour_name}
 - Date: ${tourDate}${pickupTime}
-- Status: CONFIRMED
+${booking.pickup_place ? `- Pickup Location: ${booking.pickup_place}\n` : ''}- Status: CONFIRMED
 
 👥 Your Group:
 - Adults: ${booking.adults}
@@ -1341,48 +1381,111 @@ Thank you for choosing Royal Nordic Tours!`;
         // Load tours for management
         async function loadToursForManagement() {
             try {
+                console.log('Loading tours for management...');
                 const { data: tours, error } = await supabase
                     .from('tours')
                     .select('*')
                     .order('id');
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase error:', error);
+                    throw error;
+                }
+                
+                console.log('Tours loaded:', tours);
                 
                 const content = document.getElementById('tourManagementContent');
+                if (!content) {
+                    console.error('Tour management content element not found');
+                    return;
+                }
+                
                 content.innerHTML = '';
                 
+                if (!tours || tours.length === 0) {
+                    content.innerHTML = '<p class="text-gray-600">No tours found in database.</p>';
+                    return;
+                }
+                
+                // Get booking counts for each tour
+                const bookingCounts = {};
+                try {
+                    const { data: bookings } = await supabase
+                        .from('bookings')
+                        .select('tour_id, status');
+                    
+                    if (bookings) {
+                        bookings.forEach(booking => {
+                            if (!bookingCounts[booking.tour_id]) {
+                                bookingCounts[booking.tour_id] = { total: 0, confirmed: 0 };
+                            }
+                            bookingCounts[booking.tour_id].total++;
+                            if (booking.status === 'confirmed') {
+                                bookingCounts[booking.tour_id].confirmed++;
+                            }
+                        });
+                    }
+                } catch (err) {
+                    console.warn('Could not load booking counts:', err);
+                }
+                
                 tours.forEach(tour => {
+                    const counts = bookingCounts[tour.id] || { total: 0, confirmed: 0 };
                     const tourDiv = document.createElement('div');
-                    tourDiv.className = 'border border-gray-200 rounded-lg p-4';
+                    tourDiv.className = 'border border-gray-200 rounded-lg p-4 mb-4';
                     tourDiv.innerHTML = `
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">${tour.name}</h3>
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">${tour.name}</h3>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    ${counts.confirmed} confirmed bookings • ${counts.total} total bookings
+                                </p>
+                            </div>
+                            <span class="text-xs text-gray-500">ID: ${tour.id}</span>
+                        </div>
                         <div class="grid grid-cols-3 gap-4 mb-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Adult Price (€)</label>
-                                <input type="number" id="tour-${tour.id}-adult" value="${tour.adult_price}" step="0.01" 
-                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Adult Price (€) *</label>
+                                <input type="number" id="tour-${tour.id}-adult" value="${tour.adult_price || 0}" step="0.01" min="0"
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <p class="text-xs text-gray-500 mt-1">Current: €${tour.adult_price || 0}</p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Child Price (€)</label>
-                                <input type="number" id="tour-${tour.id}-child" value="${tour.child_price}" step="0.01" 
-                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Child Price (€) *</label>
+                                <input type="number" id="tour-${tour.id}-child" value="${tour.child_price || 0}" step="0.01" min="0"
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <p class="text-xs text-gray-500 mt-1">Current: €${tour.child_price || 0}</p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Max Capacity</label>
-                                <input type="number" id="tour-${tour.id}-capacity" value="${tour.max_capacity}" 
-                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Max Capacity *</label>
+                                <input type="number" id="tour-${tour.id}-capacity" value="${tour.max_capacity || 8}" min="1"
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <p class="text-xs text-gray-500 mt-1">Current: ${tour.max_capacity || 8}</p>
                             </div>
                         </div>
-                        <button onclick="updateTourPricing(${tour.id})" 
-                                class="bg-blue-600 text-white py-2 px-4 rounded text-sm hover:bg-blue-700 transition-colors">
-                            💾 Save Changes
-                        </button>
+                        <div class="flex items-center justify-between">
+                            <button onclick="updateTourPricing(${tour.id})" 
+                                    class="bg-blue-600 text-white py-2 px-4 rounded text-sm hover:bg-blue-700 transition-colors font-medium">
+                                💾 Save Changes
+                            </button>
+                            <span class="text-xs text-gray-500">Changes affect the website immediately</span>
+                        </div>
                     `;
                     content.appendChild(tourDiv);
                 });
                 
+                console.log('Tour management UI loaded successfully');
+                
             } catch (error) {
                 console.error('Error loading tours:', error);
+                const content = document.getElementById('tourManagementContent');
+                if (content) {
+                    content.innerHTML = `<div class="bg-red-50 border border-red-200 rounded p-4">
+                        <p class="text-red-800 font-medium">Error loading tours</p>
+                        <p class="text-red-600 text-sm mt-1">${error.message}</p>
+                        <p class="text-red-600 text-xs mt-2">Check browser console for details</p>
+                    </div>`;
+                }
                 alert('❌ Error loading tours: ' + error.message);
             }
         }
@@ -1390,32 +1493,70 @@ Thank you for choosing Royal Nordic Tours!`;
         // Update tour pricing
         async function updateTourPricing(tourId) {
             try {
-                const adultPrice = parseFloat(document.getElementById(`tour-${tourId}-adult`).value);
-                const childPrice = parseFloat(document.getElementById(`tour-${tourId}-child`).value);
-                const maxCapacity = parseInt(document.getElementById(`tour-${tourId}-capacity`).value);
+                const adultPriceInput = document.getElementById(`tour-${tourId}-adult`);
+                const childPriceInput = document.getElementById(`tour-${tourId}-child`);
+                const capacityInput = document.getElementById(`tour-${tourId}-capacity`);
                 
-                if (isNaN(adultPrice) || isNaN(childPrice) || isNaN(maxCapacity)) {
-                    alert('❌ Please enter valid numbers');
+                if (!adultPriceInput || !childPriceInput || !capacityInput) {
+                    alert('❌ Could not find input fields');
                     return;
                 }
                 
-                const { error } = await supabase
+                const adultPrice = parseFloat(adultPriceInput.value);
+                const childPrice = parseFloat(childPriceInput.value);
+                const maxCapacity = parseInt(capacityInput.value);
+                
+                if (isNaN(adultPrice) || adultPrice < 0) {
+                    alert('❌ Please enter a valid adult price (must be a positive number)');
+                    adultPriceInput.focus();
+                    return;
+                }
+                
+                if (isNaN(childPrice) || childPrice < 0) {
+                    alert('❌ Please enter a valid child price (must be a positive number)');
+                    childPriceInput.focus();
+                    return;
+                }
+                
+                if (isNaN(maxCapacity) || maxCapacity < 1) {
+                    alert('❌ Please enter a valid capacity (must be at least 1)');
+                    capacityInput.focus();
+                    return;
+                }
+                
+                // Confirm before updating
+                const tourName = adultPriceInput.closest('.border').querySelector('h3').textContent;
+                const confirmed = confirm(`Update pricing for "${tourName}"?\n\nAdult: €${adultPrice}\nChild: €${childPrice}\nCapacity: ${maxCapacity}`);
+                if (!confirmed) return;
+                
+                console.log('Updating tour:', tourId, { adultPrice, childPrice, maxCapacity });
+                
+                const { data, error } = await supabase
                     .from('tours')
                     .update({
                         adult_price: adultPrice,
                         child_price: childPrice,
                         max_capacity: maxCapacity
                     })
-                    .eq('id', tourId);
+                    .eq('id', tourId)
+                    .select();
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase error:', error);
+                    throw error;
+                }
                 
-                alert('✅ Tour pricing updated successfully!');
-                await loadToursForManagement();
+                if (data && data.length > 0) {
+                    console.log('Tour updated successfully:', data[0]);
+                    alert('✅ Tour pricing updated successfully!\n\nThe changes are now live on the website.');
+                    await loadToursForManagement();
+                } else {
+                    throw new Error('No data returned from update. Tour may not exist.');
+                }
                 
             } catch (error) {
                 console.error('Error updating tour pricing:', error);
-                alert('❌ Error updating tour pricing: ' + error.message);
+                alert('❌ Error updating tour pricing: ' + (error.message || 'Unknown error') + '\n\nPlease check the browser console for details.');
             }
         }
 
