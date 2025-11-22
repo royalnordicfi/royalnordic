@@ -11,7 +11,7 @@ const NorthernLightsTour = () => {
   const [tourData, setTourData] = useState({
     adult_price: 179,
     child_price: 129,
-    max_capacity: 8
+    max_capacity: 100
   });
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +24,7 @@ const NorthernLightsTour = () => {
           setTourData({
             adult_price: northernLightsTour.adult_price,
             child_price: northernLightsTour.child_price,
-            max_capacity: northernLightsTour.max_capacity
+            max_capacity: northernLightsTour.max_capacity || 100
           });
         }
       } catch (error) {
@@ -40,7 +40,7 @@ const NorthernLightsTour = () => {
 
   const features = [
     'Guaranteed Northern Lights - 100% money back guarantee',
-    'Small group experience (max 8 people)',
+    'Small group experience',
     'Expert guides with experience',
     'Pick up and drop off from your accommodation',
     'Warm drinks and snacks',
@@ -137,7 +137,7 @@ const NorthernLightsTour = () => {
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Group Size</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">Max {tourData.max_capacity} people</p>
+            <p className="text-gray-300 text-sm sm:text-base">Small group experience</p>
           </div>
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">

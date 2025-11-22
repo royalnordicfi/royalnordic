@@ -64,106 +64,64 @@
     <!-- Main Admin Panel -->
     <div id="adminPanel" class="hidden min-h-screen">
         <!-- Header -->
-        <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+        <header class="bg-gray-800 text-white shadow-lg">
             <div class="px-4 py-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-3xl font-bold">Royal Nordic Admin Dashboard</h1>
-                        <p class="text-blue-100 mt-1">Complete tour management system</p>
-                        <p class="text-sm text-blue-200" id="userInfo">Logged in as: admin@royalnordic.fi</p>
+                        <h1 class="text-2xl font-bold">Royal Nordic Admin</h1>
+                        <p class="text-gray-300 mt-1 text-sm">Booking Management</p>
+                        <p class="text-xs text-gray-400 mt-1" id="userInfo">Logged in as: admin@royalnordic.fi</p>
                     </div>
                     <div class="text-right">
-                        <div class="text-sm text-blue-200">Last updated</div>
-                        <div class="text-lg font-semibold" id="lastUpdated">Just now</div>
-                        <button id="logoutBtn" class="mt-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                            Secure Logout
+                        <div class="text-xs text-gray-400">Last updated</div>
+                        <div class="text-sm font-semibold" id="lastUpdated">Just now</div>
+                        <button id="logoutBtn" class="mt-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors">
+                            Logout
                         </button>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Dashboard Overview -->
-        <div class="px-4 py-6">
-            <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">Dashboard Overview</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-blue-600 mb-2" id="todayBookings">0</div>
-                        <div class="text-sm text-gray-600">Bookings Today</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-green-600 mb-2" id="thisWeekBookings">0</div>
-                        <div class="text-sm text-gray-600">This Week</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-purple-600 mb-2" id="thisMonthBookings">0</div>
-                        <div class="text-sm text-gray-600">This Month</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Stats Cards -->
-        <div class="p-4">
+        <div class="px-4 py-4">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white rounded-xl p-4 shadow-sm border">
-                    <div class="text-2xl font-bold text-blue-600" id="totalBookings">0</div>
+                <div class="bg-white rounded-lg p-4 border border-gray-200">
+                    <div class="text-2xl font-bold text-gray-900" id="totalBookings">0</div>
                     <div class="text-sm text-gray-600">Total Bookings</div>
                 </div>
-                <div class="bg-white rounded-xl p-4 shadow-sm border">
+                <div class="bg-white rounded-lg p-4 border border-gray-200">
                     <div class="text-2xl font-bold text-green-600" id="confirmedBookings">0</div>
                     <div class="text-sm text-gray-600">Confirmed</div>
                 </div>
-                <div class="bg-white rounded-xl p-4 shadow-sm border">
-                    <div class="text-2xl font-bold text-emerald-600" id="totalRevenue">€0</div>
-                    <div class="text-sm text-gray-600">Total Revenue</div>
+                <div class="bg-white rounded-lg p-4 border border-gray-200">
+                    <div class="text-2xl font-bold text-gray-900" id="totalRevenue">€0</div>
+                    <div class="text-sm text-gray-600">Revenue</div>
                 </div>
-                <div class="bg-white rounded-xl p-4 shadow-sm border">
-                    <div class="text-2xl font-bold text-purple-600" id="totalParticipants">0</div>
+                <div class="bg-white rounded-lg p-4 border border-gray-200">
+                    <div class="text-2xl font-bold text-gray-900" id="totalParticipants">0</div>
                     <div class="text-sm text-gray-600">Participants</div>
                 </div>
             </div>
         </div>
 
         <!-- Quick Actions -->
-        <div class="px-4 pb-6">
-            <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="px-4 pb-4">
+            <div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+                <div class="flex flex-wrap gap-2">
                     <button onclick="loadBookings()" 
-                            class="bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
-                        Refresh Data
-                    </button>
-                    <button onclick="loadTourData()" 
-                            class="bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
-                        Refresh Tours
+                            class="bg-gray-700 text-white py-2 px-4 rounded text-sm hover:bg-gray-800 transition-colors">
+                        Refresh
                     </button>
                     <button onclick="exportBookings()" 
-                            class="bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        Export Data
-                    </button>
-                    <button onclick="showTourManagement()" 
-                            class="bg-orange-600 text-white py-3 px-4 rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                        </svg>
-                        Tour Settings
+                            class="bg-gray-600 text-white py-2 px-4 rounded text-sm hover:bg-gray-700 transition-colors">
+                        Export CSV
                     </button>
                 </div>
             </div>
                 </div>
                 
-        <!-- Tour Management Section -->
+        <!-- Tour Management Section (Hidden) -->
         <div id="tourManagement" class="px-4 pb-6 hidden">
             <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Tour Management</h2>
@@ -354,47 +312,6 @@
             </div>
         </div>
 
-        <!-- Search and Filter Section -->
-        <div class="px-4 pb-6">
-            <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Search & Filter Bookings</h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Search by Name/Email</label>
-                        <input type="text" id="searchInput" placeholder="Enter name or email..." 
-                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Tour</label>
-                        <select id="tourFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">All Tours</option>
-                            <option value="Northern Lights Tour">Northern Lights Tour</option>
-                            <option value="Snowshoe Adventure">Snowshoe Adventure</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
-                        <select id="statusFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">All Statuses</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
-                        <input type="date" id="dateFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                </div>
-                <div class="mt-4 flex space-x-2">
-                    <button onclick="applyFilters()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
-                        Apply Filters
-                    </button>
-                    <button onclick="clearFilters()" class="bg-gray-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700">
-                        Clear Filters
-                    </button>
-                </div>
-            </div>
-        </div>
 
         <!-- Availability Management Section -->
         <div id="availabilitySection" class="px-4 pb-6 hidden">
@@ -469,11 +386,38 @@
             </div>
         </div>
 
+        <!-- Search and Filter Section -->
+        <div class="px-4 pb-4">
+            <div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                        <input type="text" id="searchInput" placeholder="Name or email..." 
+                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-gray-500 focus:border-gray-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select id="statusFilter" class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-white">
+                            <option value="">All</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="pending">Pending</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="applyFilters()" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 w-full">
+                            Filter
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Bookings List -->
         <div class="px-4 pb-6">
-            <div class="bg-white rounded-xl shadow-sm border">
-                <div class="p-4 border-b">
-                    <h2 class="text-lg font-semibold text-gray-900">Recent Bookings</h2>
+            <div class="bg-white rounded-lg border border-gray-200">
+                <div class="p-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">All Bookings</h2>
                 </div>
                 
                 <div id="bookingsList" class="divide-y divide-gray-200">
@@ -544,7 +488,6 @@
                     document.getElementById('userInfo').textContent = `Logged in as: ${email}`;
                     
                     loadBookings();
-                    loadTourData();
                     updateStats();
                 }, 1000);
                 } else {
@@ -687,9 +630,8 @@
         // Create booking element
         function createBookingElement(booking) {
             const div = document.createElement('div');
-            div.className = 'p-6 hover:bg-gray-50 transition-colors border-b border-gray-100';
+            div.className = 'p-4 hover:bg-gray-50 transition-colors';
             
-            const statusClass = `status-${booking.status.toLowerCase()}`;
             const statusColors = {
                 'confirmed': 'bg-green-100 text-green-800',
                 'pending': 'bg-yellow-100 text-yellow-800',
@@ -701,11 +643,11 @@
                 <div class="flex items-start justify-between">
                     <div class="flex-1">
                         <div class="flex items-center space-x-3 mb-3">
-                            <h3 class="text-lg font-semibold text-gray-900">${booking.customer_name}</h3>
-                            <span class="px-3 py-1 rounded-full text-xs font-medium ${statusColors[booking.status] || 'bg-gray-100 text-gray-800'}">
+                            <h3 class="text-base font-semibold text-gray-900">${booking.customer_name}</h3>
+                            <span class="px-2 py-1 rounded text-xs font-medium ${statusColors[booking.status] || 'bg-gray-100 text-gray-800'}">
                                 ${booking.status.toUpperCase()}
                             </span>
-                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded">
                                 #${booking.id}
                             </span>
                         </div>
@@ -761,19 +703,20 @@
                         ` : ''}
                     </div>
                     
-                    <div class="ml-6 flex flex-col space-y-2">
-                        <select class="status-select border border-gray-300 rounded px-3 py-2 text-sm font-medium" 
+                    <div class="ml-6 flex flex-col space-y-2 min-w-[200px]">
+                        <select class="status-select border border-gray-300 rounded px-3 py-2 text-sm bg-white" 
                                 data-booking-id="${booking.id}" data-current-status="${booking.status}">
-                            <option value="confirmed" ${booking.status === 'confirmed' ? 'selected' : ''}>✅ Confirmed</option>
-                            <option value="pending_crypto_payment" ${booking.status === 'pending_crypto_payment' ? 'selected' : ''}>🪙 Pending Crypto Payment</option>
-                            <option value="cancelled" ${booking.status === 'cancelled' ? 'selected' : ''}>❌ Cancelled</option>
+                            <option value="pending" ${booking.status === 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="confirmed" ${booking.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                            <option value="pending_crypto_payment" ${booking.status === 'pending_crypto_payment' ? 'selected' : ''}>Pending Crypto</option>
+                            <option value="cancelled" ${booking.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
                         </select>
-                        <button onclick="viewBookingDetails(${booking.id})" 
-                                class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            👁️ View Details
+                        <button onclick="sendConfirmationEmail(${booking.id})" 
+                                class="bg-green-600 text-white py-2 px-3 rounded text-sm hover:bg-green-700 transition-colors">
+                            📧 Send Email
                         </button>
                         <button onclick="deleteBooking(${booking.id})" 
-                                class="text-red-600 hover:text-red-800 text-sm font-medium">
+                                class="bg-red-600 text-white py-2 px-3 rounded text-sm hover:bg-red-700 transition-colors">
                             🗑️ Delete
                         </button>
                     </div>
@@ -792,16 +735,12 @@
         // Update booking status
         async function updateBookingStatus(bookingId, newStatus) {
             try {
-                console.log(`Updating booking ${bookingId} to status: ${newStatus}`);
-                
-                // Get the current booking to check if we need to update calendar slots
                 const currentBooking = currentBookings.find(b => b.id === bookingId);
                 if (!currentBooking) {
                     alert('Booking not found');
                     return;
                 }
                 
-                // Update booking status in Supabase
                 const { error: bookingError } = await supabase
                     .from('bookings')
                     .update({ status: newStatus })
@@ -809,63 +748,200 @@
                 
                 if (bookingError) {
                     console.error('Error updating booking status:', bookingError);
-                    alert('Error updating booking status');
+                    alert('❌ Error updating status: ' + bookingError.message);
                     return;
                 }
                 
-                // Note: Calendar slots are automatically managed by database triggers
-                // No manual slot management needed here
-                
-                // Note: Calendar slots are automatically managed by database triggers
-                // No manual slot management needed here
-                
-                // Reload bookings and tour data immediately to show updated status
+                // Reload bookings
                 await loadBookings();
-                await loadTourData();
-                
-                // Show success message
-                const statusMessages = {
-                    'confirmed': '✅ Booking confirmed and calendar slots reserved',
-                    'cancelled': '❌ Booking cancelled and calendar slots freed up',
-                    'pending_crypto_payment': '🪙 Booking marked as pending crypto payment'
-                };
-                
-                alert(statusMessages[newStatus] || 'Status updated successfully');
-                
-                // Force refresh the page to ensure all data is up to date
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
+                alert('✅ Status updated successfully');
                 
             } catch (error) {
                 console.error('Error updating booking status:', error);
-                alert('Error updating booking status');
+                alert('❌ Error updating booking status');
             }
+        }
+
+        // Send confirmation email
+        async function sendConfirmationEmail(bookingId) {
+            try {
+                const booking = currentBookings.find(b => b.id === bookingId);
+                if (!booking) {
+                    alert('Booking not found');
+                    return;
+                }
+
+                // Generate email HTML and text
+                const emailHTML = generateCustomerConfirmationHTML(booking);
+                const emailText = generateCustomerConfirmationText(booking);
+
+                // Send via Supabase Edge Function
+                const response = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${supabaseKey}`,
+                    },
+                    body: JSON.stringify({
+                        to: [booking.customer_email],
+                        subject: `Booking Confirmed: ${booking.tour_name} - Royal Nordic`,
+                        html: emailHTML,
+                        text: emailText
+                    }),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to send email');
+                }
+
+                alert('✅ Confirmation email sent successfully!');
+            } catch (error) {
+                console.error('Error sending confirmation email:', error);
+                alert('❌ Error sending email: ' + error.message);
+            }
+        }
+
+        // Generate customer confirmation HTML
+        function generateCustomerConfirmationHTML(booking) {
+            const tourDate = new Date(booking.tour_date).toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            const pickupTime = booking.tour_name === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : 
+                             booking.tour_name === 'Northern Lights Tour' ? ' at 20:00' : '';
+            
+            return `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .header { background: #1f2937; color: white; padding: 20px; text-align: center; }
+    .content { padding: 20px; }
+    .booking-details { background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9; }
+    .highlight { background: #f9fafb; padding: 15px; border-radius: 6px; margin: 10px 0; }
+    .footer { background: #f3f4f6; padding: 20px; text-align: center; color: #6b7280; }
+    .status-confirmed { color: #059669; font-weight: bold; }
+    .contact-info { background: #fef3c7; padding: 15px; border-radius: 6px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🌟 Booking Confirmed!</h1>
+    <p>Royal Nordic Tours</p>
+  </div>
+  <div class="content">
+    <h2>Thank you for your booking, ${booking.customer_name}!</h2>
+    <p>Your tour has been successfully confirmed. We're excited to show you the magic of Lapland!</p>
+    <div class="booking-details">
+      <h3>📋 Your Booking Details</h3>
+      <p><strong>Booking ID:</strong> #${booking.id}</p>
+      <p><strong>Tour:</strong> ${booking.tour_name}</p>
+      <p><strong>Date:</strong> ${tourDate}${pickupTime}</p>
+      <p><strong>Status:</strong> <span class="status-confirmed">CONFIRMED</span></p>
+    </div>
+    <div class="highlight">
+      <h3>👥 Your Group</h3>
+      <p><strong>Adults:</strong> ${booking.adults}</p>
+      <p><strong>Children:</strong> ${booking.children}</p>
+      <p><strong>Total Amount:</strong> €${booking.total_price}</p>
+    </div>
+    ${booking.special_requests ? `
+    <div class="highlight">
+      <h3>📝 Your Special Requests</h3>
+      <p>${booking.special_requests}</p>
+    </div>
+    ` : ''}
+    <div class="contact-info">
+      <h3>📞 Contact Information</h3>
+      <p><strong>Email:</strong> contact@royalnordic.fi</p>
+      <p><strong>Phone:</strong> +358 40 123 4567</p>
+      <p><strong>Website:</strong> royalnordic.fi</p>
+    </div>
+    <div class="highlight">
+      <h3>🎯 What's Next?</h3>
+      <p>• You will receive a reminder email 24 hours before your tour</p>
+      <p>• Please arrive 15 minutes before your scheduled time</p>
+      <p>• Dress warmly for Arctic conditions</p>
+      <p>• Contact us if you have any questions</p>
+    </div>
+  </div>
+  <div class="footer">
+    <p>Thank you for choosing Royal Nordic Tours!</p>
+    <p>Booking ID: #${booking.id}</p>
+  </div>
+</body>
+</html>`;
+        }
+
+        // Generate customer confirmation text
+        function generateCustomerConfirmationText(booking) {
+            const tourDate = new Date(booking.tour_date).toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            const pickupTime = booking.tour_name === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : 
+                             booking.tour_name === 'Northern Lights Tour' ? ' at 20:00' : '';
+            
+            return `
+Booking Confirmed - Royal Nordic Tours
+
+Thank you for your booking, ${booking.customer_name}!
+
+Your tour has been successfully confirmed. We're excited to show you the magic of Lapland!
+
+📋 Your Booking Details:
+- Booking ID: #${booking.id}
+- Tour: ${booking.tour_name}
+- Date: ${tourDate}${pickupTime}
+- Status: CONFIRMED
+
+👥 Your Group:
+- Adults: ${booking.adults}
+- Children: ${booking.children}
+- Total Amount: €${booking.total_price}
+
+${booking.special_requests ? `
+📝 Your Special Requests:
+${booking.special_requests}
+` : ''}
+
+📞 Contact Information:
+- Email: contact@royalnordic.fi
+- Phone: +358 40 123 4567
+- Website: royalnordic.fi
+
+🎯 What's Next?
+• You will receive a reminder email 24 hours before your tour
+• Please arrive 15 minutes before your scheduled time
+• Dress warmly for Arctic conditions
+• Contact us if you have any questions
+
+Thank you for choosing Royal Nordic Tours!
+Booking ID: #${booking.id}`;
         }
 
         // Delete booking permanently
         async function deleteBooking(bookingId) {
             try {
                 // Confirm deletion
-                const confirmed = confirm('⚠️ Are you sure you want to PERMANENTLY DELETE this booking?\n\nThis action cannot be undone and will free up calendar slots.');
+                const confirmed = confirm('⚠️ Are you sure you want to PERMANENTLY DELETE this booking?\n\nThis action cannot be undone.');
                 if (!confirmed) return;
                 
                 console.log(`Deleting booking ${bookingId}`);
                 
-                // Get the current booking to check if we need to free up calendar slots
                 const currentBooking = currentBookings.find(b => b.id === bookingId);
                 if (!currentBooking) {
                     alert('Booking not found');
                     return;
                 }
                 
-                console.log('Current booking found:', currentBooking);
-                
-                // Note: Calendar slots are automatically managed by database triggers
-                // No manual slot management needed here
-                
                 // Delete the booking from database
-                console.log('Attempting to delete booking from database...');
                 const { error: deleteError } = await supabase
                     .from('bookings')
                     .delete()
@@ -873,39 +949,28 @@
                 
                 if (deleteError) {
                     console.error('Error deleting booking:', deleteError);
-                    console.log('Delete error details:', deleteError);
-                    
-                    // If direct deletion fails, try updating status to 'deleted' instead
-                    console.log('Trying to mark booking as deleted instead...');
-                    const { error: updateError } = await supabase
+                    // If deletion fails due to RLS, try to cancel it instead
+                    const { error: cancelError } = await supabase
                         .from('bookings')
                         .update({ status: 'cancelled' })
                         .eq('id', bookingId);
                     
-                    if (updateError) {
-                        console.error('Error marking booking as cancelled:', updateError);
-                        alert('Error deleting booking. Please try cancelling it instead.');
+                    if (cancelError) {
+                        alert('❌ Error: Cannot delete booking. ' + deleteError.message);
                         return;
                 } else {
-                        console.log('Booking marked as cancelled instead of deleted');
-                        alert('Booking marked as cancelled (deletion not allowed by database policy)');
+                        alert('⚠️ Booking could not be deleted, but has been marked as cancelled.');
                     }
                 } else {
-                    console.log(`Booking ${bookingId} deleted successfully`);
+                    alert('✅ Booking deleted successfully');
                 }
                 
-                // Reload bookings and tour data immediately
+                // Reload bookings
                 await loadBookings();
-                await loadTourData();
-                
-                // Show success message
-                if (!deleteError) {
-                    alert('🗑️ Booking deleted permanently and calendar slots freed up');
-                }
                 
             } catch (error) {
                 console.error('Error deleting booking:', error);
-                alert('Error deleting booking: ' + error.message);
+                alert('❌ Error deleting booking: ' + error.message);
             }
         }
 
@@ -913,7 +978,6 @@
         function updateStats(bookings = []) {
             const total = bookings.length;
             const confirmed = bookings.filter(b => b.status === 'confirmed').length;
-            const cancelled = bookings.filter(b => b.status === 'cancelled').length;
             const totalRevenue = bookings
                 .filter(b => b.status === 'confirmed')
                 .reduce((sum, b) => sum + b.total_price, 0);
@@ -921,54 +985,16 @@
                 .filter(b => b.status === 'confirmed')
                 .reduce((sum, b) => sum + b.adults + b.children, 0);
             
-            // Calculate time-based stats
-            const today = new Date().toISOString().split('T')[0];
-            const todayBookings = bookings.filter(b => b.tour_date === today).length;
-            
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            const thisWeekBookings = bookings.filter(b => new Date(b.created_at) >= weekAgo).length;
-            
-            const monthAgo = new Date();
-            monthAgo.setMonth(monthAgo.getMonth() - 1);
-            const thisMonthBookings = bookings.filter(b => new Date(b.created_at) >= monthAgo).length;
-            
             // Update main stats
             document.getElementById('totalBookings').textContent = total;
             document.getElementById('confirmedBookings').textContent = confirmed;
-            document.getElementById('totalRevenue').textContent = `€${totalRevenue}`;
+            document.getElementById('totalRevenue').textContent = `€${totalRevenue.toFixed(2)}`;
             document.getElementById('totalParticipants').textContent = totalParticipants;
-            
-            // Update dashboard overview
-            document.getElementById('todayBookings').textContent = todayBookings;
-            document.getElementById('thisWeekBookings').textContent = thisWeekBookings;
-            document.getElementById('thisMonthBookings').textContent = thisMonthBookings;
             
             // Update last updated time
             document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
         }
 
-        // View booking details
-        function viewBookingDetails(bookingId) {
-            const booking = currentBookings.find(b => b.id === bookingId);
-            if (!booking) return;
-            
-            const details = `
-Booking #${booking.id}
-Customer: ${booking.customer_name}
-Email: ${booking.customer_email}
-Phone: ${booking.customer_phone || 'Not provided'}
-Tour: ${booking.tour_name}
-Date: ${new Date(booking.tour_date).toLocaleDateString('en-GB')}
-Participants: ${booking.adults} adults, ${booking.children} children
-Total Price: €${booking.total_price}
-Status: ${booking.status}
-Booked: ${new Date(booking.created_at).toLocaleString('en-GB')}
-${booking.special_requests ? `Special Requests: ${booking.special_requests}` : ''}
-            `;
-            
-            alert(details);
-        }
 
         // Export bookings
         function exportBookings() {
@@ -1342,20 +1368,16 @@ ${booking.special_requests ? `Special Requests: ${booking.special_requests}` : '
         // Apply filters
         function applyFilters() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const tourFilter = document.getElementById('tourFilter').value;
             const statusFilter = document.getElementById('statusFilter').value;
-            const dateFilter = document.getElementById('dateFilter').value;
 
             filteredBookings = currentBookings.filter(booking => {
                 const matchesSearch = !searchTerm || 
                     booking.customer_name.toLowerCase().includes(searchTerm) ||
                     booking.customer_email.toLowerCase().includes(searchTerm);
                 
-                const matchesTour = !tourFilter || booking.tour_name === tourFilter;
                 const matchesStatus = !statusFilter || booking.status === statusFilter;
-                const matchesDate = !dateFilter || booking.tour_date === dateFilter;
 
-                return matchesSearch && matchesTour && matchesStatus && matchesDate;
+                return matchesSearch && matchesStatus;
             });
 
             displayBookings(filteredBookings);
@@ -1365,9 +1387,7 @@ ${booking.special_requests ? `Special Requests: ${booking.special_requests}` : '
         // Clear filters
         function clearFilters() {
             document.getElementById('searchInput').value = '';
-            document.getElementById('tourFilter').value = '';
             document.getElementById('statusFilter').value = '';
-            document.getElementById('dateFilter').value = '';
             
             filteredBookings = currentBookings;
             displayBookings(currentBookings);
@@ -1450,6 +1470,10 @@ ${booking.special_requests ? `Special Requests: ${booking.special_requests}` : '
             const searchInput = document.getElementById('searchInput');
             if (searchInput) {
                 searchInput.addEventListener('input', applyFilters);
+            }
+            const statusFilter = document.getElementById('statusFilter');
+            if (statusFilter) {
+                statusFilter.addEventListener('change', applyFilters);
             }
         });
 

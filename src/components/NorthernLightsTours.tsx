@@ -11,7 +11,7 @@ const NorthernLightsTours: React.FC = () => {
       description: "Chase the Aurora Borealis with our expert guides. We guarantee you'll see the lights or get a full refund!",
       image: "/lights1.jpg",
       duration: "1-10 hours",
-      groupSize: "Up to 8 people",
+      groupSize: "Small group experience",
       location: "Rovaniemi, Lapland",
       features: ["Professional guide", "Hotel pickup", "Photography assistance", "Warm drinks and snacks"],
       route: "/northern-lights-tour",
