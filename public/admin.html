@@ -117,6 +117,14 @@
                             class="bg-gray-600 text-white py-2 px-4 rounded text-sm hover:bg-gray-700 transition-colors">
                         Export CSV
                     </button>
+                    <button onclick="showManualBookingForm()" 
+                            class="bg-green-600 text-white py-2 px-4 rounded text-sm hover:bg-green-700 transition-colors">
+                        ➕ Manual Booking
+                    </button>
+                    <button onclick="showTourManagement()" 
+                            class="bg-blue-600 text-white py-2 px-4 rounded text-sm hover:bg-blue-700 transition-colors">
+                        ⚙️ Tour Prices
+                    </button>
                 </div>
             </div>
                 </div>
@@ -422,6 +430,112 @@
                 
                 <div id="bookingsList" class="divide-y divide-gray-200">
                     <!-- Bookings will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Manual Booking Form Modal -->
+        <div id="manualBookingModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-gray-900">Create Manual Booking Confirmation</h2>
+                        <button onclick="closeManualBookingForm()" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <form id="manualBookingForm" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Customer Name *</label>
+                                <input type="text" id="manualCustomerName" required 
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Customer Email *</label>
+                                <input type="email" id="manualCustomerEmail" required 
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Customer Phone</label>
+                            <input type="tel" id="manualCustomerPhone" 
+                                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tour Name *</label>
+                            <input type="text" id="manualTourName" required 
+                                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm" 
+                                   placeholder="e.g., Northern Lights Tour">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tour Date *</label>
+                            <input type="date" id="manualTourDate" required 
+                                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Adults *</label>
+                                <input type="number" id="manualAdults" required min="0" 
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Children *</label>
+                                <input type="number" id="manualChildren" required min="0" 
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Total Price (€) *</label>
+                            <input type="number" id="manualTotalPrice" required step="0.01" min="0" 
+                                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Special Requests</label>
+                            <textarea id="manualSpecialRequests" rows="3" 
+                                      class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
+                        </div>
+                        
+                        <div class="flex space-x-3 pt-4">
+                            <button type="submit" 
+                                    class="flex-1 bg-green-600 text-white py-2 px-4 rounded text-sm hover:bg-green-700 transition-colors">
+                                📧 Send Confirmation Email
+                            </button>
+                            <button type="button" onclick="closeManualBookingForm()" 
+                                    class="flex-1 bg-gray-600 text-white py-2 px-4 rounded text-sm hover:bg-gray-700 transition-colors">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tour Management Modal -->
+        <div id="tourManagementModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-gray-900">Tour Price Management</h2>
+                        <button onclick="closeTourManagement()" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div id="tourManagementContent" class="space-y-6">
+                        <!-- Tours will be loaded here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -771,6 +885,13 @@
                     return;
                 }
 
+                // Show loading state
+                const button = event?.target || document.querySelector(`button[onclick="sendConfirmationEmail(${bookingId})"]`);
+                if (button) {
+                    button.disabled = true;
+                    button.textContent = 'Sending...';
+                }
+
                 // Generate email HTML and text
                 const emailHTML = generateCustomerConfirmationHTML(booking);
                 const emailText = generateCustomerConfirmationText(booking);
@@ -791,14 +912,27 @@
                 });
 
                 if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Failed to send email');
+                    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(errorData.error || 'Failed to send email');
                 }
 
-                alert('✅ Confirmation email sent successfully!');
+                alert('✅ Confirmation email sent successfully to ' + booking.customer_email + '!');
+                
+                // Reset button
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = '📧 Send Email';
+                }
             } catch (error) {
                 console.error('Error sending confirmation email:', error);
                 alert('❌ Error sending email: ' + error.message);
+                
+                // Reset button
+                const button = event?.target || document.querySelector(`button[onclick="sendConfirmationEmail(${bookingId})"]`);
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = '📧 Send Email';
+                }
             }
         }
 
@@ -941,6 +1075,17 @@ Booking ID: #${booking.id}`;
                     return;
                 }
                 
+                // First, we need to get the tour_date_id to potentially free up slots
+                const { data: bookingData, error: fetchError } = await supabase
+                    .from('bookings')
+                    .select('tour_date_id')
+                    .eq('id', bookingId)
+                    .single();
+                
+                if (fetchError) {
+                    console.error('Error fetching booking:', fetchError);
+                }
+                
                 // Delete the booking from database
                 const { error: deleteError } = await supabase
                     .from('bookings')
@@ -948,29 +1093,329 @@ Booking ID: #${booking.id}`;
                     .eq('id', bookingId);
                 
                 if (deleteError) {
-                    console.error('Error deleting booking:', deleteError);
-                    // If deletion fails due to RLS, try to cancel it instead
+                    console.error('Delete error:', deleteError);
+                    // Try to cancel instead if deletion fails
                     const { error: cancelError } = await supabase
                         .from('bookings')
                         .update({ status: 'cancelled' })
                         .eq('id', bookingId);
                     
                     if (cancelError) {
-                        alert('❌ Error: Cannot delete booking. ' + deleteError.message);
+                        alert('❌ Error: Cannot delete or cancel booking. ' + deleteError.message + '\n\nPlease check database permissions.');
                         return;
-                } else {
-                        alert('⚠️ Booking could not be deleted, but has been marked as cancelled.');
+                    } else {
+                        alert('⚠️ Booking could not be deleted (permission issue), but has been marked as cancelled.');
+                        await loadBookings();
+                        return;
                     }
-                } else {
-                    alert('✅ Booking deleted successfully');
                 }
                 
-                // Reload bookings
+                // If deletion succeeded, update the tour_date available slots
+                if (bookingData && bookingData.tour_date_id) {
+                    // Get current booking count for this date
+                    const { data: dateData } = await supabase
+                        .from('tour_dates')
+                        .select('available_slots, total_booked')
+                        .eq('id', bookingData.tour_date_id)
+                        .single();
+                    
+                    if (dateData) {
+                        // Increment available slots and decrement total_booked
+                        const newAvailable = (dateData.available_slots || 0) + (currentBooking.adults + currentBooking.children);
+                        const newTotalBooked = Math.max(0, (dateData.total_booked || 0) - (currentBooking.adults + currentBooking.children));
+                        
+                        await supabase
+                            .from('tour_dates')
+                            .update({
+                                available_slots: newAvailable,
+                                total_booked: newTotalBooked
+                            })
+                            .eq('id', bookingData.tour_date_id);
+                    }
+                }
+                
+                alert('✅ Booking deleted successfully');
                 await loadBookings();
                 
             } catch (error) {
                 console.error('Error deleting booking:', error);
                 alert('❌ Error deleting booking: ' + error.message);
+            }
+        }
+
+        // Show manual booking form
+        function showManualBookingForm() {
+            document.getElementById('manualBookingModal').classList.remove('hidden');
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('manualTourDate').value = today;
+        }
+
+        // Close manual booking form
+        function closeManualBookingForm() {
+            document.getElementById('manualBookingModal').classList.add('hidden');
+            document.getElementById('manualBookingForm').reset();
+        }
+
+        // Handle manual booking form submission
+        document.getElementById('manualBookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const bookingData = {
+                customer_name: document.getElementById('manualCustomerName').value,
+                customer_email: document.getElementById('manualCustomerEmail').value,
+                customer_phone: document.getElementById('manualCustomerPhone').value || '',
+                tour_name: document.getElementById('manualTourName').value,
+                tour_date: document.getElementById('manualTourDate').value,
+                adults: parseInt(document.getElementById('manualAdults').value),
+                children: parseInt(document.getElementById('manualChildren').value),
+                total_price: parseFloat(document.getElementById('manualTotalPrice').value),
+                special_requests: document.getElementById('manualSpecialRequests').value || ''
+            };
+
+            try {
+                // Generate email HTML and text
+                const emailHTML = generateManualBookingEmailHTML(bookingData);
+                const emailText = generateManualBookingEmailText(bookingData);
+
+                // Send via Supabase Edge Function
+                const response = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${supabaseKey}`,
+                    },
+                    body: JSON.stringify({
+                        to: [bookingData.customer_email],
+                        subject: `Booking Confirmed: ${bookingData.tour_name} - Royal Nordic`,
+                        html: emailHTML,
+                        text: emailText
+                    }),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to send email');
+                }
+
+                alert('✅ Confirmation email sent successfully!');
+                closeManualBookingForm();
+                
+            } catch (error) {
+                console.error('Error sending confirmation email:', error);
+                alert('❌ Error sending email: ' + error.message);
+            }
+        });
+
+        // Generate email HTML for manual booking
+        function generateManualBookingEmailHTML(booking) {
+            const tourDate = new Date(booking.tour_date).toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            const pickupTime = booking.tour_name === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : 
+                             booking.tour_name === 'Northern Lights Tour' ? ' at 20:00' : '';
+            
+            return `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .header { background: #1f2937; color: white; padding: 20px; text-align: center; }
+    .content { padding: 20px; }
+    .booking-details { background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9; }
+    .highlight { background: #f9fafb; padding: 15px; border-radius: 6px; margin: 10px 0; }
+    .footer { background: #f3f4f6; padding: 20px; text-align: center; color: #6b7280; }
+    .status-confirmed { color: #059669; font-weight: bold; }
+    .contact-info { background: #fef3c7; padding: 15px; border-radius: 6px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🌟 Booking Confirmed!</h1>
+    <p>Royal Nordic Tours</p>
+  </div>
+  <div class="content">
+    <h2>Thank you for your booking, ${booking.customer_name}!</h2>
+    <p>Your tour has been successfully confirmed. We're excited to show you the magic of Lapland!</p>
+    <div class="booking-details">
+      <h3>📋 Your Booking Details</h3>
+      <p><strong>Tour:</strong> ${booking.tour_name}</p>
+      <p><strong>Date:</strong> ${tourDate}${pickupTime}</p>
+      <p><strong>Status:</strong> <span class="status-confirmed">CONFIRMED</span></p>
+    </div>
+    <div class="highlight">
+      <h3>👥 Your Group</h3>
+      <p><strong>Adults:</strong> ${booking.adults}</p>
+      <p><strong>Children:</strong> ${booking.children}</p>
+      <p><strong>Total Amount:</strong> €${booking.total_price}</p>
+    </div>
+    ${booking.special_requests ? `
+    <div class="highlight">
+      <h3>📝 Your Special Requests</h3>
+      <p>${booking.special_requests}</p>
+    </div>
+    ` : ''}
+    <div class="contact-info">
+      <h3>📞 Contact Information</h3>
+      <p><strong>Email:</strong> contact@royalnordic.fi</p>
+      <p><strong>Phone:</strong> +358 40 123 4567</p>
+      <p><strong>Website:</strong> royalnordic.fi</p>
+    </div>
+    <div class="highlight">
+      <h3>🎯 What's Next?</h3>
+      <p>• You will receive a reminder email 24 hours before your tour</p>
+      <p>• Please arrive 15 minutes before your scheduled time</p>
+      <p>• Dress warmly for Arctic conditions</p>
+      <p>• Contact us if you have any questions</p>
+    </div>
+  </div>
+  <div class="footer">
+    <p>Thank you for choosing Royal Nordic Tours!</p>
+  </div>
+</body>
+</html>`;
+        }
+
+        // Generate email text for manual booking
+        function generateManualBookingEmailText(booking) {
+            const tourDate = new Date(booking.tour_date).toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            const pickupTime = booking.tour_name === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : 
+                             booking.tour_name === 'Northern Lights Tour' ? ' at 20:00' : '';
+            
+            return `
+Booking Confirmed - Royal Nordic Tours
+
+Thank you for your booking, ${booking.customer_name}!
+
+Your tour has been successfully confirmed. We're excited to show you the magic of Lapland!
+
+📋 Your Booking Details:
+- Tour: ${booking.tour_name}
+- Date: ${tourDate}${pickupTime}
+- Status: CONFIRMED
+
+👥 Your Group:
+- Adults: ${booking.adults}
+- Children: ${booking.children}
+- Total Amount: €${booking.total_price}
+
+${booking.special_requests ? `
+📝 Your Special Requests:
+${booking.special_requests}
+` : ''}
+
+📞 Contact Information:
+- Email: contact@royalnordic.fi
+- Phone: +358 40 123 4567
+- Website: royalnordic.fi
+
+🎯 What's Next?
+• You will receive a reminder email 24 hours before your tour
+• Please arrive 15 minutes before your scheduled time
+• Dress warmly for Arctic conditions
+• Contact us if you have any questions
+
+Thank you for choosing Royal Nordic Tours!`;
+        }
+
+        // Show tour management
+        async function showTourManagement() {
+            document.getElementById('tourManagementModal').classList.remove('hidden');
+            await loadToursForManagement();
+        }
+
+        // Close tour management
+        function closeTourManagement() {
+            document.getElementById('tourManagementModal').classList.add('hidden');
+        }
+
+        // Load tours for management
+        async function loadToursForManagement() {
+            try {
+                const { data: tours, error } = await supabase
+                    .from('tours')
+                    .select('*')
+                    .order('id');
+                
+                if (error) throw error;
+                
+                const content = document.getElementById('tourManagementContent');
+                content.innerHTML = '';
+                
+                tours.forEach(tour => {
+                    const tourDiv = document.createElement('div');
+                    tourDiv.className = 'border border-gray-200 rounded-lg p-4';
+                    tourDiv.innerHTML = `
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">${tour.name}</h3>
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Adult Price (€)</label>
+                                <input type="number" id="tour-${tour.id}-adult" value="${tour.adult_price}" step="0.01" 
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Child Price (€)</label>
+                                <input type="number" id="tour-${tour.id}-child" value="${tour.child_price}" step="0.01" 
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Max Capacity</label>
+                                <input type="number" id="tour-${tour.id}-capacity" value="${tour.max_capacity}" 
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            </div>
+                        </div>
+                        <button onclick="updateTourPricing(${tour.id})" 
+                                class="bg-blue-600 text-white py-2 px-4 rounded text-sm hover:bg-blue-700 transition-colors">
+                            💾 Save Changes
+                        </button>
+                    `;
+                    content.appendChild(tourDiv);
+                });
+                
+            } catch (error) {
+                console.error('Error loading tours:', error);
+                alert('❌ Error loading tours: ' + error.message);
+            }
+        }
+
+        // Update tour pricing
+        async function updateTourPricing(tourId) {
+            try {
+                const adultPrice = parseFloat(document.getElementById(`tour-${tourId}-adult`).value);
+                const childPrice = parseFloat(document.getElementById(`tour-${tourId}-child`).value);
+                const maxCapacity = parseInt(document.getElementById(`tour-${tourId}-capacity`).value);
+                
+                if (isNaN(adultPrice) || isNaN(childPrice) || isNaN(maxCapacity)) {
+                    alert('❌ Please enter valid numbers');
+                    return;
+                }
+                
+                const { error } = await supabase
+                    .from('tours')
+                    .update({
+                        adult_price: adultPrice,
+                        child_price: childPrice,
+                        max_capacity: maxCapacity
+                    })
+                    .eq('id', tourId);
+                
+                if (error) throw error;
+                
+                alert('✅ Tour pricing updated successfully!');
+                await loadToursForManagement();
+                
+            } catch (error) {
+                console.error('Error updating tour pricing:', error);
+                alert('❌ Error updating tour pricing: ' + error.message);
             }
         }
 
@@ -1043,11 +1488,6 @@ Booking ID: #${booking.id}`;
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
 
-        // Show/hide tour management
-        function showTourManagement() {
-            const tourManagement = document.getElementById('tourManagement');
-            tourManagement.classList.toggle('hidden');
-        }
 
         // Show availability management
         function manageAvailability(tourId) {
