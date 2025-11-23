@@ -1092,66 +1092,109 @@ Booking ID: #${booking.id}`;
                 
                 const currentBooking = currentBookings.find(b => b.id === bookingId);
                 if (!currentBooking) {
-                    alert('Booking not found');
+                    alert('❌ Booking not found in current list');
                     return;
                 }
                 
-                // First, we need to get the tour_date_id to potentially free up slots
+                // First, get full booking data including tour_date_id
                 const { data: bookingData, error: fetchError } = await supabase
                     .from('bookings')
-                    .select('tour_date_id')
+                    .select('tour_date_id, adults, children')
                     .eq('id', bookingId)
                     .single();
                 
                 if (fetchError) {
                     console.error('Error fetching booking:', fetchError);
+                    // Use current booking data as fallback
+                    if (!currentBooking) {
+                        alert('❌ Error: Could not fetch booking data. ' + fetchError.message);
+                        return;
+                    }
                 }
                 
+                // Use booking data from database if available, otherwise use current booking
+                const adults = bookingData?.adults || currentBooking.adults;
+                const children = bookingData?.children || currentBooking.children;
+                const tourDateId = bookingData?.tour_date_id;
+                
                 // Delete the booking from database
-                const { error: deleteError } = await supabase
+                console.log('Attempting to delete booking...');
+                const { data: deleteData, error: deleteError } = await supabase
                     .from('bookings')
                     .delete()
-                    .eq('id', bookingId);
+                    .eq('id', bookingId)
+                    .select();
                 
                 if (deleteError) {
-                    console.error('Delete error:', deleteError);
-                    // Try to cancel instead if deletion fails
+                    console.error('Delete error details:', deleteError);
+                    console.error('Error code:', deleteError.code);
+                    console.error('Error message:', deleteError.message);
+                    console.error('Error details:', deleteError.details);
+                    console.error('Error hint:', deleteError.hint);
+                    
+                    // Try to cancel instead if deletion fails (fallback)
+                    console.log('Deletion failed, attempting to cancel booking as fallback...');
                     const { error: cancelError } = await supabase
                         .from('bookings')
                         .update({ status: 'cancelled' })
                         .eq('id', bookingId);
                     
                     if (cancelError) {
-                        alert('❌ Error: Cannot delete or cancel booking. ' + deleteError.message + '\n\nPlease check database permissions.');
+                        alert('❌ Error: Cannot delete or cancel booking.\n\n' + 
+                              'Delete Error: ' + deleteError.message + '\n' +
+                              'Cancel Error: ' + cancelError.message + '\n\n' +
+                              'This might be a database permissions (RLS) issue.\n\n' +
+                              'Please check:\n' +
+                              '1. Run migration 005_fix_admin_rls_policies.sql in Supabase\n' +
+                              '2. Verify RLS policies allow deletion for anon users\n' +
+                              '3. Check browser console for more details');
+                        console.error('Cancel error:', cancelError);
                         return;
                     } else {
-                        alert('⚠️ Booking could not be deleted (permission issue), but has been marked as cancelled.');
+                        alert('⚠️ Booking could not be deleted (permission issue), but has been marked as cancelled.\n\n' +
+                              'Original error: ' + deleteError.message + '\n\n' +
+                              'Please check RLS policies in Supabase to enable deletion.');
                         await loadBookings();
                         return;
                     }
                 }
                 
+                console.log('Booking deleted successfully, updating tour date slots...');
+                
                 // If deletion succeeded, update the tour_date available slots
-                if (bookingData && bookingData.tour_date_id) {
-                    // Get current booking count for this date
-                    const { data: dateData } = await supabase
-                        .from('tour_dates')
-                        .select('available_slots, total_booked')
-                        .eq('id', bookingData.tour_date_id)
-                        .single();
-                    
-                    if (dateData) {
-                        // Increment available slots and decrement total_booked
-                        const newAvailable = (dateData.available_slots || 0) + (currentBooking.adults + currentBooking.children);
-                        const newTotalBooked = Math.max(0, (dateData.total_booked || 0) - (currentBooking.adults + currentBooking.children));
-                        
-                        await supabase
+                if (tourDateId) {
+                    try {
+                        // Get current booking count for this date
+                        const { data: dateData, error: dateError } = await supabase
                             .from('tour_dates')
-                            .update({
-                                available_slots: newAvailable,
-                                total_booked: newTotalBooked
-                            })
-                            .eq('id', bookingData.tour_date_id);
+                            .select('available_slots, total_booked')
+                            .eq('id', tourDateId)
+                            .single();
+                        
+                        if (dateError) {
+                            console.warn('Could not fetch tour date data:', dateError);
+                        } else if (dateData) {
+                            // Increment available slots and decrement total_booked
+                            const participants = adults + children;
+                            const newAvailable = (dateData.available_slots || 0) + participants;
+                            const newTotalBooked = Math.max(0, (dateData.total_booked || 0) - participants);
+                            
+                            const { error: updateError } = await supabase
+                                .from('tour_dates')
+                                .update({
+                                    available_slots: newAvailable,
+                                    total_booked: newTotalBooked
+                                })
+                                .eq('id', tourDateId);
+                            
+                            if (updateError) {
+                                console.warn('Could not update tour date slots:', updateError);
+                            } else {
+                                console.log('Tour date slots updated successfully');
+                            }
+                        }
+                    } catch (slotError) {
+                        console.warn('Error updating slots (non-critical):', slotError);
                     }
                 }
                 
@@ -1160,7 +1203,7 @@ Booking ID: #${booking.id}`;
                 
             } catch (error) {
                 console.error('Error deleting booking:', error);
-                alert('❌ Error deleting booking: ' + error.message);
+                alert('❌ Error deleting booking: ' + (error.message || 'Unknown error') + '\n\nPlease check the browser console for details.');
             }
         }
 
@@ -1433,6 +1476,8 @@ Thank you for choosing Royal Nordic Tours!`;
                     const counts = bookingCounts[tour.id] || { total: 0, confirmed: 0 };
                     const tourDiv = document.createElement('div');
                     tourDiv.className = 'border border-gray-200 rounded-lg p-4 mb-4';
+                    tourDiv.setAttribute('data-tour-id', tour.id);
+                    tourDiv.setAttribute('data-tour-name', tour.name);
                     tourDiv.innerHTML = `
                         <div class="flex items-center justify-between mb-4">
                             <div>
@@ -1524,8 +1569,11 @@ Thank you for choosing Royal Nordic Tours!`;
                     return;
                 }
                 
+                // Get tour name from data attribute
+                const tourContainer = adultPriceInput.closest('[data-tour-id]');
+                const tourName = tourContainer ? tourContainer.getAttribute('data-tour-name') : `Tour ID ${tourId}`;
+                
                 // Confirm before updating
-                const tourName = adultPriceInput.closest('.border').querySelector('h3').textContent;
                 const confirmed = confirm(`Update pricing for "${tourName}"?\n\nAdult: €${adultPrice}\nChild: €${childPrice}\nCapacity: ${maxCapacity}`);
                 if (!confirmed) return;
                 
