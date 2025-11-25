@@ -9,10 +9,101 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+        }
+        
+        /* Enhanced Status Colors */
         .status-pending { background-color: #fef3c7; color: #92400e; }
         .status-confirmed { background-color: #d1fae5; color: #065f46; }
         .status-cancelled { background-color: #fee2e2; color: #991b1b; }
+        .status-completed { background-color: #d1fae5; color: #065f46; }
+        .status-pending_crypto_payment { background-color: #fed7aa; color: #9a3412; }
+        .status-new { background-color: #e9d5ff; color: #6b21a8; }
+        .status-contacted { background-color: #ddd6fe; color: #5b21b6; }
+        .status-quoted { background-color: #bfdbfe; color: #1e40af; }
+        .status-scheduled { background-color: #bae6fd; color: #0c4a6e; }
+        .status-in_progress { background-color: #bfdbfe; color: #1e3a8a; }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .grid.grid-cols-2.md\\:grid-cols-4.lg\\:grid-cols-6 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .grid.grid-cols-2.md\\:grid-cols-4 {
+                grid-template-columns: repeat(1, 1fr);
+            }
+            
+            /* Make booking cards more compact on mobile */
+            .p-4.mt-4.rounded-lg.border {
+                padding: 1rem;
+            }
+            
+            /* Stack action buttons vertically on mobile */
+            .flex.flex-col.space-y-2.min-w-\\[220px\\] {
+                min-width: 100%;
+            }
+            
+            /* Make calendar grid responsive */
+            .grid.grid-cols-2.sm\\:grid-cols-4.lg\\:grid-cols-7 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            /* Smaller text on mobile */
+            .text-2xl {
+                font-size: 1.5rem;
+            }
+            
+            .text-3xl {
+                font-size: 1.875rem;
+            }
+        }
+        
+        @media (min-width: 640px) {
+            .grid.grid-cols-2.sm\\:grid-cols-4.lg\\:grid-cols-7 {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .grid.grid-cols-2.sm\\:grid-cols-4.lg\\:grid-cols-7 {
+                grid-template-columns: repeat(7, 1fr);
+            }
+        }
+        
+        /* Smooth transitions */
+        * {
+            transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+            transition-duration: 150ms;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Better scrollbars */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Print styles */
+        @media print {
+            .no-print, button, select {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -83,48 +174,225 @@
             </div>
         </header>
 
-        <!-- Stats Cards -->
+        <!-- Enhanced Stats Dashboard -->
         <div class="px-4 py-4">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white rounded-lg p-4 border border-gray-200">
+            <!-- Notification Banner -->
+            <div id="notificationBanner" class="hidden mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">🔔</span>
+                        <div>
+                            <div class="font-semibold text-blue-900" id="notificationTitle">New Activity</div>
+                            <div class="text-sm text-blue-700" id="notificationMessage"></div>
+                        </div>
+                    </div>
+                    <button onclick="hideNotificationBanner()" class="text-blue-400 hover:text-blue-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
+                <div class="bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow">
                     <div class="text-2xl font-bold text-gray-900" id="totalBookings">0</div>
-                    <div class="text-sm text-gray-600">Total Bookings</div>
+                    <div class="text-xs text-gray-600">Total Bookings</div>
                 </div>
-                <div class="bg-white rounded-lg p-4 border border-gray-200">
+                <div class="bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow">
                     <div class="text-2xl font-bold text-green-600" id="confirmedBookings">0</div>
-                    <div class="text-sm text-gray-600">Confirmed</div>
+                    <div class="text-xs text-gray-600">Confirmed</div>
                 </div>
-                <div class="bg-white rounded-lg p-4 border border-gray-200">
-                    <div class="text-2xl font-bold text-gray-900" id="totalRevenue">€0</div>
-                    <div class="text-sm text-gray-600">Revenue</div>
+                <div class="bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow">
+                    <div class="text-2xl font-bold text-emerald-600" id="totalRevenue">€0</div>
+                    <div class="text-xs text-gray-600">Total Revenue</div>
                 </div>
-                <div class="bg-white rounded-lg p-4 border border-gray-200">
-                    <div class="text-2xl font-bold text-gray-900" id="totalParticipants">0</div>
-                    <div class="text-sm text-gray-600">Participants</div>
+                <div class="bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow">
+                    <div class="text-2xl font-bold text-blue-600" id="totalParticipants">0</div>
+                    <div class="text-xs text-gray-600">Participants</div>
+                </div>
+                <div class="bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-1">
+                        <div class="text-2xl font-bold text-purple-600" id="upcomingTours">0</div>
+                        <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">Next 7d</span>
+                    </div>
+                    <div class="text-xs text-gray-600">Upcoming Tours</div>
+                </div>
+                <div class="bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow">
+                    <div class="text-lg font-bold text-orange-600" id="popularTour">—</div>
+                    <div class="text-xs text-gray-600">Most Popular</div>
+                </div>
+            </div>
+            
+            <!-- This Month Stats -->
+            <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-6 text-white mb-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <div class="text-sm opacity-90">This Month</div>
+                        <div class="text-3xl font-bold" id="thisMonthBookings">0</div>
+                        <div class="text-xs opacity-75">bookings</div>
+                    </div>
+                    <div>
+                        <div class="text-sm opacity-90">Month Revenue</div>
+                        <div class="text-3xl font-bold" id="thisMonthRevenue">€0</div>
+                        <div class="text-xs opacity-75">confirmed</div>
+                    </div>
+                    <div>
+                        <div class="text-sm opacity-90">Avg Booking</div>
+                        <div class="text-3xl font-bold" id="avgBookingSize">€0</div>
+                        <div class="text-xs opacity-75">per booking</div>
+                    </div>
+                    <div>
+                        <div class="text-sm opacity-90">Pending Actions</div>
+                        <div class="text-3xl font-bold" id="pendingActions">0</div>
+                        <div class="text-xs opacity-75">need attention</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Actions -->
+        <!-- Quick Actions & Advanced Filters -->
         <div class="px-4 pb-4">
+            <!-- Quick Action Buttons -->
             <div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
-                <div class="flex flex-wrap gap-2">
-                    <button onclick="loadBookings()" 
-                            class="bg-gray-700 text-white py-2 px-4 rounded text-sm hover:bg-gray-800 transition-colors">
-                        Refresh
+                <div class="flex flex-wrap gap-2 items-center justify-between">
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="loadBookings()" 
+                                class="bg-gray-700 text-white py-2 px-4 rounded text-sm hover:bg-gray-800 transition-colors">
+                            🔄 Refresh
+                        </button>
+                        <button onclick="exportBookings()" 
+                                class="bg-gray-600 text-white py-2 px-4 rounded text-sm hover:bg-gray-700 transition-colors">
+                            📥 Export CSV
+                        </button>
+                        <button onclick="showManualBookingForm()" 
+                                class="bg-green-600 text-white py-2 px-4 rounded text-sm hover:bg-green-700 transition-colors">
+                            ➕ Manual Booking
+                        </button>
+                        <button onclick="showTourManagement()" 
+                                class="bg-blue-600 text-white py-2 px-4 rounded text-sm hover:bg-blue-700 transition-colors">
+                            ⚙️ Tour Prices
+                        </button>
+                        <button onclick="showCustomerDatabase()" 
+                                class="bg-purple-600 text-white py-2 px-4 rounded text-sm hover:bg-purple-700 transition-colors">
+                            👥 Customers
+                        </button>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <span class="text-xs text-gray-500" id="selectedCount"></span>
+                        <button id="bulkActionsBtn" onclick="toggleBulkMode()" 
+                                class="bg-indigo-600 text-white py-2 px-4 rounded text-sm hover:bg-indigo-700 transition-colors">
+                            ☑️ Bulk Select
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Filters Panel -->
+            <div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-semibold text-gray-900">🔍 Advanced Filters</h3>
+                    <button onclick="toggleFiltersPanel()" class="text-sm text-blue-600 hover:text-blue-700">
+                        <span id="filterToggleText">Show More</span>
                     </button>
-                    <button onclick="exportBookings()" 
-                            class="bg-gray-600 text-white py-2 px-4 rounded text-sm hover:bg-gray-700 transition-colors">
-                        Export CSV
+                </div>
+
+                <!-- Basic Filters (Always Visible) -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Search</label>
+                        <input type="text" id="searchInput" placeholder="Name or email..." 
+                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Type</label>
+                        <select id="typeFilter" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Types</option>
+                            <option value="tour">Tours</option>
+                            <option value="manual">Manual Bookings</option>
+                            <option value="transportation">Transportation</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Status</label>
+                        <select id="statusFilter" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Statuses</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="pending_crypto_payment">Pending Crypto</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="new">New</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Quick Date</label>
+                        <select id="quickDateFilter" onchange="applyQuickDateFilter()" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Time</option>
+                            <option value="today">Today</option>
+                            <option value="tomorrow">Tomorrow</option>
+                            <option value="next7days">Next 7 Days</option>
+                            <option value="thisweek">This Week</option>
+                            <option value="nextweek">Next Week</option>
+                            <option value="thismonth">This Month</option>
+                            <option value="past">Past Bookings</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Advanced Filters (Collapsible) -->
+                <div id="advancedFiltersPanel" class="hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-gray-200">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Date From</label>
+                            <input type="date" id="dateFromFilter" 
+                                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Date To</label>
+                            <input type="date" id="dateToFilter" 
+                                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Min Price (€)</label>
+                            <input type="number" id="minPriceFilter" placeholder="0" 
+                                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 mt-3">
+                    <button onclick="applyFilters()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                        Apply Filters
                     </button>
-                    <button onclick="showManualBookingForm()" 
-                            class="bg-green-600 text-white py-2 px-4 rounded text-sm hover:bg-green-700 transition-colors">
-                        ➕ Manual Booking
+                    <button onclick="clearAllFilters()" class="bg-gray-600 text-white px-4 py-2 rounded text-sm hover:bg-gray-700">
+                        Clear All
                     </button>
-                    <button onclick="showTourManagement()" 
-                            class="bg-blue-600 text-white py-2 px-4 rounded text-sm hover:bg-blue-700 transition-colors">
-                        ⚙️ Tour Prices
-                    </button>
+                </div>
+            </div>
+
+            <!-- Bulk Actions Bar (Hidden by default) -->
+            <div id="bulkActionsBar" class="hidden bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-4">
+                <div class="flex items-center justify-between flex-wrap gap-3">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()" 
+                               class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
+                        <label for="selectAllCheckbox" class="text-sm font-medium text-indigo-900">
+                            Select All (<span id="bulkSelectedCount">0</span> selected)
+                        </label>
+                    </div>
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="bulkSendEmails()" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700">
+                            📧 Send Emails
+                        </button>
+                        <button onclick="bulkExport()" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700">
+                            📥 Export Selected
+                        </button>
+                        <button onclick="bulkUpdateStatus()" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700">
+                            🔄 Update Status
+                        </button>
+                        <button onclick="exitBulkMode()" class="bg-gray-600 text-white px-3 py-1.5 rounded text-sm hover:bg-gray-700">
+                            ✕ Cancel
+                        </button>
+                    </div>
                 </div>
             </div>
                 </div>
@@ -612,6 +880,92 @@
                 </div>
             </div>
         </div>
+
+        <!-- Email Preview Modal -->
+        <div id="emailPreviewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-900">📧 Email Preview</h2>
+                    <button onclick="closeEmailPreview()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <div class="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="text-sm text-blue-900">
+                            <strong>To:</strong> <span id="previewEmailTo"></span><br>
+                            <strong>Subject:</strong> <span id="previewEmailSubject"></span>
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                        <div id="previewEmailContent" class="prose max-w-none"></div>
+                    </div>
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button onclick="closeEmailPreview()" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            Cancel
+                        </button>
+                        <button id="sendEmailFromPreview" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            Send Email
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Database Modal -->
+        <div id="customerDatabaseModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+                <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-900">👥 Customer Database</h2>
+                    <button onclick="closeCustomerDatabase()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <input type="text" id="customerSearchInput" placeholder="Search customers..." 
+                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div id="customerDatabaseContent" class="space-y-3">
+                        <!-- Customers will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Status Update Modal -->
+        <div id="bulkStatusModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
+                <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-900">Update Status</h2>
+                    <button onclick="closeBulkStatusModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <p class="text-sm text-gray-600 mb-4">Update status for <strong id="bulkStatusCount">0</strong> selected bookings:</p>
+                    <select id="bulkStatusSelect" class="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4">
+                        <option value="confirmed">Confirmed</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="pending_crypto_payment">Pending Crypto Payment</option>
+                    </select>
+                    <div class="flex justify-end gap-3">
+                        <button onclick="closeBulkStatusModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            Cancel
+                        </button>
+                        <button onclick="confirmBulkStatusUpdate()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                            Update Status
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 
@@ -909,6 +1263,15 @@
                     </div>
                     
                     <div class="flex flex-col space-y-2 min-w-[220px] w-full lg:w-auto">
+                        ${bulkMode ? `
+                            <div class="flex items-center justify-center p-3 bg-indigo-50 rounded border border-indigo-200">
+                                <input type="checkbox" 
+                                       class="bulk-checkbox w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" 
+                                       data-booking-uid="${booking.uid}"
+                                       ${selectedBookings.has(booking.uid) ? 'checked' : ''}
+                                       onchange="toggleBookingSelection('${booking.uid}')">
+                            </div>
+                        ` : ''}
                         ${statusOptions.length ? `
                             <select class="status-select border border-gray-300 rounded px-3 py-2 text-sm bg-white text-gray-800" 
                                     data-booking-uid="${booking.uid}" data-current-status="${booking.status}">
@@ -917,17 +1280,40 @@
                                 `).join('')}
                         </select>
                         ` : ''}
+                        
+                        <!-- Quick Action Buttons -->
+                        <div class="grid grid-cols-2 gap-2">
+                            ${booking.customer_phone ? `
+                                <button onclick="callCustomer('${booking.customer_phone}')"
+                                        class="bg-blue-600 text-white py-1.5 px-2 rounded text-xs hover:bg-blue-700 transition-colors"
+                                        title="Call customer">
+                                    📞 Call
+                                </button>
+                            ` : ''}
+                            <button onclick="emailCustomer('${booking.customer_email}', 'Re: ${booking.tour_name || 'Your Booking'}')"
+                                    class="bg-cyan-600 text-white py-1.5 px-2 rounded text-xs hover:bg-cyan-700 transition-colors"
+                                    title="Email customer">
+                                ✉️ Email
+                            </button>
+                        </div>
+                        
                         ${showEmailButton ? `
-                            <button data-action="send-email" data-booking-uid="${booking.uid}"
+                            <button onclick="showEmailPreviewForBooking('${booking.uid}')"
                                     class="bg-green-600 text-white py-2 px-3 rounded text-sm hover:bg-green-700 transition-colors">
-                                📧 Send Email
-                        </button>
+                                📧 Preview & Send
+                            </button>
                         ` : `
                             <button type="button" onclick="openTransportationEmail('${booking.uid}')"
                                     class="bg-purple-600 text-white py-2 px-3 rounded text-sm hover:bg-purple-700 transition-colors">
                                 📧 Reply via Email
                             </button>
                         `}
+                        
+                        <button onclick="addBookingNote('${booking.uid}')"
+                                class="bg-yellow-600 text-white py-2 px-3 rounded text-sm hover:bg-yellow-700 transition-colors">
+                            📝 Add Note
+                        </button>
+                        
                         <button onclick="deleteBooking('${booking.uid}')"
                                 class="bg-red-600 text-white py-2 px-3 rounded text-sm hover:bg-red-700 transition-colors">
                             🗑️ Delete
@@ -1757,6 +2143,7 @@ Thank you for choosing Royal Nordic Tours!`;
         }
 
         // Update stats
+        // Enhanced updateStats function with all new metrics
         function updateStats(bookings = []) {
             const total = bookings.length;
             const confirmed = bookings.filter(b => {
@@ -1765,14 +2152,72 @@ Thank you for choosing Royal Nordic Tours!`;
                 }
                 return ['confirmed', 'completed'].includes(b.status);
             }).length;
-            const totalRevenue = bookings.reduce((sum, b) => sum + (Number(b.total_price) || 0), 0);
+            
+            const confirmedBookings = bookings.filter(b => ['confirmed', 'completed'].includes(b.status));
+            const totalRevenue = confirmedBookings.reduce((sum, b) => sum + (Number(b.total_price) || 0), 0);
             const totalParticipants = bookings.reduce((sum, b) => sum + ((b.adults || 0) + (b.children || 0)), 0);
             
+            // Calculate upcoming tours (next 7 days)
+            const now = new Date();
+            const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+            const upcomingTours = bookings.filter(b => {
+                if (!b.tour_date) return false;
+                const tourDate = new Date(b.tour_date);
+                return tourDate >= now && tourDate <= sevenDaysLater && ['confirmed', 'completed'].includes(b.status);
+            }).length;
+            
+            // Find most popular tour
+            const tourCounts = {};
+            bookings.filter(b => b.type === 'tour' && ['confirmed', 'completed'].includes(b.status))
+                    .forEach(b => {
+                        const tourName = b.tour_name || 'Unknown';
+                        tourCounts[tourName] = (tourCounts[tourName] || 0) + 1;
+                    });
+            let popularTour = '—';
+            let maxCount = 0;
+            for (const [name, count] of Object.entries(tourCounts)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    popularTour = name.length > 20 ? name.substring(0, 20) + '...' : name;
+                }
+            }
+            
+            // Calculate this month stats
+            const thisMonth = now.getMonth();
+            const thisYear = now.getFullYear();
+            const thisMonthBookings = bookings.filter(b => {
+                const created = new Date(b.created_at || b.tour_date);
+                return created.getMonth() === thisMonth && created.getFullYear() === thisYear;
+            });
+            const thisMonthRevenue = thisMonthBookings
+                .filter(b => ['confirmed', 'completed'].includes(b.status))
+                .reduce((sum, b) => sum + (Number(b.total_price) || 0), 0);
+            
+            // Calculate average booking size
+            const avgBookingSize = confirmed > 0 ? totalRevenue / confirmed : 0;
+            
+            // Calculate pending actions
+            const pendingActions = bookings.filter(b => 
+                ['pending_crypto_payment', 'new', 'pending'].includes(b.status)
+            ).length;
+            
+            // Update all stat elements
             document.getElementById('totalBookings').textContent = total;
             document.getElementById('confirmedBookings').textContent = confirmed;
-            document.getElementById('totalRevenue').textContent = `€${totalRevenue.toFixed(2)}`;
+            document.getElementById('totalRevenue').textContent = `€${totalRevenue.toFixed(0)}`;
             document.getElementById('totalParticipants').textContent = totalParticipants;
+            document.getElementById('upcomingTours').textContent = upcomingTours;
+            document.getElementById('popularTour').textContent = popularTour;
+            document.getElementById('thisMonthBookings').textContent = thisMonthBookings.length;
+            document.getElementById('thisMonthRevenue').textContent = `€${thisMonthRevenue.toFixed(0)}`;
+            document.getElementById('avgBookingSize').textContent = `€${avgBookingSize.toFixed(0)}`;
+            document.getElementById('pendingActions').textContent = pendingActions;
             document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+            
+            // Show notification if there are pending actions
+            if (pendingActions > 0) {
+                showNotification(`You have ${pendingActions} booking${pendingActions > 1 ? 's' : ''} requiring attention`, 'Pending Actions');
+            }
         }
 
 
@@ -2750,6 +3195,425 @@ Thank you for choosing Royal Nordic Tours!`;
                 console.error('Error saving availability:', error);
                 alert('❌ Error saving availability changes');
             }
+        }
+
+        // ========================================
+        // NEW ENHANCED FEATURES FUNCTIONS
+        // ========================================
+
+        // Notification System
+        function showNotification(message, title = 'Notification') {
+            const banner = document.getElementById('notificationBanner');
+            const titleEl = document.getElementById('notificationTitle');
+            const messageEl = document.getElementById('notificationMessage');
+            
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            banner.classList.remove('hidden');
+            
+            // Auto-hide after 10 seconds
+            setTimeout(() => {
+                hideNotificationBanner();
+            }, 10000);
+        }
+
+        function hideNotificationBanner() {
+            document.getElementById('notificationBanner').classList.add('hidden');
+        }
+
+        // Filter Panel Functions
+        function toggleFiltersPanel() {
+            const panel = document.getElementById('advancedFiltersPanel');
+            const toggleText = document.getElementById('filterToggleText');
+            
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                toggleText.textContent = 'Show Less';
+            } else {
+                panel.classList.add('hidden');
+                toggleText.textContent = 'Show More';
+            }
+        }
+
+        function applyQuickDateFilter() {
+            const quickDate = document.getElementById('quickDateFilter').value;
+            const dateFromEl = document.getElementById('dateFromFilter');
+            const dateToEl = document.getElementById('dateToFilter');
+            
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            
+            let dateFrom = null;
+            let dateTo = null;
+            
+            switch(quickDate) {
+                case 'today':
+                    dateFrom = today;
+                    dateTo = today;
+                    break;
+                case 'tomorrow':
+                    dateFrom = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+                    dateTo = dateFrom;
+                    break;
+                case 'next7days':
+                    dateFrom = today;
+                    dateTo = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+                    break;
+                case 'thisweek':
+                    const dayOfWeek = today.getDay();
+                    dateFrom = new Date(today.getTime() - dayOfWeek * 24 * 60 * 60 * 1000);
+                    dateTo = new Date(dateFrom.getTime() + 6 * 24 * 60 * 60 * 1000);
+                    break;
+                case 'nextweek':
+                    const daysUntilNextMonday = (8 - today.getDay()) % 7 || 7;
+                    dateFrom = new Date(today.getTime() + daysUntilNextMonday * 24 * 60 * 60 * 1000);
+                    dateTo = new Date(dateFrom.getTime() + 6 * 24 * 60 * 60 * 1000);
+                    break;
+                case 'thismonth':
+                    dateFrom = new Date(now.getFullYear(), now.getMonth(), 1);
+                    dateTo = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                    break;
+                case 'past':
+                    dateTo = yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+                    break;
+            }
+            
+            if (dateFrom) {
+                dateFromEl.value = dateFrom.toISOString().split('T')[0];
+            } else {
+                dateFromEl.value = '';
+            }
+            
+            if (dateTo) {
+                dateToEl.value = dateTo.toISOString().split('T')[0];
+            } else if (quickDate !== 'past') {
+                dateToEl.value = '';
+            }
+            
+            applyFilters();
+        }
+
+        function clearAllFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('quickDateFilter').value = '';
+            document.getElementById('dateFromFilter').value = '';
+            document.getElementById('dateToFilter').value = '';
+            document.getElementById('minPriceFilter').value = '';
+            applyFilters();
+        }
+
+        // Bulk Mode Functions
+        let bulkMode = false;
+        let selectedBookings = new Set();
+
+        function toggleBulkMode() {
+            bulkMode = !bulkMode;
+            selectedBookings.clear();
+            
+            const bulkBar = document.getElementById('bulkActionsBar');
+            const bulkBtn = document.getElementById('bulkActionsBtn');
+            
+            if (bulkMode) {
+                bulkBar.classList.remove('hidden');
+                bulkBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                bulkBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                bulkBtn.textContent = '✓ Bulk Mode Active';
+                
+                // Refresh display to show checkboxes
+                displayBookings(filteredBookings);
+            } else {
+                exitBulkMode();
+            }
+        }
+
+        function exitBulkMode() {
+            bulkMode = false;
+            selectedBookings.clear();
+            document.getElementById('bulkActionsBar').classList.add('hidden');
+            const bulkBtn = document.getElementById('bulkActionsBtn');
+            bulkBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+            bulkBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+            bulkBtn.textContent = '☑️ Bulk Select';
+            document.getElementById('selectAllCheckbox').checked = false;
+            displayBookings(filteredBookings);
+        }
+
+        function toggleSelectAll() {
+            const checkbox = document.getElementById('selectAllCheckbox');
+            if (checkbox.checked) {
+                filteredBookings.forEach(b => selectedBookings.add(b.uid));
+            } else {
+                selectedBookings.clear();
+            }
+            updateBulkSelectedCount();
+            displayBookings(filteredBookings);
+        }
+
+        function toggleBookingSelection(uid) {
+            if (selectedBookings.has(uid)) {
+                selectedBookings.delete(uid);
+            } else {
+                selectedBookings.add(uid);
+            }
+            updateBulkSelectedCount();
+        }
+
+        function updateBulkSelectedCount() {
+            document.getElementById('bulkSelectedCount').textContent = selectedBookings.size;
+            document.getElementById('selectedCount').textContent = selectedBookings.size > 0 ? `${selectedBookings.size} selected` : '';
+        }
+
+        function bulkSendEmails() {
+            if (selectedBookings.size === 0) {
+                alert('Please select at least one booking');
+                return;
+            }
+            
+            if (confirm(`Send confirmation emails to ${selectedBookings.size} selected booking(s)?`)) {
+                let sent = 0;
+                selectedBookings.forEach(async (uid) => {
+                    const booking = currentBookings.find(b => b.uid === uid);
+                    if (booking && booking.type !== 'transportation') {
+                        try {
+                            await sendConfirmationEmail(uid);
+                            sent++;
+                        } catch (error) {
+                            console.error(`Failed to send email for ${uid}:`, error);
+                        }
+                    }
+                });
+                
+                setTimeout(() => {
+                    alert(`✅ Sent ${sent} email(s) successfully!`);
+                    exitBulkMode();
+                }, 2000);
+            }
+        }
+
+        function bulkExport() {
+            if (selectedBookings.size === 0) {
+                alert('Please select at least one booking');
+                return;
+            }
+            
+            const selectedData = currentBookings.filter(b => selectedBookings.has(b.uid));
+            const csvContent = [
+                ['ID', 'Type', 'Customer Name', 'Email', 'Phone', 'Service', 'Scheduled Date', 'Adults', 'Children', 'Total Price', 'Status'],
+                ...selectedData.map(booking => [
+                    booking.uid,
+                    booking.type,
+                    booking.customer_name,
+                    booking.customer_email,
+                    booking.customer_phone || '',
+                    booking.tour_name || booking.destination || '',
+                    booking.tour_date || '',
+                    booking.adults || 0,
+                    booking.children || 0,
+                    Number(booking.total_price) || 0,
+                    booking.status
+                ])
+            ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `royal-nordic-selected-bookings-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showNotification(`Exported ${selectedBookings.size} booking(s)`, 'Export Complete');
+        }
+
+        function bulkUpdateStatus() {
+            if (selectedBookings.size === 0) {
+                alert('Please select at least one booking');
+                return;
+            }
+            
+            document.getElementById('bulkStatusCount').textContent = selectedBookings.size;
+            document.getElementById('bulkStatusModal').classList.remove('hidden');
+        }
+
+        function closeBulkStatusModal() {
+            document.getElementById('bulkStatusModal').classList.add('hidden');
+        }
+
+        async function confirmBulkStatusUpdate() {
+            const newStatus = document.getElementById('bulkStatusSelect').value;
+            
+            if (!newStatus) {
+                alert('Please select a status');
+                return;
+            }
+            
+            let updated = 0;
+            for (const uid of selectedBookings) {
+                const booking = currentBookings.find(b => b.uid === uid);
+                if (booking) {
+                    try {
+                        // Update based on booking type
+                        if (booking.type === 'tour') {
+                            await supabase.from('bookings').update({ status: newStatus }).eq('id', booking.rawId);
+                        } else if (booking.type === 'manual') {
+                            await supabase.from('manual_bookings').update({ status: newStatus }).eq('id', booking.rawId);
+                        } else if (booking.type === 'transportation') {
+                            await supabase.from('transportation_requests').update({ status: newStatus }).eq('id', booking.rawId);
+                        }
+                        updated++;
+                    } catch (error) {
+                        console.error(`Failed to update ${uid}:`, error);
+                    }
+                }
+            }
+            
+            closeBulkStatusModal();
+            exitBulkMode();
+            await loadBookings();
+            showNotification(`Updated ${updated} booking(s) to ${newStatus}`, 'Bulk Update Complete');
+        }
+
+        // Email Preview Functions
+        let pendingEmailData = null;
+
+        function showEmailPreviewForBooking(uid) {
+            const booking = currentBookings.find(b => b.uid === uid);
+            if (!booking) return;
+            
+            let emailHTML = '';
+            if (booking.type === 'manual') {
+                emailHTML = generateManualBookingEmailHTML(booking);
+            } else {
+                emailHTML = generateCustomerConfirmationHTML(booking);
+            }
+            
+            document.getElementById('previewEmailTo').textContent = booking.customer_email;
+            document.getElementById('previewEmailSubject').textContent = `Booking Confirmed: ${booking.tour_name} - Royal Nordic`;
+            document.getElementById('previewEmailContent').innerHTML = emailHTML;
+            
+            pendingEmailData = { uid, booking, emailHTML };
+            
+            document.getElementById('sendEmailFromPreview').onclick = async () => {
+                closeEmailPreview();
+                await sendConfirmationEmail(uid);
+            };
+            
+            document.getElementById('emailPreviewModal').classList.remove('hidden');
+        }
+
+        function closeEmailPreview() {
+            document.getElementById('emailPreviewModal').classList.add('hidden');
+            pendingEmailData = null;
+        }
+
+        // Customer Database Functions
+        function showCustomerDatabase() {
+            // Build customer database from bookings
+            const customerMap = new Map();
+            
+            currentBookings.forEach(booking => {
+                const email = booking.customer_email;
+                if (!customerMap.has(email)) {
+                    customerMap.set(email, {
+                        name: booking.customer_name,
+                        email: email,
+                        phone: booking.customer_phone || '',
+                        bookings: [],
+                        totalSpent: 0,
+                        lastBooking: null
+                    });
+                }
+                
+                const customer = customerMap.get(email);
+                customer.bookings.push(booking);
+                customer.totalSpent += Number(booking.total_price) || 0;
+                
+                const bookingDate = new Date(booking.created_at || booking.tour_date);
+                if (!customer.lastBooking || bookingDate > new Date(customer.lastBooking)) {
+                    customer.lastBooking = bookingDate.toISOString();
+                }
+            });
+            
+            // Sort by total spent (descending)
+            const customers = Array.from(customerMap.values()).sort((a, b) => b.totalSpent - a.totalSpent);
+            
+            const content = document.getElementById('customerDatabaseContent');
+            content.innerHTML = '';
+            
+            if (customers.length === 0) {
+                content.innerHTML = '<p class="text-center text-gray-500 py-8">No customers yet</p>';
+            } else {
+                customers.forEach(customer => {
+                    const div = document.createElement('div');
+                    div.className = 'border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow';
+                    div.innerHTML = `
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-900">${customer.name}</h3>
+                                <p class="text-sm text-gray-600">${customer.email}</p>
+                                ${customer.phone ? `<p class="text-sm text-gray-600">📞 ${customer.phone}</p>` : ''}
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-green-600">€${customer.totalSpent.toFixed(0)}</div>
+                                <div class="text-xs text-gray-500">${customer.bookings.length} booking${customer.bookings.length > 1 ? 's' : ''}</div>
+                                ${customer.bookings.length > 1 ? '<div class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full mt-1">Returning</div>' : ''}
+                            </div>
+                        </div>
+                        <div class="mt-3 text-xs text-gray-500">
+                            Last booking: ${new Date(customer.lastBooking).toLocaleDateString('en-GB')}
+                        </div>
+                    `;
+                    content.appendChild(div);
+                });
+            }
+            
+            // Setup search
+            document.getElementById('customerSearchInput').oninput = (e) => {
+                const search = e.target.value.toLowerCase();
+                const items = content.children;
+                for (let item of items) {
+                    const text = item.textContent.toLowerCase();
+                    item.style.display = text.includes(search) ? '' : 'none';
+                }
+            };
+            
+            document.getElementById('customerDatabaseModal').classList.remove('hidden');
+        }
+
+        function closeCustomerDatabase() {
+            document.getElementById('customerDatabaseModal').classList.add('hidden');
+        }
+
+        // Quick Action Functions for Booking Cards
+        function callCustomer(phone) {
+            if (phone) {
+                window.location.href = `tel:${phone}`;
+            } else {
+                alert('No phone number available');
+            }
+        }
+
+        function emailCustomer(email, subject = '') {
+            window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
+        }
+
+        async function addBookingNote(uid) {
+            const note = prompt('Add a note for this booking:');
+            if (note) {
+                // Store note in localStorage for now (can be enhanced to store in DB)
+                const notes = JSON.parse(localStorage.getItem('bookingNotes') || '{}');
+                notes[uid] = note;
+                localStorage.setItem('bookingNotes', JSON.stringify(notes));
+                showNotification('Note added successfully', 'Note Saved');
+                loadBookings();
+            }
+        }
+
+        function getBookingNote(uid) {
+            const notes = JSON.parse(localStorage.getItem('bookingNotes') || '{}');
+            return notes[uid] || null;
         }
 
         // Initialize - only your credentials work
