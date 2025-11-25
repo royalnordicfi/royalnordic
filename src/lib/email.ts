@@ -56,7 +56,7 @@ export async function sendBookingNotification(bookingData: BookingNotificationDa
 // Send booking confirmation to customer
 export async function sendCustomerConfirmation(bookingData: BookingNotificationData) {
   const confirmation: EmailNotification = {
-    to: [bookingData.customerEmail],
+    to: [bookingData.customerEmail, 'contact@royalnordic.fi'],
     subject: `Booking Confirmed: ${bookingData.tourName} - Royal Nordic`,
     html: generateCustomerConfirmationHTML(bookingData),
     text: generateCustomerConfirmationText(bookingData)

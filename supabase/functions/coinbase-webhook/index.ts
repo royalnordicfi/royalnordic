@@ -141,7 +141,7 @@ serve(async (req) => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            to: customerEmail,
+            to: [customerEmail, 'contact@royalnordic.fi'],
             subject: `Booking Confirmation - ${tourName}`,
             type: 'customer_confirmation',
             data: emailData

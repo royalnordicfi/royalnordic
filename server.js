@@ -633,7 +633,7 @@ app.post('/api/send-stripe-confirmation', async (req, res) => {
       },
       body: JSON.stringify({
         from: 'Royal Nordic <noreply@royalnordic.fi>',
-        to: [customerEmail],
+        to: [customerEmail, 'contact@royalnordic.fi'],
         subject: `Booking Confirmation - ${tourName} - Royal Nordic`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f9fa;">

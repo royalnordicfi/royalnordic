@@ -1026,7 +1026,7 @@
                         'Authorization': `Bearer ${supabaseKey}`,
                     },
                     body: JSON.stringify({
-                        to: [booking.customer_email],
+                        to: [booking.customer_email, 'contact@royalnordic.fi'],
                         subject,
                         html: emailHTML,
                         text: emailText
@@ -1387,7 +1387,7 @@ Booking ID: #${booking.id}`;
                         'Authorization': `Bearer ${supabaseKey}`,
                     },
                     body: JSON.stringify({
-                        to: [bookingData.customer_email],
+                        to: [bookingData.customer_email, 'contact@royalnordic.fi'],
                         subject: `Booking Confirmed: ${bookingData.tour_name} - Royal Nordic`,
                         html: emailHTML,
                         text: emailText

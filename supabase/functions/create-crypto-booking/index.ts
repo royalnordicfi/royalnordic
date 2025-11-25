@@ -227,7 +227,7 @@ This is a crypto payment booking! You need to contact the customer to provide wa
     } else {
       emailData = {
         from: 'Royal Nordic <contact@royalnordic.fi>',
-        to: [bookingData.customerEmail],
+        to: [bookingData.customerEmail, 'contact@royalnordic.fi'],
         subject: `Crypto Booking Confirmed: ${bookingData.tourName} - Royal Nordic`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f9fa;">
