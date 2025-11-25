@@ -80,7 +80,7 @@ const Tours = () => {
                   {/* Icon */}
                   <div className="absolute top-3 right-3 bg-emerald-500/20 backdrop-blur-sm p-2 rounded-full border border-emerald-500/30">
                     <IconComponent className="w-4 h-4 text-emerald-400" />
-                  </div>
+            </div>
                 </div>
 
                 {/* Content */}
@@ -97,13 +97,13 @@ const Tours = () => {
                   <div className="flex items-center justify-between pt-3 border-t border-gray-800">
                     <span className="text-xs text-gray-400 font-clean">
                       {category.tourCount}
-                    </span>
+                  </span>
                     <span className="text-emerald-400 font-semibold text-sm group-hover:translate-x-2 transition-transform">
                       Explore →
-                    </span>
-                  </div>
-                </div>
-              </Link>
+                  </span>
+              </div>
+            </div>
+          </Link>
             );
           })}
         </div>

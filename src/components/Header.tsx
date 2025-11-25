@@ -60,7 +60,7 @@ const Header = () => {
     }`}>
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex justify-between items-center h-24 pt-1">
-                 {/* Logo */}
+          {/* Logo */}
                  <div className="flex-shrink-0 flex flex-col items-center space-y-1" style={{marginLeft: '120px'}}>
             <img 
               src="/logo.png" 
@@ -119,7 +119,7 @@ const Header = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Phone size={12} />
-                <span>+358 45 78345138</span>
+              <span>+358 45 78345138</span>
               </div>
             </div>
             
