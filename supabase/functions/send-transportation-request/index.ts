@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,9 +19,18 @@ serve(async (req) => {
       destination,
       additionalInfo,
       serviceType,
+      phone,
+      pickupDetails,
+      preferredDate,
+      preferredTime,
+      groupSize,
       to,
       subject
     } = await req.json()
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    const supabase = supabaseUrl && supabaseServiceKey ? createClient(supabaseUrl, supabaseServiceKey) : null
 
     // Get Resend API key from environment
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
@@ -31,6 +41,33 @@ serve(async (req) => {
         JSON.stringify({ error: 'Email service not configured' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       )
+    }
+
+    // Persist request for admin visibility
+    if (supabase) {
+      const { error: insertError } = await supabase
+        .from('transportation_requests')
+        .insert({
+          name,
+          email,
+          phone: phone || '',
+          service_type: serviceType,
+          destination: destination || '',
+          pickup_details: pickupDetails || destination || '',
+          preferred_date: preferredDate || null,
+          preferred_time: preferredTime || '',
+          group_size: groupSize || '',
+          additional_info: additionalInfo || '',
+          status: 'new'
+        })
+
+      if (insertError) {
+        console.error('Error saving transportation request to Supabase:', insertError)
+      } else {
+        console.log('Transportation request stored successfully')
+      }
+    } else {
+      console.warn('Supabase credentials missing, skipping database persistence')
     }
 
     // Construct email content for transportation request

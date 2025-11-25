@@ -657,237 +657,275 @@
         // Load bookings
         async function loadBookings() {
             try {
-                console.log('Loading bookings from Supabase...');
-                
-                // Use Supabase client to get bookings
-                const { data, error } = await supabase
-                    .from('bookings')
-                    .select(`
-                        *,
-                        tours(name),
-                        tour_dates(date)
-                    `)
-                    .order('created_at', { ascending: false });
-                
-                console.log('Bookings response:', { data, error });
-                
-                if (error) {
-                    console.error('Error loading bookings:', error);
-                    throw error;
+                console.log('Loading bookings, manual entries, and transportation requests from Supabase...');
+
+                const [
+                    tourResponse,
+                    manualResponse,
+                    transportationResponse
+                ] = await Promise.all([
+                    supabase
+                        .from('bookings')
+                        .select(`
+                            *,
+                            tours(name),
+                            tour_dates(date)
+                        `)
+                        .order('created_at', { ascending: false }),
+                    supabase
+                        .from('manual_bookings')
+                        .select('*')
+                        .order('created_at', { ascending: false }),
+                    supabase
+                        .from('transportation_requests')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                ]);
+
+                if (tourResponse.error) {
+                    console.error('Error loading tour bookings:', tourResponse.error);
+                    throw tourResponse.error;
                 }
-                
-                if (data && Array.isArray(data)) {
-                    currentBookings = data.map(booking => ({
-                        id: booking.id,
-                        customer_name: booking.customer_name,
-                        customer_email: booking.customer_email,
-                        customer_phone: booking.customer_phone,
-                        adults: booking.adults,
-                        children: booking.children,
-                        total_price: booking.total_price,
-                        status: booking.status,
-                        created_at: booking.created_at,
-                        special_requests: booking.special_requests || '',
-                        tour_name: booking.tours?.name || 'Unknown Tour',
-                        tour_date: booking.tour_dates?.date || 'Unknown Date',
-                        payment_type: booking.payment_type || 'card',
-                        crypto_type: booking.crypto_type || ''
-                    }));
-                    displayBookings(currentBookings);
-                    updateStats(currentBookings);
-                } else {
-                    // Show sample data if API fails
-                    const sampleBookings = [
-                        {
-                            id: 1,
-                            customer_name: "Miro Vesterinen",
-                            customer_email: "mirov.vesterinen@gmail.com",
-                            customer_phone: "+358 40 123 4567",
-                            adults: 2,
-                            children: 1,
-                            total_price: 507,
-                            status: "confirmed",
-                            created_at: "2025-08-26T15:59:23Z",
-                            special_requests: "Vegetarian meals please",
-                            tour_name: "Northern Lights Tour",
-                            tour_date: "2025-09-15"
-                        }
-                    ];
-                    displayBookings(sampleBookings);
-                    updateStats(sampleBookings);
+
+                if (manualResponse?.error) {
+                    console.warn('Manual bookings table not ready yet:', manualResponse.error.message);
                 }
+
+                if (transportationResponse?.error) {
+                    console.warn('Transportation requests table not ready yet:', transportationResponse.error.message);
+                }
+
+                const tourBookings = Array.isArray(tourResponse.data) ? tourResponse.data.map(normalizeTourBooking) : [];
+                const manualBookings = manualResponse?.data ? manualResponse.data.map(normalizeManualBooking) : [];
+                const transportationRequests = transportationResponse?.data ? transportationResponse.data.map(normalizeTransportationRequest) : [];
+
+                const combined = [...tourBookings, ...manualBookings, ...transportationRequests]
+                    .sort((a, b) => b.sortTimestamp - a.sortTimestamp);
+
+                currentBookings = combined;
+                filteredBookings = combined;
+
+                displayBookings(filteredBookings);
+                updateStats(filteredBookings);
             } catch (error) {
                 console.error('Error loading bookings:', error);
-                // Show sample data on error
-                const sampleBookings = [
-                    {
-                        id: 1,
-                        customer_name: "Miro Vesterinen",
-                        customer_email: "mirov.vesterinen@gmail.com",
-                        customer_phone: "+358 40 123 4567",
-                        adults: 2,
-                        children: 1,
-                        total_price: 507,
-                        status: "confirmed",
-                        created_at: "2025-08-26T15:59:23Z",
-                        special_requests: "Vegetarian meals please",
-                        tour_name: "Northern Lights Tour",
-                        tour_date: "2025-09-15"
-                    }
-                ];
-                displayBookings(sampleBookings);
-                updateStats(sampleBookings);
+                displayBookings([]);
+                updateStats([]);
             }
         }
 
-        // Display bookings
-        function displayBookings(bookings) {
+        // Display bookings grouped by date
+        function displayBookings(bookings = []) {
             const container = document.getElementById('bookingsList');
             container.innerHTML = '';
             
-            if (bookings.length === 0) {
+            if (!bookings || bookings.length === 0) {
                 container.innerHTML = `
                     <div class="p-8 text-center text-gray-500">
                         <div class="text-4xl mb-4">📋</div>
                         <p class="text-lg font-medium">No bookings yet</p>
-                        <p class="text-sm">When customers start booking tours, they'll appear here</p>
+                        <p class="text-sm">Manual entries and transportation requests will appear here as well.</p>
                     </div>
                 `;
                 return;
             }
-            
-            bookings.forEach((booking) => {
-                const bookingElement = createBookingElement(booking);
-                container.appendChild(bookingElement);
+
+            const grouped = groupBookingsByDate(bookings);
+
+            grouped.forEach(group => {
+                const section = document.createElement('div');
+                section.className = 'mb-6';
+                section.innerHTML = `
+                    <div class="flex items-center justify-between mb-3 px-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">${group.label}</h3>
+                            <p class="text-xs text-gray-500">Showing ${group.items.length} booking${group.items.length !== 1 ? 's' : ''}</p>
+                        </div>
+                        <div class="text-xs text-gray-500 uppercase tracking-wide">Date group</div>
+                    </div>
+                `;
+
+                group.items
+                    .sort((a, b) => b.sortTimestamp - a.sortTimestamp)
+                    .forEach(booking => {
+                        const bookingElement = createBookingElement(booking);
+                        section.appendChild(bookingElement);
+                    });
+
+                container.appendChild(section);
             });
         }
 
-        // Create booking element
+        // Create booking card
         function createBookingElement(booking) {
             const div = document.createElement('div');
-            div.className = 'p-4 hover:bg-gray-50 transition-colors';
-            
+            div.className = 'p-4 mt-4 rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md';
+
             const statusColors = {
                 'confirmed': 'bg-green-100 text-green-800',
                 'pending': 'bg-yellow-100 text-yellow-800',
                 'pending_crypto_payment': 'bg-orange-100 text-orange-800',
-                'cancelled': 'bg-red-100 text-red-800'
+                'cancelled': 'bg-red-100 text-red-800',
+                'in_progress': 'bg-blue-100 text-blue-800',
+                'completed': 'bg-emerald-100 text-emerald-800',
+                'new': 'bg-purple-100 text-purple-800',
+                'contacted': 'bg-purple-50 text-purple-700',
+                'quoted': 'bg-indigo-50 text-indigo-700',
+                'scheduled': 'bg-sky-100 text-sky-800'
             };
-            
+
+            const badgeInfo = BOOKING_TYPE_BADGES[booking.type] || { label: 'Booking', classes: 'bg-gray-100 text-gray-800' };
+            const statusClass = statusColors[booking.status] || 'bg-gray-100 text-gray-800';
+            const participants = (booking.adults || 0) + (booking.children || 0);
+            const priceValue = Number(booking.total_price || 0);
+            const scheduledDate = booking.tour_date ? new Date(booking.tour_date).toLocaleDateString('en-GB') : 'Date to be confirmed';
+            const createdDate = booking.created_at ? new Date(booking.created_at).toLocaleString('en-GB') : 'Unknown';
+            const statusOptions = STATUS_OPTIONS[booking.type] || [];
+            const showEmailButton = booking.type !== 'transportation';
+
+            const pickupDetails = (booking.pickup_place || booking.pickup_time) ? `
+                <div class="text-sm text-gray-600">
+                    <span class="font-medium text-gray-900">🚐 Pickup:</span> 
+                    ${booking.pickup_place ? booking.pickup_place : 'Location TBD'}
+                    ${booking.pickup_time ? ` • ${booking.pickup_time}` : ''}
+                </div>
+            ` : '';
+
+            const destinationDetails = booking.destination ? `
+                <div class="text-sm text-gray-600">
+                    <span class="font-medium text-gray-900">📍 Route:</span> ${booking.destination}
+                </div>
+            ` : '';
+
+            const notesContent = booking.special_requests || booking.additional_info;
+
             div.innerHTML = `
-                <div class="flex items-start justify-between">
-                    <div class="flex-1">
-                        <div class="flex items-center space-x-3 mb-3">
-                            <h3 class="text-base font-semibold text-gray-900">${booking.customer_name}</h3>
-                            <span class="px-2 py-1 rounded text-xs font-medium ${statusColors[booking.status] || 'bg-gray-100 text-gray-800'}">
-                                ${booking.status.toUpperCase()}
+                <div class="flex items-start justify-between gap-6 flex-col lg:flex-row">
+                    <div class="flex-1 w-full">
+                        <div class="flex flex-wrap items-center gap-2 mb-3">
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold ${badgeInfo.classes}">${badgeInfo.label}</span>
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">
+                                ${booking.status.replace(/_/g, ' ').toUpperCase()}
                             </span>
-                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded">
-                                #${booking.id}
+                            <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded">
+                                #${booking.uid.toUpperCase()}
                             </span>
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">${booking.customer_name}</h3>
+                        <p class="text-sm text-gray-500 mb-4">${booking.tour_name || 'Service'}</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm text-gray-600">
                             <div class="space-y-2">
-                                <div class="text-sm text-gray-600">
-                                    <span class="font-medium">📧 Email:</span> ${booking.customer_email}
-                                </div>
-                                <div class="text-sm text-gray-600">
-                                    <span class="font-medium">📞 Phone:</span> ${booking.customer_phone || 'Not provided'}
-                                </div>
-                                <div class="text-sm text-gray-600">
-                                    <span class="font-medium">👥 Participants:</span> ${booking.adults} adults, ${booking.children} children
-                                </div>
-                                <div class="text-sm text-gray-600">
-                                    <span class="font-medium">💰 Total Price:</span> €${booking.total_price}
-                                </div>
+                                <div><span class="font-medium text-gray-900">📧 Email:</span> ${booking.customer_email}</div>
+                                <div><span class="font-medium text-gray-900">📞 Phone:</span> ${booking.customer_phone || 'Not provided'}</div>
+                                <div><span class="font-medium text-gray-900">🕒 Received:</span> ${createdDate}</div>
+                                ${participants > 0 ? `<div><span class="font-medium text-gray-900">👥 Participants:</span> ${booking.adults} adults, ${booking.children} children</div>` : ''}
+                ${priceValue > 0 ? `<div><span class="font-medium text-gray-900">💰 Total Price:</span> €${priceValue.toFixed(2)}</div>` : (booking.type === 'transportation' ? `<div><span class="font-medium text-gray-900">💰 Pricing:</span> Quote pending</div>` : '')}
                                 ${booking.payment_type === 'crypto' ? `
-                                <div class="text-sm text-gray-600">
-                                    <span class="font-medium">🪙 Payment:</span> <span class="text-orange-600 font-semibold">${booking.crypto_type ? booking.crypto_type.toUpperCase() : 'CRYPTO'}</span>
-                                </div>
+                                <div><span class="font-medium text-gray-900">🪙 Payment:</span> <span class="text-orange-600 font-semibold">${booking.crypto_type ? booking.crypto_type.toUpperCase() : 'CRYPTO'}</span></div>
                                 ` : ''}
-                        </div>
-                        
+                            </div>
                             <div class="space-y-2">
-                                <div class="text-sm text-gray-600">
-                                    <span class="font-medium">🎯 Tour:</span> ${booking.tour_name || 'Unknown Tour'}
-                                </div>
-                                <div class="text-sm text-gray-600">
-                                    <span class="font-medium">📅 Tour Date:</span> ${new Date(booking.tour_date).toLocaleDateString('en-GB')}
-                                </div>
-                                <div class="text-sm text-gray-600">
-                                    <span class="font-medium">🕒 Booked:</span> ${new Date(booking.created_at).toLocaleString('en-GB')}
-                                </div>
-                                <div class="text-sm text-gray-600">
-                                    <span class="font-medium">📊 Total People:</span> ${booking.adults + booking.children}
-                                </div>
+                                <div><span class="font-medium text-gray-900">📅 Scheduled For:</span> ${scheduledDate}</div>
+                                ${pickupDetails}
+                                ${destinationDetails}
+                                ${booking.type === 'transportation' ? `
+                                <div><span class="font-medium text-gray-900">📝 Request Status:</span> ${booking.status.replace(/_/g, ' ')}</div>
+                                ` : ''}
+                                ${participants > 0 ? `<div><span class="font-medium text-gray-900">📊 Total People:</span> ${participants}</div>` : ''}
                             </div>
-                    </div>
-                    
+                        </div>
+
                         ${booking.payment_type === 'crypto' && booking.status === 'pending_crypto_payment' ? `
-                            <div class="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                                <div class="text-sm font-medium text-orange-800 mb-1">🪙 Crypto Payment Required:</div>
-                                <div class="text-sm text-orange-700">Contact customer to provide ${booking.crypto_type ? booking.crypto_type.toUpperCase() : 'CRYPTO'} wallet address and payment instructions.</div>
+                            <div class="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg text-sm text-orange-900">
+                                <div class="font-medium mb-1">🪙 Crypto Payment Required</div>
+                                Contact customer to provide ${booking.crypto_type ? booking.crypto_type.toUpperCase() : 'CRYPTO'} wallet address and payment instructions.
                             </div>
                         ` : ''}
-                        ${booking.special_requests ? `
-                            <div class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                <div class="text-sm font-medium text-yellow-800 mb-1">💬 Special Requests:</div>
-                                <div class="text-sm text-yellow-700">${booking.special_requests}</div>
+
+                        ${notesContent ? `
+                            <div class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-900">
+                                <div class="font-medium mb-1">💬 Notes:</div>
+                                <div>${notesContent}</div>
                             </div>
                         ` : ''}
                     </div>
-                    
-                    <div class="ml-6 flex flex-col space-y-2 min-w-[200px]">
-                        <select class="status-select border border-gray-300 rounded px-3 py-2 text-sm bg-white" 
-                                data-booking-id="${booking.id}" data-current-status="${booking.status}">
-                            <option value="pending" ${booking.status === 'pending' ? 'selected' : ''}>Pending</option>
-                            <option value="confirmed" ${booking.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
-                            <option value="pending_crypto_payment" ${booking.status === 'pending_crypto_payment' ? 'selected' : ''}>Pending Crypto</option>
-                            <option value="cancelled" ${booking.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
-                        </select>
-                        <button onclick="sendConfirmationEmail(${booking.id})" 
-                                class="bg-green-600 text-white py-2 px-3 rounded text-sm hover:bg-green-700 transition-colors">
-                            📧 Send Email
-                        </button>
-                        <button onclick="deleteBooking(${booking.id})" 
+
+                    <div class="flex flex-col space-y-2 min-w-[220px] w-full lg:w-auto">
+                        ${statusOptions.length ? `
+                            <select class="status-select border border-gray-300 rounded px-3 py-2 text-sm bg-white text-gray-800" 
+                                    data-booking-uid="${booking.uid}" data-current-status="${booking.status}">
+                                ${statusOptions.map(option => `
+                                    <option value="${option.value}" ${booking.status === option.value ? 'selected' : ''}>${option.label}</option>
+                                `).join('')}
+                            </select>
+                        ` : ''}
+                        ${showEmailButton ? `
+                            <button data-action="send-email" data-booking-uid="${booking.uid}"
+                                    class="bg-green-600 text-white py-2 px-3 rounded text-sm hover:bg-green-700 transition-colors">
+                                📧 Send Email
+                            </button>
+                        ` : `
+                            <button type="button" onclick="openTransportationEmail('${booking.uid}')"
+                                    class="bg-purple-600 text-white py-2 px-3 rounded text-sm hover:bg-purple-700 transition-colors">
+                                📧 Reply via Email
+                            </button>
+                        `}
+                        <button onclick="deleteBooking('${booking.uid}')"
                                 class="bg-red-600 text-white py-2 px-3 rounded text-sm hover:bg-red-700 transition-colors">
                             🗑️ Delete
                         </button>
                     </div>
                 </div>
             `;
-            
-            // Add status change handler
+
             const statusSelect = div.querySelector('.status-select');
-            statusSelect.addEventListener('change', (e) => {
-                updateBookingStatus(booking.id, e.target.value);
-            });
-            
+            if (statusSelect) {
+                statusSelect.addEventListener('change', (e) => {
+                    updateBookingStatus(e.target.getAttribute('data-booking-uid'), e.target.value);
+                });
+            }
+
             return div;
         }
 
         // Update booking status
-        async function updateBookingStatus(bookingId, newStatus) {
+        async function updateBookingStatus(bookingUid, newStatus) {
             try {
-                const currentBooking = currentBookings.find(b => b.id === bookingId);
-                if (!currentBooking) {
+                const booking = currentBookings.find(b => b.uid === bookingUid);
+                if (!booking) {
                     alert('Booking not found');
                     return;
                 }
+
+                let updateError = null;
+
+                if (booking.type === 'manual') {
+                    const { error } = await supabase
+                        .from('manual_bookings')
+                        .update({ status: newStatus })
+                        .eq('id', booking.rawId);
+                    updateError = error;
+                } else if (booking.type === 'transportation') {
+                    const { error } = await supabase
+                        .from('transportation_requests')
+                        .update({ status: newStatus })
+                        .eq('id', booking.rawId);
+                    updateError = error;
+                } else {
+                    const { error } = await supabase
+                        .from('bookings')
+                        .update({ status: newStatus })
+                        .eq('id', booking.rawId);
+                    updateError = error;
+                }
                 
-                const { error: bookingError } = await supabase
-                    .from('bookings')
-                    .update({ status: newStatus })
-                    .eq('id', bookingId);
-                
-                if (bookingError) {
-                    console.error('Error updating booking status:', bookingError);
-                    alert('❌ Error updating status: ' + bookingError.message);
+                if (updateError) {
+                    console.error('Error updating booking status:', updateError);
+                    alert('❌ Error updating status: ' + updateError.message);
                     return;
                 }
                 
-                // Reload bookings
                 await loadBookings();
                 alert('✅ Status updated successfully');
                 
@@ -898,26 +936,32 @@
         }
 
         // Send confirmation email
-        async function sendConfirmationEmail(bookingId) {
+        async function sendConfirmationEmail(bookingUid) {
             try {
-                const booking = currentBookings.find(b => b.id === bookingId);
+                const booking = currentBookings.find(b => b.uid === bookingUid);
                 if (!booking) {
                     alert('Booking not found');
                     return;
                 }
 
-                // Show loading state
-                const button = event?.target || document.querySelector(`button[onclick="sendConfirmationEmail(${bookingId})"]`);
+                const button = document.querySelector(`button[data-action="send-email"][data-booking-uid="${bookingUid}"]`);
                 if (button) {
                     button.disabled = true;
                     button.textContent = 'Sending...';
                 }
 
-                // Generate email HTML and text
-                const emailHTML = generateCustomerConfirmationHTML(booking);
-                const emailText = generateCustomerConfirmationText(booking);
+                let emailHTML = '';
+                let emailText = '';
+                let subject = `Booking Confirmed: ${booking.tour_name} - Royal Nordic`;
 
-                // Send via Supabase Edge Function
+                if (booking.type === 'manual') {
+                    emailHTML = generateManualBookingEmailHTML(booking);
+                    emailText = generateManualBookingEmailText(booking);
+                } else {
+                    emailHTML = generateCustomerConfirmationHTML(booking);
+                    emailText = generateCustomerConfirmationText(booking);
+                }
+
                 const response = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
                     method: 'POST',
                     headers: {
@@ -926,7 +970,7 @@
                     },
                     body: JSON.stringify({
                         to: [booking.customer_email],
-                        subject: `Booking Confirmed: ${booking.tour_name} - Royal Nordic`,
+                        subject,
                         html: emailHTML,
                         text: emailText
                     }),
@@ -939,7 +983,6 @@
 
                 alert('✅ Confirmation email sent successfully to ' + booking.customer_email + '!');
                 
-                // Reset button
                 if (button) {
                     button.disabled = false;
                     button.innerHTML = '📧 Send Email';
@@ -948,8 +991,7 @@
                 console.error('Error sending confirmation email:', error);
                 alert('❌ Error sending email: ' + error.message);
                 
-                // Reset button
-                const button = event?.target || document.querySelector(`button[onclick="sendConfirmationEmail(${bookingId})"]`);
+                const button = document.querySelector(`button[data-action="send-email"][data-booking-uid="${bookingUid}"]`);
                 if (button) {
                     button.disabled = false;
                     button.innerHTML = '📧 Send Email';
@@ -1082,17 +1124,51 @@ Booking ID: #${booking.id}`;
         }
 
         // Delete booking permanently
-        async function deleteBooking(bookingId) {
+        async function deleteBooking(bookingUid) {
             try {
                 // Confirm deletion
                 const confirmed = confirm('⚠️ Are you sure you want to PERMANENTLY DELETE this booking?\n\nThis action cannot be undone.');
                 if (!confirmed) return;
                 
-                console.log(`Deleting booking ${bookingId}`);
+                console.log(`Deleting booking ${bookingUid}`);
                 
-                const currentBooking = currentBookings.find(b => b.id === bookingId);
+                const currentBooking = currentBookings.find(b => b.uid === bookingUid);
                 if (!currentBooking) {
                     alert('❌ Booking not found in current list');
+                    return;
+                }
+
+                if (currentBooking.type === 'manual') {
+                    const { error } = await supabase
+                        .from('manual_bookings')
+                        .delete()
+                        .eq('id', currentBooking.rawId);
+                    
+                    if (error) {
+                        console.error('Error deleting manual booking:', error);
+                        alert('❌ Error deleting manual booking: ' + error.message);
+                        return;
+                    }
+                    
+                    alert('✅ Manual booking deleted successfully');
+                    await loadBookings();
+                    return;
+                }
+
+                if (currentBooking.type === 'transportation') {
+                    const { error } = await supabase
+                        .from('transportation_requests')
+                        .delete()
+                        .eq('id', currentBooking.rawId);
+                    
+                    if (error) {
+                        console.error('Error deleting transportation request:', error);
+                        alert('❌ Error deleting transportation request: ' + error.message);
+                        return;
+                    }
+                    
+                    alert('✅ Transportation request removed');
+                    await loadBookings();
                     return;
                 }
                 
@@ -1100,7 +1176,7 @@ Booking ID: #${booking.id}`;
                 const { data: bookingData, error: fetchError } = await supabase
                     .from('bookings')
                     .select('tour_date_id, adults, children')
-                    .eq('id', bookingId)
+                    .eq('id', currentBooking.rawId)
                     .single();
                 
                 if (fetchError) {
@@ -1122,7 +1198,7 @@ Booking ID: #${booking.id}`;
                 const { data: deleteData, error: deleteError } = await supabase
                     .from('bookings')
                     .delete()
-                    .eq('id', bookingId)
+                    .eq('id', currentBooking.rawId)
                     .select();
                 
                 if (deleteError) {
@@ -1137,7 +1213,7 @@ Booking ID: #${booking.id}`;
                     const { error: cancelError } = await supabase
                         .from('bookings')
                         .update({ status: 'cancelled' })
-                        .eq('id', bookingId);
+                        .eq('id', currentBooking.rawId);
                     
                     if (cancelError) {
                         alert('❌ Error: Cannot delete or cancel booking.\n\n' + 
@@ -1266,8 +1342,23 @@ Booking ID: #${booking.id}`;
                     throw new Error(error.error || 'Failed to send email');
                 }
 
-                alert('✅ Confirmation email sent successfully!');
-                closeManualBookingForm();
+                const { data: savedBooking, error: saveError } = await supabase
+                    .from('manual_bookings')
+                    .insert({
+                        ...bookingData,
+                        status: 'confirmed'
+                    })
+                    .select()
+                    .single();
+
+                if (saveError) {
+                    console.error('Error saving manual booking:', saveError);
+                    alert('Email sent, but failed to save booking internally: ' + saveError.message);
+                } else {
+                    alert('✅ Confirmation email sent and booking saved!');
+                    closeManualBookingForm();
+                    await loadBookings();
+                }
                 
             } catch (error) {
                 console.error('Error sending confirmation email:', error);
@@ -1611,21 +1702,19 @@ Thank you for choosing Royal Nordic Tours!`;
         // Update stats
         function updateStats(bookings = []) {
             const total = bookings.length;
-            const confirmed = bookings.filter(b => b.status === 'confirmed').length;
-            const totalRevenue = bookings
-                .filter(b => b.status === 'confirmed')
-                .reduce((sum, b) => sum + b.total_price, 0);
-            const totalParticipants = bookings
-                .filter(b => b.status === 'confirmed')
-                .reduce((sum, b) => sum + b.adults + b.children, 0);
+            const confirmed = bookings.filter(b => {
+                if (b.type === 'transportation') {
+                    return ['contacted', 'quoted', 'scheduled', 'completed'].includes(b.status);
+                }
+                return ['confirmed', 'completed'].includes(b.status);
+            }).length;
+            const totalRevenue = bookings.reduce((sum, b) => sum + (Number(b.total_price) || 0), 0);
+            const totalParticipants = bookings.reduce((sum, b) => sum + ((b.adults || 0) + (b.children || 0)), 0);
             
-            // Update main stats
             document.getElementById('totalBookings').textContent = total;
             document.getElementById('confirmedBookings').textContent = confirmed;
             document.getElementById('totalRevenue').textContent = `€${totalRevenue.toFixed(2)}`;
             document.getElementById('totalParticipants').textContent = totalParticipants;
-            
-            // Update last updated time
             document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
         }
 
@@ -1638,20 +1727,22 @@ Thank you for choosing Royal Nordic Tours!`;
             }
             
             const csvContent = [
-                ['ID', 'Customer Name', 'Email', 'Phone', 'Tour', 'Date', 'Adults', 'Children', 'Total Price', 'Status', 'Booked At', 'Special Requests'],
+                ['ID', 'Type', 'Customer Name', 'Email', 'Phone', 'Service', 'Route / Destination', 'Scheduled Date', 'Created At', 'Adults', 'Children', 'Total Price', 'Status', 'Notes'],
                 ...currentBookings.map(booking => [
-                    booking.id,
+                    booking.uid,
+                    booking.type,
                     booking.customer_name,
                     booking.customer_email,
                     booking.customer_phone || '',
                     booking.tour_name || '',
-                    new Date(booking.tour_date).toLocaleDateString('en-GB'),
-                    booking.adults,
-                    booking.children,
-                    booking.total_price,
+                    booking.destination || booking.pickup_place || '',
+                    booking.tour_date ? new Date(booking.tour_date).toLocaleDateString('en-GB') : 'No date',
+                    booking.created_at ? new Date(booking.created_at).toLocaleString('en-GB') : '',
+                    booking.adults || 0,
+                    booking.children || 0,
+                    (Number(booking.total_price) || 0).toFixed(2),
                     booking.status,
-                    new Date(booking.created_at).toLocaleString('en-GB'),
-                    booking.special_requests || ''
+                    booking.special_requests || booking.additional_info || ''
                 ])
             ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
             
@@ -1676,6 +1767,176 @@ Thank you for choosing Royal Nordic Tours!`;
         let availabilityData = new Map();
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
+
+        const BOOKING_TYPE_BADGES = {
+            tour: { label: 'Tour Booking', classes: 'bg-emerald-100 text-emerald-800' },
+            manual: { label: 'Manual Booking', classes: 'bg-blue-100 text-blue-800' },
+            transportation: { label: 'Transportation Request', classes: 'bg-purple-100 text-purple-800' }
+        };
+
+        const STATUS_OPTIONS = {
+            tour: [
+                { value: 'pending', label: 'Pending' },
+                { value: 'confirmed', label: 'Confirmed' },
+                { value: 'pending_crypto_payment', label: 'Pending Crypto' },
+                { value: 'cancelled', label: 'Cancelled' }
+            ],
+            manual: [
+                { value: 'pending', label: 'Pending' },
+                { value: 'confirmed', label: 'Confirmed' },
+                { value: 'in_progress', label: 'In Progress' },
+                { value: 'completed', label: 'Completed' },
+                { value: 'cancelled', label: 'Cancelled' }
+            ],
+            transportation: [
+                { value: 'new', label: 'New' },
+                { value: 'contacted', label: 'Contacted' },
+                { value: 'quoted', label: 'Quote Sent' },
+                { value: 'scheduled', label: 'Scheduled' },
+                { value: 'completed', label: 'Completed' },
+                { value: 'cancelled', label: 'Cancelled' }
+            ]
+        };
+
+        function parseDateValue(value) {
+            if (!value) return null;
+            const parsed = new Date(value);
+            return isNaN(parsed.getTime()) ? null : parsed;
+        }
+
+        function formatDateHeading(key) {
+            if (!key || key === 'no-date') {
+                return 'No specific date / custom requests';
+            }
+            const dateObj = parseDateValue(key);
+            if (!dateObj) return key;
+            return dateObj.toLocaleDateString('en-GB', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        function normalizeTourBooking(booking) {
+            const tourDate = booking.tour_dates?.date || booking.tour_date || null;
+            const dateObj = tourDate ? parseDateValue(tourDate) : parseDateValue(booking.created_at);
+            return {
+                uid: `tour-${booking.id}`,
+                type: 'tour',
+                rawId: booking.id,
+                id: booking.id,
+                customer_name: booking.customer_name,
+                customer_email: booking.customer_email,
+                customer_phone: booking.customer_phone,
+                adults: booking.adults || 0,
+                children: booking.children || 0,
+                total_price: Number(booking.total_price) || 0,
+                status: booking.status,
+                created_at: booking.created_at,
+                special_requests: booking.special_requests || '',
+                tour_name: booking.tours?.name || booking.tour_name || 'Tour Booking',
+                tour_date: tourDate,
+                payment_type: booking.payment_type || 'card',
+                crypto_type: booking.crypto_type || '',
+                pickup_time: booking.pickup_time || '',
+                pickup_place: booking.pickup_place || '',
+                destination: '',
+                additional_info: '',
+                displayDateKey: tourDate || 'no-date',
+                sortTimestamp: dateObj ? dateObj.getTime() : Date.now()
+            };
+        }
+
+        function normalizeManualBooking(booking) {
+            const bookingDate = booking.tour_date || null;
+            const dateObj = bookingDate ? parseDateValue(bookingDate) : parseDateValue(booking.created_at);
+            return {
+                uid: `manual-${booking.id}`,
+                type: 'manual',
+                rawId: booking.id,
+                id: booking.id,
+                customer_name: booking.customer_name,
+                customer_email: booking.customer_email,
+                customer_phone: booking.customer_phone || '',
+                adults: booking.adults || 0,
+                children: booking.children || 0,
+                total_price: Number(booking.total_price) || 0,
+                status: booking.status || 'confirmed',
+                created_at: booking.created_at,
+                special_requests: booking.special_requests || '',
+                tour_name: booking.tour_name || 'Manual Booking',
+                tour_date: bookingDate,
+                payment_type: 'manual',
+                crypto_type: '',
+                pickup_time: booking.pickup_time || '',
+                pickup_place: booking.pickup_place || '',
+                destination: '',
+                additional_info: '',
+                displayDateKey: bookingDate || 'no-date',
+                sortTimestamp: dateObj ? dateObj.getTime() : Date.now()
+            };
+        }
+
+        function normalizeTransportationRequest(request) {
+            const createdAt = parseDateValue(request.created_at);
+            return {
+                uid: `transportation-${request.id}`,
+                type: 'transportation',
+                rawId: request.id,
+                id: request.id,
+                customer_name: request.name,
+                customer_email: request.email,
+                customer_phone: request.phone || '',
+                adults: 0,
+                children: 0,
+                total_price: 0,
+                status: request.status || 'new',
+                created_at: request.created_at,
+                special_requests: request.additional_info || '',
+                tour_name: request.service_type || 'Transportation Request',
+                tour_date: null,
+                payment_type: 'transportation',
+                crypto_type: '',
+                pickup_time: '',
+                pickup_place: request.pickup_details || '',
+                destination: request.destination || '',
+                additional_info: request.additional_info || '',
+                displayDateKey: 'no-date',
+                sortTimestamp: createdAt ? createdAt.getTime() : Date.now()
+            };
+        }
+
+        function groupBookingsByDate(bookings) {
+            const groups = new Map();
+            bookings.forEach(booking => {
+                const key = booking.displayDateKey || 'no-date';
+                if (!groups.has(key)) {
+                    const isNoDate = key === 'no-date';
+                    const sortValue = isNoDate ? -Infinity : (parseDateValue(key)?.getTime() || -Infinity);
+                    groups.set(key, {
+                        key,
+                        label: formatDateHeading(key),
+                        sortValue,
+                        items: []
+                    });
+                }
+                groups.get(key).items.push(booking);
+            });
+            return Array.from(groups.values()).sort((a, b) => b.sortValue - a.sortValue);
+        }
+
+        function openTransportationEmail(bookingUid) {
+            const booking = currentBookings.find(b => b.uid === bookingUid);
+            if (!booking) {
+                alert('Transportation request not found');
+                return;
+            }
+            const subject = encodeURIComponent(`Transportation Request - ${booking.tour_name}`);
+            const routeInfo = booking.destination ? `Route: ${booking.destination}\n` : '';
+            const body = encodeURIComponent(`Hi ${booking.customer_name},\n\nThank you for your transportation request.\n${routeInfo}We'll be in touch shortly with a personalized quote.\n\nBest regards,\nRoyal Nordic`);
+            window.location.href = `mailto:${booking.customer_email}?subject=${subject}&body=${body}`;
+        }
 
 
         // Show availability management
@@ -2000,9 +2261,15 @@ Thank you for choosing Royal Nordic Tours!`;
             const statusFilter = document.getElementById('statusFilter').value;
 
             filteredBookings = currentBookings.filter(booking => {
-                const matchesSearch = !searchTerm || 
-                    booking.customer_name.toLowerCase().includes(searchTerm) ||
-                    booking.customer_email.toLowerCase().includes(searchTerm);
+                const haystack = [
+                    booking.customer_name,
+                    booking.customer_email,
+                    booking.customer_phone,
+                    booking.tour_name,
+                    booking.destination
+                ].filter(Boolean).join(' ').toLowerCase();
+
+                const matchesSearch = !searchTerm || haystack.includes(searchTerm);
                 
                 const matchesStatus = !statusFilter || booking.status === statusFilter;
 
@@ -2019,8 +2286,8 @@ Thank you for choosing Royal Nordic Tours!`;
             document.getElementById('statusFilter').value = '';
             
             filteredBookings = currentBookings;
-            displayBookings(currentBookings);
-            updateStats(currentBookings);
+            displayBookings(filteredBookings);
+            updateStats(filteredBookings);
         }
 
         // Availability Management Functions
