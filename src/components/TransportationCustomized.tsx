@@ -8,13 +8,18 @@ const TransportationCustomized = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     destination: '',
+    pickupDetails: '',
+    preferredDate: '',
+    preferredTime: '',
+    groupSize: '',
     additionalInfo: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('');
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -37,7 +42,12 @@ const TransportationCustomized = () => {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
+          phone: formData.phone,
           destination: formData.destination,
+          pickupDetails: formData.pickupDetails,
+          preferredDate: formData.preferredDate || null,
+          preferredTime: formData.preferredTime || '',
+          groupSize: formData.groupSize || '',
           additionalInfo: formData.additionalInfo,
           serviceType: 'Private Customized Transportation',
           to: ['royalnordicfi@gmail.com', 'contact@royalnordic.fi'],
@@ -47,7 +57,17 @@ const TransportationCustomized = () => {
 
       if (response.ok) {
         setSubmitStatus('success');
-        setFormData({ name: '', email: '', destination: '', additionalInfo: '' });
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          destination: '',
+          pickupDetails: '',
+          preferredDate: '',
+          preferredTime: '',
+          groupSize: '',
+          additionalInfo: ''
+        });
       } else {
         console.error('Response not ok:', response.status, response.statusText);
         const errorData = await response.text();
@@ -262,11 +282,73 @@ const TransportationCustomized = () => {
                     />
                   </div>
 
+                  {/* Phone Field */}
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-medium text-white mb-2">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="+358 40 123 4567"
+                    />
+                  </div>
+
+                  {/* Preferred Date & Time */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="preferredDate" className="block text-sm font-medium text-white mb-2">
+                        Preferred Date
+                      </label>
+                      <input
+                        type="date"
+                        id="preferredDate"
+                        name="preferredDate"
+                        value={formData.preferredDate}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="preferredTime" className="block text-sm font-medium text-white mb-2">
+                        Preferred Time
+                      </label>
+                      <input
+                        type="time"
+                        id="preferredTime"
+                        name="preferredTime"
+                        value={formData.preferredTime}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Group Size */}
+                  <div>
+                    <label htmlFor="groupSize" className="block text-sm font-medium text-white mb-2">
+                      Group Size & Luggage Details
+                    </label>
+                    <input
+                      type="text"
+                      id="groupSize"
+                      name="groupSize"
+                      value={formData.groupSize}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="e.g., 6 adults, baby seats, ski equipment"
+                    />
+                  </div>
+
                   {/* Destination Field */}
                   <div>
                     <label htmlFor="destination" className="block text-sm font-medium text-white mb-2">
                       <MapPin className="w-4 h-4 inline mr-2" />
-                      Where do you need transportation? *
+                      Route & Destination Details *
                     </label>
                     <input
                       type="text"
@@ -277,6 +359,22 @@ const TransportationCustomized = () => {
                       required
                       className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       placeholder="e.g., Rovaniemi Airport to Levi, or custom route"
+                    />
+                  </div>
+
+                  {/* Pickup Details */}
+                  <div>
+                    <label htmlFor="pickupDetails" className="block text-sm font-medium text-white mb-2">
+                      Pickup Instructions
+                    </label>
+                    <input
+                      type="text"
+                      id="pickupDetails"
+                      name="pickupDetails"
+                      value={formData.pickupDetails}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="Exact pickup location, flight info, etc."
                     />
                   </div>
 

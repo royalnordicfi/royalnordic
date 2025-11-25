@@ -77,10 +77,15 @@ Transportation Request - ${serviceType}
 Customer Details:
 - Name: ${name}
 - Email: ${email}
+- Phone: ${phone || 'Not provided'}
 - Destination: ${destination}
+- Pickup Details: ${pickupDetails || 'Not provided'}
+- Preferred Date: ${preferredDate || 'Not provided'}
+- Preferred Time: ${preferredTime || 'Not provided'}
+- Group Size: ${groupSize || 'Not specified'}
 
 Additional Information:
-${additionalInfo}
+${additionalInfo || 'N/A'}
 
 This request was submitted through your website's transportation form.
     `.trim()
@@ -102,9 +107,14 @@ This request was submitted through your website's transportation form.
             <h2>Transportation Request - ${serviceType}</h2>
             <p><strong>Name:</strong> ${name}</p>
             <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
             <p><strong>Destination:</strong> ${destination}</p>
+            <p><strong>Pickup Details:</strong> ${pickupDetails || 'Not provided'}</p>
+            ${preferredDate ? `<p><strong>Preferred Date:</strong> ${preferredDate}</p>` : ''}
+            ${preferredTime ? `<p><strong>Preferred Time:</strong> ${preferredTime}</p>` : ''}
+            ${groupSize ? `<p><strong>Group Size:</strong> ${groupSize}</p>` : ''}
             <p><strong>Additional Information:</strong></p>
-            <p>${additionalInfo}</p>
+            <p>${additionalInfo || 'N/A'}</p>
             <hr>
             <p><em>This request was submitted through your website's transportation form.</em></p>
           `,

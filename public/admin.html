@@ -129,6 +129,50 @@
             </div>
                 </div>
                 
+        <!-- Booking Calendar Overview -->
+        <div class="px-4 pb-4">
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900">Calendar Overview</h2>
+                        <p class="text-sm text-gray-500">Track every tour booking, manual entry, and transportation request by day.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="changeCalendarMonth(-1)" class="px-3 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">←</button>
+                        <div id="bookingCalendarMonth" class="font-semibold text-gray-900">Month</div>
+                        <button onclick="changeCalendarMonth(1)" class="px-3 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">→</button>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-3 text-xs text-gray-500 mb-4">
+                    <div class="flex items-center gap-1">
+                        <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+                        <span>Tours</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="w-3 h-3 rounded-full bg-blue-400"></span>
+                        <span>Manual bookings</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="w-3 h-3 rounded-full bg-purple-400"></span>
+                        <span>Transportation requests</span>
+                    </div>
+                    <div class="text-xs text-gray-400">Click a day to filter the bookings list.</div>
+                </div>
+                <div id="bookingCalendarGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2"></div>
+                <div id="calendarSelectedDate" class="hidden mt-4 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-800 text-sm flex items-center justify-between">
+                    <span id="calendarSelectedLabel"></span>
+                    <button onclick="clearCalendarFilter()" class="text-emerald-700 font-semibold text-xs underline">Show all dates</button>
+                </div>
+                <div id="unscheduledContainer" class="hidden mt-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-semibold text-gray-900">Requests without a scheduled date</h3>
+                        <span class="text-xs text-gray-500">Add a date to place them on the calendar</span>
+                    </div>
+                    <div id="unscheduledList" class="space-y-2"></div>
+                </div>
+            </div>
+        </div>
+                
         <!-- Tour Management Section (Hidden) -->
         <div id="tourManagement" class="px-4 pb-6 hidden">
             <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
@@ -421,6 +465,14 @@
             </div>
         </div>
 
+        <!-- Active Filters -->
+        <div id="activeFiltersBar" class="px-4 pb-2 hidden">
+            <div class="bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-2 flex items-center justify-between text-sm text-emerald-800">
+                <span id="activeFilterLabel">Filtered view</span>
+                <button onclick="clearCalendarFilter()" class="font-semibold underline text-emerald-700 text-xs">Clear date filter</button>
+            </div>
+        </div>
+
         <!-- Bookings List -->
         <div class="px-4 pb-6">
             <div class="bg-white rounded-lg border border-gray-200">
@@ -665,12 +717,12 @@
                     transportationResponse
                 ] = await Promise.all([
                     supabase
-                        .from('bookings')
-                        .select(`
-                            *,
-                            tours(name),
-                            tour_dates(date)
-                        `)
+                    .from('bookings')
+                    .select(`
+                        *,
+                        tours(name),
+                        tour_dates(date)
+                    `)
                         .order('created_at', { ascending: false }),
                     supabase
                         .from('manual_bookings')
@@ -707,10 +759,12 @@
 
                 displayBookings(filteredBookings);
                 updateStats(filteredBookings);
+                refreshCalendarData(currentBookings);
             } catch (error) {
                 console.error('Error loading bookings:', error);
                 displayBookings([]);
                 updateStats([]);
+                refreshCalendarData([]);
             }
         }
 
@@ -729,7 +783,7 @@
                 `;
                 return;
             }
-
+            
             const grouped = groupBookingsByDate(bookings);
 
             grouped.forEach(group => {
@@ -748,7 +802,7 @@
                 group.items
                     .sort((a, b) => b.sortTimestamp - a.sortTimestamp)
                     .forEach(booking => {
-                        const bookingElement = createBookingElement(booking);
+                const bookingElement = createBookingElement(booking);
                         section.appendChild(bookingElement);
                     });
 
@@ -760,7 +814,7 @@
         function createBookingElement(booking) {
             const div = document.createElement('div');
             div.className = 'p-4 mt-4 rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md';
-
+            
             const statusColors = {
                 'confirmed': 'bg-green-100 text-green-800',
                 'pending': 'bg-yellow-100 text-yellow-800',
@@ -778,23 +832,25 @@
             const statusClass = statusColors[booking.status] || 'bg-gray-100 text-gray-800';
             const participants = (booking.adults || 0) + (booking.children || 0);
             const priceValue = Number(booking.total_price || 0);
-            const scheduledDate = booking.tour_date ? new Date(booking.tour_date).toLocaleDateString('en-GB') : 'Date to be confirmed';
+            const scheduledDateValue = booking.tour_date || null;
+            const scheduledDate = scheduledDateValue ? new Date(scheduledDateValue).toLocaleDateString('en-GB') : 'Date to be confirmed';
             const createdDate = booking.created_at ? new Date(booking.created_at).toLocaleString('en-GB') : 'Unknown';
             const statusOptions = STATUS_OPTIONS[booking.type] || [];
             const showEmailButton = booking.type !== 'transportation';
+            const groupSizeInfo = booking.group_size && !participants ? `<div><span class="font-medium text-gray-900">👥 Group:</span> ${booking.group_size}</div>` : '';
 
             const pickupDetails = (booking.pickup_place || booking.pickup_time) ? `
-                <div class="text-sm text-gray-600">
+                                <div class="text-sm text-gray-600">
                     <span class="font-medium text-gray-900">🚐 Pickup:</span> 
                     ${booking.pickup_place ? booking.pickup_place : 'Location TBD'}
                     ${booking.pickup_time ? ` • ${booking.pickup_time}` : ''}
-                </div>
+                                </div>
             ` : '';
 
             const destinationDetails = booking.destination ? `
-                <div class="text-sm text-gray-600">
+                                <div class="text-sm text-gray-600">
                     <span class="font-medium text-gray-900">📍 Route:</span> ${booking.destination}
-                </div>
+                                </div>
             ` : '';
 
             const notesContent = booking.special_requests || booking.additional_info;
@@ -810,7 +866,7 @@
                             <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded">
                                 #${booking.uid.toUpperCase()}
                             </span>
-                        </div>
+                                </div>
                         <h3 class="text-lg font-semibold text-gray-900">${booking.customer_name}</h3>
                         <p class="text-sm text-gray-500 mb-4">${booking.tour_name || 'Service'}</p>
 
@@ -821,10 +877,11 @@
                                 <div><span class="font-medium text-gray-900">🕒 Received:</span> ${createdDate}</div>
                                 ${participants > 0 ? `<div><span class="font-medium text-gray-900">👥 Participants:</span> ${booking.adults} adults, ${booking.children} children</div>` : ''}
                 ${priceValue > 0 ? `<div><span class="font-medium text-gray-900">💰 Total Price:</span> €${priceValue.toFixed(2)}</div>` : (booking.type === 'transportation' ? `<div><span class="font-medium text-gray-900">💰 Pricing:</span> Quote pending</div>` : '')}
+                                ${groupSizeInfo}
                                 ${booking.payment_type === 'crypto' ? `
                                 <div><span class="font-medium text-gray-900">🪙 Payment:</span> <span class="text-orange-600 font-semibold">${booking.crypto_type ? booking.crypto_type.toUpperCase() : 'CRYPTO'}</span></div>
                                 ` : ''}
-                            </div>
+                        </div>
                             <div class="space-y-2">
                                 <div><span class="font-medium text-gray-900">📅 Scheduled For:</span> ${scheduledDate}</div>
                                 ${pickupDetails}
@@ -834,8 +891,8 @@
                                 ` : ''}
                                 ${participants > 0 ? `<div><span class="font-medium text-gray-900">📊 Total People:</span> ${participants}</div>` : ''}
                             </div>
-                        </div>
-
+                    </div>
+                    
                         ${booking.payment_type === 'crypto' && booking.status === 'pending_crypto_payment' ? `
                             <div class="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg text-sm text-orange-900">
                                 <div class="font-medium mb-1">🪙 Crypto Payment Required</div>
@@ -850,7 +907,7 @@
                             </div>
                         ` : ''}
                     </div>
-
+                    
                     <div class="flex flex-col space-y-2 min-w-[220px] w-full lg:w-auto">
                         ${statusOptions.length ? `
                             <select class="status-select border border-gray-300 rounded px-3 py-2 text-sm bg-white text-gray-800" 
@@ -858,13 +915,13 @@
                                 ${statusOptions.map(option => `
                                     <option value="${option.value}" ${booking.status === option.value ? 'selected' : ''}>${option.label}</option>
                                 `).join('')}
-                            </select>
+                        </select>
                         ` : ''}
                         ${showEmailButton ? `
                             <button data-action="send-email" data-booking-uid="${booking.uid}"
                                     class="bg-green-600 text-white py-2 px-3 rounded text-sm hover:bg-green-700 transition-colors">
                                 📧 Send Email
-                            </button>
+                        </button>
                         ` : `
                             <button type="button" onclick="openTransportationEmail('${booking.uid}')"
                                     class="bg-purple-600 text-white py-2 px-3 rounded text-sm hover:bg-purple-700 transition-colors">
@@ -878,14 +935,14 @@
                     </div>
                 </div>
             `;
-
+            
             const statusSelect = div.querySelector('.status-select');
             if (statusSelect) {
-                statusSelect.addEventListener('change', (e) => {
+            statusSelect.addEventListener('change', (e) => {
                     updateBookingStatus(e.target.getAttribute('data-booking-uid'), e.target.value);
-                });
+            });
             }
-
+            
             return div;
         }
 
@@ -897,7 +954,7 @@
                     alert('Booking not found');
                     return;
                 }
-
+                
                 let updateError = null;
 
                 if (booking.type === 'manual') {
@@ -914,8 +971,8 @@
                     updateError = error;
                 } else {
                     const { error } = await supabase
-                        .from('bookings')
-                        .update({ status: newStatus })
+                    .from('bookings')
+                    .update({ status: newStatus })
                         .eq('id', booking.rawId);
                     updateError = error;
                 }
@@ -1137,7 +1194,7 @@ Booking ID: #${booking.id}`;
                     alert('❌ Booking not found in current list');
                     return;
                 }
-
+                
                 if (currentBooking.type === 'manual') {
                     const { error } = await supabase
                         .from('manual_bookings')
@@ -1226,7 +1283,7 @@ Booking ID: #${booking.id}`;
                               '3. Check browser console for more details');
                         console.error('Cancel error:', cancelError);
                         return;
-                    } else {
+                } else {
                         alert('⚠️ Booking could not be deleted (permission issue), but has been marked as cancelled.\n\n' +
                               'Original error: ' + deleteError.message + '\n\n' +
                               'Please check RLS policies in Supabase to enable deletion.');
@@ -1265,7 +1322,7 @@ Booking ID: #${booking.id}`;
                             
                             if (updateError) {
                                 console.warn('Could not update tour date slots:', updateError);
-                            } else {
+                } else {
                                 console.log('Tour date slots updated successfully');
                             }
                         }
@@ -1767,6 +1824,10 @@ Thank you for choosing Royal Nordic Tours!`;
         let availabilityData = new Map();
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
+        let bookingCalendarMap = new Map();
+        let calendarViewMonth = new Date().getMonth();
+        let calendarViewYear = new Date().getFullYear();
+        let calendarFilterDate = null;
 
         const BOOKING_TYPE_BADGES = {
             tour: { label: 'Tour Booking', classes: 'bg-emerald-100 text-emerald-800' },
@@ -1820,7 +1881,8 @@ Thank you for choosing Royal Nordic Tours!`;
 
         function normalizeTourBooking(booking) {
             const tourDate = booking.tour_dates?.date || booking.tour_date || null;
-            const dateObj = tourDate ? parseDateValue(tourDate) : parseDateValue(booking.created_at);
+            const preferredDate = tourDate || (booking.created_at ? booking.created_at.split('T')[0] : null);
+            const dateObj = preferredDate ? parseDateValue(preferredDate) : null;
             return {
                 uid: `tour-${booking.id}`,
                 type: 'tour',
@@ -1843,14 +1905,15 @@ Thank you for choosing Royal Nordic Tours!`;
                 pickup_place: booking.pickup_place || '',
                 destination: '',
                 additional_info: '',
-                displayDateKey: tourDate || 'no-date',
+                displayDateKey: preferredDate || 'no-date',
                 sortTimestamp: dateObj ? dateObj.getTime() : Date.now()
             };
         }
 
         function normalizeManualBooking(booking) {
             const bookingDate = booking.tour_date || null;
-            const dateObj = bookingDate ? parseDateValue(bookingDate) : parseDateValue(booking.created_at);
+            const preferredDate = bookingDate || (booking.created_at ? booking.created_at.split('T')[0] : null);
+            const dateObj = preferredDate ? parseDateValue(preferredDate) : null;
             return {
                 uid: `manual-${booking.id}`,
                 type: 'manual',
@@ -1873,13 +1936,16 @@ Thank you for choosing Royal Nordic Tours!`;
                 pickup_place: booking.pickup_place || '',
                 destination: '',
                 additional_info: '',
-                displayDateKey: bookingDate || 'no-date',
+                displayDateKey: preferredDate || 'no-date',
                 sortTimestamp: dateObj ? dateObj.getTime() : Date.now()
             };
         }
 
         function normalizeTransportationRequest(request) {
+            const preferredDate = request.preferred_date || request.tour_date || null;
             const createdAt = parseDateValue(request.created_at);
+            const dateKey = preferredDate || (request.created_at ? request.created_at.split('T')[0] : 'no-date');
+            const dateObj = dateKey && dateKey !== 'no-date' ? parseDateValue(dateKey) : createdAt;
             return {
                 uid: `transportation-${request.id}`,
                 type: 'transportation',
@@ -1895,15 +1961,17 @@ Thank you for choosing Royal Nordic Tours!`;
                 created_at: request.created_at,
                 special_requests: request.additional_info || '',
                 tour_name: request.service_type || 'Transportation Request',
-                tour_date: null,
+                tour_date: preferredDate,
                 payment_type: 'transportation',
                 crypto_type: '',
-                pickup_time: '',
+                pickup_time: request.preferred_time || '',
                 pickup_place: request.pickup_details || '',
                 destination: request.destination || '',
                 additional_info: request.additional_info || '',
-                displayDateKey: 'no-date',
-                sortTimestamp: createdAt ? createdAt.getTime() : Date.now()
+                group_size: request.group_size || '',
+                preferred_time: request.preferred_time || '',
+                displayDateKey: dateKey || 'no-date',
+                sortTimestamp: dateObj ? dateObj.getTime() : Date.now()
             };
         }
 
@@ -1926,6 +1994,181 @@ Thank you for choosing Royal Nordic Tours!`;
             return Array.from(groups.values()).sort((a, b) => b.sortValue - a.sortValue);
         }
 
+        function refreshCalendarData(bookings) {
+            bookingCalendarMap = buildCalendarMap(bookings);
+            if (calendarFilterDate && !bookingCalendarMap.has(calendarFilterDate)) {
+                calendarFilterDate = null;
+            }
+            renderBookingCalendar();
+            updateUnscheduledList(bookings);
+            updateActiveFilterBar();
+        }
+
+        function buildCalendarMap(bookings) {
+            const map = new Map();
+            bookings.forEach(booking => {
+                let dateKey = booking.displayDateKey && booking.displayDateKey !== 'no-date'
+                    ? booking.displayDateKey
+                    : (booking.tour_date || (booking.created_at ? booking.created_at.split('T')[0] : null));
+
+                if (!dateKey) {
+                    booking.displayDateKey = 'no-date';
+                    return;
+                }
+
+                booking.displayDateKey = dateKey;
+                if (!map.has(dateKey)) {
+                    map.set(dateKey, {
+                        bookings: [],
+                        counts: { tour: 0, manual: 0, transportation: 0 }
+                    });
+                }
+                const entry = map.get(dateKey);
+                entry.bookings.push(booking);
+                entry.counts[booking.type] = (entry.counts[booking.type] || 0) + 1;
+            });
+            return map;
+        }
+
+        function renderBookingCalendar() {
+            const grid = document.getElementById('bookingCalendarGrid');
+            const monthLabel = document.getElementById('bookingCalendarMonth');
+            const selectedWrap = document.getElementById('calendarSelectedDate');
+            const selectedLabel = document.getElementById('calendarSelectedLabel');
+
+            if (!grid) return;
+
+            const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+            if (monthLabel) {
+                monthLabel.textContent = `${monthNames[calendarViewMonth]} ${calendarViewYear}`;
+            }
+
+            grid.innerHTML = '';
+            const firstDay = new Date(calendarViewYear, calendarViewMonth, 1);
+            const startDay = firstDay.getDay();
+            const daysInMonth = new Date(calendarViewYear, calendarViewMonth + 1, 0).getDate();
+
+            for (let i = 0; i < startDay; i++) {
+                const spacer = document.createElement('div');
+                spacer.className = 'h-20';
+                grid.appendChild(spacer);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateKey = new Date(calendarViewYear, calendarViewMonth, day).toISOString().split('T')[0];
+                const entry = bookingCalendarMap.get(dateKey);
+                const isSelected = calendarFilterDate === dateKey;
+
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = [
+                    'p-3 rounded-xl border text-left transition focus:outline-none',
+                    entry ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200 bg-white',
+                    isSelected ? 'ring-2 ring-emerald-500' : '',
+                    'hover:ring-2 hover:ring-emerald-400'
+                ].join(' ').trim();
+
+                const counts = entry?.counts || {};
+                const total = entry ? entry.bookings.length : 0;
+                const summaryLines = [];
+                if (counts.tour) summaryLines.push(`<span class="text-emerald-700 font-semibold">${counts.tour} tour${counts.tour > 1 ? 's' : ''}</span>`);
+                if (counts.manual) summaryLines.push(`<span class="text-blue-700 font-semibold">${counts.manual} manual</span>`);
+                if (counts.transportation) summaryLines.push(`<span class="text-purple-700 font-semibold">${counts.transportation} transport</span>`);
+
+                button.innerHTML = `
+                    <div class="text-sm font-semibold text-gray-900">${day}</div>
+                    <div class="mt-1 text-[10px] text-gray-500">${total ? `${total} booking${total > 1 ? 's' : ''}` : 'No bookings'}</div>
+                    ${summaryLines.length ? `<div class="mt-1 flex flex-col gap-0.5 text-[10px] leading-tight">${summaryLines.join('')}</div>` : ''}
+                `;
+
+                button.addEventListener('click', () => handleCalendarDayClick(dateKey));
+                grid.appendChild(button);
+            }
+
+            if (selectedWrap && selectedLabel) {
+                if (calendarFilterDate) {
+                    const entry = bookingCalendarMap.get(calendarFilterDate);
+                    selectedWrap.classList.remove('hidden');
+                    const countText = entry ? ` (${entry.bookings.length} booking${entry.bookings.length !== 1 ? 's' : ''})` : '';
+                    selectedLabel.textContent = `${formatDateHeading(calendarFilterDate)}${countText}`;
+                } else {
+                    selectedWrap.classList.add('hidden');
+                }
+            }
+        }
+
+        function handleCalendarDayClick(dateKey) {
+            calendarFilterDate = calendarFilterDate === dateKey ? null : dateKey;
+            applyFilters();
+            renderBookingCalendar();
+            updateActiveFilterBar();
+            document.getElementById('bookingsList')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function changeCalendarMonth(direction) {
+            calendarViewMonth += direction;
+            if (calendarViewMonth < 0) {
+                calendarViewMonth = 11;
+                calendarViewYear--;
+            } else if (calendarViewMonth > 11) {
+                calendarViewMonth = 0;
+                calendarViewYear++;
+            }
+            renderBookingCalendar();
+        }
+
+        function clearCalendarFilter() {
+            if (!calendarFilterDate) return;
+            calendarFilterDate = null;
+            applyFilters();
+            renderBookingCalendar();
+            updateActiveFilterBar();
+        }
+
+        function updateActiveFilterBar() {
+            const bar = document.getElementById('activeFiltersBar');
+            const label = document.getElementById('activeFilterLabel');
+            if (!bar || !label) return;
+            if (calendarFilterDate) {
+                bar.classList.remove('hidden');
+                label.textContent = `Showing bookings for ${formatDateHeading(calendarFilterDate)}`;
+            } else {
+                bar.classList.add('hidden');
+            }
+        }
+
+        function updateUnscheduledList(bookings) {
+            const container = document.getElementById('unscheduledContainer');
+            const list = document.getElementById('unscheduledList');
+            if (!container || !list) return;
+
+            const unscheduled = bookings.filter(b => !b.displayDateKey || b.displayDateKey === 'no-date');
+            if (!unscheduled.length) {
+                container.classList.add('hidden');
+                list.innerHTML = '';
+                return;
+            }
+
+            container.classList.remove('hidden');
+            const preview = unscheduled.slice(0, 5);
+            list.innerHTML = preview.map(booking => {
+                const created = booking.created_at ? new Date(booking.created_at).toLocaleDateString('en-GB') : 'Unknown';
+                return `
+                    <div class="p-3 rounded-lg border border-dashed border-gray-200 bg-white flex items-center justify-between text-sm">
+                        <div>
+                            <div class="font-semibold text-gray-900">${booking.customer_name}</div>
+                            <div class="text-gray-500">${booking.tour_name} · ${booking.type === 'transportation' ? 'Transportation' : 'Manual'}</div>
+                            <div class="text-xs text-gray-400">Added ${created}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (unscheduled.length > preview.length) {
+                list.innerHTML += `<div class="text-xs text-gray-500 px-1">+${unscheduled.length - preview.length} more unscheduled bookings</div>`;
+            }
+        }
+
         function openTransportationEmail(bookingUid) {
             const booking = currentBookings.find(b => b.uid === bookingUid);
             if (!booking) {
@@ -1934,7 +2177,11 @@ Thank you for choosing Royal Nordic Tours!`;
             }
             const subject = encodeURIComponent(`Transportation Request - ${booking.tour_name}`);
             const routeInfo = booking.destination ? `Route: ${booking.destination}\n` : '';
-            const body = encodeURIComponent(`Hi ${booking.customer_name},\n\nThank you for your transportation request.\n${routeInfo}We'll be in touch shortly with a personalized quote.\n\nBest regards,\nRoyal Nordic`);
+            const dateInfo = booking.tour_date ? `Preferred date: ${new Date(booking.tour_date).toLocaleDateString('en-GB')}\n` : '';
+            const timeInfo = booking.preferred_time || booking.pickup_time ? `Preferred time: ${booking.preferred_time || booking.pickup_time}\n` : '';
+            const groupInfo = booking.group_size ? `Group size: ${booking.group_size}\n` : '';
+            const pickupInfo = booking.pickup_place ? `Pickup: ${booking.pickup_place}\n` : '';
+            const body = encodeURIComponent(`Hi ${booking.customer_name},\n\nThank you for your transportation request.\n${routeInfo}${dateInfo}${timeInfo}${groupInfo}${pickupInfo}\nWe'll be in touch shortly with a personalized quote.\n\nBest regards,\nRoyal Nordic`);
             window.location.href = `mailto:${booking.customer_email}?subject=${subject}&body=${body}`;
         }
 
@@ -2273,21 +2520,27 @@ Thank you for choosing Royal Nordic Tours!`;
                 
                 const matchesStatus = !statusFilter || booking.status === statusFilter;
 
-                return matchesSearch && matchesStatus;
+                const matchesDate = !calendarFilterDate || booking.displayDateKey === calendarFilterDate;
+
+                return matchesSearch && matchesStatus && matchesDate;
             });
 
             displayBookings(filteredBookings);
             updateStats(filteredBookings);
+            updateActiveFilterBar();
         }
 
         // Clear filters
         function clearFilters() {
             document.getElementById('searchInput').value = '';
             document.getElementById('statusFilter').value = '';
+            calendarFilterDate = null;
             
             filteredBookings = currentBookings;
             displayBookings(filteredBookings);
             updateStats(filteredBookings);
+            renderBookingCalendar();
+            updateActiveFilterBar();
         }
 
         // Availability Management Functions
