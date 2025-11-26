@@ -2500,7 +2500,8 @@ Thank you for choosing Royal Nordic Tours!`;
             }
 
             for (let day = 1; day <= daysInMonth; day++) {
-                const dateKey = new Date(calendarViewYear, calendarViewMonth, day).toISOString().split('T')[0];
+                // Format date string directly to avoid timezone conversion issues
+                const dateKey = `${calendarViewYear}-${String(calendarViewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const entry = bookingCalendarMap.get(dateKey);
                 const isSelected = calendarFilterDate === dateKey;
 
@@ -2788,7 +2789,8 @@ Thank you for choosing Royal Nordic Tours!`;
             
             // Days of the month
             for (let day = 1; day <= daysInMonth; day++) {
-                const dateString = new Date(year, month, day).toISOString().split('T')[0];
+                // Format date string directly to avoid timezone conversion issues
+                const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const dateData = window.modalAvailabilityData?.get(dateString);
                 const isAvailable = dateData?.is_available !== false;
                 const isToday = year === today.getFullYear() && month === today.getMonth() && day === today.getDate();
