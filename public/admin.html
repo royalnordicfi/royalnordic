@@ -2230,8 +2230,28 @@ Booking ID: #${booking.id}`;
         }
 
         // Handle manual booking form submission
+        // Track if form is being submitted to prevent duplicates
+        let isSubmittingManualBooking = false;
+
         document.getElementById('manualBookingForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            e.stopPropagation(); // Prevent event bubbling
+            
+            // Prevent duplicate submissions
+            if (isSubmittingManualBooking) {
+                console.log('Form already submitting, ignoring duplicate submission');
+                return;
+            }
+            
+            isSubmittingManualBooking = true;
+            
+            // Disable submit button
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '⏳ Sending...';
+            }
             
             const bookingData = {
                 customer_name: document.getElementById('manualCustomerName').value,
@@ -2252,7 +2272,8 @@ Booking ID: #${booking.id}`;
                 const emailHTML = generateManualBookingEmailHTML(bookingData);
                 const emailText = generateManualBookingEmailText(bookingData);
 
-                // Send via Supabase Edge Function
+                // Send ONE email to both recipients (customer and you)
+                console.log('Sending confirmation email to:', bookingData.customer_email, 'and contact@royalnordic.fi');
                 const response = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
                     method: 'POST',
                     headers: {
@@ -2272,6 +2293,9 @@ Booking ID: #${booking.id}`;
                     throw new Error(error.error || 'Failed to send email');
                 }
 
+                console.log('Email sent successfully');
+
+                // Save to database
                 const { data: savedBooking, error: saveError } = await supabase
                     .from('manual_bookings')
                     .insert({
@@ -2283,9 +2307,9 @@ Booking ID: #${booking.id}`;
 
                 if (saveError) {
                     console.error('Error saving manual booking:', saveError);
-                    alert('Email sent, but failed to save booking internally: ' + saveError.message);
+                    alert('✅ Email sent successfully!\n\n⚠️ However, failed to save booking in database: ' + saveError.message);
                 } else {
-                    alert('✅ Confirmation email sent and booking saved!');
+                    alert('✅ Success!\n\n📧 Confirmation email sent to:\n• ' + bookingData.customer_email + '\n• contact@royalnordic.fi\n\n💾 Booking saved to database');
                     closeManualBookingForm();
                     await loadBookings();
                 }
@@ -2293,6 +2317,13 @@ Booking ID: #${booking.id}`;
             } catch (error) {
                 console.error('Error sending confirmation email:', error);
                 alert('❌ Error sending email: ' + error.message);
+            } finally {
+                // Always reset the submission flag and button state
+                isSubmittingManualBooking = false;
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText || '📧 Send & Save Booking';
+                }
             }
         });
 
