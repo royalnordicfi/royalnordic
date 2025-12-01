@@ -10,7 +10,7 @@ const RanuaZooTour = () => {
   const [tourData, setTourData] = useState({
     adult_price: 99,
     child_price: 79,
-    max_capacity: 8
+    max_capacity: 16
   });
   const [loading, setLoading] = useState(true);
 

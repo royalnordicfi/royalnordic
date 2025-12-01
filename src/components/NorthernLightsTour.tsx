@@ -11,7 +11,7 @@ const NorthernLightsTour = () => {
   const [tourData, setTourData] = useState({
     adult_price: 179,
     child_price: 129,
-    max_capacity: 100
+    max_capacity: 16
   });
   const [loading, setLoading] = useState(true);
 

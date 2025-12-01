@@ -10,7 +10,7 @@ const IceFishingTour = () => {
   const [tourData, setTourData] = useState({
     adult_price: 119,
     child_price: 99,
-    max_capacity: 8
+    max_capacity: 16
   });
   const [loading, setLoading] = useState(true);
 

@@ -190,6 +190,7 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
                 tourName="Family-Friendly Northern Lights Tour"
                 adultPrice={79}
                 childPrice={59}
+                maxCapacity={16}
                 seasonStart="10-16"
                 seasonEnd="04-15"
               />

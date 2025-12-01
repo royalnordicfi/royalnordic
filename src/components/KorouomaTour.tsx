@@ -10,7 +10,7 @@ const KorouomaTour = () => {
   const [tourData, setTourData] = useState({
     adult_price: 129,
     child_price: 109,
-    max_capacity: 10
+    max_capacity: 16
   });
   const [loading, setLoading] = useState(true);
 
