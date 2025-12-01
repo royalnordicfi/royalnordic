@@ -29,7 +29,7 @@ const Tours = () => {
       icon: Sun,
       image: "/icefishing3.jpg",
       route: "/daytime-experiences",
-      tourCount: "2 experiences available"
+      tourCount: "3 experiences available"
     },
     {
       id: 4,

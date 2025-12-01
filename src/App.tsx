@@ -12,6 +12,7 @@ import NorthernLightsTour from './components/NorthernLightsTour';
 import SnowshoeRental from './components/SnowshoeRental';
 import IceFishingTour from './components/IceFishingTour';
 import RanuaZooTour from './components/RanuaZooTour';
+import KorouomaTour from './components/KorouomaTour';
 import CustomizedTour from './components/CustomizedTour';
 import NorthernLightsTours from './components/NorthernLightsTours';
 import RentingEquipment from './components/RentingEquipment';
@@ -79,6 +80,7 @@ function App() {
           <Route path="/snowshoe-rental" element={<SnowshoeRental />} />
           <Route path="/ice-fishing" element={<IceFishingTour />} />
           <Route path="/ranua-zoo" element={<RanuaZooTour />} />
+          <Route path="/korouoma-canyon" element={<KorouomaTour />} />
           <Route path="/customized-tour" element={<CustomizedTour />} />
           
           {/* Blog Routes */}
