@@ -91,7 +91,7 @@ const NorthernLightsTour = () => {
       {/* Header */}
       <div className="relative">
         <ImageSlideshow 
-          images={["/lights1.jpg", "/lights4.jpg", "/lights6.jpg"]}
+          images={["/nortti1.jpg", "/nortti3.jpg", "/nortti5.jpg", "/nortti7.jpg"]}
           className="h-[35rem] sm:h-[40rem] md:h-[45rem] lg:h-[50rem]"
           alt="Northern Lights Tour Images"
         />
@@ -256,7 +256,7 @@ const NorthernLightsTour = () => {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
             <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
               <img 
-                src="/lights1.jpg" 
+                src="/nortti2.jpg" 
                 alt="Northern Lights Experience 1" 
                 className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
                 loading="lazy"
@@ -265,7 +265,7 @@ const NorthernLightsTour = () => {
             </div>
             <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
               <img 
-                src="/lights5.jpg" 
+                src="/nortti4.jpg" 
                 alt="Northern Lights Experience 2" 
                 className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
                 loading="lazy"
@@ -274,7 +274,7 @@ const NorthernLightsTour = () => {
             </div>
             <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
               <img 
-                src="/lights4.jpg" 
+                src="/nortti6.jpg" 
                 alt="Northern Lights Experience 3" 
                 className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
                 loading="lazy"
@@ -283,7 +283,7 @@ const NorthernLightsTour = () => {
             </div>
             <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
               <img 
-                src="/lights6.jpg" 
+                src="/nortti8.jpg" 
                 alt="Northern Lights Experience 4" 
                 className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
                 loading="lazy"

@@ -16,10 +16,10 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
   };
 
   const tourImages = [
-    "/lights1.jpg",
-    "/lights4.jpg", 
-    "/lights5.jpg",
-    "/lights6.jpg"
+    "/family1.jpg",
+    "/family2.jpg", 
+    "/family3.jpg",
+    "/family4.jpg"
   ];
 
   return (

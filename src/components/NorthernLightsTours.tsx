@@ -9,7 +9,7 @@ const NorthernLightsTours: React.FC = () => {
       id: 1,
       name: "Guaranteed Northern Lights Tour",
       description: "Chase the Aurora Borealis with our expert guides. We guarantee you'll see the lights or get a full refund!",
-      image: "/lights1.jpg",
+      image: "/nortti1.jpg",
       duration: "1-10 hours",
       groupSize: "Small group experience",
       location: "Rovaniemi, Lapland",
@@ -21,7 +21,7 @@ const NorthernLightsTours: React.FC = () => {
       id: 2,
       name: "Family-Friendly Northern Lights Tour",
       description: "Perfect for families with children! Shorter duration and kid-friendly activities while hunting the Aurora.",
-      image: "/lights4.jpg",
+      image: "/family1.jpg",
       duration: "2 hours (21:00-23:00)",
       groupSize: "Max 16 people",
       location: "Rovaniemi, Lapland",
@@ -36,7 +36,7 @@ const NorthernLightsTours: React.FC = () => {
       {/* Hero Section */}
       <div 
         className="relative h-[40vh] sm:h-[50vh] bg-cover bg-center"
-        style={{ backgroundImage: 'url(/lights5.jpg)' }}
+        style={{ backgroundImage: 'url(/nortti5.jpg)' }}
       >
         <div className="absolute inset-0 bg-black/60"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black"></div>

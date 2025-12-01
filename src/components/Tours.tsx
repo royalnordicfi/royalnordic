@@ -9,7 +9,7 @@ const Tours = () => {
       title: "Northern Lights Tours",
       description: "Chase the magical Aurora Borealis with our expert-guided tours. Guaranteed sightings or full refund!",
       icon: Sparkles,
-      image: "/lights5.jpg",
+      image: "/nortti5.jpg",
       route: "/northern-lights-tours",
       tourCount: "2 tours available"
     },
