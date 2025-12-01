@@ -28,7 +28,7 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
       <div className="relative">
         <ImageSlideshow 
           images={tourImages}
-          className="h-[90vh] sm:h-[95vh] lg:h-[100vh]"
+          className="h-[35rem] sm:h-[40rem] md:h-[45rem] lg:h-[50rem]"
           alt="Family-Friendly Northern Lights Tour"
         />
         
@@ -43,12 +43,12 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
               Back to Northern Lights Tours
             </Link>
             
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-luxury font-bold mb-4 sm:mb-6 leading-tight drop-shadow-2xl">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-luxury font-bold mb-4 sm:mb-6 leading-tight drop-shadow-2xl">
               <span className="bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent drop-shadow-2xl">
                 Family-Friendly Northern Lights Tour
               </span>
             </h1>
-            <p className="text-lg sm:text-xl md:text-2xl text-white font-clean max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-2xl">
+            <p className="text-sm sm:text-lg md:text-xl lg:text-2xl text-white font-clean max-w-2xl sm:max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-2xl px-2">
               Perfect for families! Experience the magic of the Aurora Borealis in a comfortable, kid-friendly setting.
             </p>
           </div>

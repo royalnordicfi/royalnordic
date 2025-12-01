@@ -37,7 +37,7 @@ const ImageSlideshow: React.FC<ImageSlideshowProps> = ({
           src={image}
           alt={`${alt} ${index + 1}`}
           loading={index === 0 ? "eager" : "lazy"}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+          className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000 ${
             index === currentImageIndex ? 'opacity-100' : 'opacity-0'
           }`}
         />

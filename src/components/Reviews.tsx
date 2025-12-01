@@ -68,6 +68,78 @@ const Reviews = () => {
       review: "Miro is a wonderful guy and a great guide, he showed us the Northern Lights after a bit of driving, wonderful experience! RECOMMENDED✨",
       location: "Finland",
       date: "October 16, 2025"
+    },
+    {
+      id: 8,
+      name: "GetYourGuide Traveler",
+      rating: 5,
+      review: "I chose a guaranteed tour because the weather was cloudy in the Rovaniemi region and it was my last day. Mico took us to very nice locations by instantly tracking the possibility of aurora and the cloud situation. He was right in front of the hostel on time and was a very pleasant conversationalist, chatting with nearby passengers along the way and taking our photos in the lights. At first, the lights were insufficient, but he took us around until we saw a big explosion, and finally, we could see the lights dancing in the sky. It was really amazing, it was dancing from one end to the other like a rainbow right above us.",
+      location: "Turkey",
+      date: "November 27, 2025"
+    },
+    {
+      id: 9,
+      name: "Alba",
+      rating: 5,
+      review: "The tour was great. The waterfalls were already frozen and the views were breathtaking. The guide was really good and super friendly! We'd definitely do it again 🤩",
+      location: "Spain",
+      date: "November 25, 2025"
+    },
+    {
+      id: 10,
+      name: "Angie",
+      rating: 5,
+      review: "Miro was an amazing tour guide, he made sure we were comfortable the whole trip and was very attentive and open to chat about his culture and country. We had a great time and saw the most amazing northern lights we could ever ask for, he made everything he could to help us see them, we drove almost 4 hours to the north to chase them (he is a very safe driver) and then he took some amazing pictures for us. We totally recommend him and his company to see the lights, he knows what he's doing and it really shows! He clearly loves what he does!",
+      location: "Colombia",
+      date: "November 24, 2025"
+    },
+    {
+      id: 11,
+      name: "Sarah",
+      rating: 5,
+      review: "So glad we booked this experience! Miro went above and beyond to make sure we got to witness the northern lights, he made sure everyone was safe and that we all had a great evening. At some points we waited in the van so we kept warm and he came to get us out when the lights appeared. The hot juice was just what was needed to warm us up! We are coming back next year with more family members and will be booking this tour again for sure. You will not be disappointed with Miro and his team. Five stars all round!!",
+      location: "United Kingdom",
+      date: "November 18, 2025"
+    },
+    {
+      id: 12,
+      name: "Laura",
+      rating: 5,
+      review: "The tour is highly recommended. The small group size and the tour guide made it a fantastic experience.",
+      location: "Germany",
+      date: "November 17, 2025"
+    },
+    {
+      id: 13,
+      name: "Ashwini",
+      rating: 5,
+      review: "The guide is amazing. He took us to various spots to get best views. Amazing driving skills, interactive and took photos with lot of patience. We finished at around 12.30am. Maybe the trip could have started around 8pm. It is a hard job in this weather and the trip was totally worth the money. The berry hot drink was yummy, food was missing though. Recommend everyone to take this trip.",
+      location: "United Kingdom",
+      date: "November 16, 2025"
+    },
+    {
+      id: 14,
+      name: "GetYourGuide Traveler",
+      rating: 5,
+      review: "The zoo was really nice and our guide Miro was great... we're glad we took the tour 👍😊",
+      location: "Germany",
+      date: "November 16, 2025"
+    },
+    {
+      id: 15,
+      name: "Maria Fuertes",
+      rating: 5,
+      review: "Miro took us to Sweden because it was the best place to see them. He took several shots with the camera. On our way back, he stopped again at another spot to get a better look at them, even though it wasn't planned. It was awesome!",
+      location: "Italy",
+      date: "November 13, 2025"
+    },
+    {
+      id: 16,
+      name: "Jimil",
+      rating: 5,
+      review: "An unforgettable Northern Lights experience! Our trip to see the Northern Lights was truly magical. The car was very comfortable, and Mica made sure everyone felt at ease throughout the journey. Even though we didn't spot the lights at first, Miro's dedication and enthusiasm made all the difference — we finally witnessed the beautiful display on our way back! Thank you, Miro, for going above and beyond to make this such a special experience. We'll happily recommend this tour to anyone hoping to see the Northern Lights!",
+      location: "United Kingdom",
+      date: "November 10, 2025"
     }
   ];
 

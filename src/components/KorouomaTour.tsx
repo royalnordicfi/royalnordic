@@ -108,7 +108,7 @@ const KorouomaTour = () => {
               Back to Daytime Experiences
             </Link>
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-luxury font-bold mb-4 sm:mb-6 leading-tight drop-shadow-2xl">
-              <span className="bg-gradient-to-r from-cyan-400 via-white to-cyan-400 bg-clip-text text-transparent drop-shadow-2xl">
+              <span className="bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent drop-shadow-2xl">
                 Korouoma Canyon Adventure
               </span>
             </h1>
@@ -126,7 +126,7 @@ const KorouomaTour = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-12">
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
-              <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 mr-2 sm:mr-3" />
+              <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Duration</h3>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">~6 hours</p>
@@ -134,7 +134,7 @@ const KorouomaTour = () => {
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
-              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 mr-2 sm:mr-3" />
+              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Group Size</h3>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Small groups (2-10 people)</p>
@@ -142,7 +142,7 @@ const KorouomaTour = () => {
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
-              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 mr-2 sm:mr-3" />
+              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Location</h3>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Korouoma Canyon, Lapland</p>
@@ -174,7 +174,7 @@ const KorouomaTour = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 {features.map((feature, index) => (
                   <div key={index} className="flex items-start">
-                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
                     <span className="text-gray-300 text-sm sm:text-base">{feature}</span>
                   </div>
                 ))}
@@ -206,7 +206,7 @@ const KorouomaTour = () => {
                   <div key={index}>
                     <div className="flex">
                       {item.time && (
-                        <div className="flex-shrink-0 w-14 sm:w-16 text-cyan-400 font-semibold text-sm sm:text-base">
+                        <div className="flex-shrink-0 w-14 sm:w-16 text-emerald-400 font-semibold text-sm sm:text-base">
                           {item.time}
                         </div>
                       )}
@@ -225,7 +225,7 @@ const KorouomaTour = () => {
 
             {/* Highlights */}
             {/* Important Information */}
-            <div className="bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-lg sm:rounded-xl p-4 sm:p-6">
+            <div className="bg-gradient-to-br from-emerald-500/10 to-green-500/10 border border-emerald-500/20 rounded-lg sm:rounded-xl p-4 sm:p-6">
               <h2 className="text-lg sm:text-xl font-luxury font-bold text-white mb-3 sm:mb-4">✨ Experience Highlights</h2>
               <ul className="space-y-2 text-gray-300 text-sm sm:text-base">
                 <li>🏔️ Explore Korouoma canyon's frozen waterfalls and icy streams</li>
@@ -235,8 +235,8 @@ const KorouomaTour = () => {
                 <li>🚐 Comfortable minibus transport from your hotel</li>
                 <li>❄️ Experience one of Lapland's most beautiful winter landscapes</li>
               </ul>
-              <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                <p className="text-blue-300 text-sm">
+              <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                <p className="text-emerald-300 text-sm">
                   <strong>Free Cancellation:</strong> Cancel up to 24 hours in advance for a full refund
                 </p>
               </div>
