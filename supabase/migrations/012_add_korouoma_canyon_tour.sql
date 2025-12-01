@@ -6,8 +6,8 @@ VALUES (
     6, 
     'Korouoma Canyon Winter Adventure', 
     'Hike to magnificent frozen waterfalls and enjoy grilled food in the stunning winter landscape. Experience one of Lapland most beautiful natural wonders with professional guidance',
-    116.00, 
-    116.00, 
+    129.00, 
+    109.00, 
     10
 )
 ON CONFLICT (id) DO UPDATE SET
@@ -17,12 +17,12 @@ ON CONFLICT (id) DO UPDATE SET
   child_price = EXCLUDED.child_price,
   max_capacity = EXCLUDED.max_capacity;
 
--- Insert Korouoma Canyon dates for November 1, 2025 - April 30, 2026 (winter season only)
+-- Insert Korouoma Canyon dates from December 1, 2025 onwards (year-round availability)
 DO $$
 DECLARE
   korouoma_tour_id BIGINT := 6;
-  tour_date DATE := '2025-11-01'::DATE;
-  end_date DATE := '2026-04-30'::DATE;
+  tour_date DATE := '2025-12-01'::DATE;
+  end_date DATE := '2027-12-31'::DATE;
 BEGIN
   WHILE tour_date <= end_date LOOP
     INSERT INTO tour_dates (tour_id, date, available_slots) 
@@ -35,6 +35,6 @@ END $$;
 
 -- Success message
 SELECT 'Korouoma Canyon Winter Adventure tour added successfully!' as status;
-SELECT 'Available dates: Nov 1, 2025 - Apr 30, 2026' as season;
-SELECT 'Price: €116 per person (same for adults and children)' as pricing;
+SELECT 'Available dates: Dec 1, 2025 - Dec 31, 2027 (2 years)' as season;
+SELECT 'Price: €129 adult / €109 child' as pricing;
 

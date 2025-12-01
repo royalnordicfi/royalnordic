@@ -8,8 +8,8 @@ import { getAllTours } from '../lib/api';
 
 const KorouomaTour = () => {
   const [tourData, setTourData] = useState({
-    adult_price: 116,
-    child_price: 116,
+    adult_price: 129,
+    child_price: 109,
     max_capacity: 10
   });
   const [loading, setLoading] = useState(true);
@@ -262,8 +262,8 @@ const KorouomaTour = () => {
                     adultPrice={tourData.adult_price}
                     childPrice={tourData.child_price}
                     maxCapacity={tourData.max_capacity}
-                    seasonStart="11-01"
-                    seasonEnd="04-30"
+                    seasonStart="12-01"
+                    seasonEnd="12-31"
                   />
                 )}
               </div>
