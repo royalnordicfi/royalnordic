@@ -8,9 +8,9 @@ import { getAllTours } from '../lib/api';
 
 const KorouomaTour = () => {
   const [tourData, setTourData] = useState({
-    adult_price: 149,
-    child_price: 119,
-    max_capacity: 8
+    adult_price: 116,
+    child_price: 116,
+    max_capacity: 10
   });
   const [loading, setLoading] = useState(true);
 
@@ -37,16 +37,16 @@ const KorouomaTour = () => {
   }, []);
 
   const features = [
-    'Professional guide with extensive Korouoma knowledge',
-    'Hotel pickup and drop-off from Rovaniemi',
-    'All hiking equipment provided',
-    'Warm winter clothing available if needed',
-    'Hot drinks and traditional Lappish snacks',
-    'Small group experience (max 8 people)',
-    'Photography assistance and best photo spots',
-    'Visit to frozen waterfalls',
-    'Winter hiking through pristine nature',
-    'Safety equipment included'
+    'Hotel pickup from Rovaniemi',
+    'Professional English-speaking guide',
+    'Enjoy grilled food and hot drinks at scenic viewpoints',
+    'Visit the magnificent frozen waterfalls',
+    'Explore pristine snowy trails and beautiful landscapes',
+    'Warm and comfortable minibus transport',
+    'Small group experience for personalized attention',
+    'Expert knowledge about Korouoma geology and nature',
+    'Photos by stunning ice formations and waterfalls',
+    'Scenic nature views throughout the journey'
   ];
 
   const itinerary = [
@@ -129,7 +129,7 @@ const KorouomaTour = () => {
               <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Duration</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">6-7 hours (full day)</p>
+            <p className="text-gray-300 text-sm sm:text-base">~6 hours</p>
           </div>
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
@@ -137,7 +137,7 @@ const KorouomaTour = () => {
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Group Size</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">Max 8 people</p>
+            <p className="text-gray-300 text-sm sm:text-base">Small groups (2-10 people)</p>
           </div>
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
@@ -157,14 +157,14 @@ const KorouomaTour = () => {
             <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">About This Experience</h2>
               <p className="text-gray-300 text-sm sm:text-base mb-3 sm:mb-4 font-clean">
-                Korouoma Canyon is one of Finland's most spectacular natural wonders, especially in winter when the 
-                waterfalls freeze into magnificent ice formations. This full-day adventure takes you through pristine 
-                Arctic wilderness, past frozen waterfalls up to 30 meters high, and along scenic canyon trails.
+                Experience the magnificent frozen waterfalls and pristine winter landscapes of Korouoma Canyon, 
+                one of Lapland's most stunning natural wonders. This winter wonderland adventure takes you hiking 
+                through snow-covered trails to spectacular ice formations.
               </p>
               <p className="text-gray-300 text-sm sm:text-base font-clean">
-                Our experienced guides will lead you on snowshoes through this winter wonderland, sharing stories 
-                about the area's geology, wildlife, and the indigenous Sámi culture. Perfect for nature lovers and 
-                photography enthusiasts!
+                We travel approximately 100 km from Rovaniemi to Korouoma and get ready for an unforgettable 
+                journey through nature's winter beauty. Our professional guide will lead you to the best viewpoints 
+                where you can enjoy grilled food and hot drinks while surrounded by breathtaking frozen waterfalls.
               </p>
             </div>
 
@@ -181,31 +181,19 @@ const KorouomaTour = () => {
               </div>
             </div>
 
-            {/* What to Bring */}
+            {/* What's Not Included */}
             <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">What to Bring</h2>
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">What's Not Included</h2>
               <div className="space-y-2">
                 <div className="flex items-start">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-300 text-sm sm:text-base">Warm layered clothing</span>
-                </div>
-                <div className="flex items-start">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-300 text-sm sm:text-base">Winter boots (waterproof recommended)</span>
-                </div>
-                <div className="flex items-start">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-300 text-sm sm:text-base">Gloves and warm hat</span>
-                </div>
-                <div className="flex items-start">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-300 text-sm sm:text-base">Camera or smartphone for photos</span>
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0 text-xl font-bold">×</div>
+                  <span className="text-gray-300 text-sm sm:text-base">Warm winter clothing (remember to dress warmly in Arctic conditions)</span>
                 </div>
               </div>
-              <div className="mt-4 p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-lg">
-                <p className="text-cyan-300 text-sm font-medium">
-                  <strong>Note:</strong> Moderate fitness level required. The hike involves uneven terrain and 
-                  winter conditions. We provide snowshoes and trekking poles.
+              <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                <p className="text-amber-300 text-sm font-medium">
+                  <strong>What to Bring:</strong> Comfortable footwear, warm layered clothes, weather-appropriate outerwear. 
+                  If you have any questions, contact us at contact@royalnordic.fi
                 </p>
               </div>
             </div>
@@ -236,15 +224,27 @@ const KorouomaTour = () => {
             </div>
 
             {/* Highlights */}
+            {/* Important Information */}
             <div className="bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-lg sm:rounded-xl p-4 sm:p-6">
               <h2 className="text-lg sm:text-xl font-luxury font-bold text-white mb-3 sm:mb-4">✨ Experience Highlights</h2>
               <ul className="space-y-2 text-gray-300 text-sm sm:text-base">
-                <li>🏔️ Spectacular frozen waterfalls up to 30 meters high</li>
-                <li>🌲 Pristine Arctic forest landscapes</li>
-                <li>📸 Incredible photo opportunities</li>
-                <li>🥾 Authentic Finnish wilderness experience</li>
-                <li>❄️ Unique ice formations and winter beauty</li>
+                <li>🏔️ Explore Korouoma canyon's frozen waterfalls and icy streams</li>
+                <li>🥾 Enjoy small group hiking through pristine grilled paths and beautiful landscapes</li>
+                <li>🔥 Grilled food and hot drinks at scenic nature viewpoints</li>
+                <li>📸 Take photos by stunning ice formations and frozen waterfalls</li>
+                <li>🚐 Comfortable minibus transport from your hotel</li>
+                <li>❄️ Experience one of Lapland's most beautiful winter landscapes</li>
               </ul>
+              <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                <p className="text-blue-300 text-sm">
+                  <strong>Free Cancellation:</strong> Cancel up to 24 hours in advance for a full refund
+                </p>
+              </div>
+              <div className="mt-3 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                <p className="text-emerald-300 text-sm">
+                  <strong>Book Now, Pay Later:</strong> Reserve your spot today and pay when you're ready
+                </p>
+              </div>
             </div>
           </div>
 
@@ -302,11 +302,13 @@ const KorouomaTour = () => {
         <div className="mt-12 bg-amber-500/10 border border-amber-500/20 rounded-xl p-6">
           <h3 className="text-xl font-bold text-amber-300 mb-4">Important Information</h3>
           <div className="space-y-3 text-gray-300">
-            <p>• <strong>Fitness Level:</strong> Moderate - suitable for most people with basic fitness</p>
-            <p>• <strong>Age Limit:</strong> Recommended for ages 12+ due to hiking difficulty</p>
-            <p>• <strong>Season:</strong> Best experienced November - April when waterfalls are frozen</p>
-            <p>• <strong>Weather:</strong> Tour runs in most weather conditions. Warm clothing essential!</p>
-            <p>• <strong>Accessibility:</strong> Not wheelchair accessible due to natural terrain</p>
+            <p>• <strong>Duration:</strong> Approximately 6 hours including transport</p>
+            <p>• <strong>Group Size:</strong> 2-10 people for a personal experience</p>
+            <p>• <strong>Languages:</strong> English and Finnish guides available</p>
+            <p>• <strong>Season:</strong> November - April when waterfalls are beautifully frozen</p>
+            <p>• <strong>Dress Code:</strong> Warm clothing essential - thermal layers, winter boots, gloves, hat</p>
+            <p>• <strong>Fitness Level:</strong> Moderate - suitable for most people with basic mobility</p>
+            <p>• <strong>Cancellation:</strong> Free cancellation up to 24 hours before the tour</p>
           </div>
         </div>
       </div>

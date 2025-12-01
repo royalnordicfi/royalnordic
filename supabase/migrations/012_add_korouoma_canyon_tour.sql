@@ -5,10 +5,10 @@ INSERT INTO tours (id, name, description, adult_price, child_price, max_capacity
 VALUES (
     6, 
     'Korouoma Canyon Winter Adventure', 
-    'Explore the breathtaking frozen waterfalls and stunning ice formations of Korouoma Canyon on this full-day winter hiking adventure through pristine Arctic wilderness',
-    149.00, 
-    119.00, 
-    8
+    'Hike to magnificent frozen waterfalls and enjoy grilled food in the stunning winter landscape. Experience one of Lapland most beautiful natural wonders with professional guidance',
+    116.00, 
+    116.00, 
+    10
 )
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
@@ -26,7 +26,7 @@ DECLARE
 BEGIN
   WHILE tour_date <= end_date LOOP
     INSERT INTO tour_dates (tour_id, date, available_slots) 
-    VALUES (korouoma_tour_id, tour_date, 8)
+    VALUES (korouoma_tour_id, tour_date, 10)
     ON CONFLICT (tour_id, date) DO NOTHING;
     
     tour_date := tour_date + INTERVAL '1 day';
@@ -36,5 +36,5 @@ END $$;
 -- Success message
 SELECT 'Korouoma Canyon Winter Adventure tour added successfully!' as status;
 SELECT 'Available dates: Nov 1, 2025 - Apr 30, 2026' as season;
-SELECT 'Price: €149 adult / €119 child' as pricing;
+SELECT 'Price: €116 per person (same for adults and children)' as pricing;
 
