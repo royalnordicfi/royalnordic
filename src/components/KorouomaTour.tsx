@@ -51,39 +51,24 @@ const KorouomaTour = () => {
 
   const itinerary = [
     {
-      time: '09:00',
+      time: '09:00 - 10:00',
       activity: 'Hotel Pickup',
       description: 'Pickup from your accommodation in Rovaniemi area'
     },
     {
-      time: '10:00',
-      activity: 'Arrive at Korouoma',
-      description: '50km drive to Korouoma Canyon Nature Reserve'
+      time: '10:00 - 11:00',
+      activity: 'Drive to Korouoma',
+      description: 'Approximately 100km drive to Korouoma Canyon Nature Reserve'
     },
     {
-      time: '10:15',
-      activity: 'Begin Winter Hike',
-      description: 'Guided hike through snow-covered forests and frozen waterfalls'
+      time: '11:00 - 15:00',
+      activity: 'Walking in Korouoma & Barbecue',
+      description: 'Guided hike through snow-covered forests and frozen waterfalls, barbecue and snacks with stunning views'
     },
     {
-      time: '12:00',
-      activity: 'Lunch Break',
-      description: 'Hot drinks and traditional Lappish snacks with stunning views'
-    },
-    {
-      time: '13:00',
-      activity: 'Explore Frozen Waterfalls',
-      description: 'Visit the magnificent frozen waterfalls and ice formations'
-    },
-    {
-      time: '14:30',
-      activity: 'Return Journey',
-      description: 'Drive back to Rovaniemi with scenic views'
-    },
-    {
-      time: '15:30',
-      activity: 'Drop-off',
-      description: 'Return to your accommodation'
+      time: '15:00 - 16:00',
+      activity: 'Return Journey & Drop-off',
+      description: 'Drive back to Rovaniemi and return to your accommodation'
     }
   ];
 
@@ -129,7 +114,7 @@ const KorouomaTour = () => {
               <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Duration</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">~6 hours</p>
+            <p className="text-gray-300 text-sm sm:text-base">~7 hours (09:00 - 16:00)</p>
           </div>
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
