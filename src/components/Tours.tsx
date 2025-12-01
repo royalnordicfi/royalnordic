@@ -75,7 +75,7 @@ const Tours = () => {
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
                   
                   {/* Icon */}
                   <div className="absolute top-3 right-3 bg-emerald-500/20 backdrop-blur-sm p-2 rounded-full border border-emerald-500/30">
