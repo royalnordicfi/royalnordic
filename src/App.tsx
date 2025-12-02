@@ -41,6 +41,7 @@ import TermsConditions from './components/TermsConditions';
 import ScrollToTop from './components/ScrollToTop';
 import WhatsAppWidget from './components/WhatsAppWidget';
 import AdminPanel from './components/AdminPanel';
+import SaleModal from './components/SaleModal';
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
           {/* Homepage */}
           <Route path="/" element={
             <>
+              <SaleModal />
               <Hero />
               <div id="tours">
                 <Tours />

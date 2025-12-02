@@ -32,7 +32,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
     fullName: '',
     email: '',
     phone: '',
-    specialRequests: ''
+    specialRequests: '',
+    discountCode: ''
   })
 
   const [availability, setAvailability] = useState<TourDate[]>([])
@@ -310,7 +311,37 @@ const BookingForm: React.FC<BookingFormProps> = ({
   // }
 
   const calculateTotal = () => {
-    return (formData.adults * adultPrice) + (formData.children * childPrice)
+    const subtotal = (formData.adults * adultPrice) + (formData.children * childPrice)
+    const discount = getDiscountAmount(subtotal)
+    return subtotal - discount
+  }
+
+  const getDiscountAmount = (subtotal: number) => {
+    // Check if discount code is valid and sale is active
+    const now = new Date()
+    const saleStart = new Date('2025-12-02')
+    const saleEnd = new Date('2025-12-16')
+    saleEnd.setHours(23, 59, 59, 999)
+
+    const isSaleActive = now >= saleStart && now <= saleEnd
+    const isValidCode = formData.discountCode.trim().toUpperCase() === 'DECEMBER15'
+
+    if (isSaleActive && isValidCode) {
+      return subtotal * 0.15 // 15% discount
+    }
+    return 0
+  }
+
+  const isDiscountValid = () => {
+    const now = new Date()
+    const saleStart = new Date('2025-12-02')
+    const saleEnd = new Date('2025-12-16')
+    saleEnd.setHours(23, 59, 59, 999)
+
+    const isSaleActive = now >= saleStart && now <= saleEnd
+    const isValidCode = formData.discountCode.trim().toUpperCase() === 'DECEMBER15'
+
+    return isSaleActive && isValidCode
   }
 
   const getAvailableSlots = (date: string) => {
@@ -355,7 +386,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
         throw new Error(`Only ${availableSlots} slots available for this date`)
       }
 
-      const totalPrice = calculateTotal()
+      const subtotal = (formData.adults * adultPrice) + (formData.children * childPrice)
+      const discount = getDiscountAmount(subtotal)
+      const totalPrice = subtotal - discount
+      
       const tourDate = (() => {
         const [year, month, day] = formData.preferredDate.split('-').map(Number)
         const date = new Date(year, month - 1, day)
@@ -381,6 +415,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
           adults: formData.adults.toString(),
           children: formData.children.toString(),
           total_price: totalPrice.toString(),
+          subtotal: subtotal.toString(),
+          discount: discount.toString(),
+          discount_code: formData.discountCode.trim().toUpperCase(),
           phone: formData.phone,
           special_requests: formData.specialRequests
         }
@@ -468,7 +505,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
       }
       
       const tourDateId = selectedDateData.id || Date.now()
-      const totalPrice = calculateTotal()
+      const subtotal = (formData.adults * adultPrice) + (formData.children * childPrice)
+      const discount = getDiscountAmount(subtotal)
+      const totalPrice = subtotal - discount
       
       const tourDate = (() => {
         const [year, month, day] = formData.preferredDate.split('-').map(Number)
@@ -491,6 +530,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
         adults: formData.adults,
         children: formData.children,
         total_price: totalPrice,
+        subtotal: subtotal,
+        discount: discount,
+        discount_code: formData.discountCode.trim().toUpperCase(),
         tour_name: tourName,
         tour_date: tourDate,
         crypto_type: cryptoFormData.cryptoType,
@@ -766,6 +808,30 @@ const BookingForm: React.FC<BookingFormProps> = ({
           />
         </div>
 
+        {/* Discount Code */}
+        <div>
+          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Discount Code</h4>
+          <div className="flex gap-2">
+            <input 
+              type="text" 
+              name="discountCode"
+              value={formData.discountCode}
+              onChange={handleChange}
+              placeholder="Enter code (e.g. DECEMBER15)"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm uppercase"
+              style={{ textTransform: 'uppercase' }}
+            />
+            {isDiscountValid() && (
+              <div className="flex items-center px-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+                <span className="text-emerald-600 text-sm font-semibold">✓ Valid</span>
+              </div>
+            )}
+          </div>
+          {formData.discountCode && !isDiscountValid() && (
+            <p className="text-xs text-red-600 mt-1">Invalid code or sale period has ended</p>
+          )}
+        </div>
+
         {/* Total Price */}
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
           <div className="space-y-2 mb-3">
@@ -804,10 +870,26 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 <span className="text-gray-800 font-medium">€{formData.children * childPrice}</span>
               </div>
             )}
+            {(() => {
+              const subtotal = (formData.adults * adultPrice) + (formData.children * childPrice)
+              const discount = getDiscountAmount(subtotal)
+              return discount > 0 ? (
+                <>
+                  <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
+                    <span className="text-gray-600">Subtotal:</span>
+                    <span className="text-gray-800 font-medium">€{subtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-emerald-600 font-semibold">Discount (15%):</span>
+                    <span className="text-emerald-600 font-semibold">-€{discount.toFixed(2)}</span>
+                  </div>
+                </>
+              ) : null
+            })()}
             <div className="border-t border-gray-300 pt-2">
               <div className="flex justify-between items-center">
                 <span className="text-lg font-semibold text-gray-800">Total:</span>
-                <span className="text-2xl font-bold text-blue-600">€{calculateTotal()}</span>
+                <span className="text-2xl font-bold text-blue-600">€{calculateTotal().toFixed(2)}</span>
               </div>
               <p className="text-xs text-gray-500 mt-1">Includes VAT</p>
             </div>
