@@ -39,6 +39,17 @@ const DaytimeExperiences: React.FC = () => {
       features: ["Hotel pickup", "Professional guide", "Grilled food", "Hot drinks"],
       route: "/korouoma-canyon",
       badge: "Adventure"
+    },
+    {
+      id: 4,
+      name: "Snowmobile Safari",
+      description: "Experience the thrill of snowmobiling through Lapland's pristine wilderness. Multiple duration options available for all skill levels.",
+      image: "/snowmobile1.jpg",
+      duration: "0.5h, 1h, 2h, or 3h",
+      groupSize: "Flexible",
+      location: "Rovaniemi, Lapland",
+      features: ["Professional guide", "All equipment", "Safety briefing", "Scenic routes"],
+      route: "/snowmobile-safari"
     }
   ];
 
