@@ -61,14 +61,14 @@ const BestSellersSlideshow: React.FC = () => {
   };
 
   return (
-    <section className="relative py-12 sm:py-16 lg:py-20 bg-black overflow-hidden">
+    <section className="relative py-8 sm:py-12 lg:py-16 bg-black overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-8 sm:mb-12">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-luxury font-bold mb-4 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
+        <div className="text-center mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-luxury font-bold mb-3 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
             BEST SELLERS
           </h2>
-          <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed font-clean">
+          <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed font-clean">
             Our most popular experiences in Lapland
           </p>
         </div>
@@ -76,7 +76,7 @@ const BestSellersSlideshow: React.FC = () => {
         {/* Slideshow Container */}
         <div className="relative">
           {/* Slides */}
-          <div className="relative h-[400px] sm:h-[500px] lg:h-[600px] rounded-2xl overflow-hidden">
+          <div className="relative h-[300px] sm:h-[350px] lg:h-[450px] rounded-2xl overflow-hidden">
             {bestSellers.map((tour, index) => (
               <Link
                 key={tour.id}
@@ -97,29 +97,29 @@ const BestSellersSlideshow: React.FC = () => {
                 </div>
 
                 {/* Content */}
-                <div className="relative z-10 h-full flex flex-col justify-end p-6 sm:p-8 lg:p-12">
+                <div className="relative z-10 h-full flex flex-col justify-end p-4 sm:p-6 lg:p-8">
                   {/* Badge */}
-                  <div className="inline-flex items-center bg-emerald-500/20 backdrop-blur-sm px-4 py-2 rounded-full mb-4 border border-emerald-400/30 w-fit">
-                    <Star className="w-4 h-4 text-emerald-400 mr-2" />
-                    <span className="text-emerald-300 font-bold text-xs sm:text-sm tracking-wider uppercase">
+                  <div className="inline-flex items-center bg-emerald-500/20 backdrop-blur-sm px-3 py-1.5 rounded-full mb-3 border border-emerald-400/30 w-fit">
+                    <Star className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-400 mr-2" />
+                    <span className="text-emerald-300 font-bold text-xs tracking-wider uppercase">
                       {tour.badge}
                     </span>
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-luxury font-bold text-white mb-4 leading-tight">
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-luxury font-bold text-white mb-3 leading-tight">
                     {tour.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="text-base sm:text-lg lg:text-xl text-gray-200 mb-6 max-w-2xl leading-relaxed font-clean">
+                  <p className="text-sm sm:text-base lg:text-lg text-gray-200 mb-4 max-w-2xl leading-relaxed font-clean">
                     {tour.description}
                   </p>
 
                   {/* CTA Button */}
-                  <div className="flex items-center text-emerald-400 font-semibold text-lg sm:text-xl group">
+                  <div className="flex items-center text-emerald-400 font-semibold text-base sm:text-lg group">
                     <span>Explore Tour</span>
-                    <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2 group-hover:translate-x-2 transition-transform" />
+                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-2 transition-transform" />
                   </div>
                 </div>
               </Link>
