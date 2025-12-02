@@ -103,7 +103,7 @@ ${formData.message ? `Additional Message:\n${formData.message}` : ''}`;
       {/* Header */}
       <div className="relative">
         <ImageSlideshow 
-          images={["/snowmobile1.jpg", "/snowmobile2.jpg"]}
+          images={["/snowmobiling1.jpg", "/snowmobiling2.jpg"]}
           className="h-[35rem] sm:h-[40rem] md:h-[45rem] lg:h-[50rem]"
           alt="Snowmobile Safari Images"
         />

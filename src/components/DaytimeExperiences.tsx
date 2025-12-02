@@ -44,7 +44,7 @@ const DaytimeExperiences: React.FC = () => {
       id: 4,
       name: "Snowmobile Safari",
       description: "Experience the thrill of snowmobiling through Lapland's pristine wilderness. Multiple duration options available for all skill levels.",
-      image: "/snowmobile1.jpg",
+      image: "/snowmobiling.jpg",
       duration: "0.5h, 1h, 2h, or 3h",
       groupSize: "Flexible",
       location: "Rovaniemi, Lapland",

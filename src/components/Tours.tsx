@@ -11,7 +11,7 @@ const Tours = () => {
       icon: Sparkles,
       image: "/nortti5.jpg",
       route: "/northern-lights-tours",
-      tourCount: "2 tours available"
+      tourCount: "3 tours available"
     },
     {
       id: 2,
@@ -29,7 +29,7 @@ const Tours = () => {
       icon: Sun,
       image: "/icefishing3.jpg",
       route: "/daytime-experiences",
-      tourCount: "3 experiences available"
+      tourCount: "4 experiences available"
     },
     {
       id: 4,
