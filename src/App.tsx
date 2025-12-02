@@ -42,6 +42,9 @@ import ScrollToTop from './components/ScrollToTop';
 import WhatsAppWidget from './components/WhatsAppWidget';
 import AdminPanel from './components/AdminPanel';
 import SaleModal from './components/SaleModal';
+import SnowmobileSafari from './components/SnowmobileSafari';
+import BestSellersSlideshow from './components/BestSellersSlideshow';
+import MonsterTruckNorthernLights from './components/MonsterTruckNorthernLights';
 
 function App() {
   return (
@@ -56,6 +59,7 @@ function App() {
             <>
               <SaleModal />
               <Hero />
+              <BestSellersSlideshow />
               <div id="tours">
                 <Tours />
               </div>
@@ -84,6 +88,8 @@ function App() {
           <Route path="/ranua-zoo" element={<RanuaZooTour />} />
           <Route path="/korouoma-canyon" element={<KorouomaTour />} />
           <Route path="/customized-tour" element={<CustomizedTour />} />
+          <Route path="/snowmobile-safari" element={<SnowmobileSafari />} />
+          <Route path="/monster-truck-northern-lights" element={<MonsterTruckNorthernLights />} />
           
           {/* Blog Routes */}
           <Route path="/blog" element={<Blog />} />

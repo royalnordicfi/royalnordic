@@ -28,6 +28,18 @@ const NorthernLightsTours: React.FC = () => {
       features: ["Family-friendly guide", "Hotel pickup", "Warm drinks & snacks", "Shorter duration for kids"],
       route: "/family-friendly-northern-lights",
       badge: "Family Favorite"
+    },
+    {
+      id: 3,
+      name: "Monster Truck Northern Lights Experience",
+      description: "Experience the magic of the Arctic night on board a giant monster truck! Deep into the wilderness for the best Northern Lights viewing.",
+      image: "/monsteri1.jpg",
+      duration: "3 hours",
+      groupSize: "Flexible",
+      location: "Rovaniemi, Lapland",
+      features: ["Professional guide and driver", "Specially built monster truck", "Remote viewing locations", "No experience required"],
+      route: "/monster-truck-northern-lights",
+      badge: "Unique Experience"
     }
   ];
 

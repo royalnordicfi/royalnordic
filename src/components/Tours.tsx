@@ -50,7 +50,7 @@ const Tours = () => {
         {/* Section Header */}
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-luxury font-bold mb-4 sm:mb-6 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
-            EXPLORE OUR TOURS
+            ALL TOURS
           </h2>
           <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed font-clean">
             Discover the magic of Lapland through our carefully curated experiences. From Northern Lights to Arctic adventures.
