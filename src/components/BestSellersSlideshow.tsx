@@ -26,7 +26,7 @@ const BestSellersSlideshow: React.FC = () => {
       id: 3,
       title: "Snowmobile Safari",
       description: "Experience the thrill of snowmobiling through Lapland's pristine wilderness. Multiple duration options available.",
-      image: "/nortti3.jpg",
+      image: "/snowmobile1.jpg",
       route: "/snowmobile-safari",
       badge: "BEST SELLER"
     },
