@@ -93,7 +93,6 @@ ${formData.message ? `Additional Message:\n${formData.message}` : ''}`;
     'Experienced guides for safety',
     'Scenic routes through Lapland wilderness',
     'Suitable for all skill levels',
-    'Small group sizes for personalized experience',
     'Safety briefing included',
     'Warm clothing available if needed'
   ];
@@ -136,21 +135,13 @@ ${formData.message ? `Additional Message:\n${formData.message}` : ''}`;
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8 lg:py-12">
         {/* Quick Info */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-12">
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Duration</h3>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">0.5h, 1h, 2h, or 3h</p>
-          </div>
-          
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-            <div className="flex items-center mb-2 sm:mb-3">
-              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Group Size</h3>
-            </div>
-            <p className="text-gray-300 text-sm sm:text-base">Flexible</p>
           </div>
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">

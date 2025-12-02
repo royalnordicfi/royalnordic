@@ -46,7 +46,6 @@ const DaytimeExperiences: React.FC = () => {
       description: "Experience the thrill of snowmobiling through Lapland's pristine wilderness. Multiple duration options available for all skill levels.",
       image: "/snowmobiling.jpg",
       duration: "0.5h, 1h, 2h, or 3h",
-      groupSize: "Flexible",
       location: "Rovaniemi, Lapland",
       features: ["Professional guide", "All equipment", "Safety briefing", "Scenic routes"],
       route: "/snowmobile-safari"
@@ -124,10 +123,12 @@ const DaytimeExperiences: React.FC = () => {
                     <Clock className="w-5 h-5 mr-3 text-emerald-400 flex-shrink-0" />
                     <span className="font-clean">{experience.duration}</span>
                   </div>
-                  <div className="flex items-center text-gray-300">
-                    <Users className="w-5 h-5 mr-3 text-emerald-400 flex-shrink-0" />
-                    <span className="font-clean">{experience.groupSize}</span>
-                  </div>
+                  {experience.groupSize && (
+                    <div className="flex items-center text-gray-300">
+                      <Users className="w-5 h-5 mr-3 text-emerald-400 flex-shrink-0" />
+                      <span className="font-clean">{experience.groupSize}</span>
+                    </div>
+                  )}
                   <div className="flex items-center text-gray-300">
                     <MapPin className="w-5 h-5 mr-3 text-emerald-400 flex-shrink-0" />
                     <span className="font-clean">{experience.location}</span>
