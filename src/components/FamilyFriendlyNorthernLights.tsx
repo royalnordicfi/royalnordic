@@ -191,7 +191,7 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
                 adultPrice={79}
                 childPrice={59}
                 maxCapacity={16}
-                seasonStart="10-16"
+                seasonStart="09-15"
                 seasonEnd="04-15"
               />
             </div>

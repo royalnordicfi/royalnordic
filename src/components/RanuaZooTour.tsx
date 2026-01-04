@@ -235,8 +235,7 @@ const RanuaZooTour = () => {
                     adultPrice={tourData.adult_price}
                     childPrice={tourData.child_price}
                     maxCapacity={tourData.max_capacity}
-                    seasonStart="09-25"
-                    seasonEnd="06-30"
+                    // Ranua Zoo is open all year - no season restrictions
                   />
                 )}
               </div>

@@ -189,7 +189,36 @@ const BookingForm: React.FC<BookingFormProps> = ({
   }
 
 
-
+  // Helper function to check if a date is in season (works across multiple years)
+  const isDateInSeason = (dateString: string): boolean => {
+    if (!seasonStart || !seasonEnd) return true // No season restriction
+    
+    const dateObj = new Date(dateString)
+    const dateYear = dateObj.getFullYear()
+    
+    // Parse season dates (format: "MM-DD")
+    const [startMonth, startDay] = seasonStart.split('-').map(Number)
+    const [endMonth, endDay] = seasonEnd.split('-').map(Number)
+    
+    // Create season start and end dates
+    const seasonStartThisYear = new Date(dateYear, startMonth - 1, startDay)
+    const seasonEndThisYear = new Date(dateYear, endMonth - 1, endDay)
+    const seasonStartPrevYear = new Date(dateYear - 1, startMonth - 1, startDay)
+    const seasonEndNextYear = new Date(dateYear + 1, endMonth - 1, endDay)
+    
+    // Check if season spans year boundary (e.g., Sep to Apr)
+    if (endMonth < startMonth) {
+      // Season spans across year boundary
+      // Check if date is in the season that started in previous year and ends this year
+      const inPrevYearSeason = dateObj >= seasonStartPrevYear && dateObj <= seasonEndThisYear
+      // Check if date is in the season that starts this year and ends next year
+      const inThisYearSeason = dateObj >= seasonStartThisYear && dateObj <= seasonEndNextYear
+      return inPrevYearSeason || inThisYearSeason
+    } else {
+      // Season within same year (e.g., Dec 1 to Dec 31)
+      return dateObj >= seasonStartThisYear && dateObj <= seasonEndThisYear
+    }
+  }
 
   // Get calendar grid for current month
   const getCalendarGrid = () => {
@@ -208,30 +237,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
     })
     
     // Apply season filtering if seasonStart and seasonEnd are provided
+    // Note: We still show all dates in the calendar, but filter database results
     let filteredDates = monthDates
     if (seasonStart && seasonEnd) {
-      const currentYear = new Date().getFullYear()
-      // Create proper date objects for the season
-      const seasonStartDate = new Date(`${currentYear}-${seasonStart}`)
-      const seasonEndDate = new Date(`${currentYear + 1}-${seasonEnd}`)
-      
-      // Debug logging
-      console.log('Season filtering:', {
-        seasonStart,
-        seasonEnd,
-        seasonStartDate: seasonStartDate.toISOString(),
-        seasonEndDate: seasonEndDate.toISOString(),
-        monthDates: monthDates.length
-      })
-      
-      filteredDates = monthDates.filter(date => {
-        const dateObj = new Date(date.date)
-        const isInSeason = dateObj >= seasonStartDate && dateObj <= seasonEndDate
-        console.log('Date check:', date.date, dateObj.toISOString(), isInSeason)
-        return isInSeason
-      })
-      
-      console.log('Filtered dates:', filteredDates.length)
+      filteredDates = monthDates.filter(date => isDateInSeason(date.date))
     }
     
     // Create a map for faster lookup
@@ -266,13 +275,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // Check if date is in the past (before today)
       const isPastDate = dateString < todayString
       
-      // Determine date status:
-      // - isPastDate: Past dates (gray, disabled)
-      // - isFullBooked: Dates with 0 remaining slots (red, shows authenticity)
-      // - isAvailable: Dates that can be booked (white, clickable)
-      // CRITICAL: Only use database data for availability - no season filtering
-      const isAvailable = !isPastDate && dateData && (dateData.remaining_slots || 0) > 0
-      
+      // Check if date is in season (works across multiple years)
+      const inSeason = seasonStart && seasonEnd ? isDateInSeason(dateString) : true
       
       // Determine date status:
       // - isPastDate: Past dates (gray, disabled)
@@ -280,6 +284,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // - isFullBooked: Dates with 0 remaining slots (red, shows authenticity)
       // - isAvailable: Dates that can be booked (white, clickable)
       const isFullBooked = dateData && dateData.remaining_slots !== undefined && dateData.remaining_slots === 0
+      const isAvailable = !isPastDate && inSeason && dateData && (dateData.remaining_slots || 0) > 0
       
       grid.push({
         day,
@@ -287,7 +292,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         available: isAvailable,
         remainingSlots: dateData?.remaining_slots ?? 0,
         isPastDate,
-        isOutOfSeason: false, // No season filtering - database controls all
+        isOutOfSeason: seasonStart && seasonEnd ? !inSeason : false,
         isFullBooked
       })
     }

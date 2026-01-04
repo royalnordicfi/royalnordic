@@ -247,8 +247,7 @@ const KorouomaTour = () => {
                     adultPrice={tourData.adult_price}
                     childPrice={tourData.child_price}
                     maxCapacity={tourData.max_capacity}
-                    seasonStart="12-01"
-                    seasonEnd="12-31"
+                    // Korouoma is open all year - no season restrictions
                   />
                 )}
               </div>
