@@ -20,20 +20,9 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
   const [editingSlots, setEditingSlots] = useState<number>(0)
   const [isEditing, setIsEditing] = useState(false)
 
-  // Load availability data
-  useEffect(() => {
-    loadAvailability()
-  }, [tourId, loadAvailability])
-
-  // Auto-refresh availability when month changes
-  useEffect(() => {
-    loadAvailability()
-  }, [currentMonth, loadAvailability])
-
   const loadAvailability = useCallback(async () => {
     try {
       setLoading(true)
-      // Use the new Supabase function instead of the old API
       const { data, error } = await supabase.functions.invoke('get-tour-availability', {
         body: { tourId }
       })
@@ -42,7 +31,6 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
         throw new Error(error.message)
       }
       
-      // Transform the response to match the expected format
       const transformedData = data.availableDates.map((date: any) => ({
         id: date.id,
         tour_id: tourId,
@@ -55,10 +43,15 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
       setAvailability(transformedData)
     } catch (err) {
       console.error('Availability error:', err)
+      setError(err instanceof Error ? err.message : 'Failed to load availability')
     } finally {
       setLoading(false)
     }
   }, [tourId])
+
+  useEffect(() => {
+    loadAvailability()
+  }, [tourId, currentMonth, loadAvailability])
 
   // Get month name and year
   const getMonthYearString = () => {

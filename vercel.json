@@ -9,6 +9,33 @@
       }
     }
   ],
+  "redirects": [
+    {
+      "source": "/admin-panel",
+      "destination": "https://admin.royalnordic.fi/",
+      "permanent": true
+    },
+    {
+      "source": "/admin-panel/(.*)",
+      "destination": "https://admin.royalnordic.fi/",
+      "permanent": true
+    },
+    {
+      "source": "/admin.html",
+      "destination": "https://admin.royalnordic.fi/",
+      "permanent": true
+    },
+    {
+      "source": "/admin",
+      "destination": "https://admin.royalnordic.fi/",
+      "permanent": true
+    },
+    {
+      "source": "/admin-:path*",
+      "destination": "https://admin.royalnordic.fi/",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
@@ -20,6 +47,16 @@
     }
   ],
   "headers": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "admin.royalnordic.fi" }],
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [

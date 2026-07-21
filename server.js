@@ -827,13 +827,16 @@ app.post('/api/test-email', async (req, res) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📱 Mobile admin panel: http://localhost:${PORT}/admin`);
+  console.log(`🔐 Admin console: https://admin.royalnordic.fi`);
   console.log(`💳 Stripe integration ready`);
 });
 
-// Serve admin panel
-app.get('/admin', (req, res) => {
-  res.sendFile('admin.html', { root: './public' });
+app.get('/admin', (_req, res) => {
+  res.redirect(302, 'https://admin.royalnordic.fi/')
+});
+
+app.get('/admin.html', (_req, res) => {
+  res.redirect(302, 'https://admin.royalnordic.fi/')
 });
 
 export default app;
