@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { 
   Calendar, 
   Users, 
@@ -17,6 +17,14 @@ import {
   Trash2
 } from 'lucide-react'
 import { getAdminBookings, updateBookingStatus, sendManualConfirmationEmail, deleteBooking } from '../lib/api'
+import {
+  getAdminSession,
+  onAdminAuthChange,
+  signOutAdmin,
+  type AdminSessionState,
+} from '../lib/adminAuth'
+import AdminLogin from './AdminLogin'
+import AdminAvailability from './AdminAvailability'
 import type { Booking } from '../lib/supabase'
 
 interface AdminBooking extends Booking {
@@ -25,8 +33,10 @@ interface AdminBooking extends Booking {
 }
 
 const AdminPanel: React.FC = () => {
+  const [auth, setAuth] = useState<AdminSessionState | null>(null)
+  const [authChecked, setAuthChecked] = useState(false)
   const [bookings, setBookings] = useState<AdminBooking[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'confirmed' | 'cancelled'>('all')
@@ -36,12 +46,33 @@ const AdminPanel: React.FC = () => {
   const [deletingBookingId, setDeletingBookingId] = useState<number | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<{ bookingId: number, customerName: string } | null>(null)
 
-  // Load bookings
   useEffect(() => {
-    loadBookings()
+    let mounted = true
+    getAdminSession()
+      .then((state) => {
+        if (mounted) {
+          setAuth(state)
+          setAuthChecked(true)
+        }
+      })
+      .catch(() => {
+        if (mounted) {
+          setAuth({ session: null, user: null, isSignedIn: false })
+          setAuthChecked(true)
+        }
+      })
+
+    const unsubscribe = onAdminAuthChange((state) => {
+      if (mounted) setAuth(state)
+    })
+
+    return () => {
+      mounted = false
+      unsubscribe()
+    }
   }, [])
 
-  const loadBookings = async () => {
+  const loadBookings = useCallback(async () => {
     try {
       setLoading(true)
       setError('')
@@ -53,6 +84,39 @@ const AdminPanel: React.FC = () => {
     } finally {
       setLoading(false)
     }
+  }, [])
+
+  useEffect(() => {
+    if (auth?.isSignedIn) {
+      loadBookings()
+    } else {
+      setBookings([])
+    }
+  }, [auth?.isSignedIn, loadBookings])
+
+  const handleSignOut = async () => {
+    try {
+      await signOutAdmin()
+      setBookings([])
+      setSelectedBooking(null)
+    } catch (err: any) {
+      setError(err.message || 'Failed to sign out')
+    }
+  }
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600">Checking session…</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!auth?.isSignedIn) {
+    return <AdminLogin onSuccess={() => getAdminSession().then(setAuth)} />
   }
 
   // Update booking status
@@ -183,13 +247,24 @@ const AdminPanel: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-900">Royal Nordic Admin</h1>
               <p className="text-gray-600">Manage bookings and monitor your business</p>
             </div>
-            <button
-              onClick={loadBookings}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Refresh
-            </button>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-500 hidden sm:inline">
+                {auth.user?.email}
+              </span>
+              <button
+                onClick={loadBookings}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Refresh
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                Sign out
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -652,53 +727,9 @@ const AdminPanel: React.FC = () => {
         </div>
       )}
 
-      {/* Tour Availability Management */}
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Tour Availability Management</h2>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Northern Lights Tour */}
-          <div className="border border-gray-200 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Northern Lights Tour</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Season:</span>
-                <span className="text-sm font-medium">Sep 15 - Apr 15</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Max Capacity:</span>
-                <span className="text-sm font-medium">8 people</span>
-              </div>
-              <button
-                onClick={() => window.open('/admin-availability.html', '_blank')}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Manage Availability
-              </button>
-            </div>
-          </div>
-
-          {/* Snowshoe Rental */}
-          <div className="border border-gray-200 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Snowshoe Rental</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Season:</span>
-                <span className="text-sm font-medium">Nov 1 - Apr 1</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Max Capacity:</span>
-                <span className="text-sm font-medium">3 people</span>
-              </div>
-              <button
-                onClick={() => window.open('/admin-availability.html', '_blank')}
-                className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
-              >
-                Manage Availability
-              </button>
-            </div>
-          </div>
-        </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 space-y-8">
+        <AdminAvailability tourId={1} tourName="Northern Lights Tour" maxCapacity={8} />
+        <AdminAvailability tourId={2} tourName="Snowshoe Adventure" maxCapacity={3} />
       </div>
     </div>
   )

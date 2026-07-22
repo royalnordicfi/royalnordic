@@ -40,7 +40,6 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsConditions from './components/TermsConditions';
 import ScrollToTop from './components/ScrollToTop';
 import WhatsAppWidget from './components/WhatsAppWidget';
-import AdminPanel from './components/AdminPanel';
 import SaleModal from './components/SaleModal';
 import SnowmobileSafari from './components/SnowmobileSafari';
 import BestSellersSlideshow from './components/BestSellersSlideshow';
@@ -115,9 +114,6 @@ function App() {
           <Route path="/crypto-payment-success" element={<CryptoPaymentSuccess />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
-          
-          {/* Admin Panel */}
-          <Route path="/admin-panel" element={<AdminPanel />} />
         </Routes>
         
         {/* WhatsApp Widget - appears on all pages */}

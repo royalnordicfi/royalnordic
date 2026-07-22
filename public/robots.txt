@@ -1,26 +1,16 @@
 User-agent: *
 Allow: /
 
-# Favicon
 Allow: /favicon.ico
 Allow: /favicon-google.ico
 Allow: /favicon-google.png
 Allow: /royalnordiclogotransparent.png
 
-# Sitemap
 Sitemap: https://royalnordic.fi/sitemap.xml
 
-# Crawl-delay for respectful crawling
 Crawl-delay: 1
 
-# Disallow admin areas
 Disallow: /admin
+Disallow: /admin-panel
 Disallow: /admin.html
 Disallow: /api/
-
-# Allow important pages
-Allow: /northern-lights-tour
-Allow: /snowshoe-rental
-Allow: /customized-tour
-Allow: /privacy-policy
-Allow: /terms-conditions

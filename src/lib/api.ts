@@ -2,6 +2,14 @@ import { supabase } from './supabase'
 import { sendBookingNotification, sendCustomerConfirmation } from './email'
 import type { Tour, TourDate, Booking } from './supabase'
 
+async function requireAdminSession() {
+  const { data, error } = await supabase.auth.getSession()
+  if (error || !data.session) {
+    throw new Error('Admin authentication required')
+  }
+  return data.session
+}
+
 // Tour availability API
 export async function getTourAvailability(tourId: number, startDate?: string, endDate?: string) {
   let query = supabase
@@ -33,8 +41,10 @@ export async function getTourAvailability(tourId: number, startDate?: string, en
   })) || []
 }
 
-// Update tour availability API
+// Update tour availability API (admin session + RLS)
 export async function updateTourAvailability(tourId: number, date: string, availableSlots: number) {
+  await requireAdminSession()
+
   // Check if date already exists
   const { data: existingDate, error: checkError } = await supabase
     .from('tour_dates')
@@ -147,7 +157,7 @@ export async function getTourStatistics(tourId: number) {
   }
 }
 
-// Create booking API
+// Create booking — prefers SECURITY DEFINER RPC after RLS migration
 export async function createBooking(bookingData: {
   tour_id: number
   tour_date_id: number
@@ -160,49 +170,64 @@ export async function createBooking(bookingData: {
   stripe_payment_intent_id: string
   special_requests?: string
 }) {
-  // First check availability
-  const { data: dateData, error: dateError } = await supabase
-    .from('tour_dates')
-    .select('available_slots, total_booked')
-    .eq('id', bookingData.tour_date_id)
-    .single()
+  let bookingId: number | null = null
 
-  if (dateError) {
-    throw new Error('Date not found')
+  const { data: rpcRows, error: rpcError } = await supabase.rpc('create_public_booking', {
+    p_tour_id: bookingData.tour_id,
+    p_tour_date_id: bookingData.tour_date_id,
+    p_customer_name: bookingData.customer_name,
+    p_customer_email: bookingData.customer_email,
+    p_customer_phone: bookingData.customer_phone || null,
+    p_adults: bookingData.adults,
+    p_children: bookingData.children,
+    p_total_price: bookingData.total_price,
+    p_stripe_payment_intent_id: bookingData.stripe_payment_intent_id,
+    p_special_requests: bookingData.special_requests || null,
+  })
+
+  if (!rpcError) {
+    bookingId = Array.isArray(rpcRows)
+      ? rpcRows[0]?.id ?? null
+      : (rpcRows as { id?: number } | null)?.id ?? null
+  } else {
+    // Fallback until migration 015 is applied (insert without RETURNING)
+    const { data: dateData, error: dateError } = await supabase
+      .from('tour_dates')
+      .select('available_slots, total_booked')
+      .eq('id', bookingData.tour_date_id)
+      .single()
+
+    if (dateError) {
+      throw new Error('Date not found')
+    }
+
+    const remainingSlots = dateData.available_slots - dateData.total_booked
+    const requestedSlots = bookingData.adults + bookingData.children
+    if (requestedSlots > remainingSlots) {
+      throw new Error(`Only ${remainingSlots} slots available`)
+    }
+
+    const { data: booking, error: insertError } = await supabase
+      .from('bookings')
+      .insert([{ ...bookingData, status: 'confirmed' }])
+      .select('id')
+      .single()
+
+    if (insertError) {
+      throw new Error(rpcError.message || insertError.message)
+    }
+
+    bookingId = booking.id
+
+    // Legacy path only: trigger may also update slots; keep for pre-RLS compat
+    await supabase
+      .from('tour_dates')
+      .update({ total_booked: dateData.total_booked + requestedSlots })
+      .eq('id', bookingData.tour_date_id)
   }
 
-  const remainingSlots = dateData.available_slots - dateData.total_booked
-  const requestedSlots = bookingData.adults + bookingData.children
+  const booking = { id: bookingId ?? 0 }
 
-  if (requestedSlots > remainingSlots) {
-    throw new Error(`Only ${remainingSlots} slots available`)
-  }
-
-  // Create booking with confirmed status (automatic confirmation)
-  const { data: booking, error: bookingError } = await supabase
-    .from('bookings')
-    .insert([{
-      ...bookingData,
-      status: 'confirmed' // Automatically confirm bookings
-    }])
-    .select()
-    .single()
-
-  if (bookingError) {
-    throw new Error(bookingError.message)
-  }
-
-  // Update available slots
-  const { error: updateError } = await supabase
-    .from('tour_dates')
-    .update({ total_booked: dateData.total_booked + requestedSlots })
-    .eq('id', bookingData.tour_date_id)
-
-  if (updateError) {
-    throw new Error(updateError.message)
-  }
-
-  // Get tour and date information for email notification
   const { data: tourData } = await supabase
     .from('tours')
     .select('name')
@@ -215,7 +240,6 @@ export async function createBooking(bookingData: {
     .eq('id', bookingData.tour_date_id)
     .single()
 
-  // Send email notifications
   if (tourData && dateDataForEmail) {
     const emailData = {
       bookingId: booking.id,
@@ -229,18 +253,16 @@ export async function createBooking(bookingData: {
       totalPrice: bookingData.total_price,
       specialRequests: bookingData.special_requests,
       paymentStatus: 'confirmed' as const,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     }
 
     try {
-      // Send notification to Royal Nordic staff
       await sendBookingNotification(emailData)
     } catch (error) {
       console.error('Failed to send admin email notification:', error)
     }
 
     try {
-      // Send confirmation to customer
       await sendCustomerConfirmation(emailData)
     } catch (error) {
       console.error('Failed to send customer confirmation:', error)
@@ -250,36 +272,9 @@ export async function createBooking(bookingData: {
   return booking
 }
 
-// Admin API functions
-export async function adminLogin(email: string, password: string, secureKey: string) {
-  const { data, error } = await supabase
-    .from('admin_users')
-    .select('*')
-    .eq('email', email)
-    .single()
-
-  if (error || !data) {
-    throw new Error('Invalid credentials')
-  }
-
-  // Check password and secure key
-  if (data.password_hash !== password) {
-    throw new Error('Invalid credentials')
-  }
-
-  // For now, we'll use a simple secure key check
-  // In production, you'd use proper hashing
-  if (secureKey !== 'admin1234567890123') {
-    throw new Error('Invalid credentials')
-  }
-
-  return {
-    token: 'admin-token', // You'd generate a real JWT here
-    user: { id: data.id, email: data.email }
-  }
-}
-
 export async function getAdminBookings() {
+  await requireAdminSession()
+
   const { data, error } = await supabase
     .from('bookings')
     .select(`
@@ -303,15 +298,16 @@ export async function getAdminBookings() {
     throw new Error(error.message || 'Failed to load bookings')
   }
 
-  // Ensure data structure is correct
   return (data || []).map((booking: any) => ({
     ...booking,
     tours: booking.tours || { name: 'Unknown Tour' },
-    tour_dates: booking.tour_dates || { date: new Date().toISOString() }
+    tour_dates: booking.tour_dates || { date: new Date().toISOString() },
   }))
 }
 
 export async function updateBookingStatus(bookingId: number, status: 'pending' | 'confirmed' | 'cancelled') {
+  await requireAdminSession()
+
   const { data, error } = await supabase
     .from('bookings')
     .update({ status })
@@ -326,12 +322,10 @@ export async function updateBookingStatus(bookingId: number, status: 'pending' |
   return data
 }
 
-// Delete booking API
 export async function deleteBooking(bookingId: number) {
-  const { error } = await supabase
-    .from('bookings')
-    .delete()
-    .eq('id', bookingId)
+  await requireAdminSession()
+
+  const { error } = await supabase.from('bookings').delete().eq('id', bookingId)
 
   if (error) {
     throw new Error(error.message)
@@ -340,7 +334,6 @@ export async function deleteBooking(bookingId: number) {
   return { success: true }
 }
 
-// Send manual confirmation email to customer
 export async function sendManualConfirmationEmail(booking: {
   id: number
   customer_name: string
@@ -354,6 +347,8 @@ export async function sendManualConfirmationEmail(booking: {
   tours: { name: string }
   tour_dates: { date: string }
 }) {
+  await requireAdminSession()
+
   const emailData = {
     bookingId: booking.id,
     customerName: booking.customer_name,
@@ -366,7 +361,7 @@ export async function sendManualConfirmationEmail(booking: {
     totalPrice: booking.total_price,
     specialRequests: booking.special_requests,
     paymentStatus: 'confirmed' as const,
-    createdAt: booking.created_at
+    createdAt: booking.created_at,
   }
 
   try {
