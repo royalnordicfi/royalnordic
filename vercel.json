@@ -2,6 +2,10 @@
   "version": 2,
   "builds": [
     {
+      "src": "api/omega/v1/operational-summary.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
