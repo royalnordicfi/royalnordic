@@ -42,6 +42,11 @@ CREATE TABLE IF NOT EXISTS public.vehicles (
 );
 
 -- ---------- BOOKINGS ops columns ----------
+-- payment_type / crypto_type may be missing if migration 002 was never applied
+ALTER TABLE public.bookings
+  ADD COLUMN IF NOT EXISTS payment_type TEXT DEFAULT 'card',
+  ADD COLUMN IF NOT EXISTS crypto_type TEXT;
+
 ALTER TABLE public.bookings
   ADD COLUMN IF NOT EXISTS booking_ref TEXT,
   ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT 'direct_website',
@@ -79,10 +84,13 @@ UPDATE public.bookings
 SET booking_ref = 'RN-' || id::text
 WHERE booking_ref IS NULL;
 
+-- Backfill payment_status from booking status only (no assumed commission/platform rates).
+-- Treat confirmed as paid; crypto-pending stays pending_crypto. Safe if payment_type absent historically.
 UPDATE public.bookings
 SET payment_status = CASE
-  WHEN status = 'confirmed' AND coalesce(payment_type, 'card') <> 'crypto' THEN 'paid'
+  WHEN status = 'confirmed' THEN 'paid'
   WHEN status = 'pending_crypto_payment' THEN 'pending_crypto'
+  WHEN status = 'cancelled' THEN payment_status
   ELSE payment_status
 END
 WHERE payment_status = 'unpaid' OR payment_status IS NULL;
