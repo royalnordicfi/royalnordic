@@ -63,7 +63,7 @@ export default function AdminShell() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900">
+    <div className="min-h-screen bg-gray-100 text-gray-900 overflow-x-clip">
       <header className="sticky top-0 z-40 bg-black text-white px-4 py-3 flex items-center justify-between">
         <div className="min-w-0">
           <Link to="/" className="font-semibold tracking-wide">
@@ -93,11 +93,12 @@ export default function AdminShell() {
         </div>
       </header>
 
-      <div className="md:flex md:min-h-[calc(100vh-56px)]">
+      {/* Document scrolls normally; sidebar sticks — avoid nested overflow traps */}
+      <div className="md:flex md:items-start">
         <nav
           className={`${
             open ? 'block' : 'hidden'
-          } md:block md:w-56 bg-white border-b md:border-b-0 md:border-r border-gray-200`}
+          } md:block md:w-56 md:shrink-0 md:sticky md:top-[52px] md:self-start md:max-h-[calc(100vh-52px)] md:overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200`}
         >
           <ul className="p-2 space-y-1">
             {nav.map((item) => (
@@ -121,7 +122,7 @@ export default function AdminShell() {
           </ul>
         </nav>
 
-        <main className="flex-1 p-4 md:p-6 max-w-6xl w-full mx-auto">
+        <main className="flex-1 min-w-0 p-4 md:p-6 max-w-6xl w-full mx-auto pb-8">
           <Outlet />
         </main>
       </div>

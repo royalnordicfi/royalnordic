@@ -12,15 +12,15 @@ const Hero = () => {
   return (
     <section 
       id="home" 
-      className="relative w-screen h-screen flex items-center justify-center overflow-hidden"
+      className="relative w-full h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* Video Background */}
+      {/* Video Background — pointer-events none so wheel/trackpad scrolls the page */}
       <video
         autoPlay
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         style={{
           zIndex: 1,
           backgroundColor: 'black'
@@ -34,10 +34,10 @@ const Hero = () => {
       </video>
       
       {/* Video Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80 z-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80 z-10 pointer-events-none"></div>
       
       {/* Bottom transition overlay for smooth flow to tours */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/90 via-black/60 to-transparent z-10"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/90 via-black/60 to-transparent z-10 pointer-events-none"></div>
 
       {/* Content */}
       <div className="relative z-20 text-center px-3 sm:px-6 lg:px-8 max-w-5xl mx-auto">
