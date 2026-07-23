@@ -1,6 +1,7 @@
 -- Royal Nordic Admin OS V1
 -- Extends existing bookings/tours; adds guides, vehicles, customers, booking_events.
 -- Requires is_admin() from migration 015.
+-- Idempotent: safe to re-run after a partial/failed attempt.
 
 -- ---------- TOURS (products) ----------
 ALTER TABLE public.tours
@@ -42,20 +43,38 @@ CREATE TABLE IF NOT EXISTS public.vehicles (
 );
 
 -- ---------- BOOKINGS ops columns ----------
--- payment_type / crypto_type may be missing if migration 002 was never applied
+-- Ensure crypto columns exist (migration 002 may never have been applied)
 ALTER TABLE public.bookings
-  ADD COLUMN IF NOT EXISTS payment_type TEXT DEFAULT 'card',
+  ADD COLUMN IF NOT EXISTS payment_type TEXT DEFAULT 'card';
+
+ALTER TABLE public.bookings
   ADD COLUMN IF NOT EXISTS crypto_type TEXT;
 
 ALTER TABLE public.bookings
-  ADD COLUMN IF NOT EXISTS booking_ref TEXT,
-  ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT 'direct_website',
-  ADD COLUMN IF NOT EXISTS pickup_location TEXT,
-  ADD COLUMN IF NOT EXISTS tour_time TEXT,
-  ADD COLUMN IF NOT EXISTS payment_status TEXT NOT NULL DEFAULT 'unpaid',
-  ADD COLUMN IF NOT EXISTS internal_notes TEXT,
-  ADD COLUMN IF NOT EXISTS guide_id BIGINT REFERENCES public.guides(id) ON DELETE SET NULL,
-  ADD COLUMN IF NOT EXISTS vehicle_id BIGINT REFERENCES public.vehicles(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS booking_ref TEXT;
+
+ALTER TABLE public.bookings
+  ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT 'direct_website';
+
+ALTER TABLE public.bookings
+  ADD COLUMN IF NOT EXISTS pickup_location TEXT;
+
+ALTER TABLE public.bookings
+  ADD COLUMN IF NOT EXISTS tour_time TEXT;
+
+ALTER TABLE public.bookings
+  ADD COLUMN IF NOT EXISTS payment_status TEXT NOT NULL DEFAULT 'unpaid';
+
+ALTER TABLE public.bookings
+  ADD COLUMN IF NOT EXISTS internal_notes TEXT;
+
+ALTER TABLE public.bookings
+  ADD COLUMN IF NOT EXISTS guide_id BIGINT REFERENCES public.guides(id) ON DELETE SET NULL;
+
+ALTER TABLE public.bookings
+  ADD COLUMN IF NOT EXISTS vehicle_id BIGINT REFERENCES public.vehicles(id) ON DELETE SET NULL;
+
+ALTER TABLE public.bookings
   ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 
 -- Expand booking status values
@@ -84,13 +103,11 @@ UPDATE public.bookings
 SET booking_ref = 'RN-' || id::text
 WHERE booking_ref IS NULL;
 
--- Backfill payment_status from booking status only (no assumed commission/platform rates).
--- Treat confirmed as paid; crypto-pending stays pending_crypto. Safe if payment_type absent historically.
+-- Backfill payment_status from booking status (no payment_type dependency)
 UPDATE public.bookings
 SET payment_status = CASE
   WHEN status = 'confirmed' THEN 'paid'
   WHEN status = 'pending_crypto_payment' THEN 'pending_crypto'
-  WHEN status = 'cancelled' THEN payment_status
   ELSE payment_status
 END
 WHERE payment_status = 'unpaid' OR payment_status IS NULL;
@@ -155,7 +172,6 @@ CREATE POLICY "booking_events_admin_all" ON public.booking_events
   FOR ALL TO authenticated
   USING (public.is_admin()) WITH CHECK (public.is_admin());
 
--- Ensure tours admin update covers new columns (policies from 015)
 -- Seed public_name for known tours without inventing new products
 UPDATE public.tours SET
   public_name = CASE name
