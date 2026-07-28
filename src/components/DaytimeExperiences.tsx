@@ -19,12 +19,12 @@ const DaytimeExperiences: React.FC = () => {
     {
       id: 2,
       name: "Nordic Animals of Ranua Zoo",
-      description: "Discover the incredible wildlife of Finland at Ranua Zoo, home to bears, wolves, lynx, and many other Nordic animals.",
+      description: "Day trip from Rovaniemi to Ranua Wildlife Park — polar bears and 50+ Arctic species, transfers and tickets included.",
       image: "/ranua1.jpg",
       duration: "5 hours",
-      groupSize: "Up to 8 people",
+      groupSize: "Max 16 people",
       location: "Ranua, Lapland",
-      features: ["Hotel pickup", "Expert guide", "Zoo tickets", "Transportation"],
+      features: ["Hotel pickup", "Zoo tickets", "Polar bears & Arctic wildlife", "English & Finnish"],
       route: "/ranua-zoo",
       badge: "Family Favorite"
     },
