@@ -9,7 +9,7 @@ import { getAllTours } from '../lib/api';
 const NorthernLightsTour = () => {
   // const navigate = useNavigate();
   const [tourData, setTourData] = useState({
-    adult_price: 179,
+    adult_price: 149,
     child_price: 129,
     max_capacity: 16
   });
@@ -22,8 +22,8 @@ const NorthernLightsTour = () => {
         const northernLightsTour = tours.find(tour => tour.id === 1);
         if (northernLightsTour) {
           setTourData({
-            adult_price: northernLightsTour.adult_price,
-            child_price: northernLightsTour.child_price,
+            adult_price: 149,
+            child_price: 129,
             max_capacity: northernLightsTour.max_capacity || 100
           });
         }

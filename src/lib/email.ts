@@ -197,7 +197,8 @@ Booking ID: #${booking.bookingId}
 // Helper functions to get tour prices
 function getAdultPrice(tourName: string): number {
   const prices: Record<string, number> = {
-    'Northern Lights Tour': 179,
+    'Northern Lights Tour': 149,
+    'Guaranteed Northern Lights Tour': 149,
     'Quality Snowshoe Rental': 59,
     'Customized Tour': 200
   }
@@ -206,7 +207,8 @@ function getAdultPrice(tourName: string): number {
 
 function getChildPrice(tourName: string): number {
   const prices: Record<string, number> = {
-    'Northern Lights Tour': 149,
+    'Northern Lights Tour': 129,
+    'Guaranteed Northern Lights Tour': 129,
     'Quality Snowshoe Rental': 49,
     'Customized Tour': 150
   }

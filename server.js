@@ -115,7 +115,7 @@ db.serialize(() => {
     if (row.count === 0) {
       db.run(`INSERT INTO tours (name, description, adult_price, child_price, max_capacity) 
                VALUES (?, ?, ?, ?, ?)`, 
-        ['Northern Lights Tour', 'Guaranteed Northern Lights experience in Lapland', 179, 149, 8]
+        ['Northern Lights Tour', 'Guaranteed Northern Lights experience in Lapland', 149, 129, 8]
       );
       
       // Insert sample dates for Northern Lights Tour: September 15, 2025 - April 15, 2026
@@ -631,8 +631,8 @@ app.post('/api/send-stripe-confirmation', async (req, res) => {
     }
 
     // Calculate price breakdown
-    const adultPrice = 179;
-    const childPrice = 149;
+    const adultPrice = 149;
+    const childPrice = 129;
     const adultTotal = adultPrice * adults;
     const childTotal = childPrice * children;
 
