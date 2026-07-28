@@ -15,7 +15,8 @@ const NorthernLightsTours: React.FC = () => {
       location: "Rovaniemi, Lapland",
       features: ["Professional guide", "Hotel pickup", "Photography assistance", "Warm drinks and snacks"],
       route: "/northern-lights-tour",
-      badge: "Most Popular"
+      badge: "Most Popular",
+      bookingMode: "instant" as const,
     },
     {
       id: 2,
@@ -27,19 +28,21 @@ const NorthernLightsTours: React.FC = () => {
       location: "Rovaniemi, Lapland",
       features: ["Family-friendly guide", "Hotel pickup", "Warm drinks & snacks", "Shorter duration for kids"],
       route: "/family-friendly-northern-lights",
-      badge: "Family Favorite"
+      badge: "Family Favorite",
+      bookingMode: "instant" as const,
     },
     {
       id: 3,
       name: "Monster Truck Northern Lights Experience",
-      description: "Experience the magic of the Arctic night on board a giant monster truck! Deep into the wilderness for the best Northern Lights viewing.",
+      description: "Experience the magic of the Arctic night on board a giant monster truck! Deep into the wilderness for the best Northern Lights viewing. Request-only — not instant online checkout.",
       image: "/monsteri1.jpg",
       duration: "3 hours",
       groupSize: "Flexible",
       location: "Rovaniemi, Lapland",
       features: ["Professional guide and driver", "Specially built monster truck", "Remote viewing locations", "No experience required"],
       route: "/monster-truck-northern-lights",
-      badge: "Unique Experience"
+      badge: "Request quote",
+      bookingMode: "inquiry" as const,
     }
   ];
 
@@ -139,7 +142,10 @@ const NorthernLightsTours: React.FC = () => {
                 {/* CTA */}
                 <div className="flex items-center justify-between pt-4 border-t border-gray-800">
                   <span className="text-emerald-400 font-semibold group-hover:translate-x-2 transition-transform">
-                    View Details →
+                    {tour.bookingMode === 'inquiry' ? 'Request quote →' : 'Book online →'}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {tour.bookingMode === 'inquiry' ? 'Inquiry only' : 'Instant checkout'}
                   </span>
                 </div>
               </div>

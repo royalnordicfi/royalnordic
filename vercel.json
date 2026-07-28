@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/omega/v1/operational-summary.js",
+      "src": "api/**/*.js",
       "use": "@vercel/node"
     },
     {
@@ -46,7 +46,7 @@
       "destination": "/api/$1"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ],

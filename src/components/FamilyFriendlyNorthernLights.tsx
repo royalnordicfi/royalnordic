@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Clock, Users, MapPin, Star, CheckCircle, XCircle, Calendar, Euro } from 'lucide-react';
 import ImageSlideshow from './ImageSlideshow';
@@ -6,15 +6,6 @@ import Footer from './Footer';
 import BookingForm from './BookingForm';
 
 const FamilyFriendlyNorthernLights: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState('');
-  const [isBooking, setIsBooking] = useState(false);
-
-  const handleBooking = () => {
-    setIsBooking(true);
-    // Redirect to booking system
-    window.location.href = 'https://royalnordic.fi/book';
-  };
-
   const tourImages = [
     "/family1.jpg",
     "/family2.jpg", 
@@ -190,7 +181,6 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
                 tourName="Family-Friendly Northern Lights Tour"
                 adultPrice={79}
                 childPrice={59}
-                maxCapacity={16}
                 seasonStart="09-15"
                 seasonEnd="04-15"
               />

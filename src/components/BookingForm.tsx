@@ -32,9 +32,18 @@ const BookingForm: React.FC<BookingFormProps> = ({
     fullName: '',
     email: '',
     phone: '',
+    pickupLocation: '',
     specialRequests: '',
     discountCode: ''
   })
+
+  const isDecemberSaleWindow = () => {
+    const now = new Date()
+    const saleStart = new Date('2025-12-02')
+    const saleEnd = new Date('2025-12-16')
+    saleEnd.setHours(23, 59, 59, 999)
+    return now >= saleStart && now <= saleEnd
+  }
 
   const [availability, setAvailability] = useState<TourDate[]>([])
   const [loading, setLoading] = useState(false)
@@ -322,31 +331,16 @@ const BookingForm: React.FC<BookingFormProps> = ({
   }
 
   const getDiscountAmount = (subtotal: number) => {
-    // Check if discount code is valid and sale is active
-    const now = new Date()
-    const saleStart = new Date('2025-12-02')
-    const saleEnd = new Date('2025-12-16')
-    saleEnd.setHours(23, 59, 59, 999)
-
-    const isSaleActive = now >= saleStart && now <= saleEnd
     const isValidCode = formData.discountCode.trim().toUpperCase() === 'DECEMBER15'
-
-    if (isSaleActive && isValidCode) {
-      return subtotal * 0.15 // 15% discount
+    if (isDecemberSaleWindow() && isValidCode) {
+      return subtotal * 0.15
     }
     return 0
   }
 
   const isDiscountValid = () => {
-    const now = new Date()
-    const saleStart = new Date('2025-12-02')
-    const saleEnd = new Date('2025-12-16')
-    saleEnd.setHours(23, 59, 59, 999)
-
-    const isSaleActive = now >= saleStart && now <= saleEnd
     const isValidCode = formData.discountCode.trim().toUpperCase() === 'DECEMBER15'
-
-    return isSaleActive && isValidCode
+    return isDecemberSaleWindow() && isValidCode
   }
 
   const getAvailableSlots = (date: string) => {
@@ -424,7 +418,15 @@ const BookingForm: React.FC<BookingFormProps> = ({
           discount: discount.toString(),
           discount_code: formData.discountCode.trim().toUpperCase(),
           phone: formData.phone,
-          special_requests: formData.specialRequests
+          pickup_location: formData.pickupLocation.trim(),
+          special_requests: [
+            formData.pickupLocation.trim()
+              ? `Pickup: ${formData.pickupLocation.trim()}`
+              : '',
+            formData.specialRequests.trim(),
+          ]
+            .filter(Boolean)
+            .join('\n'),
         }
       }
 
@@ -800,6 +802,24 @@ const BookingForm: React.FC<BookingFormProps> = ({
           </div>
         </div>
 
+        {/* Pickup — needed for ops; collected before payment */}
+        <div>
+          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">
+            Pickup location
+          </h4>
+          <input
+            type="text"
+            name="pickupLocation"
+            value={formData.pickupLocation}
+            onChange={handleChange}
+            placeholder="Hotel or address in Rovaniemi"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Optional but recommended — helps us confirm your pickup before the tour.
+          </p>
+        </div>
+
         {/* Special Requests */}
         <div>
           <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Special Requests</h4>
@@ -813,29 +833,31 @@ const BookingForm: React.FC<BookingFormProps> = ({
           />
         </div>
 
-        {/* Discount Code */}
-        <div>
-          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Discount Code</h4>
-          <div className="flex gap-2">
-            <input 
-              type="text" 
-              name="discountCode"
-              value={formData.discountCode}
-              onChange={handleChange}
-              placeholder="Enter code (e.g. DECEMBER15)"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm uppercase"
-              style={{ textTransform: 'uppercase' }}
-            />
-            {isDiscountValid() && (
-              <div className="flex items-center px-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-                <span className="text-emerald-600 text-sm font-semibold">✓ Valid</span>
-              </div>
+        {/* Discount — only during verified December sale window */}
+        {isDecemberSaleWindow() && (
+          <div>
+            <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Discount Code</h4>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                name="discountCode"
+                value={formData.discountCode}
+                onChange={handleChange}
+                placeholder="Enter code (e.g. DECEMBER15)"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm uppercase"
+                style={{ textTransform: 'uppercase' }}
+              />
+              {isDiscountValid() && (
+                <div className="flex items-center px-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+                  <span className="text-emerald-600 text-sm font-semibold">✓ Valid</span>
+                </div>
+              )}
+            </div>
+            {formData.discountCode && !isDiscountValid() && (
+              <p className="text-xs text-red-600 mt-1">Invalid code</p>
             )}
           </div>
-          {formData.discountCode && !isDiscountValid() && (
-            <p className="text-xs text-red-600 mt-1">Invalid code or sale period has ended</p>
-          )}
-        </div>
+        )}
 
         {/* Total Price */}
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">

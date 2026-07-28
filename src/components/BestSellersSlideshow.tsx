@@ -25,18 +25,18 @@ const BestSellersSlideshow: React.FC = () => {
     {
       id: 3,
       title: "Snowmobile Safari",
-      description: "Experience the thrill of snowmobiling through Lapland's pristine wilderness. Multiple duration options available.",
+      description: "Experience the thrill of snowmobiling through Lapland's pristine wilderness. Multiple duration options available. Request quote — not instant checkout.",
       image: "/snowmobiling.jpg",
       route: "/snowmobile-safari",
-      badge: "BEST SELLER"
+      badge: "REQUEST QUOTE"
     },
     {
       id: 4,
       title: "Monster Truck Northern Lights Experience",
-      description: "Experience the magic of the Arctic night on board a giant monster truck! Deep into the wilderness for the best Northern Lights viewing.",
+      description: "Experience the magic of the Arctic night on board a giant monster truck! Deep into the wilderness for the best Northern Lights viewing. Request quote — not instant checkout.",
       image: "/monsteri1.jpg",
       route: "/monster-truck-northern-lights",
-      badge: "BEST SELLER"
+      badge: "REQUEST QUOTE"
     }
   ];
 
