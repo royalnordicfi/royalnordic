@@ -126,7 +126,7 @@ const Header = () => {
             {/* Social Media Icons */}
             <div className="flex items-center space-x-6">
               <a
-                href="https://www.instagram.com/royalnordicfi/"
+                href="https://www.instagram.com/royalnordic.fi/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-pink-500 transition-colors duration-200"
@@ -228,7 +228,7 @@ const Header = () => {
             {/* Mobile Social Media Icons */}
             <div className="flex items-center justify-center space-x-8 pt-4">
               <a
-                href="https://www.instagram.com/royalnordicfi/"
+                href="https://www.instagram.com/royalnordic.fi/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-pink-500 transition-colors duration-200"

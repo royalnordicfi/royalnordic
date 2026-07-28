@@ -109,7 +109,7 @@ const Footer: React.FC = () => {
               <h5 className="text-white font-medium mb-3">Follow Us</h5>
               <div className="flex items-center space-x-4">
                 <a
-                  href="https://www.instagram.com/royalnordicfi/"
+                  href="https://www.instagram.com/royalnordic.fi/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-300 hover:text-pink-500 transition-colors duration-200"
