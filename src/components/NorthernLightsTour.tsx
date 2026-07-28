@@ -83,7 +83,7 @@ const NorthernLightsTour = () => {
   // const pricing = [
   //   {
   //     option: "Adult (15+ years)",
-  //     price: "€179",
+  //     price: "€149",
   //     includes: ["All equipment", "Professional guide", "Hot drinks & snacks", "Transportation"]
   //   },
   //   {
