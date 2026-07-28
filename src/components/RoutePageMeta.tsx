@@ -16,7 +16,7 @@ const META: Record<string, { title: string; description: string; ogImage?: strin
   '/family-friendly-northern-lights': {
     title: 'Family-Friendly Northern Lights Tour Rovaniemi | Royal Nordic',
     description:
-      'Shorter Northern Lights tour designed for families with children. Hotel pickup from Rovaniemi. Book direct with Royal Nordic.',
+      '2-hour family aurora tour from Rovaniemi: hotel pickup, English & Finnish guide, hot drinks. Aurora not guaranteed. Free cancellation 24h.',
   },
   '/northern-lights-tours': {
     title: 'Northern Lights Tours Rovaniemi | Royal Nordic',
