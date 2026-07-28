@@ -14,7 +14,9 @@ const DaytimeExperiences: React.FC = () => {
       groupSize: "Up to 8 people",
       location: "Rovaniemi, Lapland",
       features: ["Professional guide", "All equipment", "Hot drinks", "Traditional techniques"],
-      route: "/ice-fishing"
+      route: "/ice-fishing",
+      fromPrice: 119,
+      bookingMode: "instant" as const,
     },
     {
       id: 2,
@@ -26,29 +28,34 @@ const DaytimeExperiences: React.FC = () => {
       location: "Ranua, Lapland",
       features: ["Hotel pickup", "Expert guide", "Zoo tickets", "Transportation"],
       route: "/ranua-zoo",
-      badge: "Family Favorite"
+      badge: "Family Favorite",
+      fromPrice: 99,
+      bookingMode: "instant" as const,
     },
     {
       id: 3,
       name: "Korouoma Canyon Winter Adventure",
       description: "Hike to magnificent frozen waterfalls and enjoy grilled food in the stunning winter landscape. One of Lapland's most beautiful natural wonders!",
       image: "/korouoma1.jpg",
-      duration: "~6 hours",
+      duration: "~7 hours (09:00–16:00)",
       groupSize: "2-10 people",
       location: "Korouoma Canyon, Lapland",
       features: ["Hotel pickup", "Professional guide", "Grilled food", "Hot drinks"],
       route: "/korouoma-canyon",
-      badge: "Adventure"
+      badge: "Adventure",
+      fromPrice: 129,
+      bookingMode: "instant" as const,
     },
     {
       id: 4,
       name: "Snowmobile Safari",
-      description: "Experience the thrill of snowmobiling through Lapland's pristine wilderness. Multiple duration options available for all skill levels.",
+      description: "Experience the thrill of snowmobiling through Lapland's pristine wilderness. Multiple duration options available for all skill levels. Request quote — not instant checkout.",
       image: "/snowmobiling.jpg",
       duration: "0.5h, 1h, 2h, or 3h",
       location: "Rovaniemi, Lapland",
       features: ["Professional guide", "All equipment", "Safety briefing", "Scenic routes"],
-      route: "/snowmobile-safari"
+      route: "/snowmobile-safari",
+      bookingMode: "inquiry" as const,
     }
   ];
 
@@ -148,9 +155,14 @@ const DaytimeExperiences: React.FC = () => {
                 </div>
 
                 {/* CTA */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-800">
+                <div className="flex items-center justify-between gap-3 pt-4 border-t border-gray-800">
                   <span className="text-emerald-400 font-semibold group-hover:translate-x-2 transition-transform">
-                    View Details →
+                    {experience.bookingMode === 'inquiry' ? 'Request quote →' : 'Book online →'}
+                  </span>
+                  <span className="text-xs text-gray-300 shrink-0">
+                    {'fromPrice' in experience && experience.fromPrice
+                      ? `From €${experience.fromPrice}`
+                      : 'Quote'}
                   </span>
                 </div>
               </div>

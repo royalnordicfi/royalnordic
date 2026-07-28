@@ -8,14 +8,16 @@ const NorthernLightsTours: React.FC = () => {
     {
       id: 1,
       name: "Guaranteed Northern Lights Tour",
-      description: "Chase the Aurora Borealis with our expert guides. We guarantee you'll see the lights or get a full refund!",
+      description: "Chase the Aurora Borealis with our expert guides. If no lights are visible, free return trip on the next available date.",
       image: "/nortti1.jpg",
       duration: "1-10 hours",
       groupSize: "Small group experience",
       location: "Rovaniemi, Lapland",
       features: ["Professional guide", "Hotel pickup", "Photography assistance", "Warm drinks and snacks"],
       route: "/northern-lights-tour",
-      badge: "Most Popular"
+      badge: "Most Popular",
+      bookingMode: "instant" as const,
+      fromPrice: 179,
     },
     {
       id: 2,
@@ -27,19 +29,22 @@ const NorthernLightsTours: React.FC = () => {
       location: "Rovaniemi, Lapland",
       features: ["Family-friendly guide", "Hotel pickup", "Warm drinks & snacks", "Shorter duration for kids"],
       route: "/family-friendly-northern-lights",
-      badge: "Family Favorite"
+      badge: "Family Favorite",
+      bookingMode: "instant" as const,
+      fromPrice: 79,
     },
     {
       id: 3,
       name: "Monster Truck Northern Lights Experience",
-      description: "Experience the magic of the Arctic night on board a giant monster truck! Deep into the wilderness for the best Northern Lights viewing.",
+      description: "Experience the magic of the Arctic night on board a giant monster truck! Deep into the wilderness for the best Northern Lights viewing. Request-only — not instant online checkout.",
       image: "/monsteri1.jpg",
       duration: "3 hours",
       groupSize: "Flexible",
       location: "Rovaniemi, Lapland",
       features: ["Professional guide and driver", "Specially built monster truck", "Remote viewing locations", "No experience required"],
       route: "/monster-truck-northern-lights",
-      badge: "Unique Experience"
+      badge: "Request quote",
+      bookingMode: "inquiry" as const,
     }
   ];
 
@@ -137,9 +142,16 @@ const NorthernLightsTours: React.FC = () => {
                 </div>
 
                 {/* CTA */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-800">
+                <div className="flex items-center justify-between gap-3 pt-4 border-t border-gray-800">
                   <span className="text-emerald-400 font-semibold group-hover:translate-x-2 transition-transform">
-                    View Details →
+                    {tour.bookingMode === 'inquiry' ? 'Request quote →' : 'Book online →'}
+                  </span>
+                  <span className="text-xs text-gray-300 shrink-0">
+                    {'fromPrice' in tour && tour.fromPrice
+                      ? `From €${tour.fromPrice}`
+                      : tour.bookingMode === 'inquiry'
+                        ? 'Quote'
+                        : 'Instant checkout'}
                   </span>
                 </div>
               </div>
@@ -163,7 +175,7 @@ const NorthernLightsTours: React.FC = () => {
             </div>
             <div className="flex items-start">
               <span className="text-emerald-400 mr-2">✓</span>
-              <span>Full refund if Northern Lights don't appear</span>
+              <span>Free return trip if Northern Lights don't appear</span>
             </div>
             <div className="flex items-start">
               <span className="text-emerald-400 mr-2">✓</span>

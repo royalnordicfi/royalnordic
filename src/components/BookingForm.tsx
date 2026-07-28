@@ -32,9 +32,18 @@ const BookingForm: React.FC<BookingFormProps> = ({
     fullName: '',
     email: '',
     phone: '',
+    pickupLocation: '',
     specialRequests: '',
     discountCode: ''
   })
+
+  const isDecemberSaleWindow = () => {
+    const now = new Date()
+    const saleStart = new Date('2025-12-02')
+    const saleEnd = new Date('2025-12-16')
+    saleEnd.setHours(23, 59, 59, 999)
+    return now >= saleStart && now <= saleEnd
+  }
 
   const [availability, setAvailability] = useState<TourDate[]>([])
   const [loading, setLoading] = useState(false)
@@ -322,31 +331,16 @@ const BookingForm: React.FC<BookingFormProps> = ({
   }
 
   const getDiscountAmount = (subtotal: number) => {
-    // Check if discount code is valid and sale is active
-    const now = new Date()
-    const saleStart = new Date('2025-12-02')
-    const saleEnd = new Date('2025-12-16')
-    saleEnd.setHours(23, 59, 59, 999)
-
-    const isSaleActive = now >= saleStart && now <= saleEnd
     const isValidCode = formData.discountCode.trim().toUpperCase() === 'DECEMBER15'
-
-    if (isSaleActive && isValidCode) {
-      return subtotal * 0.15 // 15% discount
+    if (isDecemberSaleWindow() && isValidCode) {
+      return subtotal * 0.15
     }
     return 0
   }
 
   const isDiscountValid = () => {
-    const now = new Date()
-    const saleStart = new Date('2025-12-02')
-    const saleEnd = new Date('2025-12-16')
-    saleEnd.setHours(23, 59, 59, 999)
-
-    const isSaleActive = now >= saleStart && now <= saleEnd
     const isValidCode = formData.discountCode.trim().toUpperCase() === 'DECEMBER15'
-
-    return isSaleActive && isValidCode
+    return isDecemberSaleWindow() && isValidCode
   }
 
   const getAvailableSlots = (date: string) => {
@@ -424,7 +418,15 @@ const BookingForm: React.FC<BookingFormProps> = ({
           discount: discount.toString(),
           discount_code: formData.discountCode.trim().toUpperCase(),
           phone: formData.phone,
-          special_requests: formData.specialRequests
+          pickup_location: formData.pickupLocation.trim(),
+          special_requests: [
+            formData.pickupLocation.trim()
+              ? `Pickup: ${formData.pickupLocation.trim()}`
+              : '',
+            formData.specialRequests.trim(),
+          ]
+            .filter(Boolean)
+            .join('\n'),
         }
       }
 
@@ -631,6 +633,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
           </div>
           
           {/* Simple Date Picker */}
+          <div className="mb-2 flex flex-wrap justify-between items-baseline gap-2">
+            <p className="text-sm text-gray-700 font-medium">From €{adultPrice} / adult · €{childPrice} / child</p>
+            <p className="text-xs text-gray-500">EUR incl. VAT</p>
+          </div>
           <div className="grid grid-cols-7 gap-1 mb-3">
             {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
               <div key={day} className="text-center text-xs font-medium text-gray-500 py-1">
@@ -640,10 +646,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
           </div>
           
           {/* Available Dates Grid */}
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-1 booking-calendar-grid">
             {availability.length > 0 ? getCalendarGrid().map((day, index) => {
               if (day === null) {
-                return <div key={`empty-${index}`} className="h-12"></div>
+                return <div key={`empty-${index}`} className="h-11 sm:h-14"></div>
               }
               
               const { day: calendarDay, date, available, remainingSlots, isPastDate, isOutOfSeason, isFullBooked } = day
@@ -655,7 +661,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
                   key={date} 
                   type="button"
                   onClick={() => isAvailable && setFormData({...formData, preferredDate: date})}
-                  className={`h-12 rounded text-sm font-medium transition-colors ${
+                  className={`h-11 sm:h-14 rounded text-sm font-medium transition-colors booking-calendar-day ${
                     formData.preferredDate === date
                       ? 'bg-blue-600 text-white'
                       : isPastDate
@@ -670,36 +676,36 @@ const BookingForm: React.FC<BookingFormProps> = ({
                   }`}
                   disabled={!isAvailable}
                 >
-                  <div className="text-xs">{calendarDay}</div>
-                  <div className="text-xs text-emerald-600 font-semibold">€{adultPrice}</div>
+                  <div className="text-sm sm:text-xs font-semibold">{calendarDay}</div>
+                  <div className="hidden sm:block text-xs text-emerald-600 font-semibold">€{adultPrice}</div>
                   {isAvailable && (
-                    <div className="text-xs text-gray-500">{remainingSlots} slots</div>
+                    <div className="hidden sm:block text-xs text-gray-500">{remainingSlots} left</div>
                   )}
                   {isFullBooked && (
-                    <div className="text-xs text-red-600 font-semibold">FULL</div>
+                    <div className="text-[10px] sm:text-xs text-red-600 font-semibold">FULL</div>
                   )}
                   {isOutOfSeason && (
-                    <div className="text-xs text-gray-500">Closed</div>
+                    <div className="hidden sm:block text-xs text-gray-500">Closed</div>
                   )}
                 </button>
               )
             }) : (
-              // Show loading state when availability data is not loaded
               Array.from({ length: 35 }, (_, index) => (
-                <div key={`loading-${index}`} className="h-12 bg-gray-100 rounded animate-pulse"></div>
+                <div key={`loading-${index}`} className="h-11 sm:h-14 bg-gray-100 rounded animate-pulse"></div>
               ))
             )}
           </div>
 
-          <p className="text-xs text-gray-500 mt-2">Showing prices in EUR (Euro)</p>
+          <p className="text-xs text-gray-500 mt-2">Tap a date · weekday appears in the total below</p>
         </div>
 
       {/* Participants Section */}
         <div>
           <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Participants</h4>
-          {!formData.preferredDate && (
-            <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded p-3 mb-4">
-              <strong>Please select a date first</strong> to choose the number of participants
+          {formData.preferredDate &&
+            getAvailableSlots(formData.preferredDate) < formData.adults + formData.children && (
+            <div className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded p-3 mb-4">
+              Only {getAvailableSlots(formData.preferredDate)} seats left on this date — reduce participants or pick another day.
             </div>
           )}
         <div className="space-y-4">
@@ -717,9 +723,23 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 <span className="text-lg font-semibold text-gray-900 min-w-[2rem] text-center">{formData.adults}</span>
               <button 
                 type="button"
-                  onClick={() => setFormData({...formData, adults: Math.min(getAvailableSlots(formData.preferredDate), formData.adults + 1)})}
+                  onClick={() =>
+                    setFormData({
+                      ...formData,
+                      adults: formData.preferredDate
+                        ? Math.min(
+                            Math.max(1, getAvailableSlots(formData.preferredDate) - formData.children),
+                            formData.adults + 1,
+                          )
+                        : formData.adults + 1,
+                    })
+                  }
                   className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold"
-                  disabled={!formData.preferredDate || formData.adults + formData.children >= getAvailableSlots(formData.preferredDate)}
+                  disabled={
+                    formData.preferredDate
+                      ? formData.adults + formData.children >= getAvailableSlots(formData.preferredDate)
+                      : false
+                  }
               >
                 +
               </button>
@@ -741,9 +761,23 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 <span className="text-lg font-semibold text-gray-900 min-w-[2rem] text-center">{formData.children}</span>
               <button 
                 type="button"
-                  onClick={() => setFormData({...formData, children: Math.min(getAvailableSlots(formData.preferredDate) - formData.adults, formData.children + 1)})}
+                  onClick={() =>
+                    setFormData({
+                      ...formData,
+                      children: formData.preferredDate
+                        ? Math.min(
+                            Math.max(0, getAvailableSlots(formData.preferredDate) - formData.adults),
+                            formData.children + 1,
+                          )
+                        : formData.children + 1,
+                    })
+                  }
                   className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold"
-                  disabled={!formData.preferredDate || formData.adults + formData.children >= getAvailableSlots(formData.preferredDate)}
+                  disabled={
+                    formData.preferredDate
+                      ? formData.adults + formData.children >= getAvailableSlots(formData.preferredDate)
+                      : false
+                  }
               >
                 +
               </button>
@@ -800,6 +834,24 @@ const BookingForm: React.FC<BookingFormProps> = ({
           </div>
         </div>
 
+        {/* Pickup — needed for ops; collected before payment */}
+        <div>
+          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">
+            Pickup location
+          </h4>
+          <input
+            type="text"
+            name="pickupLocation"
+            value={formData.pickupLocation}
+            onChange={handleChange}
+            placeholder="Hotel or address in Rovaniemi"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Optional but recommended — helps us confirm your pickup before the tour.
+          </p>
+        </div>
+
         {/* Special Requests */}
         <div>
           <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Special Requests</h4>
@@ -813,29 +865,31 @@ const BookingForm: React.FC<BookingFormProps> = ({
           />
         </div>
 
-        {/* Discount Code */}
-        <div>
-          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Discount Code</h4>
-          <div className="flex gap-2">
-            <input 
-              type="text" 
-              name="discountCode"
-              value={formData.discountCode}
-              onChange={handleChange}
-              placeholder="Enter code (e.g. DECEMBER15)"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm uppercase"
-              style={{ textTransform: 'uppercase' }}
-            />
-            {isDiscountValid() && (
-              <div className="flex items-center px-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-                <span className="text-emerald-600 text-sm font-semibold">✓ Valid</span>
-              </div>
+        {/* Discount — only during verified December sale window */}
+        {isDecemberSaleWindow() && (
+          <div>
+            <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Discount Code</h4>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                name="discountCode"
+                value={formData.discountCode}
+                onChange={handleChange}
+                placeholder="Enter code (e.g. DECEMBER15)"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm uppercase"
+                style={{ textTransform: 'uppercase' }}
+              />
+              {isDiscountValid() && (
+                <div className="flex items-center px-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+                  <span className="text-emerald-600 text-sm font-semibold">✓ Valid</span>
+                </div>
+              )}
+            </div>
+            {formData.discountCode && !isDiscountValid() && (
+              <p className="text-xs text-red-600 mt-1">Invalid code</p>
             )}
           </div>
-          {formData.discountCode && !isDiscountValid() && (
-            <p className="text-xs text-red-600 mt-1">Invalid code or sale period has ended</p>
-          )}
-        </div>
+        )}
 
         {/* Total Price */}
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
@@ -903,7 +957,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
         {/* Payment Options */}
         <div className="space-y-3">
-          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Choose Payment Method</h4>
+          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Book & pay</h4>
+          <p className="text-xs text-gray-600 -mt-1 mb-2">
+            Free cancellation up to 24 hours before start · Northern Lights: free return trip if none appear (see Terms).
+          </p>
           
           {/* Pay by Card/Bank Button */}
           {!isStripeConfigured && (
@@ -940,7 +997,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 <svg className="w-6 h-6 mr-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"/>
                 </svg>
-                Pay by Card / Bank
+                Book & pay €{calculateTotal().toFixed(0)} — Card / Bank
               </>
             )}
           </button>

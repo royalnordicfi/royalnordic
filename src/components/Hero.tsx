@@ -51,7 +51,7 @@ const Hero = () => {
         </h1>
         
         <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 mb-6 sm:mb-8 max-w-2xl sm:max-w-3xl mx-auto leading-relaxed font-clean px-2 sm:px-0">
-          Step into a world where time stands still and nature speaks in whispers. Here in Lapland, we don't just show you the Northern Lights – we help you feel them in your soul. It's where wilderness becomes your playground, where every snowflake tells a story, and where adventure finds you in the most unexpected moments.
+          Guaranteed Northern Lights, Arctic day tours, and private experiences in Rovaniemi — book online in minutes.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

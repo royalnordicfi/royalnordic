@@ -24,7 +24,7 @@ const NorthernLightsTour = () => {
           setTourData({
             adult_price: northernLightsTour.adult_price,
             child_price: northernLightsTour.child_price,
-            max_capacity: northernLightsTour.max_capacity || 100
+            max_capacity: northernLightsTour.max_capacity || 16
           });
         }
       } catch (error) {
@@ -39,7 +39,7 @@ const NorthernLightsTour = () => {
   }, []);
 
   const features = [
-    'Guaranteed Northern Lights - 100% money back guarantee',
+    'Guaranteed Northern Lights — if no lights are visible, free return trip on the next available date',
     'Small group experience',
     'Expert guides with experience',
     'Pick up and drop off from your accommodation',

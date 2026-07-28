@@ -26,6 +26,11 @@ const rows: Array<{
     note: 'Existing email resend path in legacy panel; Admin OS V1 does not auto-send.',
   },
   {
+    name: 'OMEGA read API',
+    status: 'broken',
+    note: 'Handler exists but live /api/omega returns SPA HTML; edge function not deployed. Fix routing + secrets required.',
+  },
+  {
     name: 'GetYourGuide',
     status: 'missing',
     note: 'No API sync. Enter manually or CSV import with source=getyourguide.',
