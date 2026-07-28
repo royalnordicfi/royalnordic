@@ -10,7 +10,7 @@ const META: Record<string, { title: string; description: string; ogImage?: strin
   '/northern-lights-tour': {
     title: 'Guaranteed Northern Lights Tour Rovaniemi | Royal Nordic',
     description:
-      'Small-group aurora hunt from Rovaniemi with hotel pickup, English & Finnish guides, flexible 2–10 hour duration. Free cancellation 24h. Book & pay securely.',
+      'Small-group aurora hunt from Rovaniemi with hotel pickup, English & Finnish guides, flexible 2–12 hour duration. Free cancellation 24h. Book & pay securely.',
     ogImage: 'https://royalnordic.fi/nortti1.jpg',
   },
   '/family-friendly-northern-lights': {

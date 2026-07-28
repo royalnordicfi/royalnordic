@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
-// import { Calendar, Users, Mail, Phone, MessageSquare, CreditCard } from 'lucide-react'
 import { createCheckoutSession, redirectToCheckout } from '../lib/stripe'
 import { createCryptoCheckout, redirectToCryptoCheckout } from '../lib/crypto'
 import { supabase } from '../lib/supabase'
@@ -20,9 +19,12 @@ interface BookingFormProps {
   tourName: string
   adultPrice: number
   childPrice: number
+  maxCapacity?: number
   seasonStart?: string
   seasonEnd?: string
 }
+
+type FieldKey = 'preferredDate' | 'fullName' | 'email'
 
 const BookingForm: React.FC<BookingFormProps> = ({
   tourId,
@@ -33,6 +35,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
   seasonEnd
 }) => {
   const navigate = useNavigate()
+  const dateSectionRef = useRef<HTMLDivElement>(null)
+  const fullNameRef = useRef<HTMLInputElement>(null)
+  const emailRef = useRef<HTMLInputElement>(null)
+  const errorBannerRef = useRef<HTMLDivElement>(null)
+
   const [formData, setFormData] = useState({
     preferredDate: '',
     adults: 1,
@@ -47,6 +54,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
   const [availability, setAvailability] = useState<TourDate[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldKey, string>>>({})
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [showCryptoModal, setShowCryptoModal] = useState(false)
   const [cryptoFormData, setCryptoFormData] = useState({
@@ -54,6 +62,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
     cryptoType: 'bitcoin',
     specialRequests: ''
   })
+
+  const isNorthernLightsTour = tourName.toLowerCase().includes('northern lights')
 
   // Check if Stripe is configured
   const isStripeConfigured = !!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
@@ -269,10 +279,69 @@ const BookingForm: React.FC<BookingFormProps> = ({
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     })
+    if (name === 'fullName' || name === 'email') {
+      setFieldErrors((prev) => {
+        if (!prev[name as FieldKey]) return prev
+        const next = { ...prev }
+        delete next[name as FieldKey]
+        return next
+      })
+    }
+  }
+
+  const clearFieldError = (key: FieldKey) => {
+    setFieldErrors((prev) => {
+      if (!prev[key]) return prev
+      const next = { ...prev }
+      delete next[key]
+      return next
+    })
+  }
+
+  const validateRequiredFields = (): boolean => {
+    const errors: Partial<Record<FieldKey, string>> = {}
+
+    if (!formData.preferredDate) {
+      errors.preferredDate = 'Please select a date'
+    }
+    if (!formData.fullName.trim()) {
+      errors.fullName = 'Please enter your full name'
+    }
+    if (!formData.email.trim()) {
+      errors.email = 'Please enter your email'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+      errors.email = 'Please enter a valid email'
+    }
+
+    setFieldErrors(errors)
+
+    const order: FieldKey[] = ['preferredDate', 'fullName', 'email']
+    const firstKey = order.find((key) => errors[key])
+    if (!firstKey) {
+      setError('')
+      return true
+    }
+
+    setError(errors[firstKey] || 'Please fill in all required fields')
+
+    requestAnimationFrame(() => {
+      if (firstKey === 'preferredDate') {
+        dateSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      } else if (firstKey === 'fullName') {
+        fullNameRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        fullNameRef.current?.focus({ preventScroll: true })
+      } else if (firstKey === 'email') {
+        emailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        emailRef.current?.focus({ preventScroll: true })
+      }
+    })
+
+    return false
   }
 
   // const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -322,27 +391,19 @@ const BookingForm: React.FC<BookingFormProps> = ({
     return dateData?.remaining_slots || 0
   }
 
-
-  // const isDateAvailable = (date: string) => {
-  //   const availableSlots = getAvailableSlots(date)
-  //   const requestedSlots = formData.adults + formData.children
-  //   return availableSlots >= requestedSlots
-  // }
+  const selectedSeatsLeft = formData.preferredDate ? getAvailableSlots(formData.preferredDate) : 0
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
     setError('')
 
-    try {
-      // Validate form data
-      if (!formData.preferredDate) {
-        throw new Error('Please select a date')
-      }
-      if (!formData.fullName || !formData.email) {
-        throw new Error('Please fill in all required fields')
-      }
+    if (!validateRequiredFields()) {
+      return
+    }
 
+    setLoading(true)
+
+    try {
       // Find the tour date ID for the selected date
       const selectedDateData = availability.find(d => d.date === formData.preferredDate)
       if (!selectedDateData) {
@@ -438,24 +499,16 @@ const BookingForm: React.FC<BookingFormProps> = ({
   }
 
   const handleCryptoPayment = () => {
-    // Validate form data first
-    if (!formData.preferredDate) {
-      setError('Please select a date')
-      return
-    }
-    if (!formData.fullName || !formData.email) {
-      setError('Please fill in all required fields')
+    if (!validateRequiredFields()) {
       return
     }
 
-    // Pre-fill crypto form with booking data
     setCryptoFormData({
       fullName: formData.fullName,
       cryptoType: 'bitcoin',
       specialRequests: formData.specialRequests
     })
-    
-    // Show crypto modal (NO booking created yet)
+
     setShowCryptoModal(true)
     setError('')
   }
@@ -558,8 +611,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
       
       <form className="space-y-6">
         {/* Date Selection */}
-        <div>
+        <div ref={dateSectionRef} className="scroll-mt-24">
           <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Choose a date</h4>
+          {fieldErrors.preferredDate && (
+            <p className="text-sm text-red-600 mb-2">{fieldErrors.preferredDate}</p>
+          )}
           
           {/* Month/Year Navigation */}
           <div className="flex items-center justify-between mb-4">
@@ -601,7 +657,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           <div className="grid grid-cols-7 gap-1">
             {availability.length > 0 ? getCalendarGrid().map((day, index) => {
               if (day === null) {
-                return <div key={`empty-${index}`} className="h-11 sm:h-14"></div>
+                return <div key={`empty-${index}`} className="h-12 sm:h-14"></div>
               }
               
               const { day: calendarDay, date, available, remainingSlots, isPastDate, isOutOfSeason, isFullBooked } = day
@@ -612,8 +668,13 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 <button
                   key={date} 
                   type="button"
-                  onClick={() => isAvailable && setFormData({...formData, preferredDate: date})}
-                  className={`h-11 sm:h-14 rounded text-sm font-medium transition-colors ${
+                  onClick={() => {
+                    if (!isAvailable) return
+                    setFormData({ ...formData, preferredDate: date })
+                    clearFieldError('preferredDate')
+                    setError('')
+                  }}
+                  className={`h-12 sm:h-14 rounded text-sm font-medium transition-colors ${
                     formData.preferredDate === date
                       ? 'bg-emerald-600 text-white'
                       : isPastDate
@@ -623,7 +684,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
                       : isFullBooked
                       ? 'bg-red-100 text-red-600 border border-red-200 cursor-not-allowed'
                       : isAvailable
-                      ? 'bg-white border border-gray-300 hover:bg-emerald-50 text-gray-900 cursor-pointer'
+                      ? fieldErrors.preferredDate
+                        ? 'bg-white border border-red-400 hover:bg-emerald-50 text-gray-900 cursor-pointer'
+                        : 'bg-white border border-gray-300 hover:bg-emerald-50 text-gray-900 cursor-pointer'
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   }`}
                   disabled={!isAvailable}
@@ -631,7 +694,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
                   <div className="text-xs sm:text-sm font-semibold">{calendarDay}</div>
                   <div className="hidden sm:block text-xs text-emerald-600 font-semibold">€{adultPrice}</div>
                   {isAvailable && (
-                    <div className="hidden sm:block text-[10px] text-gray-500">{remainingSlots} left</div>
+                    <div className={`text-[9px] sm:text-[10px] leading-tight ${
+                      formData.preferredDate === date ? 'text-emerald-100' : 'text-gray-500'
+                    }`}>
+                      {remainingSlots} left
+                    </div>
                   )}
                   {isFullBooked && (
                     <div className="text-[10px] sm:text-xs text-red-600 font-semibold">FULL</div>
@@ -644,7 +711,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
             }) : (
               // Show loading state when availability data is not loaded
               Array.from({ length: 35 }, (_, index) => (
-                <div key={`loading-${index}`} className="h-11 sm:h-14 bg-gray-100 rounded animate-pulse"></div>
+                <div key={`loading-${index}`} className="h-12 sm:h-14 bg-gray-100 rounded animate-pulse"></div>
               ))
             )}
           </div>
@@ -709,17 +776,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
               </div>
             </div>
             
-            {/* Available Slots Info */}
+            {/* Available seats */}
             {formData.preferredDate && (
-              <div className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded p-2">
-                Available slots for {formatTourDateShort(formData.preferredDate)}: {getAvailableSlots(formData.preferredDate)} people
+              <div className="text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2.5 font-medium">
+                {selectedSeatsLeft} {selectedSeatsLeft === 1 ? 'seat' : 'seats'} available on {formatTourDateShort(formData.preferredDate)}
               </div>
             )}
             
             {/* Capacity Warning */}
-            {formData.preferredDate && formData.adults + formData.children >= getAvailableSlots(formData.preferredDate) && (
+            {formData.preferredDate && formData.adults + formData.children >= selectedSeatsLeft && (
               <div className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded p-2">
-                Maximum capacity reached for this date ({getAvailableSlots(formData.preferredDate)} people)
+                Maximum capacity reached for this date ({selectedSeatsLeft} people)
               </div>
             )}
           </div>
@@ -729,24 +796,42 @@ const BookingForm: React.FC<BookingFormProps> = ({
         <div>
           <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Contact Information</h4>
           <div className="space-y-3">
-          <input 
-            type="text" 
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            required
+          <div>
+            <input 
+              ref={fullNameRef}
+              type="text" 
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              required
+              aria-invalid={!!fieldErrors.fullName}
               placeholder="Full Name"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-          />
-          <input 
-            type="email" 
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm scroll-mt-28 ${
+                fieldErrors.fullName ? 'border-red-400 bg-red-50' : 'border-gray-300'
+              }`}
+            />
+            {fieldErrors.fullName && (
+              <p className="text-xs text-red-600 mt-1">{fieldErrors.fullName}</p>
+            )}
+          </div>
+          <div>
+            <input 
+              ref={emailRef}
+              type="email" 
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              aria-invalid={!!fieldErrors.email}
               placeholder="Email Address"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-          />
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm scroll-mt-28 ${
+                fieldErrors.email ? 'border-red-400 bg-red-50' : 'border-gray-300'
+              }`}
+            />
+            {fieldErrors.email && (
+              <p className="text-xs text-red-600 mt-1">{fieldErrors.email}</p>
+            )}
+          </div>
           <input 
             type="tel" 
             name="phone"
@@ -853,12 +938,14 @@ const BookingForm: React.FC<BookingFormProps> = ({
         </div>
 
         {/* Payment Options */}
-        <div className="space-y-3 pb-24 lg:pb-0">
+        <div className="space-y-3">
           <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Payment</h4>
 
           <div className="rounded-lg border border-emerald-100 bg-emerald-50/60 px-3 py-2 text-xs text-emerald-900 space-y-1">
             <p>Free cancellation up to 24 hours before departure.</p>
-            <p>Northern Lights guarantee applies — see Terms for the exact promise.</p>
+            {isNorthernLightsTour && (
+              <p>Northern Lights guarantee applies — see Terms for the exact promise.</p>
+            )}
           </div>
           
           {!isStripeConfigured && (
@@ -872,9 +959,19 @@ const BookingForm: React.FC<BookingFormProps> = ({
               </div>
             </div>
           )}
+
+          {error && (
+            <div ref={errorBannerRef} className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <div className="flex items-center">
+                <div className="text-red-500 mr-2">⚠️</div>
+                <p className="text-red-700 text-sm font-medium">{error}</p>
+              </div>
+            </div>
+          )}
+
           <button 
             type="submit"
-            disabled={loading || !formData.preferredDate || !isStripeConfigured}
+            disabled={loading || !isStripeConfigured}
             className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center shadow-lg hover:shadow-xl"
             onClick={(e) => {
               e.preventDefault()
@@ -905,46 +1002,13 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
           <button 
             type="button"
-            disabled={loading || !formData.preferredDate}
+            disabled={loading}
             className="w-full text-sm text-gray-600 hover:text-emerald-700 underline underline-offset-2 py-2 disabled:opacity-50"
             onClick={handleCryptoPayment}
           >
             Prefer crypto? Request a crypto booking
           </button>
         </div>
-
-        {/* Mobile sticky book bar */}
-        <div className="lg:hidden fixed bottom-20 left-0 right-0 z-40 border-t border-gray-200 bg-white/95 backdrop-blur-md px-4 py-3 shadow-[0_-8px_24px_rgba(0,0,0,0.08)]">
-          <div className="max-w-lg mx-auto flex items-center gap-3">
-            <div className="min-w-0 flex-1">
-              <p className="text-xs text-gray-500 truncate">
-                {formData.preferredDate ? formatTourDateShort(formData.preferredDate) : 'Select a date'}
-              </p>
-              <p className="text-lg font-bold text-emerald-700">€{calculateTotal().toFixed(2)}</p>
-            </div>
-            <button
-              type="button"
-              disabled={loading || !formData.preferredDate || !isStripeConfigured}
-              className="shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-3 rounded-lg disabled:opacity-50 min-h-[44px]"
-              onClick={(e) => {
-                e.preventDefault()
-                if (!isStripeConfigured || !formData.preferredDate) return
-                handleSubmit(e as unknown as React.FormEvent)
-              }}
-            >
-              Book &amp; pay
-            </button>
-          </div>
-        </div>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-            <div className="flex items-center">
-              <div className="text-red-500 mr-2">⚠️</div>
-              <p className="text-red-700 text-sm font-medium">{error}</p>
-            </div>
-          </div>
-        )}
 
       </form>
 

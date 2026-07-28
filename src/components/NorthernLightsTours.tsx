@@ -11,11 +11,8 @@ const NorthernLightsTours: React.FC = () => {
       name: "Guaranteed Northern Lights Tour",
       description: "Chase the Aurora Borealis with expert guides, hotel pickup, and a Northern Lights guarantee.",
       image: "/nortti1.jpg",
-      duration: "2–10 hours (typically ~6h)",
-      groupSize: "Max 16 people",
-      location: "Rovaniemi, Lapland",
-      features: ["Professional guide", "Hotel pickup", "Photography guidance", "Warm drinks and snacks"],
-      route: "/northern-lights-tour",
+      duration: "2–12 hours (typically ~6h)",
+      groupSize: "Max 8 people per vehicle",
       badge: "Most Popular"
     },
     {

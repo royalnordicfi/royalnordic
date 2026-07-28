@@ -6,11 +6,13 @@ import BookingForm from './BookingForm';
 import Footer from './Footer';
 import { getAllTours } from '../lib/api';
 
+const KORUOMA_MAX_CAPACITY = 16;
+
 const KorouomaTour = () => {
   const [tourData, setTourData] = useState({
     adult_price: 129,
     child_price: 109,
-    max_capacity: 16
+    max_capacity: KORUOMA_MAX_CAPACITY
   });
   const [loading, setLoading] = useState(true);
 
@@ -23,7 +25,7 @@ const KorouomaTour = () => {
           setTourData({
             adult_price: korouomaTour.adult_price,
             child_price: korouomaTour.child_price,
-            max_capacity: korouomaTour.max_capacity || 8
+            max_capacity: KORUOMA_MAX_CAPACITY
           });
         }
       } catch (error) {
@@ -43,7 +45,7 @@ const KorouomaTour = () => {
     'Guided hike to Korouoma’s frozen waterfalls',
     'Photo stops at scenic viewpoints',
     'Warm, comfortable minivan or minibus',
-    'Small-group experience',
+    'Small group — max 8 people per vehicle',
     'Expert knowledge of Korouoma geology and nature'
   ];
 
@@ -127,7 +129,7 @@ const KorouomaTour = () => {
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Group Size</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">Small group, max {tourData.max_capacity || 16}</p>
+            <p className="text-gray-300 text-sm sm:text-base">Small group — max 8 people per vehicle</p>
           </div>
           
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
@@ -227,7 +229,6 @@ const KorouomaTour = () => {
             </div>
 
             {/* Highlights */}
-            {/* Important Information */}
             <div className="bg-gradient-to-br from-emerald-500/10 to-green-500/10 border border-emerald-500/20 rounded-lg sm:rounded-xl p-4 sm:p-6">
               <h2 className="text-lg sm:text-xl font-luxury font-bold text-white mb-3 sm:mb-4">Experience Highlights</h2>
               <ul className="space-y-2 text-gray-300 text-sm sm:text-base">
@@ -296,20 +297,6 @@ const KorouomaTour = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
-          </div>
-        </div>
-
-        {/* Important Information */}
-        <div className="mt-12 bg-amber-500/10 border border-amber-500/20 rounded-xl p-6">
-          <h3 className="text-xl font-bold text-amber-300 mb-4">Important Information</h3>
-          <div className="space-y-3 text-gray-300">
-            <p>• <strong>Duration:</strong> 6 hours (about 1.5 h each way + 3 h at the canyon)</p>
-            <p>• <strong>Group Size:</strong> Small group (max {tourData.max_capacity || 16})</p>
-            <p>• <strong>Languages:</strong> English and Finnish</p>
-            <p>• <strong>Season:</strong> Best when waterfalls are frozen (typically late autumn through spring)</p>
-            <p>• <strong>Dress Code:</strong> Warm layers, winter boots, gloves, and a hat — clothing is not provided</p>
-            <p>• <strong>Fitness:</strong> Moderate outdoor hike; not suitable for wheelchair users</p>
-            <p>• <strong>Cancellation:</strong> Free cancellation up to 24 hours before departure</p>
           </div>
         </div>
       </div>

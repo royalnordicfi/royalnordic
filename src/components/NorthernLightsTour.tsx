@@ -40,7 +40,7 @@ const NorthernLightsTour = () => {
 
   const features = [
     'Northern Lights guarantee (see Terms for the exact promise)',
-    'Small group — max 16 guests',
+    'Small group — max 8 people per vehicle',
     'Expert local guides (English & Finnish)',
     'Hotel pickup and drop-off in the Rovaniemi area',
     'Warm drinks and snacks',
@@ -138,7 +138,7 @@ const NorthernLightsTour = () => {
               <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Duration</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">2–10 hours (typically ~6h)</p>
+            <p className="text-gray-300 text-sm sm:text-base">2–12 hours (typically ~6h)</p>
           </div>
           
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
@@ -146,7 +146,7 @@ const NorthernLightsTour = () => {
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Group Size</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">Small group, max {tourData.max_capacity || 16}</p>
+            <p className="text-gray-300 text-sm sm:text-base">Small group — max 8 people per vehicle</p>
           </div>
           
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
