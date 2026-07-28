@@ -5,6 +5,8 @@ import ImageSlideshow from './ImageSlideshow';
 import BookingForm from './BookingForm';
 import Footer from './Footer';
 import { getAllTours } from '../lib/api';
+import ProductFaq from './seo/ProductFaq';
+import RelatedTours from './seo/RelatedTours';
 
 const SnowshoeRental: React.FC = () => {
   // const navigate = useNavigate();
@@ -44,6 +46,29 @@ const SnowshoeRental: React.FC = () => {
     'Equipment delivery to your accommodation',
     'Equipment pickup when finished',
     'Local area recommendations'
+  ];
+
+  const faqs = [
+    {
+      question: 'Is this a guided tour?',
+      answer:
+        'No — this is an equipment rental. We deliver snowshoes to your accommodation in Rovaniemi, provide safety instructions, and collect them when you finish exploring at your own pace.',
+    },
+    {
+      question: 'Where do you deliver?',
+      answer:
+        'We deliver to your lodging in the Rovaniemi area and collect the equipment when your rental period ends.',
+    },
+    {
+      question: 'When is snowshoe season?',
+      answer:
+        'Snowshoe rental is typically available from early November through early April, depending on snow conditions in Finnish Lapland.',
+    },
+    {
+      question: 'What is included?',
+      answer:
+        'Professional snowshoe equipment, a safety briefing, delivery and pickup, and local area recommendations for exploring near Rovaniemi.',
+    },
   ];
 
   const itinerary = [
@@ -116,7 +141,7 @@ const SnowshoeRental: React.FC = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Duration</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Duration</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Flexible rental</p>
           </div>
@@ -124,7 +149,7 @@ const SnowshoeRental: React.FC = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Group Size</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Group Size</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Individual or groups</p>
           </div>
@@ -132,7 +157,7 @@ const SnowshoeRental: React.FC = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Location</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Location</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Rovaniemi, Lapland</p>
           </div>
@@ -140,7 +165,7 @@ const SnowshoeRental: React.FC = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10 col-span-2 sm:col-span-1">
             <div className="flex items-center mb-2 sm:mb-3">
               <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Delivery</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Delivery</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">To your lodging</p>
           </div>
@@ -199,6 +224,28 @@ const SnowshoeRental: React.FC = () => {
                 ))}
               </div>
             </div>
+
+            <ProductFaq items={faqs} schemaId="snowshoe-faq" />
+
+            <RelatedTours
+              links={[
+                {
+                  to: '/northern-lights-tour',
+                  label: 'Guaranteed Northern Lights Tour',
+                  description: 'Pair daytime snowshoeing with a dedicated aurora hunt from Rovaniemi.',
+                },
+                {
+                  to: '/korouoma-canyon',
+                  label: 'Korouoma Canyon Winter Adventure',
+                  description: 'A guided outdoor day with frozen waterfalls and a campfire picnic.',
+                },
+                {
+                  to: '/blog/snowshoe-adventure-exploring-lapland-wilderness',
+                  label: 'Snowshoe adventure tips',
+                  description: 'Practical ideas for exploring Lapland’s winter trails.',
+                },
+              ]}
+            />
           </div>
 
           {/* Right Column - Booking Form (Wider) */}

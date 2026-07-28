@@ -5,6 +5,8 @@ import ImageSlideshow from './ImageSlideshow';
 import BookingForm from './BookingForm';
 import Footer from './Footer';
 import { getAllTours } from '../lib/api';
+import ProductFaq from './seo/ProductFaq';
+import RelatedTours from './seo/RelatedTours';
 
 const KORUOMA_MAX_CAPACITY = 16;
 
@@ -79,6 +81,29 @@ const KorouomaTour = () => {
     'Tell us about snack allergies when you book.'
   ];
 
+  const faqs = [
+    {
+      question: 'How long is the Korouoma Canyon tour?',
+      answer:
+        'About 6 hours in total — roughly 1.5 hours each way from Rovaniemi and about 3 hours at the canyon for hiking, photos, and a campfire picnic.',
+    },
+    {
+      question: 'What should I wear?',
+      answer:
+        'Warm layers, winter boots, gloves, and a hat. Clothing is not provided. The hike is outdoors in snowy canyon conditions.',
+    },
+    {
+      question: 'Is the tour difficult?',
+      answer:
+        'It is a moderate outdoor hike on winter trails. It is not suitable for wheelchair users. A reasonable fitness level helps you enjoy the canyon walks.',
+    },
+    {
+      question: 'Is hotel pickup included?',
+      answer:
+        'Yes. Hotel pickup and drop-off from Rovaniemi are included, along with an English & Finnish guide and a warm vehicle.',
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-black">
       {/* Header */}
@@ -119,7 +144,7 @@ const KorouomaTour = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Duration</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Duration</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">6 hours</p>
           </div>
@@ -127,7 +152,7 @@ const KorouomaTour = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Group Size</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Group Size</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Small group — max 8 people per vehicle</p>
           </div>
@@ -135,7 +160,7 @@ const KorouomaTour = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Location</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Location</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Korouoma Canyon, Lapland</p>
           </div>
@@ -143,7 +168,7 @@ const KorouomaTour = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10 col-span-2 sm:col-span-1">
             <div className="flex items-center mb-2 sm:mb-3">
               <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Languages</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Languages</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">English &amp; Finnish</p>
           </div>
@@ -249,6 +274,28 @@ const KorouomaTour = () => {
                 </p>
               </div>
             </div>
+
+            <ProductFaq items={faqs} schemaId="korouoma-faq" />
+
+            <RelatedTours
+              links={[
+                {
+                  to: '/ice-fishing',
+                  label: 'Ice Fishing Experience',
+                  description: 'Traditional fishing on frozen lakes near Rovaniemi with guide and equipment.',
+                },
+                {
+                  to: '/ranua-zoo',
+                  label: 'Ranua Wildlife Park Tour',
+                  description: 'Arctic wildlife day trip with hotel pickup from Rovaniemi.',
+                },
+                {
+                  to: '/daytime-experiences',
+                  label: 'All daytime experiences',
+                  description: 'Compare Lapland day trips and outdoor adventures from Rovaniemi.',
+                },
+              ]}
+            />
           </div>
 
           {/* Right Column - Booking Form */}
@@ -282,7 +329,7 @@ const KorouomaTour = () => {
             <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
               <img 
                 src="/korouoma1.jpg" 
-                alt="Korouoma Canyon Winter 1" 
+                alt="Frozen waterfall and snowy cliffs at Korouoma Canyon in Finnish Lapland" 
                 className="w-full h-48 sm:h-56 lg:h-64 object-cover transition-transform duration-300 group-hover:scale-110"
                 loading="lazy"
               />
@@ -291,7 +338,7 @@ const KorouomaTour = () => {
             <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
               <img 
                 src="/korouoma2.jpg" 
-                alt="Korouoma Canyon Winter 2" 
+                alt="Winter hiking trail through Korouoma Canyon Nature Reserve near Rovaniemi" 
                 className="w-full h-48 sm:h-56 lg:h-64 object-cover transition-transform duration-300 group-hover:scale-110"
                 loading="lazy"
               />

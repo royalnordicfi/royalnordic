@@ -5,6 +5,8 @@ import ImageSlideshow from './ImageSlideshow';
 import BookingForm from './BookingForm';
 import Footer from './Footer';
 import { getAllTours } from '../lib/api';
+import ProductFaq from './seo/ProductFaq';
+import RelatedTours from './seo/RelatedTours';
 
 const NorthernLightsTour = () => {
   // const navigate = useNavigate();
@@ -80,6 +82,34 @@ const NorthernLightsTour = () => {
     'Free cancellation up to 24 hours before departure.'
   ];
 
+  const faqs = [
+    {
+      question: 'What does the Northern Lights guarantee mean?',
+      answer:
+        'If no Northern Lights are visible during your tour, we offer a free return trip on the next available date. See our Terms & Conditions for the full promise.',
+    },
+    {
+      question: 'Where do you pick us up?',
+      answer:
+        'We offer hotel pickup and drop-off in the Rovaniemi area. Exact pickup time is confirmed after booking — please be ready 10–30 minutes before the standard 18:30 pickup window.',
+    },
+    {
+      question: 'How long is the tour?',
+      answer:
+        'Duration is flexible based on aurora forecasts — typically around six hours, and between about 2 and 12 hours when we need to travel farther for clearer skies.',
+    },
+    {
+      question: 'Is this suitable for children?',
+      answer:
+        'Children are welcome. Child pricing applies for ages 0–14. The evening can be long and cold outdoors, so warm clothing and stamina matter more than age alone.',
+    },
+    {
+      question: 'When is the season?',
+      answer:
+        'This aurora hunt runs in the Northern Lights season, typically from mid-September through mid-April from Rovaniemi in Finnish Lapland.',
+    },
+  ];
+
   // const pricing = [
   //   {
   //     option: "Adult (15+ years)",
@@ -136,7 +166,7 @@ const NorthernLightsTour = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Duration</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Duration</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">2–12 hours (typically ~6h)</p>
           </div>
@@ -144,7 +174,7 @@ const NorthernLightsTour = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Group Size</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Group Size</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Small group — max 8 people per vehicle</p>
           </div>
@@ -152,7 +182,7 @@ const NorthernLightsTour = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Location</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Location</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Rovaniemi, Lapland</p>
           </div>
@@ -160,7 +190,7 @@ const NorthernLightsTour = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10 col-span-2 sm:col-span-1">
             <div className="flex items-center mb-2 sm:mb-3">
               <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Languages</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Languages</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">English &amp; Finnish</p>
           </div>
@@ -179,9 +209,12 @@ const NorthernLightsTour = () => {
                 Hunt the Aurora Borealis from Rovaniemi with local guides who read live solar and weather data,
                 then drive as far as needed for clearer skies — including across borders when conditions call for it.
               </p>
-              <p className="text-gray-300 text-sm sm:text-base font-clean">
+              <p className="text-gray-300 text-sm sm:text-base font-clean mb-3 sm:mb-4">
                 Hotel pickup, a warm vehicle, hot drinks, and photography guidance are included. Duration is flexible
                 (typically around six hours, up to twelve when the sky needs more time). Free cancellation up to 24 hours before departure.
+              </p>
+              <p className="text-gray-300 text-sm sm:text-base font-clean">
+                Ideal for travellers who want a dedicated aurora hunt near the Arctic Circle — couples, friends, and small groups who value a local guide, live aurora forecasts, and time outdoors under the Lapland night sky.
               </p>
             </div>
 
@@ -235,7 +268,7 @@ const NorthernLightsTour = () => {
                         </div>
                       )}
                       <div className="flex-1">
-                        <h4 className="text-white font-semibold text-sm sm:text-base">{item.activity}</h4>
+                        <h3 className="text-white font-semibold text-sm sm:text-base">{item.activity}</h3>
                         <p className="text-gray-300 text-xs sm:text-sm">{item.description}</p>
                       </div>
                     </div>
@@ -246,6 +279,28 @@ const NorthernLightsTour = () => {
                 ))}
               </div>
             </div>
+
+            <ProductFaq items={faqs} schemaId="nl-faq" />
+
+            <RelatedTours
+              links={[
+                {
+                  to: '/family-friendly-northern-lights',
+                  label: 'Family-Friendly Northern Lights Tour',
+                  description: 'A shorter 2-hour aurora evening designed for families and all ages.',
+                },
+                {
+                  to: '/daytime-experiences',
+                  label: 'Daytime Experiences in Lapland',
+                  description: 'Ice fishing, Ranua Wildlife Park, Korouoma Canyon, and more from Rovaniemi.',
+                },
+                {
+                  to: '/blog/best-time-northern-lights-lapland-2025',
+                  label: 'Best time for Northern Lights in Lapland',
+                  description: 'Season tips for planning your aurora trip to Finnish Lapland.',
+                },
+              ]}
+            />
           </div>
 
           {/* Right Column - Booking Form (Wider) */}
@@ -277,60 +332,27 @@ const NorthernLightsTour = () => {
             Aurora Gallery
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
-            <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <img 
-                src="/lights7.jpg" 
-                alt="Aurora Borealis 1" 
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-            <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <img 
-                src="/lights8.jpg" 
-                alt="Aurora Borealis 2" 
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-            <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <img 
-                src="/lights9.jpg" 
-                alt="Aurora Borealis 3" 
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-            <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <img 
-                src="/nortti9.jpg" 
-                alt="Northern Lights Experience 1" 
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-            <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <img 
-                src="/nortti10.jpg" 
-                alt="Northern Lights Experience 2" 
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-            <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <img 
-                src="/nortti11.jpg" 
-                alt="Northern Lights Experience 3" 
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
+            {[
+              { src: '/lights7.jpg', alt: 'Green Northern Lights over snowy Lapland forest near Rovaniemi' },
+              { src: '/lights8.jpg', alt: 'Aurora Borealis reflecting above Arctic landscape in Finnish Lapland' },
+              { src: '/lights9.jpg', alt: 'Bright aurora display during a Royal Nordic Northern Lights tour' },
+              { src: '/nortti9.jpg', alt: 'Guests watching the Northern Lights on a clear winter night in Lapland' },
+              { src: '/nortti10.jpg', alt: 'Aurora hunting stop with starry sky outside Rovaniemi' },
+              { src: '/nortti11.jpg', alt: 'Northern Lights ribbons over Finnish Lapland wilderness' },
+            ].map((image) => (
+              <div
+                key={image.src}
+                className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105"
+              >
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -4,6 +4,8 @@ import { ArrowLeft, Clock, Users, MapPin, CheckCircle, XCircle } from 'lucide-re
 import ImageSlideshow from './ImageSlideshow';
 import Footer from './Footer';
 import BookingForm from './BookingForm';
+import ProductFaq from './seo/ProductFaq';
+import RelatedTours from './seo/RelatedTours';
 
 const FamilyFriendlyNorthernLights: React.FC = () => {
   const tourImages = [
@@ -21,6 +23,28 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
     'Designed for all ages — a shorter, comfortable evening for families.',
     'Dress warmly; we have a warm vehicle, but viewing stops are outdoors.',
     'Free cancellation up to 24 hours before departure.',
+  ];
+
+  const faqs = [
+    {
+      question: 'Are the Northern Lights guaranteed on this tour?',
+      answer:
+        'No. This is a shorter family-friendly evening and aurora sightings are never 100% guaranteed. If you want our guaranteed product, book the Guaranteed Northern Lights Tour.',
+    },
+    {
+      question: 'What time does the tour start?',
+      answer:
+        'Hotel pickup is typically around 21:00 in the Rovaniemi area. Exact pickup time is confirmed after booking.',
+    },
+    {
+      question: 'Is it suitable for children?',
+      answer:
+        'Yes — the format is designed for families and all ages. Child pricing applies for ages 0–14. Bring warm outdoor layers for viewing stops.',
+    },
+    {
+      question: 'How long is the tour?',
+      answer: 'About 2 hours including pickup, viewing stops with hot drinks, and return to Rovaniemi.',
+    },
   ];
 
   return (
@@ -61,7 +85,7 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Duration</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Duration</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">2 hours</p>
           </div>
@@ -69,7 +93,7 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Group Size</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Group Size</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Max 16 people</p>
           </div>
@@ -77,7 +101,7 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Location</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Location</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Rovaniemi, Lapland</p>
           </div>
@@ -85,7 +109,7 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10 col-span-2 sm:col-span-1">
             <div className="flex items-center mb-2 sm:mb-3">
               <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Languages</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Languages</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">English &amp; Finnish</p>
           </div>
@@ -195,6 +219,28 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            <ProductFaq items={faqs} schemaId="family-nl-faq" />
+
+            <RelatedTours
+              links={[
+                {
+                  to: '/northern-lights-tour',
+                  label: 'Guaranteed Northern Lights Tour',
+                  description: 'Longer aurora hunt with a free return trip if no lights appear (see Terms).',
+                },
+                {
+                  to: '/ranua-zoo',
+                  label: 'Ranua Wildlife Park Tour',
+                  description: 'A family-friendly daytime wildlife excursion from Rovaniemi.',
+                },
+                {
+                  to: '/northern-lights-tours',
+                  label: 'All Northern Lights tours',
+                  description: 'Compare guaranteed and family-friendly aurora experiences.',
+                },
+              ]}
+            />
           </div>
 
           <div className="lg:col-span-2">
@@ -220,14 +266,19 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
             Family Aurora Gallery
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-            {['/lights4.jpg', '/lights6.jpg', '/lights1.jpg', '/lights5.jpg'].map((src, i) => (
+            {[
+              { src: '/lights4.jpg', alt: 'Soft green Northern Lights above Lapland trees on a family aurora evening' },
+              { src: '/lights6.jpg', alt: 'Aurora Borealis over snow near Rovaniemi during a short family tour' },
+              { src: '/lights1.jpg', alt: 'Colourful Northern Lights display in Finnish Lapland winter sky' },
+              { src: '/lights5.jpg', alt: 'Aurora hunting night sky with snowy Arctic landscape near Rovaniemi' },
+            ].map(({ src, alt }) => (
               <div
                 key={src}
                 className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105"
               >
                 <img
                   src={src}
-                  alt={`Family Northern Lights Experience ${i + 1}`}
+                  alt={alt}
                   className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
                   loading="lazy"
                 />

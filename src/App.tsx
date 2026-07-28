@@ -46,6 +46,7 @@ import SnowmobileSafari from './components/SnowmobileSafari';
 import BestSellersSlideshow from './components/BestSellersSlideshow';
 import MonsterTruckNorthernLights from './components/MonsterTruckNorthernLights';
 import RoutePageMeta from './components/RoutePageMeta';
+import RouteJsonLd from './components/seo/RouteJsonLd';
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
       <div className="App">
         <ScrollToTop />
         <RoutePageMeta />
+        <RouteJsonLd />
         <Header />
         
         <Routes>

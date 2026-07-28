@@ -2,7 +2,6 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- Favicon Configuration - Simplified for Google -->
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/royalnordiclogotransparent.png" type="image/png" sizes="512x512" />
     <link rel="apple-touch-icon" href="/royalnordiclogotransparent.png" />
@@ -10,136 +9,83 @@
     <meta name="msapplication-TileColor" content="#000000" />
     <meta name="theme-color" content="#000000" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+
     <!-- Google Search Console Verification -->
     <meta name="google-site-verification" content="VU8uJeWvSzilS8KvkbjRaJ3dtUGh2Zh6otN4I-S" />
-    
+
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-N86JBFV3C1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      
-      // Configure Google Analytics with consent mode for GDPR compliance
       gtag('consent', 'default', {
         'analytics_storage': 'denied',
         'ad_storage': 'denied',
         'ad_user_data': 'denied',
         'ad_personalization': 'denied'
       });
-      
       gtag('config', 'G-N86JBFV3C1', {
         'anonymize_ip': true,
         'cookie_flags': 'SameSite=None;Secure'
       });
     </script>
-    
-    <!-- Sitemap -->
+
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
-    
-    <!-- Primary Meta Tags -->
-    <title>Royal Nordic - Lavish Experiences in Lapland</title>
-    <meta name="title" content="ROYAL NORDIC - Premium Lapland Tours & Northern Lights Adventures | Rovaniemi, Finland" />
-    <meta name="description" content="Experience the magic of Finnish Lapland with ROYAL NORDIC. Guaranteed Northern Lights tours, snowshoe adventures, and customized experiences in Rovaniemi. Book your Arctic adventure today!" />
-    <meta name="keywords" content="northern lights tour, lapland tours, rovaniemi, finland, aurora borealis, snowshoe adventure, arctic tours, finnish lapland, northern lights finland, lapland winter, arctic adventure, northern lights guaranteed, royal nordic, lapland experiences, finland tours, rovaniemi tours, aurora hunting, winter lapland, arctic wilderness, lapland adventure, northern lights photography, finnish arctic, lapland activities, winter tours finland, aurora borealis finland, lapland travel, arctic circle tours, finland winter activities, lapland northern lights, rovaniemi northern lights, finland aurora tours, lapland snowshoe, arctic adventures finland, winter lapland tours, northern lights lapland, finland winter tours, lapland experiences, royal nordic tours" />
-    <meta name="author" content="ROYAL NORDIC" />
+
+    <!-- Primary Meta Tags (SPA updates these client-side per route) -->
+    <title>Royal Nordic | Lavish Experiences in Lapland — Northern Lights Tours Rovaniemi</title>
+    <meta name="title" content="Royal Nordic | Lavish Experiences in Lapland — Northern Lights Tours Rovaniemi" />
+    <meta name="description" content="Premium Lapland tours from Rovaniemi: guaranteed Northern Lights, ice fishing, Ranua Zoo, Korouoma Canyon, and private transfers. Book direct." />
+    <meta name="author" content="Royal Nordic" />
     <meta name="robots" content="index, follow" />
-    <meta name="language" content="English" />
-    <meta name="revisit-after" content="7 days" />
-    
-    <!-- Structured Data for SEO -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "TouristAttraction",
-      "name": "Royal Nordic - Lapland Tours",
-      "description": "Premium Northern Lights tours and Arctic adventures in Finnish Lapland",
-      "url": "https://royalnordic.fi",
-      "telephone": "+358 45 78345138",
-      "email": "contact@royalnordic.fi",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Rovaniemi",
-        "addressCountry": "Finland"
-      },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": "66.5039",
-        "longitude": "25.7294"
-      },
-      "openingHours": "Mo-Su 09:00-21:00",
-      "priceRange": "€79-€179",
-      "image": "https://royalnordic.fi/lights1.jpg",
-      "sameAs": [
-        "https://royalnordic.fi"
-      ],
-      "offers": {
-        "@type": "Offer",
-        "name": "Northern Lights Tour",
-        "description": "Guaranteed Northern Lights experience in Lapland",
-        "price": "179",
-        "priceCurrency": "EUR",
-        "availability": "https://schema.org/InStock"
-      }
-    }
-    </script>
-    
-    <!-- Open Graph / Facebook -->
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://royalnordic.fi/" />
-    <meta property="og:title" content="ROYAL NORDIC - Premium Lapland Tours & Northern Lights Adventures" />
-    <meta property="og:description" content="Experience the magic of Finnish Lapland with ROYAL NORDIC. Guaranteed Northern Lights tours, snowshoe adventures, and customized experiences in Rovaniemi." />
-    <meta property="og:image" content="https://royalnordic.fi/lights1.jpg" />
+    <meta property="og:title" content="Royal Nordic | Lavish Experiences in Lapland — Northern Lights Tours Rovaniemi" />
+    <meta property="og:description" content="Premium Lapland tours from Rovaniemi: guaranteed Northern Lights, ice fishing, Ranua Zoo, Korouoma Canyon, and private transfers. Book direct." />
+    <meta property="og:image" content="https://royalnordic.fi/nortti1.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Northern Lights in Finnish Lapland - Royal Nordic Tours" />
-    <meta property="og:site_name" content="ROYAL NORDIC" />
-    <meta property="og:locale" content="en_US" />
-    
+    <meta property="og:image:alt" content="Northern Lights over Finnish Lapland — Royal Nordic tours from Rovaniemi" />
+    <meta property="og:site_name" content="Royal Nordic" />
+    <meta property="og:locale" content="en_FI" />
+
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://royalnordic.fi/" />
-    <meta property="twitter:title" content="ROYAL NORDIC - Premium Lapland Tours & Northern Lights Adventures" />
-    <meta property="twitter:description" content="Experience the magic of Finnish Lapland with ROYAL NORDIC. Guaranteed Northern Lights tours, snowshoe adventures, and customized experiences in Rovaniemi." />
-    <meta property="twitter:image" content="https://royalnordic.fi/lights1.jpg" />
-    <meta property="twitter:image:alt" content="Northern Lights in Finnish Lapland - Royal Nordic Tours" />
-    <meta property="twitter:site" content="@royalnordic" />
-    <meta property="twitter:creator" content="@royalnordic" />
-    
-    <!-- Additional SEO Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://royalnordic.fi/" />
+    <meta name="twitter:title" content="Royal Nordic | Lavish Experiences in Lapland — Northern Lights Tours Rovaniemi" />
+    <meta name="twitter:description" content="Premium Lapland tours from Rovaniemi: guaranteed Northern Lights, ice fishing, Ranua Zoo, Korouoma Canyon, and private transfers." />
+    <meta name="twitter:image" content="https://royalnordic.fi/nortti1.jpg" />
+    <meta name="twitter:image:alt" content="Northern Lights over Finnish Lapland — Royal Nordic tours from Rovaniemi" />
+
+    <!-- Local relevance -->
     <meta name="geo.region" content="FI-10" />
     <meta name="geo.placename" content="Rovaniemi, Lapland, Finland" />
-    <meta name="geo.position" content="66.5028;25.7285" />
-    <meta name="ICBM" content="66.5028, 25.7285" />
-    <meta name="DC.title" content="ROYAL NORDIC - Premium Lapland Tours" />
-    <meta name="DC.description" content="Experience the magic of Finnish Lapland with ROYAL NORDIC. Guaranteed Northern Lights tours, snowshoe adventures, and customized experiences in Rovaniemi." />
-    <meta name="DC.subject" content="Northern Lights Tours, Lapland Adventures, Arctic Experiences" />
-    <meta name="DC.creator" content="ROYAL NORDIC" />
-    <meta name="DC.publisher" content="ROYAL NORDIC" />
-    <meta name="DC.coverage" content="Rovaniemi, Lapland, Finland" />
-    <meta name="DC.date" content="2024" />
-    
-    <!-- Canonical URL -->
+    <meta name="geo.position" content="66.5039;25.7294" />
+    <meta name="ICBM" content="66.5039, 25.7294" />
+
     <link rel="canonical" href="https://royalnordic.fi/" />
-    
-    <!-- Preconnect to external domains -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Cormorant:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    
-    <!-- Structured Data for Local Business -->
+
+    <!-- Baseline structured data (SPA adds Product / FAQ / Breadcrumb per route) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "TouristInformationCenter",
-      "name": "ROYAL NORDIC",
-      "description": "Premium Lapland tours and Northern Lights adventures in Rovaniemi, Finland",
+      "@type": "TravelAgency",
+      "@id": "https://royalnordic.fi/#organization",
+      "name": "Royal Nordic",
       "url": "https://royalnordic.fi",
-      "telephone": "+358 45 78345138",
+      "logo": "https://royalnordic.fi/royalnordiclogotransparent.png",
+      "image": "https://royalnordic.fi/nortti1.jpg",
+      "description": "Premium Lapland tours from Rovaniemi — Northern Lights, daytime adventures, and private transfers in Finnish Lapland.",
+      "telephone": "+3584578345138",
       "email": "contact@royalnordic.fi",
+      "priceRange": "€59-€399",
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "Rovaniemi",
@@ -148,124 +94,45 @@
       },
       "geo": {
         "@type": "GeoCoordinates",
-        "latitude": 66.5028,
-        "longitude": 25.7285
+        "latitude": 66.5039,
+        "longitude": 25.7294
       },
-      "openingHours": "Mo-Su 09:00-21:00",
-      "sameAs": [
-        "https://www.facebook.com/royalnordic",
-        "https://www.instagram.com/royalnordic.fi/"
-      ],
-      "hasOfferCatalog": {
-        "@type": "OfferCatalog",
-        "name": "Lapland Tours",
-        "itemListElement": [
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "TouristAttraction",
-              "name": "Guaranteed Northern Lights Tour",
-              "description": "Experience the magical Aurora Borealis in Finnish Lapland",
-              "price": "179",
-              "priceCurrency": "EUR",
-              "duration": "PT4H"
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "TouristAttraction",
-              "name": "Snowshoe Adventure",
-              "description": "Explore pristine Lapland wilderness on traditional snowshoes",
-              "price": "89",
-              "priceCurrency": "EUR",
-              "duration": "PT4H"
-            }
-          }
-        ]
-      }
-    }
-    </script>
-    
-    <!-- Structured Data for Organization -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "ROYAL NORDIC",
-      "url": "https://royalnordic.fi",
-      "logo": "https://royalnordic.fi/royalnordiclogotransparent.png",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "telephone": "+358 45 78345138",
-        "contactType": "customer service",
-        "availableLanguage": ["English", "Finnish"]
+      "areaServed": {
+        "@type": "City",
+        "name": "Rovaniemi"
       },
       "sameAs": [
-        "https://www.facebook.com/royalnordic",
-        "https://www.instagram.com/royalnordic.fi/"
+        "https://www.instagram.com/royalnordic.fi/",
+        "https://www.tiktok.com/@royalnordic"
       ]
     }
     </script>
-    
-    <!-- Structured Data for Website -->
+
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "ROYAL NORDIC",
+      "name": "Royal Nordic",
       "url": "https://royalnordic.fi",
-      "description": "Premium Lapland tours and Northern Lights adventures in Rovaniemi, Finland"
+      "description": "Premium Lapland tours and Northern Lights adventures in Rovaniemi, Finnish Lapland.",
+      "publisher": {
+        "@id": "https://royalnordic.fi/#organization"
+      }
     }
     </script>
-    
-    <!-- Additional SEO Links -->
+
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#000000" />
-    <meta name="msapplication-TileColor" content="#000000" />
-    
-    <!-- Performance Optimization -->
-    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
-    <link rel="dns-prefetch" href="//fonts.gstatic.com" />
-    
-    <!-- Security Headers -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
-    
-    <!-- Mobile Optimization -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="ROYAL NORDIC" />
-    
-    <!-- Favicon -->
+    <meta name="apple-mobile-web-app-title" content="Royal Nordic" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    
-    <!-- Sitemap -->
-    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    
-    <!-- Google Analytics (replace with your actual GA4 code when ready) -->
-    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-XXXXXXXXXX');
-    </script> -->
-    
-    <!-- Google Tag Manager (replace with your actual GTM code when ready) -->
-    <!-- <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript> -->
   </body>
 </html>

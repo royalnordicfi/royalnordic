@@ -1,16 +1,11 @@
 User-agent: *
 Allow: /
 
-Allow: /favicon.ico
-Allow: /favicon-google.ico
-Allow: /favicon-google.png
-Allow: /royalnordiclogotransparent.png
-
-Sitemap: https://royalnordic.fi/sitemap.xml
-
-Crawl-delay: 1
-
 Disallow: /admin
 Disallow: /admin-panel
 Disallow: /admin.html
 Disallow: /api/
+Disallow: /payment-success
+Disallow: /crypto-payment-success
+
+Sitemap: https://royalnordic.fi/sitemap.xml
