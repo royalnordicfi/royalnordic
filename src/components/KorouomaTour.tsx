@@ -227,7 +227,7 @@ const KorouomaTour = () => {
               </div>
               <div className="mt-3 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
                 <p className="text-emerald-300 text-sm">
-                  <strong>Book Now, Pay Later:</strong> Reserve your spot today and pay when you're ready
+                  <strong>Book &amp; pay securely:</strong> Confirm your date online — payment is taken at booking via Stripe.
                 </p>
               </div>
             </div>

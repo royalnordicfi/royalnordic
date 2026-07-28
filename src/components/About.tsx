@@ -40,7 +40,7 @@ const About = () => {
                 Born from a deep love for the Arctic and the magical Northern Lights, Royal Nordic emerged from a vision to share the authentic beauty of Finnish Lapland with fellow adventurers seeking genuine wilderness experiences.
               </p>
               <p>
-                We're building our reputation as a premium tour operator in Finnish Lapland, offering intimate experiences that balance adventure with comfort, always respecting the pristine environment we're privileged to call home.
+                We operate as a premium tour company in Finnish Lapland, offering intimate experiences that balance adventure with comfort, always respecting the pristine environment we're privileged to call home.
               </p>
               <p>
                 Our carefully selected guides are not just drivers – they're passionate storytellers, skilled photographers, and Arctic specialists who ensure every moment of your journey is exceptional and authentic.

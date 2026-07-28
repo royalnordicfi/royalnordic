@@ -43,12 +43,13 @@ const DaytimeExperiences: React.FC = () => {
     {
       id: 4,
       name: "Snowmobile Safari",
-      description: "Experience the thrill of snowmobiling through Lapland's pristine wilderness. Multiple duration options available for all skill levels.",
+      description: "Snowmobile through Lapland wilderness. Partner experience — request availability and a quote.",
       image: "/snowmobiling.jpg",
       duration: "0.5h, 1h, 2h, or 3h",
       location: "Rovaniemi, Lapland",
       features: ["Professional guide", "All equipment", "Safety briefing", "Scenic routes"],
-      route: "/snowmobile-safari"
+      route: "/snowmobile-safari",
+      badge: "Request availability"
     }
   ];
 

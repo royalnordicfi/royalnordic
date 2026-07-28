@@ -44,12 +44,14 @@ import SaleModal from './components/SaleModal';
 import SnowmobileSafari from './components/SnowmobileSafari';
 import BestSellersSlideshow from './components/BestSellersSlideshow';
 import MonsterTruckNorthernLights from './components/MonsterTruckNorthernLights';
+import RoutePageMeta from './components/RoutePageMeta';
 
 function App() {
   return (
     <Router>
       <div className="App">
         <ScrollToTop />
+        <RoutePageMeta />
         <Header />
         
         <Routes>

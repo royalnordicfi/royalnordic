@@ -61,15 +61,15 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex justify-between items-center h-24 pt-1">
           {/* Logo */}
-                 <div className="flex-shrink-0 flex flex-col items-center space-y-1" style={{marginLeft: '120px'}}>
+          <div className="flex-shrink-0 flex flex-col items-start sm:items-center space-y-0.5 pl-1 sm:pl-2">
             <img 
               src="/logo.png" 
               alt="Royal Nordic Logo" 
-              className="h-10 w-auto object-contain"
+              className="h-9 sm:h-10 w-auto object-contain"
             />
             <button
               onClick={handleLogoClick}
-              className="text-lg font-termes font-bold text-white italic cursor-pointer hover:text-emerald-300 transition-all duration-300"
+              className="text-base sm:text-lg font-luxury font-bold text-white italic cursor-pointer hover:text-emerald-300 transition-all duration-300"
             >
               ROYAL NORDIC
             </button>
@@ -115,11 +115,11 @@ const Header = () => {
             <div className="flex flex-col space-y-2 text-xs text-gray-300 font-clean">
               <div className="flex items-center space-x-2">
                 <Mail size={12} />
-                <span>contact@royalnordic.fi</span>
+                <a href="mailto:contact@royalnordic.fi" className="hover:text-emerald-400 transition-colors">contact@royalnordic.fi</a>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone size={12} />
-              <span>+358 45 78345138</span>
+                <a href="tel:+3584578345138" className="hover:text-emerald-400 transition-colors">+358 45 78345138</a>
               </div>
             </div>
             
@@ -138,7 +138,7 @@ const Header = () => {
                 href="https://www.tiktok.com/@royalnordic"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-300 hover:text-black transition-colors duration-200"
+                className="text-gray-300 hover:text-white transition-colors duration-200"
                 aria-label="Follow us on TikTok"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -151,8 +151,11 @@ const Header = () => {
           {/* Mobile menu button */}
           <div className="md:hidden">
             <button
+              type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-gray-300 hover:text-white transition-colors duration-200"
+              className="text-gray-300 hover:text-white transition-colors duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
+              aria-expanded={isMobileMenuOpen}
+              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -199,17 +202,27 @@ const Header = () => {
             >
               CONTACT
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                navigate('/blog')
+                setIsMobileMenuOpen(false)
+              }}
+              className="block px-3 py-2 text-white hover:text-emerald-400 transition-colors duration-200 font-luxury font-bold text-lg tracking-wider uppercase w-full text-left"
+            >
+              BLOG
+            </button>
             
             {/* Mobile Contact Info */}
             <div className="pt-4 border-t border-gray-700 space-y-3">
-              <div className="flex items-center justify-center space-x-2 text-sm text-gray-300">
+              <a href="tel:+3584578345138" className="flex items-center justify-center space-x-2 text-sm text-gray-300 hover:text-emerald-400 min-h-[44px]">
                 <Phone size={16} />
                 <span>+358 45 78345138</span>
-              </div>
-              <div className="flex items-center justify-center space-x-2 text-sm text-gray-300">
+              </a>
+              <a href="mailto:contact@royalnordic.fi" className="flex items-center justify-center space-x-2 text-sm text-gray-300 hover:text-emerald-400 min-h-[44px]">
                 <Mail size={16} />
                 <span>contact@royalnordic.fi</span>
-              </div>
+              </a>
             </div>
             
             {/* Mobile Social Media Icons */}
@@ -227,7 +240,7 @@ const Header = () => {
                 href="https://www.tiktok.com/@royalnordic"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-300 hover:text-black transition-colors duration-200"
+                className="text-gray-300 hover:text-white transition-colors duration-200"
                 aria-label="Follow us on TikTok"
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">

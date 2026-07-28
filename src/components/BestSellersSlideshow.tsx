@@ -9,10 +9,12 @@ const BestSellersSlideshow: React.FC = () => {
     {
       id: 1,
       title: "Guaranteed Northern Lights Tour",
-      description: "Chase the magical Aurora Borealis with our expert guides. 100% money-back guarantee if you don't see the lights!",
+      description: "Chase the Aurora Borealis from Rovaniemi with expert guides, hotel pickup, and a Northern Lights guarantee.",
       image: "/nortti1.jpg",
       route: "/northern-lights-tour",
-      badge: "BEST SELLER"
+      badge: "BEST SELLER",
+      mode: "instant" as const,
+      cta: "Book this tour"
     },
     {
       id: 2,
@@ -20,23 +22,29 @@ const BestSellersSlideshow: React.FC = () => {
       description: "Meet Polar Bears, Arctic Foxes, and 50+ Arctic species at Finland's northernmost zoo. Perfect for families!",
       image: "/ranua1.jpg",
       route: "/ranua-zoo",
-      badge: "BEST SELLER"
+      badge: "BEST SELLER",
+      mode: "instant" as const,
+      cta: "Book this tour"
     },
     {
       id: 3,
       title: "Snowmobile Safari",
-      description: "Experience the thrill of snowmobiling through Lapland's pristine wilderness. Multiple duration options available.",
+      description: "Thrilling snowmobile routes through Lapland wilderness. Partner experience — request availability and a quote.",
       image: "/snowmobiling.jpg",
       route: "/snowmobile-safari",
-      badge: "BEST SELLER"
+      badge: "REQUEST ONLY",
+      mode: "inquiry" as const,
+      cta: "Request availability"
     },
     {
       id: 4,
       title: "Monster Truck Northern Lights Experience",
-      description: "Experience the magic of the Arctic night on board a giant monster truck! Deep into the wilderness for the best Northern Lights viewing.",
+      description: "Aurora hunting aboard a giant monster truck. Partner experience — request availability and a quote.",
       image: "/monsteri1.jpg",
       route: "/monster-truck-northern-lights",
-      badge: "BEST SELLER"
+      badge: "REQUEST ONLY",
+      mode: "inquiry" as const,
+      cta: "Request availability"
     }
   ];
 
@@ -98,10 +106,13 @@ const BestSellersSlideshow: React.FC = () => {
 
                 {/* Content */}
                 <div className="relative z-10 h-full flex flex-col justify-end p-4 sm:p-6 lg:p-8">
-                  {/* Badge */}
-                  <div className="inline-flex items-center bg-emerald-500/20 backdrop-blur-sm px-3 py-1.5 rounded-full mb-3 border border-emerald-400/30 w-fit">
-                    <Star className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-400 mr-2" />
-                    <span className="text-emerald-300 font-bold text-xs tracking-wider uppercase">
+                  <div className={`inline-flex items-center backdrop-blur-sm px-3 py-1.5 rounded-full mb-3 border w-fit ${
+                    tour.mode === 'inquiry'
+                      ? 'bg-amber-500/20 border-amber-400/30'
+                      : 'bg-emerald-500/20 border-emerald-400/30'
+                  }`}>
+                    <Star className={`w-3 h-3 sm:w-4 sm:h-4 mr-2 ${tour.mode === 'inquiry' ? 'text-amber-300' : 'text-emerald-400'}`} />
+                    <span className={`font-bold text-xs tracking-wider uppercase ${tour.mode === 'inquiry' ? 'text-amber-200' : 'text-emerald-300'}`}>
                       {tour.badge}
                     </span>
                   </div>
@@ -118,7 +129,7 @@ const BestSellersSlideshow: React.FC = () => {
 
                   {/* CTA Button */}
                   <div className="flex items-center text-emerald-400 font-semibold text-base sm:text-lg group">
-                    <span>Explore Tour</span>
+                    <span>{tour.cta}</span>
                     <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-2 transition-transform" />
                   </div>
                 </div>

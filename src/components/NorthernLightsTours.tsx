@@ -8,12 +8,12 @@ const NorthernLightsTours: React.FC = () => {
     {
       id: 1,
       name: "Guaranteed Northern Lights Tour",
-      description: "Chase the Aurora Borealis with our expert guides. We guarantee you'll see the lights or get a full refund!",
+      description: "Chase the Aurora Borealis with expert guides, hotel pickup, and a Northern Lights guarantee.",
       image: "/nortti1.jpg",
-      duration: "1-10 hours",
-      groupSize: "Small group experience",
+      duration: "2–10 hours (typically ~6h)",
+      groupSize: "Max 16 people",
       location: "Rovaniemi, Lapland",
-      features: ["Professional guide", "Hotel pickup", "Photography assistance", "Warm drinks and snacks"],
+      features: ["Professional guide", "Hotel pickup", "Photography guidance", "Warm drinks and snacks"],
       route: "/northern-lights-tour",
       badge: "Most Popular"
     },
@@ -32,14 +32,14 @@ const NorthernLightsTours: React.FC = () => {
     {
       id: 3,
       name: "Monster Truck Northern Lights Experience",
-      description: "Experience the magic of the Arctic night on board a giant monster truck! Deep into the wilderness for the best Northern Lights viewing.",
+      description: "Aurora hunting aboard a giant monster truck. Partner experience — request availability and a quote.",
       image: "/monsteri1.jpg",
       duration: "3 hours",
       groupSize: "Flexible",
       location: "Rovaniemi, Lapland",
       features: ["Professional guide and driver", "Specially built monster truck", "Remote viewing locations", "No experience required"],
       route: "/monster-truck-northern-lights",
-      badge: "Unique Experience"
+      badge: "Request availability"
     }
   ];
 
