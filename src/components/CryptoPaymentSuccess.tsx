@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CheckCircle, Mail, Calendar, Users, Phone } from 'lucide-react'
+import { formatTourDateForDisplay } from '../lib/tourDate'
 
 const CryptoPaymentSuccess: React.FC = () => {
   const navigate = useNavigate()
@@ -74,7 +75,7 @@ const CryptoPaymentSuccess: React.FC = () => {
               </div>
               <div className="flex items-center">
                 <Calendar className="w-3 h-3 mr-2 text-green-400" />
-                <span className="text-gray-300">Date: {bookingData.tour_date}</span>
+                <span className="text-gray-300">Date: {formatTourDateForDisplay(bookingData.tour_date_iso || bookingData.tour_date)}</span>
               </div>
               <div className="flex items-center">
                 <Users className="w-3 h-3 mr-2 text-green-400" />

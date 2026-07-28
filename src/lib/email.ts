@@ -1,4 +1,6 @@
 // Email notification service for Royal Nordic
+import { formatTourDateForDisplay } from './tourDate'
+
 export interface EmailNotification {
   to: string[]
   subject: string
@@ -116,7 +118,7 @@ function generateBookingEmailHTML(booking: BookingNotificationData): string {
           <h3>📋 Booking Details</h3>
           <p><strong>Booking ID:</strong> #${booking.bookingId}</p>
           <p><strong>Tour:</strong> ${booking.tourName}</p>
-          <p><strong>Date:</strong> ${new Date(booking.tourDate).toLocaleDateString('fi-FI')}</p>
+          <p><strong>Date:</strong> ${formatTourDateForDisplay(booking.tourDate, 'fi-FI', 'short')}</p>
           <p><strong>Status:</strong> <span class="status-${booking.paymentStatus}">${booking.paymentStatus.toUpperCase()}</span></p>
         </div>
         
@@ -166,7 +168,7 @@ New booking received!
 📋 Booking Details:
 - Booking ID: #${booking.bookingId}
 - Tour: ${booking.tourName}
-- Date: ${new Date(booking.tourDate).toLocaleDateString('fi-FI')}
+- Date: ${formatTourDateForDisplay(booking.tourDate, 'fi-FI', 'short')}
 - Status: ${booking.paymentStatus.toUpperCase()}
 
 👥 Customer Information:
@@ -242,12 +244,7 @@ function generateCustomerConfirmationHTML(booking: BookingNotificationData): str
           <h3>📋 Your Booking Details</h3>
           <p><strong>Booking ID:</strong> #${booking.bookingId}</p>
           <p><strong>Tour:</strong> ${booking.tourName}</p>
-          <p><strong>Date:</strong> ${new Date(booking.tourDate).toLocaleDateString('en-US', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          })}${booking.tourName === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : booking.tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}</p>
+          <p><strong>Date:</strong> ${formatTourDateForDisplay(booking.tourDate, 'en-US', 'long')}${booking.tourName === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : booking.tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}</p>
           <p><strong>Status:</strong> <span class="status-confirmed">CONFIRMED</span></p>
         </div>
         
@@ -302,12 +299,7 @@ Your tour has been successfully confirmed. We're excited to show you the magic o
 📋 Your Booking Details:
 - Booking ID: #${booking.bookingId}
 - Tour: ${booking.tourName}
-- Date: ${new Date(booking.tourDate).toLocaleDateString('en-US', { 
-  weekday: 'long', 
-  year: 'numeric', 
-  month: 'long', 
-  day: 'numeric' 
-})}${booking.tourName === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : booking.tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}
+- Date: ${formatTourDateForDisplay(booking.tourDate, 'en-US', 'long')}${booking.tourName === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : booking.tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}
 - Status: CONFIRMED
 
 👥 Your Group:

@@ -4,18 +4,13 @@ import { fetchOpsBookings } from '../adminApi'
 import type { OpsBooking } from '../types'
 import { Badge, statusTone } from '../components/Badge'
 import { STATUS_LABELS } from '../types'
-
-function addDays(iso: string, n: number) {
-  const d = new Date(iso + 'T12:00:00')
-  d.setDate(d.getDate() + n)
-  return d.toISOString().slice(0, 10)
-}
+import { addTourDays, todayTourDateISO } from '../../lib/tourDate'
 
 export default function CalendarPage() {
   const [bookings, setBookings] = useState<OpsBooking[]>([])
   const [error, setError] = useState('')
   const [mode, setMode] = useState<'day' | 'week'>('day')
-  const [anchor, setAnchor] = useState(() => new Date().toISOString().slice(0, 10))
+  const [anchor, setAnchor] = useState(() => todayTourDateISO())
 
   useEffect(() => {
     fetchOpsBookings()
@@ -25,7 +20,7 @@ export default function CalendarPage() {
 
   const range = useMemo(() => {
     if (mode === 'day') return [anchor]
-    return Array.from({ length: 7 }, (_, i) => addDays(anchor, i))
+    return Array.from({ length: 7 }, (_, i) => addTourDays(anchor, i))
   }, [mode, anchor])
 
   const byDate = useMemo(() => {
@@ -68,7 +63,7 @@ export default function CalendarPage() {
         <button
           type="button"
           className="px-3 py-2 border rounded-lg bg-white text-sm"
-          onClick={() => setAnchor(addDays(anchor, mode === 'day' ? -1 : -7))}
+          onClick={() => setAnchor(addTourDays(anchor, mode === 'day' ? -1 : -7))}
         >
           ←
         </button>
@@ -81,7 +76,7 @@ export default function CalendarPage() {
         <button
           type="button"
           className="px-3 py-2 border rounded-lg bg-white text-sm"
-          onClick={() => setAnchor(addDays(anchor, mode === 'day' ? 1 : 7))}
+          onClick={() => setAnchor(addTourDays(anchor, mode === 'day' ? 1 : 7))}
         >
           →
         </button>

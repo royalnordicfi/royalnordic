@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { formatTourDateForDisplay } from '../_shared/tourDate.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -166,7 +167,7 @@ async function sendEmailNotification(bookingData: any, type: 'admin' | 'customer
           <h3>📋 Booking Details</h3>
           <p><strong>Booking ID:</strong> #${bookingData.bookingId}</p>
           <p><strong>Tour:</strong> ${bookingData.tourName}</p>
-          <p><strong>Date:</strong> ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}</p>
+          <p><strong>Date:</strong> ${formatTourDateForDisplay(bookingData.tourDate, 'fi-FI', 'short')}</p>
           <p><strong>Status:</strong> ${bookingData.paymentStatus.toUpperCase()}</p>
           <p><strong>Payment Type:</strong> <span style="color: #059669; font-weight: bold;">CRYPTOCURRENCY</span></p>
           <p><strong>Crypto Type:</strong> ${bookingData.cryptoType.toUpperCase()}</p>
@@ -201,7 +202,7 @@ New Crypto Booking Alert - Royal Nordic Tours
 📋 Booking Details:
 - Booking ID: #${bookingData.bookingId}
 - Tour: ${bookingData.tourName}
-- Date: ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}
+- Date: ${formatTourDateForDisplay(bookingData.tourDate, 'fi-FI', 'short')}
 - Status: ${bookingData.paymentStatus.toUpperCase()}
 - Payment Type: CRYPTOCURRENCY
 - Crypto Type: ${bookingData.cryptoType.toUpperCase()}
@@ -251,7 +252,7 @@ This is a crypto payment booking! You need to contact the customer to provide wa
                 <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 18px;">Your Booking Details:</h3>
                 <p style="color: #4b5563; margin: 8px 0;"><strong>Booking ID:</strong> #${bookingData.bookingId}</p>
                 <p style="color: #4b5563; margin: 8px 0;"><strong>Tour:</strong> ${bookingData.tourName}</p>
-                <p style="color: #4b5563; margin: 8px 0;"><strong>Date:</strong> ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}</p>
+                <p style="color: #4b5563; margin: 8px 0;"><strong>Date:</strong> ${formatTourDateForDisplay(bookingData.tourDate, 'fi-FI', 'short')}</p>
                 <p style="color: #4b5563; margin: 8px 0;"><strong>Adults:</strong> ${bookingData.adults}</p>
                 <p style="color: #4b5563; margin: 8px 0;"><strong>Children:</strong> ${bookingData.children}</p>
                 <p style="color: #4b5563; margin: 8px 0;"><strong>Total Amount:</strong> €${bookingData.totalPrice}</p>
@@ -332,7 +333,7 @@ Thank you for booking your Lapland adventure with Royal Nordic! We're excited to
 Your Booking Details:
 - Booking ID: #${bookingData.bookingId}
 - Tour: ${bookingData.tourName}
-- Date: ${new Date(bookingData.tourDate).toLocaleDateString('fi-FI')}
+- Date: ${formatTourDateForDisplay(bookingData.tourDate, 'fi-FI', 'short')}
 - Adults: ${bookingData.adults}
 - Children: ${bookingData.children}
 - Total Amount: €${bookingData.totalPrice}

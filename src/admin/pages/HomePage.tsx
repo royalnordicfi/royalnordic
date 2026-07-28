@@ -4,9 +4,10 @@ import { fetchOpsBookings } from '../adminApi'
 import type { OpsBooking } from '../types'
 import { Badge, statusTone } from '../components/Badge'
 import { STATUS_LABELS } from '../types'
+import { todayTourDateISO } from '../../lib/tourDate'
 
 function todayISO() {
-  return new Date().toISOString().slice(0, 10)
+  return todayTourDateISO()
 }
 
 export default function HomePage() {

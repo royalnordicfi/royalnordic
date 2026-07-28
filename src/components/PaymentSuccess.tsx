@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CheckCircle, Mail, Calendar, Users } from 'lucide-react'
+import { formatTourDateForDisplay } from '../lib/tourDate'
 
 const PaymentSuccess: React.FC = () => {
   const navigate = useNavigate()
@@ -82,7 +83,7 @@ const PaymentSuccess: React.FC = () => {
               </div>
               <div className="flex items-center text-gray-300">
                 <Calendar className="w-4 h-4 mr-2 text-green-400" />
-                <span>{bookingData.tour_date}</span>
+                <span>{formatTourDateForDisplay(bookingData.tour_date_iso || bookingData.tour_date)}</span>
               </div>
               <div className="flex items-center text-gray-300">
                 <span className="font-semibold text-white">Total: €{bookingData.total_price}</span>
