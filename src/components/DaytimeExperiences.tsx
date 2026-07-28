@@ -35,6 +35,9 @@ const DaytimeExperiences: React.FC = () => {
       image: "/korouoma1.jpg",
       duration: "6 hours",
       groupSize: "Max 8 people per vehicle",
+      location: "Korouoma Canyon, Lapland",
+      features: ["Hotel pickup", "Professional guide", "Campfire picnic", "Hot drinks"],
+      route: "/korouoma-canyon",
       badge: "Adventure"
     },
     {
