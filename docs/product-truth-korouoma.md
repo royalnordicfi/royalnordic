@@ -20,8 +20,11 @@ Sources compared 2026-07-28:
 | Child / from | €109 | €97 seen in UI | Open — confirm GYG child tier |
 | Ratings | Not hardcoded | 5.0 · 2 reviews | Do not hardcode |
 
+## Decisions (2026-07-28)
+
+- Keep direct prices (€129 / €109); do not match GYG child/from UI
+- Do not add Finnish pastries to website copy
+
 ## Open
 
-- Confirm child price on GYG (€97?) vs website €109
 - Difficulty / heights suitability (customer email gaps) — add only with founder wording
-EOF
