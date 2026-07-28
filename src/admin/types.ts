@@ -20,6 +20,8 @@ export type PaymentStatus =
   | 'refunded'
   | 'pending_crypto'
 
+export type EmailStatus = 'not_sent' | 'queued' | 'sent' | 'failed'
+
 export type OpsBooking = {
   id: number
   booking_ref: string | null
@@ -45,6 +47,10 @@ export type OpsBooking = {
   tour_date_id: number
   created_at: string
   updated_at?: string | null
+  deleted_at?: string | null
+  email_status?: EmailStatus
+  email_last_sent_at?: string | null
+  email_last_error?: string | null
   tours?: { id: number; name: string; public_name?: string | null; max_capacity?: number }
   tour_dates?: { id: number; date: string }
   guides?: { id: number; name: string; phone?: string | null } | null
@@ -61,6 +67,7 @@ export type Guide = {
   name: string
   phone: string | null
   email: string | null
+  languages: string | null
   availability_status: 'available' | 'busy' | 'off'
   notes: string | null
   is_active: boolean
@@ -98,6 +105,8 @@ export type Customer = {
   name: string | null
   phone: string | null
   internal_notes: string | null
+  created_at?: string
+  updated_at?: string
   booking_count?: number
   total_value?: number
   latest_booking?: string | null
@@ -113,6 +122,54 @@ export type BookingEvent = {
   note: string | null
   created_by: string | null
   created_at: string
+}
+
+export type BookingEmail = {
+  id: number
+  booking_id: number
+  template_key: string
+  to_email: string
+  status: 'sent' | 'failed'
+  provider_message_id: string | null
+  error_message: string | null
+  created_by: string | null
+  created_at: string
+}
+
+export type OpsNotePriority = 'low' | 'normal' | 'high' | 'urgent'
+export type OpsNoteStatus = 'open' | 'done' | 'archived'
+
+export type OpsNote = {
+  id: number
+  title: string
+  body: string | null
+  priority: OpsNotePriority
+  due_date: string | null
+  assigned_to: string | null
+  status: OpsNoteStatus
+  related_booking_id: number | null
+  created_by: string | null
+  created_at: string
+  updated_at: string
+  completed_at: string | null
+}
+
+export type CapacityConflict = {
+  tour_date_id: number
+  date: string
+  tour_name: string
+  tour_id: number
+  guests: number
+  capacity: number
+  booking_ids: number[]
+}
+
+export type AssignmentConflict = {
+  kind: 'guide' | 'vehicle'
+  resource_id: number
+  resource_name: string
+  date: string
+  booking_ids: number[]
 }
 
 export const SOURCE_LABELS: Record<BookingSource, string> = {
@@ -138,4 +195,25 @@ export const PAYMENT_LABELS: Record<PaymentStatus, string> = {
   partial: 'Partial',
   refunded: 'Refunded',
   pending_crypto: 'Pending crypto',
+}
+
+export const EMAIL_LABELS: Record<EmailStatus, string> = {
+  not_sent: 'Not sent',
+  queued: 'Queued',
+  sent: 'Sent',
+  failed: 'Failed',
+}
+
+export const NOTE_PRIORITY_LABELS: Record<OpsNotePriority, string> = {
+  low: 'Low',
+  normal: 'Normal',
+  high: 'High',
+  urgent: 'Urgent',
+}
+
+/** Weekday label for a YYYY-MM-DD tour date (local calendar day). */
+export function weekdayForTourDate(dateISO: string): string {
+  const [y, m, d] = dateISO.split('-').map(Number)
+  if (!y || !m || !d) return ''
+  return new Date(y, m - 1, d).toLocaleDateString('en-GB', { weekday: 'short' })
 }

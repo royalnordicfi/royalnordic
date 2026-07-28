@@ -1,25 +1,39 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { fetchOpsBookings } from '../adminApi'
-import type { OpsBooking } from '../types'
+import {
+  detectAssignmentConflicts,
+  detectCapacityConflicts,
+  fetchOpsBookings,
+  fetchOpsNotes,
+} from '../adminApi'
+import type { OpsBooking, OpsNote } from '../types'
 import { Badge, statusTone } from '../components/Badge'
-import { STATUS_LABELS } from '../types'
+import { STATUS_LABELS, weekdayForTourDate } from '../types'
 import { todayTourDateISO } from '../../lib/tourDate'
 
-function todayISO() {
-  return todayTourDateISO()
+function addDaysISO(iso: string, days: number) {
+  const [y, m, d] = iso.split('-').map(Number)
+  const dt = new Date(y, m - 1, d + days)
+  const yy = dt.getFullYear()
+  const mm = String(dt.getMonth() + 1).padStart(2, '0')
+  const dd = String(dt.getDate()).padStart(2, '0')
+  return `${yy}-${mm}-${dd}`
 }
 
 export default function HomePage() {
   const [bookings, setBookings] = useState<OpsBooking[]>([])
+  const [notes, setNotes] = useState<OpsNote[]>([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [schemaHint, setSchemaHint] = useState(false)
 
   useEffect(() => {
     setLoading(true)
-    fetchOpsBookings()
-      .then(setBookings)
+    Promise.all([fetchOpsBookings(), fetchOpsNotes('open').catch(() => [] as OpsNote[])])
+      .then(([b, n]) => {
+        setBookings(b)
+        setNotes(n)
+      })
       .catch((e) => {
         const msg = e instanceof Error ? e.message : 'Failed to load'
         setError(msg)
@@ -30,84 +44,125 @@ export default function HomePage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const today = todayISO()
+  const today = todayTourDateISO()
+  const tomorrow = addDaysISO(today, 1)
 
   const stats = useMemo(() => {
-    const todayBookings = bookings.filter((b) => b.tour_dates?.date === today && b.status !== 'cancelled')
-    const upcoming = bookings
-      .filter((b) => (b.tour_dates?.date || '') > today && b.status !== 'cancelled')
-      .sort((a, b) => (a.tour_dates?.date || '').localeCompare(b.tour_dates?.date || ''))
-    const passengersToday = todayBookings.reduce((s, b) => s + b.adults + b.children, 0)
-    const revenueBooked = bookings
-      .filter((b) => b.status === 'confirmed' || b.status === 'completed')
-      .reduce((s, b) => s + Number(b.total_price || 0), 0)
-    const pendingActions = bookings.filter(
-      (b) =>
-        b.status === 'pending' ||
-        b.status === 'pending_crypto_payment' ||
-        b.payment_status === 'unpaid' ||
-        b.payment_status === 'pending_crypto',
+    const active = bookings.filter((b) => b.status !== 'cancelled' && !b.deleted_at)
+    const todayBookings = active
+      .filter((b) => b.tour_dates?.date === today)
+      .sort((a, b) => (a.tour_time || '').localeCompare(b.tour_time || ''))
+    const tomorrowBookings = active
+      .filter((b) => b.tour_dates?.date === tomorrow)
+      .sort((a, b) => (a.tour_time || '').localeCompare(b.tour_time || ''))
+    const guestsToday = todayBookings.reduce((s, b) => s + b.adults + b.children, 0)
+
+    const pending = active.filter(
+      (b) => b.status === 'pending' || b.status === 'pending_crypto_payment',
     )
-    const needsAssignment = bookings.filter(
+    const missingGuide = active.filter(
       (b) =>
-        b.status !== 'cancelled' &&
         b.status !== 'completed' &&
         (b.tour_dates?.date || '') >= today &&
-        (!b.guide_id || !b.vehicle_id),
+        !b.guide_id,
     )
-    const paymentIssues = bookings.filter(
+    const missingVehicle = active.filter(
+      (b) =>
+        b.status !== 'completed' &&
+        (b.tour_dates?.date || '') >= today &&
+        !b.vehicle_id,
+    )
+    const paymentIssues = active.filter(
       (b) =>
         b.payment_status === 'unpaid' ||
         b.payment_status === 'pending_crypto' ||
         b.status === 'pending_crypto_payment',
     )
+    const emailIssues = active.filter(
+      (b) => b.email_status === 'failed' || (b.email_status === 'not_sent' && b.status === 'confirmed'),
+    )
+    const capacityConflicts = detectCapacityConflicts(active)
+    const assignmentConflicts = detectAssignmentConflicts(active)
+    const customerIssues = active.filter(
+      (b) =>
+        !b.customer_phone ||
+        !b.pickup_location ||
+        (b.internal_notes || '').toLowerCase().includes('issue') ||
+        (b.special_requests || '').toLowerCase().includes('allerg'),
+    )
+    const urgentNotes = notes.filter(
+      (n) => n.status === 'open' && (n.priority === 'urgent' || n.priority === 'high'),
+    )
+    const dueNotes = notes.filter(
+      (n) => n.status === 'open' && n.due_date && n.due_date <= today,
+    )
 
     let nextAction: { label: string; to: string } | null = null
-    if (pendingActions[0]) {
+    if (paymentIssues[0]) {
       nextAction = {
-        label: `Review pending booking ${pendingActions[0].booking_ref || '#' + pendingActions[0].id}`,
-        to: `/bookings/${pendingActions[0].id}`,
+        label: `Fix payment · ${paymentIssues[0].booking_ref || '#' + paymentIssues[0].id}`,
+        to: `/bookings/${paymentIssues[0].id}`,
       }
-    } else if (needsAssignment[0]) {
+    } else if (capacityConflicts[0]) {
       nextAction = {
-        label: `Assign guide/vehicle for ${needsAssignment[0].booking_ref || '#' + needsAssignment[0].id}`,
-        to: `/bookings/${needsAssignment[0].id}`,
+        label: `Capacity overbooked · ${capacityConflicts[0].date} ${capacityConflicts[0].tour_name}`,
+        to: `/calendar?date=${capacityConflicts[0].date}`,
       }
+    } else if (missingGuide[0]) {
+      nextAction = {
+        label: `Assign guide · ${missingGuide[0].booking_ref || '#' + missingGuide[0].id}`,
+        to: `/bookings/${missingGuide[0].id}`,
+      }
+    } else if (missingVehicle[0]) {
+      nextAction = {
+        label: `Assign vehicle · ${missingVehicle[0].booking_ref || '#' + missingVehicle[0].id}`,
+        to: `/bookings/${missingVehicle[0].id}`,
+      }
+    } else if (dueNotes[0]) {
+      nextAction = { label: `Due note · ${dueNotes[0].title}`, to: '/notes' }
     } else if (todayBookings[0]) {
       nextAction = {
-        label: `Open today's first tour (${todayBookings[0].tours?.public_name || todayBookings[0].tours?.name})`,
+        label: `Today's first tour · ${todayBookings[0].tour_time || 'TBD'}`,
         to: `/bookings/${todayBookings[0].id}`,
       }
     }
 
     return {
       todayBookings,
-      upcoming: upcoming.slice(0, 8),
-      passengersToday,
-      revenueBooked,
-      pendingActions,
-      needsAssignment,
+      tomorrowBookings,
+      guestsToday,
+      pending,
+      missingGuide,
+      missingVehicle,
       paymentIssues,
+      emailIssues,
+      capacityConflicts,
+      assignmentConflicts,
+      customerIssues,
+      urgentNotes,
+      dueNotes,
       nextAction,
     }
-  }, [bookings, today])
+  }, [bookings, notes, today, tomorrow])
 
-  if (loading) return <p className="text-gray-600">Loading operations…</p>
+  if (loading) return <p className="text-gray-600 text-sm">Loading operations…</p>
 
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-bold">Today</h1>
-        <p className="text-sm text-gray-600">{today} · real booking data only</p>
+        <h1 className="text-xl font-semibold tracking-tight">Ops today</h1>
+        <p className="text-sm text-gray-500">
+          {weekdayForTourDate(today)} {today} · what needs action
+        </p>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 text-sm p-3 rounded">
+        <div className="bg-red-50 border border-red-200 text-red-800 text-sm p-3 rounded-lg">
           {error}
           {schemaHint && (
             <p className="mt-2">
-              Run SQL migration <code className="bg-red-100 px-1">016_admin_os_v1.sql</code> in
-              Supabase (and 015 if not applied). Until then some fields are not connected.
+              Apply <code className="bg-red-100 px-1 rounded">016_admin_os_v1.sql</code> and{' '}
+              <code className="bg-red-100 px-1 rounded">018_ops_hub_winter.sql</code> in Supabase.
             </p>
           )}
         </div>
@@ -116,120 +171,110 @@ export default function HomePage() {
       {stats.nextAction && (
         <Link
           to={stats.nextAction.to}
-          className="block bg-emerald-700 text-white rounded-lg p-4 font-medium"
+          className="block bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl p-4 font-medium transition-colors"
         >
           Next: {stats.nextAction.label}
         </Link>
       )}
 
-      <div className="grid grid-cols-2 gap-3">
-        <Stat label="Bookings today" value={String(stats.todayBookings.length)} />
-        <Stat label="Passengers today" value={String(stats.passengersToday)} />
-        <Stat label="Upcoming" value={String(stats.upcoming.length)} />
-        <Stat
-          label="Revenue booked"
-          value={`€${stats.revenueBooked.toFixed(0)}`}
-          hint="Confirmed + completed"
-        />
-      </div>
+      <section className="space-y-2">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Attention</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <AttentionRow label="Payment problems" count={stats.paymentIssues.length} to="/bookings?attention=payment" />
+          <AttentionRow label="Missing guide" count={stats.missingGuide.length} to="/bookings?attention=guide" />
+          <AttentionRow label="Missing vehicle" count={stats.missingVehicle.length} to="/bookings?attention=vehicle" />
+          <AttentionRow label="Bookings pending" count={stats.pending.length} to="/bookings?attention=pending" />
+          <AttentionRow label="Email not sent / failed" count={stats.emailIssues.length} to="/bookings?attention=email" />
+          <AttentionRow
+            label="Capacity conflicts"
+            count={stats.capacityConflicts.length}
+            to={stats.capacityConflicts[0] ? `/calendar?date=${stats.capacityConflicts[0].date}` : '/calendar'}
+          />
+          <AttentionRow
+            label="Guide/vehicle double-booked"
+            count={stats.assignmentConflicts.length}
+            to="/calendar"
+          />
+          <AttentionRow label="Customer issues / gaps" count={stats.customerIssues.length} to="/bookings" />
+          <AttentionRow label="Urgent / due notes" count={stats.urgentNotes.length + stats.dueNotes.length} to="/notes" />
+        </div>
+      </section>
 
-      <Section title="Needs attention">
-        <AttentionRow
-          label="Pending customer / payment actions"
-          count={stats.pendingActions.length}
-          to="/bookings?status=pending"
-        />
-        <AttentionRow
-          label="Tours needing guide or vehicle"
-          count={stats.needsAssignment.length}
-          to="/calendar"
-        />
-        <AttentionRow
-          label="Payment issues"
-          count={stats.paymentIssues.length}
-          to="/bookings"
-        />
-        <AttentionRow
-          label="Platform sync issues"
-          count={0}
-          note="Not connected — no GYG/Airbnb/Viator API"
-        />
-      </Section>
+      <DaySection title={`Today · ${guestsLabel(stats.guestsToday)}`} bookings={stats.todayBookings} empty="No tours today." />
+      <DaySection title={`Tomorrow · ${weekdayForTourDate(tomorrow)}`} bookings={stats.tomorrowBookings} empty="No tours tomorrow." />
 
-      <Section title="Bookings today">
-        {stats.todayBookings.length === 0 ? (
-          <p className="text-sm text-gray-500">No tours scheduled today.</p>
-        ) : (
+      {(stats.urgentNotes.length > 0 || stats.dueNotes.length > 0) && (
+        <section className="space-y-2">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Notes</h2>
+            <Link to="/notes" className="text-xs text-emerald-800 font-medium">
+              All notes
+            </Link>
+          </div>
           <ul className="space-y-2">
-            {stats.todayBookings.map((b) => (
-              <li key={b.id}>
-                <Link
-                  to={`/bookings/${b.id}`}
-                  className="block bg-white border border-gray-200 rounded-lg p-3"
-                >
-                  <div className="flex justify-between gap-2">
-                    <span className="font-medium text-sm">
-                      {b.tour_time || '—'} · {b.tours?.public_name || b.tours?.name}
-                    </span>
-                    <Badge tone={statusTone(b.status)}>{STATUS_LABELS[b.status]}</Badge>
-                  </div>
-                  <p className="text-xs text-gray-600 mt-1">
-                    {b.customer_name} · {b.adults + b.children} pax ·{' '}
-                    {b.pickup_location || 'Pickup TBD'}
-                  </p>
-                </Link>
-              </li>
-            ))}
+            {[...stats.dueNotes, ...stats.urgentNotes]
+              .filter((n, i, arr) => arr.findIndex((x) => x.id === n.id) === i)
+              .slice(0, 5)
+              .map((n) => (
+                <li key={n.id} className="bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
+                  <span className="font-medium">{n.title}</span>
+                  {n.due_date && <span className="text-xs text-amber-700 ml-2">Due {n.due_date}</span>}
+                  <span className="text-xs text-gray-400 ml-2">{n.priority}</span>
+                </li>
+              ))}
           </ul>
-        )}
-      </Section>
-
-      <Section title="Upcoming">
-        {stats.upcoming.length === 0 ? (
-          <p className="text-sm text-gray-500">No upcoming bookings.</p>
-        ) : (
-          <ul className="space-y-2">
-            {stats.upcoming.map((b) => (
-              <li key={b.id}>
-                <Link
-                  to={`/bookings/${b.id}`}
-                  className="block bg-white border border-gray-200 rounded-lg p-3 text-sm"
-                >
-                  <span className="font-medium">{b.tour_dates?.date}</span> ·{' '}
-                  {b.tours?.public_name || b.tours?.name} · {b.customer_name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Section>
+        </section>
+      )}
     </div>
   )
 }
 
-function Stat({
-  label,
-  value,
-  hint,
+function guestsLabel(n: number) {
+  return `${n} guest${n === 1 ? '' : 's'}`
+}
+
+function DaySection({
+  title,
+  bookings,
+  empty,
 }: {
-  label: string
-  value: string
-  hint?: string
+  title: string
+  bookings: OpsBooking[]
+  empty: string
 }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-3">
-      <div className="text-xs text-gray-500">{label}</div>
-      <div className="text-2xl font-bold mt-1">{value}</div>
-      {hint && <div className="text-[11px] text-gray-400 mt-1">{hint}</div>}
-    </div>
-  )
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
     <section className="space-y-2">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">{title}</h2>
-      {children}
+      <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{title}</h2>
+      {bookings.length === 0 ? (
+        <p className="text-sm text-gray-500">{empty}</p>
+      ) : (
+        <ul className="space-y-2">
+          {bookings.map((b) => (
+            <li key={b.id}>
+              <Link
+                to={`/bookings/${b.id}`}
+                className="block bg-white border border-gray-200 rounded-xl p-3 hover:border-emerald-300 transition-colors"
+              >
+                <div className="flex justify-between gap-2 items-start">
+                  <div className="min-w-0">
+                    <div className="font-medium text-sm truncate">
+                      {b.tour_time || 'Time TBD'} · {b.tours?.public_name || b.tours?.name}
+                    </div>
+                    <p className="text-xs text-gray-600 mt-1 truncate">
+                      {b.customer_name} · {b.adults + b.children} pax ·{' '}
+                      {b.guides?.name || 'No guide'} · {b.vehicles?.name || 'No vehicle'}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5 truncate">
+                      {b.pickup_location || 'Pickup TBD'}
+                    </p>
+                  </div>
+                  <Badge tone={statusTone(b.status)}>{STATUS_LABELS[b.status]}</Badge>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   )
 }
@@ -238,20 +283,23 @@ function AttentionRow({
   label,
   count,
   to,
-  note,
 }: {
   label: string
   count: number
   to?: string
-  note?: string
 }) {
   const body = (
-    <div className="flex justify-between items-center bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm">
-      <div>
-        <div className="font-medium">{label}</div>
-        {note && <div className="text-xs text-amber-700 mt-0.5">{note}</div>}
-      </div>
-      <span className={`font-bold ${count > 0 ? 'text-amber-700' : 'text-gray-400'}`}>{count}</span>
+    <div
+      className={`flex justify-between items-center rounded-xl px-3 py-2.5 text-sm border ${
+        count > 0
+          ? 'bg-amber-50 border-amber-200 text-amber-950'
+          : 'bg-white border-gray-200 text-gray-600'
+      }`}
+    >
+      <span className="font-medium">{label}</span>
+      <span className={`font-semibold tabular-nums ${count > 0 ? 'text-amber-800' : 'text-gray-400'}`}>
+        {count}
+      </span>
     </div>
   )
   return to && count > 0 ? <Link to={to}>{body}</Link> : body

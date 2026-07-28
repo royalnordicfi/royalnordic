@@ -87,6 +87,34 @@ export async function sendCustomerConfirmation(bookingData: BookingNotificationD
   }
 }
 
+/** Same template as sendCustomerConfirmation, but throws on failure (admin ops). */
+export async function sendCustomerConfirmationStrict(bookingData: BookingNotificationData) {
+  const confirmation: EmailNotification = {
+    to: [bookingData.customerEmail, 'contact@royalnordic.fi'],
+    subject: `Booking Confirmed: ${bookingData.tourName} - Royal Nordic`,
+    html: generateCustomerConfirmationHTML(bookingData),
+    text: generateCustomerConfirmationText(bookingData)
+  }
+
+  const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-email`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+    },
+    body: JSON.stringify(confirmation),
+  })
+
+  const body = await response.json().catch(() => ({}))
+  if (!response.ok) {
+    throw new Error(
+      (body as { error?: string }).error ||
+        `Failed to send confirmation (${response.status})`,
+    )
+  }
+  return body as { messageId?: string; success?: boolean }
+}
+
 // Generate HTML email content
 function generateBookingEmailHTML(booking: BookingNotificationData): string {
   return `

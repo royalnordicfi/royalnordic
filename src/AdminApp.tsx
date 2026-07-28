@@ -11,7 +11,7 @@ import FleetPage from './admin/pages/FleetPage'
 import CustomersPage from './admin/pages/CustomersPage'
 import RevenuePage from './admin/pages/RevenuePage'
 import ImportPage from './admin/pages/ImportPage'
-import IntegrationsPage from './admin/pages/IntegrationsPage'
+import NotesPage from './admin/pages/NotesPage'
 
 /**
  * Operator console — only mounted when hostname is admin.royalnordic.fi
@@ -45,7 +45,8 @@ function AdminApp() {
           <Route path="customers" element={<CustomersPage />} />
           <Route path="revenue" element={<RevenuePage />} />
           <Route path="import" element={<ImportPage />} />
-          <Route path="integrations" element={<IntegrationsPage />} />
+          <Route path="notes" element={<NotesPage />} />
+          <Route path="integrations" element={<Navigate to="/" replace />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
