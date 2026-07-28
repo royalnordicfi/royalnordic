@@ -34,10 +34,7 @@ const DaytimeExperiences: React.FC = () => {
       description: "6-hour canyon hike to frozen waterfalls from Rovaniemi — hotel pickup, guided trails, and a campfire picnic with hot drinks.",
       image: "/korouoma1.jpg",
       duration: "6 hours",
-      groupSize: "Small group",
-      location: "Korouoma Canyon, Lapland",
-      features: ["Hotel pickup", "Professional guide", "Campfire picnic", "Hot drinks"],
-      route: "/korouoma-canyon",
+      groupSize: "Max 8 people per vehicle",
       badge: "Adventure"
     },
     {
