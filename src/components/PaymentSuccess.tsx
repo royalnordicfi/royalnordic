@@ -30,7 +30,7 @@ const PaymentSuccess: React.FC = () => {
         {/* Northern Lights Background Effect */}
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-green-400/30 to-transparent animate-pulse"></div>
-          <div className="absolute top-1/4 left-1/4 w-1/2 h-1/4 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/4 left-1/4 w-1/2 h-1/4 bg-gradient-to-r from-emerald-400/20 to-teal-400/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
           <div className="absolute top-1/3 right-1/4 w-1/3 h-1/6 bg-gradient-to-l from-green-300/25 to-blue-300/25 rounded-full blur-2xl animate-pulse delay-500"></div>
         </div>
         
@@ -57,7 +57,7 @@ const PaymentSuccess: React.FC = () => {
       {/* Northern Lights Background Effect */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-green-400/30 to-transparent animate-pulse"></div>
-        <div className="absolute top-1/4 left-1/4 w-1/2 h-1/4 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/4 left-1/4 w-1/2 h-1/4 bg-gradient-to-r from-emerald-400/20 to-teal-400/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/3 right-1/4 w-1/3 h-1/6 bg-gradient-to-l from-green-300/25 to-blue-300/25 rounded-full blur-2xl animate-pulse delay-500"></div>
       </div>
       

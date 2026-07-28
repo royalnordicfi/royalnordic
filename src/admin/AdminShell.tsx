@@ -14,12 +14,12 @@ const nav = [
   { to: '/bookings', label: 'Bookings' },
   { to: '/manual', label: 'New booking' },
   { to: '/calendar', label: 'Calendar' },
+  { to: '/notes', label: 'Notes' },
   { to: '/products', label: 'Products' },
   { to: '/fleet', label: 'Guides & vehicles' },
   { to: '/customers', label: 'Customers' },
   { to: '/revenue', label: 'Revenue' },
   { to: '/import', label: 'Import' },
-  { to: '/integrations', label: 'Integrations' },
 ]
 
 export default function AdminShell() {
@@ -63,18 +63,18 @@ export default function AdminShell() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900 overflow-x-clip">
-      <header className="sticky top-0 z-40 bg-black text-white px-4 py-3 flex items-center justify-between">
+    <div className="min-h-screen bg-zinc-50 text-zinc-900 overflow-x-clip">
+      <header className="sticky top-0 z-40 bg-zinc-950 text-white px-4 py-3 flex items-center justify-between">
         <div className="min-w-0">
-          <Link to="/" className="font-semibold tracking-wide">
+          <Link to="/" className="font-semibold tracking-tight">
             Royal Nordic Ops
           </Link>
-          <p className="text-xs text-gray-400 truncate">{auth.user?.email}</p>
+          <p className="text-xs text-zinc-400 truncate">{auth.user?.email}</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="text-sm px-3 py-1.5 bg-gray-800 rounded"
+            className="text-sm px-3 py-1.5 bg-zinc-800 rounded-lg"
             onClick={async () => {
               await signOutAdmin()
               navigate('/')
@@ -98,9 +98,9 @@ export default function AdminShell() {
         <nav
           className={`${
             open ? 'block' : 'hidden'
-          } md:block md:w-56 md:shrink-0 md:sticky md:top-[52px] md:self-start md:max-h-[calc(100vh-52px)] md:overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200`}
+          } md:block md:w-56 md:shrink-0 md:sticky md:top-[52px] md:self-start md:max-h-[calc(100vh-52px)] md:overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-zinc-200`}
         >
-          <ul className="p-2 space-y-1">
+          <ul className="p-2 space-y-0.5">
             {nav.map((item) => (
               <li key={item.to}>
                 <NavLink
@@ -108,10 +108,10 @@ export default function AdminShell() {
                   end={item.end}
                   onClick={() => setOpen(false)}
                   className={({ isActive }) =>
-                    `block px-3 py-2.5 rounded text-sm font-medium ${
+                    `block px-3 py-2.5 rounded-lg text-sm font-medium ${
                       isActive
-                        ? 'bg-emerald-50 text-emerald-800'
-                        : 'text-gray-700 hover:bg-gray-50'
+                        ? 'bg-emerald-50 text-emerald-900'
+                        : 'text-zinc-700 hover:bg-zinc-50'
                     }`
                   }
                 >

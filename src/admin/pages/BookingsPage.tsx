@@ -3,7 +3,13 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { fetchOpsBookings } from '../adminApi'
 import type { OpsBooking } from '../types'
 import { Badge, statusTone } from '../components/Badge'
-import { PAYMENT_LABELS, SOURCE_LABELS, STATUS_LABELS } from '../types'
+import {
+  EMAIL_LABELS,
+  PAYMENT_LABELS,
+  SOURCE_LABELS,
+  STATUS_LABELS,
+  weekdayForTourDate,
+} from '../types'
 
 export default function BookingsPage() {
   const [params, setParams] = useSearchParams()
@@ -13,10 +19,16 @@ export default function BookingsPage() {
   const [search, setSearch] = useState(params.get('q') || '')
   const status = params.get('status') || 'all'
   const source = params.get('source') || 'all'
+  const attention = params.get('attention') || ''
 
   const load = () => {
     setLoading(true)
-    fetchOpsBookings({ status, source, search })
+    fetchOpsBookings({
+      status,
+      source,
+      search,
+      attention: (attention as 'payment' | 'guide' | 'vehicle' | 'email' | 'pending') || undefined,
+    })
       .then(setRows)
       .catch((e) => setError(e instanceof Error ? e.message : 'Failed'))
       .finally(() => setLoading(false))
@@ -25,12 +37,17 @@ export default function BookingsPage() {
   useEffect(() => {
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, source])
+  }, [status, source, attention])
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-xl font-bold">Bookings</h1>
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight">Bookings</h1>
+          {attention && (
+            <p className="text-xs text-amber-700 mt-0.5">Filter: {attention}</p>
+          )}
+        </div>
         <Link
           to="/manual"
           className="bg-emerald-700 text-white text-sm font-medium px-3 py-2 rounded-lg"
@@ -95,16 +112,28 @@ export default function BookingsPage() {
         </select>
       </div>
 
-      <button
-        type="button"
-        onClick={load}
-        className="text-sm text-emerald-800 font-medium"
-      >
+      {attention && (
+        <button
+          type="button"
+          className="text-sm text-emerald-800 font-medium"
+          onClick={() =>
+            setParams((p) => {
+              const n = new URLSearchParams(p)
+              n.delete('attention')
+              return n
+            })
+          }
+        >
+          Clear attention filter
+        </button>
+      )}
+
+      <button type="button" onClick={load} className="text-sm text-emerald-800 font-medium">
         Apply search
       </button>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 text-sm p-3 rounded">
+        <div className="bg-red-50 border border-red-200 text-red-800 text-sm p-3 rounded-lg">
           {error}
         </div>
       )}
@@ -115,40 +144,45 @@ export default function BookingsPage() {
         <p className="text-gray-500 text-sm">No bookings match.</p>
       ) : (
         <ul className="space-y-2">
-          {rows.map((b) => (
-            <li key={b.id}>
-              <Link
-                to={`/bookings/${b.id}`}
-                className="block bg-white border border-gray-200 rounded-lg p-3"
-              >
-                <div className="flex justify-between gap-2 items-start">
-                  <div>
-                    <div className="font-semibold text-sm">
-                      {b.booking_ref || `RN-${b.id}`} · {b.customer_name}
+          {rows.map((b) => {
+            const d = b.tour_dates?.date
+            return (
+              <li key={b.id}>
+                <Link
+                  to={`/bookings/${b.id}`}
+                  className="block bg-white border border-gray-200 rounded-xl p-3 hover:border-emerald-300"
+                >
+                  <div className="flex justify-between gap-2 items-start">
+                    <div className="min-w-0">
+                      <div className="font-semibold text-sm">
+                        {b.booking_ref || `RN-${b.id}`} · {b.customer_name}
+                      </div>
+                      <div className="text-xs text-gray-600 mt-1">
+                        {d ? `${d} (${weekdayForTourDate(d)})` : '—'} {b.tour_time || ''} ·{' '}
+                        {b.tours?.public_name || b.tours?.name}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {b.adults}+{b.children} · €{Number(b.total_price).toFixed(0)} ·{' '}
+                        {SOURCE_LABELS[b.source] || b.source} · Email:{' '}
+                        {EMAIL_LABELS[b.email_status || 'not_sent']}
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-600 mt-1">
-                      {b.tour_dates?.date} {b.tour_time || ''} ·{' '}
-                      {b.tours?.public_name || b.tours?.name}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {b.adults + b.children} pax · €{Number(b.total_price).toFixed(0)} ·{' '}
-                      {SOURCE_LABELS[b.source] || b.source}
+                    <div className="flex flex-col items-end gap-1">
+                      <Badge tone={statusTone(b.status)}>{STATUS_LABELS[b.status]}</Badge>
+                      <Badge tone={statusTone(b.payment_status)}>
+                        {PAYMENT_LABELS[b.payment_status] || b.payment_status}
+                      </Badge>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <Badge tone={statusTone(b.status)}>{STATUS_LABELS[b.status]}</Badge>
-                    <Badge tone={statusTone(b.payment_status)}>
-                      {PAYMENT_LABELS[b.payment_status] || b.payment_status}
-                    </Badge>
+                  <div className="text-xs text-gray-500 mt-2">
+                    {b.customer_email} · {b.customer_phone || 'no phone'} · Guide:{' '}
+                    {b.guides?.name || '—'} · Vehicle: {b.vehicles?.name || '—'} · Pickup:{' '}
+                    {b.pickup_location || '—'}
                   </div>
-                </div>
-                <div className="text-xs text-gray-500 mt-2">
-                  Guide: {b.guides?.name || '—'} · Vehicle: {b.vehicles?.name || '—'} · Pickup:{' '}
-                  {b.pickup_location || '—'}
-                </div>
-              </Link>
-            </li>
-          ))}
+                </Link>
+              </li>
+            )
+          })}
         </ul>
       )}
     </div>

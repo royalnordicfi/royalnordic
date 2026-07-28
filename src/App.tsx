@@ -1,5 +1,6 @@
 // import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS } from './lib/productVisibility';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Tours from './components/Tours';
@@ -44,12 +45,14 @@ import SaleModal from './components/SaleModal';
 import SnowmobileSafari from './components/SnowmobileSafari';
 import BestSellersSlideshow from './components/BestSellersSlideshow';
 import MonsterTruckNorthernLights from './components/MonsterTruckNorthernLights';
+import RoutePageMeta from './components/RoutePageMeta';
 
 function App() {
   return (
     <Router>
       <div className="App">
         <ScrollToTop />
+        <RoutePageMeta />
         <Header />
         
         <Routes>
@@ -88,7 +91,14 @@ function App() {
           <Route path="/korouoma-canyon" element={<KorouomaTour />} />
           <Route path="/customized-tour" element={<CustomizedTour />} />
           <Route path="/snowmobile-safari" element={<SnowmobileSafari />} />
-          <Route path="/monster-truck-northern-lights" element={<MonsterTruckNorthernLights />} />
+          <Route
+            path="/monster-truck-northern-lights"
+            element={
+              SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS
+                ? <MonsterTruckNorthernLights />
+                : <Navigate to="/northern-lights-tours" replace />
+            }
+          />
           
           {/* Blog Routes */}
           <Route path="/blog" element={<Blog />} />

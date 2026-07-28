@@ -87,6 +87,34 @@ export async function sendCustomerConfirmation(bookingData: BookingNotificationD
   }
 }
 
+/** Same template as sendCustomerConfirmation, but throws on failure (admin ops). */
+export async function sendCustomerConfirmationStrict(bookingData: BookingNotificationData) {
+  const confirmation: EmailNotification = {
+    to: [bookingData.customerEmail, 'contact@royalnordic.fi'],
+    subject: `Booking Confirmed: ${bookingData.tourName} - Royal Nordic`,
+    html: generateCustomerConfirmationHTML(bookingData),
+    text: generateCustomerConfirmationText(bookingData)
+  }
+
+  const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-email`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+    },
+    body: JSON.stringify(confirmation),
+  })
+
+  const body = await response.json().catch(() => ({}))
+  if (!response.ok) {
+    throw new Error(
+      (body as { error?: string }).error ||
+        `Failed to send confirmation (${response.status})`,
+    )
+  }
+  return body as { messageId?: string; success?: boolean }
+}
+
 // Generate HTML email content
 function generateBookingEmailHTML(booking: BookingNotificationData): string {
   return `
@@ -197,7 +225,8 @@ Booking ID: #${booking.bookingId}
 // Helper functions to get tour prices
 function getAdultPrice(tourName: string): number {
   const prices: Record<string, number> = {
-    'Northern Lights Tour': 179,
+    'Northern Lights Tour': 149,
+    'Guaranteed Northern Lights Tour': 149,
     'Quality Snowshoe Rental': 59,
     'Customized Tour': 200
   }
@@ -206,7 +235,8 @@ function getAdultPrice(tourName: string): number {
 
 function getChildPrice(tourName: string): number {
   const prices: Record<string, number> = {
-    'Northern Lights Tour': 149,
+    'Northern Lights Tour': 129,
+    'Guaranteed Northern Lights Tour': 129,
     'Quality Snowshoe Rental': 49,
     'Customized Tour': 150
   }
@@ -244,7 +274,7 @@ function generateCustomerConfirmationHTML(booking: BookingNotificationData): str
           <h3>📋 Your Booking Details</h3>
           <p><strong>Booking ID:</strong> #${booking.bookingId}</p>
           <p><strong>Tour:</strong> ${booking.tourName}</p>
-          <p><strong>Date:</strong> ${formatTourDateForDisplay(booking.tourDate, 'en-US', 'long')}${booking.tourName === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : booking.tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}</p>
+          <p><strong>Date:</strong> ${formatTourDateForDisplay(booking.tourDate, 'en-US', 'long')}${booking.tourName === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : booking.tourName === 'Northern Lights Tour' || booking.tourName === 'Guaranteed Northern Lights Tour' ? ' at 18:30' : ''}</p>
           <p><strong>Status:</strong> <span class="status-confirmed">CONFIRMED</span></p>
         </div>
         
@@ -299,7 +329,7 @@ Your tour has been successfully confirmed. We're excited to show you the magic o
 📋 Your Booking Details:
 - Booking ID: #${booking.bookingId}
 - Tour: ${booking.tourName}
-- Date: ${formatTourDateForDisplay(booking.tourDate, 'en-US', 'long')}${booking.tourName === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : booking.tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}
+- Date: ${formatTourDateForDisplay(booking.tourDate, 'en-US', 'long')}${booking.tourName === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : booking.tourName === 'Northern Lights Tour' || booking.tourName === 'Guaranteed Northern Lights Tour' ? ' at 18:30' : ''}
 - Status: CONFIRMED
 
 👥 Your Group:

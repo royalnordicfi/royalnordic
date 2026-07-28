@@ -115,7 +115,7 @@ db.serialize(() => {
     if (row.count === 0) {
       db.run(`INSERT INTO tours (name, description, adult_price, child_price, max_capacity) 
                VALUES (?, ?, ?, ?, ?)`, 
-        ['Northern Lights Tour', 'Guaranteed Northern Lights experience in Lapland', 179, 149, 8]
+        ['Northern Lights Tour', 'Guaranteed Northern Lights experience in Lapland', 149, 129, 8]
       );
       
       // Insert sample dates for Northern Lights Tour: September 15, 2025 - April 15, 2026
@@ -487,7 +487,7 @@ app.post('/api/admin/setup', (req, res) => {
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                       <div>
                         <p style="margin: 8px 0; font-size: 14px;"><strong>Tour:</strong> ${tourData.tour_name}</p>
-                        <p style="margin: 8px 0; font-size: 14px;"><strong>Date:</strong> ${formattedDate}${tourData.tour_name === 'Northern Lights Tour' ? ' at 20:00' : ''}</p>
+                        <p style="margin: 8px 0; font-size: 14px;"><strong>Date:</strong> ${formattedDate}${tourData.tour_name === 'Northern Lights Tour' || tourData.tour_name === 'Guaranteed Northern Lights Tour' ? ' at 18:30' : ''}</p>
                         <p style="margin: 8px 0; font-size: 14px;"><strong>Adults:</strong> ${bookingDetails.adults}</p>
                         <p style="margin: 8px 0; font-size: 14px;"><strong>Children:</strong> ${bookingDetails.children}</p>
                       </div>
@@ -569,7 +569,7 @@ Thank you for booking with Royal Nordic! Your Lapland adventure is confirmed and
 
 Tour Details:
 - Tour: ${tourData.tour_name}
-- Date: ${formattedDate}${tourData.tour_name === 'Northern Lights Tour' ? ' at 20:00' : ''}
+- Date: ${formattedDate}${tourData.tour_name === 'Northern Lights Tour' || tourData.tour_name === 'Guaranteed Northern Lights Tour' ? ' at 18:30' : ''}
 - Adults: ${bookingDetails.adults}
 - Children: ${bookingDetails.children}
 - Booking ID: #${bookingDetails.bookingId}
@@ -631,8 +631,8 @@ app.post('/api/send-stripe-confirmation', async (req, res) => {
     }
 
     // Calculate price breakdown
-    const adultPrice = 179;
-    const childPrice = 149;
+    const adultPrice = 149;
+    const childPrice = 129;
     const adultTotal = adultPrice * adults;
     const childTotal = childPrice * children;
 
@@ -673,7 +673,7 @@ app.post('/api/send-stripe-confirmation', async (req, res) => {
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                   <div>
                     <p style="margin: 8px 0; font-size: 14px;"><strong>Tour:</strong> ${tourName}</p>
-                    <p style="margin: 8px 0; font-size: 14px;"><strong>Date:</strong> ${tourDate}${tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}</p>
+                    <p style="margin: 8px 0; font-size: 14px;"><strong>Date:</strong> ${tourDate}${tourName === 'Northern Lights Tour' || tourName === 'Guaranteed Northern Lights Tour' ? ' at 18:30' : ''}</p>
                     <p style="margin: 8px 0; font-size: 14px;"><strong>Adults:</strong> ${adults}</p>
                     <p style="margin: 8px 0; font-size: 14px;"><strong>Children:</strong> ${children}</p>
                   </div>

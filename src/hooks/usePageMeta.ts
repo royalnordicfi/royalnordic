@@ -1,0 +1,59 @@
+import { useEffect } from 'react'
+
+export type PageMetaInput = {
+  title: string
+  description: string
+  canonicalPath?: string
+  ogImage?: string
+}
+
+const SITE = 'https://royalnordic.fi'
+const DEFAULT_OG = `${SITE}/nortti1.jpg`
+
+function setMeta(attr: 'name' | 'property', key: string, content: string) {
+  let el = document.head.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null
+  if (!el) {
+    el = document.createElement('meta')
+    el.setAttribute(attr, key)
+    document.head.appendChild(el)
+  }
+  el.content = content
+}
+
+function setCanonical(href: string) {
+  let link = document.head.querySelector('link[rel="canonical"]') as HTMLLinkElement | null
+  if (!link) {
+    link = document.createElement('link')
+    link.rel = 'canonical'
+    document.head.appendChild(link)
+  }
+  link.href = href
+}
+
+/**
+ * Per-route SEO for the Vite SPA. Call from page components.
+ */
+export function usePageMeta({
+  title,
+  description,
+  canonicalPath = '/',
+  ogImage = DEFAULT_OG,
+}: PageMetaInput) {
+  useEffect(() => {
+    const canonical = canonicalPath.startsWith('http')
+      ? canonicalPath
+      : `${SITE}${canonicalPath.startsWith('/') ? canonicalPath : `/${canonicalPath}`}`
+
+    document.title = title
+    setMeta('name', 'description', description)
+    setMeta('name', 'title', title)
+    setMeta('property', 'og:title', title)
+    setMeta('property', 'og:description', description)
+    setMeta('property', 'og:url', canonical)
+    setMeta('property', 'og:image', ogImage)
+    setMeta('name', 'twitter:title', title)
+    setMeta('name', 'twitter:description', description)
+    setMeta('name', 'twitter:image', ogImage)
+    setCanonical(canonical)
+  }, [title, description, canonicalPath, ogImage])
+}

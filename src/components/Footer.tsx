@@ -18,7 +18,7 @@ const Footer: React.FC = () => {
               <h3 className="text-xl font-luxury font-bold">ROYAL NORDIC</h3>
             </div>
             <p className="text-gray-300 text-sm mb-4 font-clean">
-              Achieve Happiness in Lapland
+              Lavish Experiences in Lapland
             </p>
             <p className="text-gray-400 text-sm font-clean">
               Premium Arctic adventures and authentic Lapland experiences
@@ -121,7 +121,7 @@ const Footer: React.FC = () => {
                   href="https://www.tiktok.com/@royalnordic"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-black transition-colors duration-200"
+                  className="text-gray-300 hover:text-white transition-colors duration-200"
                   aria-label="Follow us on TikTok"
                 >
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">

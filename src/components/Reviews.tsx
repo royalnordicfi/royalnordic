@@ -164,7 +164,7 @@ const Reviews = () => {
             What Our Guests Say
           </h2>
           <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto">
-            Don't just take our word for it - hear from the amazing people who've experienced the magic of Lapland with us
+            Real guests, real aurora hunts — hear from people who experienced Lapland with Royal Nordic
           </p>
         </div>
 

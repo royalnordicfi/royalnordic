@@ -9,7 +9,7 @@ import { getAllTours } from '../lib/api';
 const NorthernLightsTour = () => {
   // const navigate = useNavigate();
   const [tourData, setTourData] = useState({
-    adult_price: 179,
+    adult_price: 149,
     child_price: 129,
     max_capacity: 16
   });
@@ -22,8 +22,8 @@ const NorthernLightsTour = () => {
         const northernLightsTour = tours.find(tour => tour.id === 1);
         if (northernLightsTour) {
           setTourData({
-            adult_price: northernLightsTour.adult_price,
-            child_price: northernLightsTour.child_price,
+            adult_price: 149,
+            child_price: 129,
             max_capacity: northernLightsTour.max_capacity || 100
           });
         }
@@ -39,42 +39,51 @@ const NorthernLightsTour = () => {
   }, []);
 
   const features = [
-    'Guaranteed Northern Lights - 100% money back guarantee',
-    'Small group experience',
-    'Expert guides with experience',
-    'Pick up and drop off from your accommodation',
+    'Northern Lights guarantee (see Terms for the exact promise)',
+    'Small group — max 16 guests',
+    'Expert local guides (English & Finnish)',
+    'Hotel pickup and drop-off in the Rovaniemi area',
     'Warm drinks and snacks',
-    'Unlimited miles and time',
-    'Tips for Northern Lights viewing',
-    'Sightseeing of Lapland',
-    'Multiple viewing locations for best chances'
+    'Flexible duration based on aurora forecasts (typically ~6 hours)',
+    'Unlimited miles to clearer skies when needed',
+    'Photography guidance from your guide',
+    'Multiple viewing locations for the best chances',
+    'Scenic Lapland sightseeing en route'
   ];
 
   const itinerary = [
     {
-      time: '20:00',
-      activity: 'Pick up from hotel',
-      description: 'We\'ll collect you from your accommodation in Rovaniemi'
+      time: '18:30',
+      activity: 'Pickup',
+      description: 'Standard pickup from 18:30. Exact pickup time is confirmed after booking — please be ready 10–30 minutes before.'
     },
     {
-      activity: 'Driving to see the lights',
-      description: 'Head to our secret Northern Lights spots'
+      activity: 'Aurora hunt',
+      description: 'We drive to the best viewing spots for that night based on live forecasts — sometimes farther when skies are clearer.'
     },
     {
-      activity: 'Visiting best locations',
-      description: 'Visit multiple locations for the best viewing opportunities'
+      activity: 'Photo stops',
+      description: 'Warm drinks, snacks, and time to enjoy the Arctic night at each location.'
     },
     {
-      time: '00:00 - 05:00',
-      activity: 'Returning to accommodation',
-      description: 'Drop off between 00:00 - 05:00 depending on distance traveled'
+      time: 'Return',
+      activity: 'Drop-off',
+      description: 'Return time depends on distance traveled — usually between midnight and early morning.'
     }
+  ];
+
+  const knowBefore = [
+    'Auroras often look more colourful in photos than with the naked eye.',
+    'Dress in warm layers: thermal base, insulating mid-layer, windproof outerwear, warm boots, hat, and gloves.',
+    'Tell us about snack allergies when you book.',
+    'Extreme weather or unsafe road conditions may lead to reschedule or refund.',
+    'Free cancellation up to 24 hours before departure.'
   ];
 
   // const pricing = [
   //   {
   //     option: "Adult (15+ years)",
-  //     price: "€179",
+  //     price: "€149",
   //     includes: ["All equipment", "Professional guide", "Hot drinks & snacks", "Transportation"]
   //   },
   //   {
@@ -112,7 +121,7 @@ const NorthernLightsTour = () => {
               </span>
             </h1>
             <p className="text-sm sm:text-lg md:text-xl lg:text-2xl text-white font-clean max-w-2xl sm:max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-2xl px-2">
-              Experience the magical Aurora Borealis in the pristine Lapland wilderness with our expert guides.
+              Chase the Aurora Borealis from Rovaniemi with expert guides, hotel pickup, and photography guidance under the Arctic sky.
             </p>
           </div>
         </div>
@@ -123,29 +132,37 @@ const NorthernLightsTour = () => {
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8 lg:py-12">
         {/* Quick Info - More compact on mobile */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-12">
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-12">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Duration</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">1-10 hours (20:00 pick-up time)</p>
+            <p className="text-gray-300 text-sm sm:text-base">2–10 hours (typically ~6h)</p>
           </div>
           
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Group Size</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">Small group experience</p>
+            <p className="text-gray-300 text-sm sm:text-base">Small group, max {tourData.max_capacity || 16}</p>
           </div>
           
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Location</h3>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Rovaniemi, Lapland</p>
+          </div>
+
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10 col-span-2 sm:col-span-1">
+            <div className="flex items-center mb-2 sm:mb-3">
+              <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
+              <h3 className="text-white font-semibold text-sm sm:text-base">Languages</h3>
+            </div>
+            <p className="text-gray-300 text-sm sm:text-base">English &amp; Finnish</p>
           </div>
         </div>
 
@@ -159,13 +176,12 @@ const NorthernLightsTour = () => {
             <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">About This Tour</h2>
               <p className="text-gray-300 text-sm sm:text-base mb-3 sm:mb-4 font-clean">
-                Our Guaranteed Northern Lights Tour is the ultimate way to experience the magical Aurora Borealis 
-                in Finnish Lapland. With experienced guides who know the best Northern Lights spots, we'll take 
-                you to multiple viewing locations for the highest chances of seeing this natural wonder.
+                Hunt the Aurora Borealis from Rovaniemi with local guides who read live solar and weather data,
+                then drive as far as needed for clearer skies — including across borders when conditions call for it.
               </p>
               <p className="text-gray-300 text-sm sm:text-base font-clean">
-                We'll ensure you have the best possible experience at each location and create unforgettable 
-                memories under the dancing lights of the Northern Lights.
+                Hotel pickup, a warm vehicle, hot drinks, and photography guidance are included. Duration is flexible
+                (typically around six hours, up to ten when the sky needs more time). Free cancellation up to 24 hours before departure.
               </p>
             </div>
 
@@ -188,15 +204,22 @@ const NorthernLightsTour = () => {
               <div className="space-y-2">
                 <div className="flex items-start">
                   <div className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0 text-xl font-bold">×</div>
-                  <span className="text-gray-300 text-sm sm:text-base">Clothing and personal equipment</span>
+                  <span className="text-gray-300 text-sm sm:text-base">Clothing and personal equipment (bring warm Arctic layers)</span>
                 </div>
               </div>
-              <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                <p className="text-amber-300 text-sm font-medium">
-                  <strong>Important:</strong> Please dress warmly for Arctic conditions. We recommend thermal layers, 
-                  waterproof outerwear, warm boots, gloves, and a hat.
-                </p>
-              </div>
+            </div>
+
+            {/* Know before you go */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">Know Before You Go</h2>
+              <ul className="space-y-2">
+                {knowBefore.map((item) => (
+                  <li key={item} className="flex items-start text-gray-300 text-sm sm:text-base font-clean">
+                    <span className="text-emerald-400 mr-2 mt-0.5">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
             {/* Itinerary */}
