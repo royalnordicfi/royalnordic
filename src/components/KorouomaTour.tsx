@@ -1,4 +1,4 @@
-import { Clock, Users, MapPin, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Clock, Users, MapPin, CheckCircle, ArrowLeft, XCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ImageSlideshow from './ImageSlideshow';
@@ -23,8 +23,8 @@ const KorouomaTour = () => {
         const korouomaTour = tours.find(tour => tour.id === 6);
         if (korouomaTour) {
           setTourData({
-            adult_price: korouomaTour.adult_price,
-            child_price: korouomaTour.child_price,
+            adult_price: korouomaTour.adult_price || 129,
+            child_price: korouomaTour.child_price || 109,
             max_capacity: KORUOMA_MAX_CAPACITY
           });
         }
@@ -184,7 +184,7 @@ const KorouomaTour = () => {
               <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">What's Not Included</h2>
               <div className="space-y-2">
                 <div className="flex items-start">
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0 text-xl font-bold">×</div>
+                  <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
                   <span className="text-gray-300 text-sm sm:text-base">Warm winter clothing (bring layered Arctic clothing and sturdy footwear)</span>
                 </div>
               </div>
@@ -253,7 +253,7 @@ const KorouomaTour = () => {
 
           {/* Right Column - Booking Form */}
           <div className="lg:col-span-2">
-            <div className="sticky top-6">
+            <div className="sticky top-28">
               <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
                 <h2 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4 sm:mb-6 text-center">Book Your Adventure</h2>
                 {loading ? (
@@ -275,7 +275,7 @@ const KorouomaTour = () => {
 
         {/* Photo Gallery Section */}
         <div className="mt-12 sm:mt-16 lg:mt-20">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-luxury font-bold text-white mb-6 sm:mb-8 text-center bg-gradient-to-r from-cyan-400 via-white to-cyan-400 bg-clip-text text-transparent">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-luxury font-bold text-white mb-6 sm:mb-8 text-center bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
             Korouoma Winter Gallery
           </h2>
           <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-6 max-w-4xl mx-auto">

@@ -19,8 +19,8 @@ const BestSellersSlideshow: React.FC = () => {
     },
     {
       id: 2,
-      title: "Ranua Zoo Tour",
-      description: "Meet Polar Bears, Arctic Foxes, and 50+ Arctic species at Finland's northernmost zoo. Perfect for families!",
+      title: "Nordic Animals of Ranua Zoo",
+      description: "Day trip from Rovaniemi to Ranua Wildlife Park — polar bears and 50+ Arctic species, transfers and tickets included.",
       image: "/ranua1.jpg",
       route: "/ranua-zoo",
       badge: "BEST SELLER",

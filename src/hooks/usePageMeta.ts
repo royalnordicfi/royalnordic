@@ -5,6 +5,7 @@ export type PageMetaInput = {
   description: string
   canonicalPath?: string
   ogImage?: string
+  noIndex?: boolean
 }
 
 const SITE = 'https://royalnordic.fi'
@@ -38,6 +39,7 @@ export function usePageMeta({
   description,
   canonicalPath = '/',
   ogImage = DEFAULT_OG,
+  noIndex = false,
 }: PageMetaInput) {
   useEffect(() => {
     const canonical = canonicalPath.startsWith('http')
@@ -54,6 +56,7 @@ export function usePageMeta({
     setMeta('name', 'twitter:title', title)
     setMeta('name', 'twitter:description', description)
     setMeta('name', 'twitter:image', ogImage)
+    setMeta('name', 'robots', noIndex ? 'noindex, nofollow' : 'index, follow')
     setCanonical(canonical)
-  }, [title, description, canonicalPath, ogImage])
+  }, [title, description, canonicalPath, ogImage, noIndex])
 }

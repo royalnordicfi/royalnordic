@@ -26,8 +26,6 @@ const Hero = () => {
           backgroundColor: 'black'
         }}
         onError={(e) => console.error('Video error:', e)}
-        onLoadStart={() => console.log('Video loading started')}
-        onCanPlay={() => console.log('Video can play')}
       >
         <source src="/northernlightsvideo_final.mp4" type="video/mp4" />
         Your browser does not support the video tag.

@@ -11,7 +11,7 @@ const DaytimeExperiences: React.FC = () => {
       description: "Experience traditional Lapland ice fishing on pristine frozen lakes with expert guidance. Perfect for all skill levels!",
       image: "/icefishing2.jpg",
       duration: "3-4 hours",
-      groupSize: "Up to 8 people",
+      groupSize: "Max 8 people",
       location: "Rovaniemi, Lapland",
       features: ["Professional guide", "All equipment", "Hot drinks", "Traditional techniques"],
       route: "/ice-fishing"
@@ -21,7 +21,7 @@ const DaytimeExperiences: React.FC = () => {
       name: "Nordic Animals of Ranua Zoo",
       description: "Day trip from Rovaniemi to Ranua Wildlife Park — polar bears and 50+ Arctic species, transfers and tickets included.",
       image: "/ranua1.jpg",
-      duration: "5 hours",
+      duration: "About 5 hours",
       groupSize: "Max 16 people",
       location: "Ranua, Lapland",
       features: ["Hotel pickup", "Zoo tickets", "Polar bears & Arctic wildlife", "English & Finnish"],
@@ -138,7 +138,7 @@ const DaytimeExperiences: React.FC = () => {
 
                 {/* Features */}
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {experience.features.map((feature, index) => (
+                  {(experience.features ?? []).map((feature, index) => (
                     <span
                       key={index}
                       className="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-medium border border-emerald-500/20"

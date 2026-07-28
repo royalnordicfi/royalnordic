@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Instagram } from 'lucide-react';
+import { Instagram } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
@@ -35,8 +35,13 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/northern-lights-tour" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
-                  Northern Lights Tour
+                <Link to="/northern-lights-tours" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
+                  Northern Lights Tours
+                </Link>
+              </li>
+              <li>
+                <Link to="/daytime-experiences" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
+                  Daytime Experiences
                 </Link>
               </li>
               <li>
@@ -50,8 +55,8 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/#contact" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
-                  Contact
+                <Link to="/transportation" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
+                  Transportation
                 </Link>
               </li>
             </ul>
@@ -137,7 +142,7 @@ const Footer: React.FC = () => {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
             <p className="text-gray-400 text-sm font-clean">
-              © 2025 ROYAL NORDIC. All rights reserved.
+              © {new Date().getFullYear()} ROYAL NORDIC. All rights reserved.
             </p>
             <div className="flex space-x-4 text-sm">
               <Link to="/privacy-policy" className="text-gray-400 hover:text-white transition-colors font-clean">

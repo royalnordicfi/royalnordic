@@ -198,16 +198,19 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
           </div>
 
           <div className="lg:col-span-2">
-            <div className="sticky top-6">
-              <BookingForm
-                tourId={8}
-                tourName="Family-Friendly Northern Lights Tour"
-                adultPrice={79}
-                childPrice={59}
-                maxCapacity={16}
-                seasonStart="09-15"
-                seasonEnd="04-15"
-              />
+            <div className="sticky top-28">
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
+                <h2 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4 sm:mb-6 text-center">Book Your Tour</h2>
+                <BookingForm
+                  tourId={8}
+                  tourName="Family-Friendly Northern Lights Tour"
+                  adultPrice={79}
+                  childPrice={59}
+                  maxCapacity={16}
+                  seasonStart="09-15"
+                  seasonEnd="04-15"
+                />
+              </div>
             </div>
           </div>
         </div>
