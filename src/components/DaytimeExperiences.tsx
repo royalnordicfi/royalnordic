@@ -31,12 +31,12 @@ const DaytimeExperiences: React.FC = () => {
     {
       id: 3,
       name: "Korouoma Canyon Winter Adventure",
-      description: "Hike to magnificent frozen waterfalls and enjoy grilled food in the stunning winter landscape. One of Lapland's most beautiful natural wonders!",
+      description: "6-hour canyon hike to frozen waterfalls from Rovaniemi — hotel pickup, guided trails, and a campfire picnic with hot drinks.",
       image: "/korouoma1.jpg",
-      duration: "~6 hours",
-      groupSize: "2-10 people",
+      duration: "6 hours",
+      groupSize: "Small group",
       location: "Korouoma Canyon, Lapland",
-      features: ["Hotel pickup", "Professional guide", "Grilled food", "Hot drinks"],
+      features: ["Hotel pickup", "Professional guide", "Campfire picnic", "Hot drinks"],
       route: "/korouoma-canyon",
       badge: "Adventure"
     },

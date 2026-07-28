@@ -36,7 +36,7 @@ const META: Record<string, { title: string; description: string; ogImage?: strin
   '/korouoma-canyon': {
     title: 'Korouoma Canyon Tour from Rovaniemi | Royal Nordic',
     description:
-      'Winter hike to frozen waterfalls at Korouoma Canyon with grilled food, hot drinks, and hotel pickup from Rovaniemi.',
+      '6-hour canyon hike to frozen waterfalls from Rovaniemi: hotel pickup, English & Finnish guide, campfire picnic. Free cancellation 24h. Book & pay securely.',
   },
   '/snowshoe-rental': {
     title: 'Snowshoe Adventure Rovaniemi | Royal Nordic',
