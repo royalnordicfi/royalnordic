@@ -1,4 +1,4 @@
-import { Clock, Users, MapPin, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Clock, Users, MapPin, CheckCircle, ArrowLeft, XCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ImageSlideshow from './ImageSlideshow';
@@ -120,7 +120,7 @@ const RanuaZooTour = () => {
               <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Duration</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">5 hours</p>
+            <p className="text-gray-300 text-sm sm:text-base">About 5 hours</p>
           </div>
 
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
@@ -181,9 +181,7 @@ const RanuaZooTour = () => {
                   'Winter clothing or boot rental',
                 ].map((item) => (
                   <div key={item} className="flex items-start">
-                    <div className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0 text-xl font-bold">
-                      ×
-                    </div>
+                    <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
                     <span className="text-gray-300 text-sm sm:text-base">{item}</span>
                   </div>
                 ))}
@@ -228,7 +226,7 @@ const RanuaZooTour = () => {
           </div>
 
           <div className="lg:col-span-2">
-            <div className="sticky top-6">
+            <div className="sticky top-28">
               <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
                 <h2 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4 sm:mb-6 text-center">
                   Book Your Tour

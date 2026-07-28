@@ -9,16 +9,20 @@ const PaymentSuccess: React.FC = () => {
   const [bookingData, setBookingData] = useState<any>(null)
 
   useEffect(() => {
-    // Get booking data from sessionStorage
     const stored = sessionStorage.getItem('pendingBooking')
     if (stored) {
       const data = JSON.parse(stored)
       setBookingData(data)
-      
-      // Clear the stored data
+      // Keep a copy so refresh still shows confirmation details
+      sessionStorage.setItem('confirmedBooking', stored)
       sessionStorage.removeItem('pendingBooking')
-      
-      // Emails are now sent by the Stripe webhook after payment confirmation
+      setEmailSent(true)
+      return
+    }
+
+    const confirmed = sessionStorage.getItem('confirmedBooking')
+    if (confirmed) {
+      setBookingData(JSON.parse(confirmed))
       setEmailSent(true)
     }
   }, [])
@@ -27,24 +31,23 @@ const PaymentSuccess: React.FC = () => {
   if (!bookingData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden pt-20 pb-8 px-4">
-        {/* Northern Lights Background Effect */}
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-green-400/30 to-transparent animate-pulse"></div>
           <div className="absolute top-1/4 left-1/4 w-1/2 h-1/4 bg-gradient-to-r from-emerald-400/20 to-teal-400/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute top-1/3 right-1/4 w-1/3 h-1/6 bg-gradient-to-l from-green-300/25 to-blue-300/25 rounded-full blur-2xl animate-pulse delay-500"></div>
         </div>
         
-        {/* Main Content */}
         <div className="relative z-10 max-w-lg mx-auto">
           <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-600/50 shadow-2xl text-center">
-            <div className="text-red-500 text-4xl mb-4">⚠️</div>
-            <h1 className="text-xl font-bold text-white mb-2">No Booking Data Found</h1>
-            <p className="text-gray-300 mb-6">Please return to the tours page and try again.</p>
+            <CheckCircle className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
+            <h1 className="text-xl font-bold text-white mb-2">Looking for your confirmation?</h1>
+            <p className="text-gray-300 mb-6">
+              If you just paid, check your email for the booking confirmation. You can also browse our tours anytime.
+            </p>
             <button
               onClick={() => navigate('/')}
-              className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-lg font-semibold transition-colors min-h-[44px]"
             >
-              Back to Tours
+              Back to Home
             </button>
           </div>
         </div>

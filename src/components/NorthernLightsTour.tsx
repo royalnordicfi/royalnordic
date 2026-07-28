@@ -1,4 +1,4 @@
-import { Clock, Users, MapPin, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Clock, Users, MapPin, CheckCircle, ArrowLeft, XCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ImageSlideshow from './ImageSlideshow';
@@ -24,7 +24,7 @@ const NorthernLightsTour = () => {
           setTourData({
             adult_price: 149,
             child_price: 129,
-            max_capacity: northernLightsTour.max_capacity || 100
+            max_capacity: northernLightsTour.max_capacity || 16
           });
         }
       } catch (error) {
@@ -181,7 +181,7 @@ const NorthernLightsTour = () => {
               </p>
               <p className="text-gray-300 text-sm sm:text-base font-clean">
                 Hotel pickup, a warm vehicle, hot drinks, and photography guidance are included. Duration is flexible
-                (typically around six hours, up to ten when the sky needs more time). Free cancellation up to 24 hours before departure.
+                (typically around six hours, up to twelve when the sky needs more time). Free cancellation up to 24 hours before departure.
               </p>
             </div>
 
@@ -203,7 +203,7 @@ const NorthernLightsTour = () => {
               <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">What's Not Included</h2>
               <div className="space-y-2">
                 <div className="flex items-start">
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0 text-xl font-bold">×</div>
+                  <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
                   <span className="text-gray-300 text-sm sm:text-base">Clothing and personal equipment (bring warm Arctic layers)</span>
                 </div>
               </div>
@@ -250,7 +250,7 @@ const NorthernLightsTour = () => {
 
           {/* Right Column - Booking Form (Wider) */}
           <div className="lg:col-span-2">
-            <div className="sticky top-6">
+            <div className="sticky top-28">
               <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
                 <h2 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4 sm:mb-6 text-center">Book Your Tour</h2>
                 {loading ? (

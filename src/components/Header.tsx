@@ -102,6 +102,12 @@ const Header = () => {
               TRANSPORTATION
             </button>
             <button 
+              onClick={() => navigate('/blog')}
+              className="text-white hover:text-emerald-400 transition-colors duration-200 font-luxury font-bold text-sm lg:text-base tracking-wider uppercase whitespace-nowrap"
+            >
+              BLOG
+            </button>
+            <button 
               onClick={() => scrollToSection('contact')}
               className="text-white hover:text-emerald-400 transition-colors duration-200 font-luxury font-bold text-sm lg:text-base tracking-wider uppercase whitespace-nowrap"
             >

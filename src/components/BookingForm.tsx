@@ -63,7 +63,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
     specialRequests: ''
   })
 
-  const isNorthernLightsTour = tourName.toLowerCase().includes('northern lights')
+  const isNorthernLightsTour = tourName === 'Guaranteed Northern Lights Tour'
 
   // Check if Stripe is configured
   const isStripeConfigured = !!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
@@ -735,7 +735,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               <button 
                 type="button"
                   onClick={() => setFormData({...formData, adults: Math.max(1, formData.adults - 1)})}
-                  className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold"
+                  className="w-11 h-11 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold"
               >
                 -
               </button>
@@ -743,7 +743,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               <button 
                 type="button"
                   onClick={() => setFormData({...formData, adults: Math.min(getAvailableSlots(formData.preferredDate), formData.adults + 1)})}
-                  className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold"
+                  className="w-11 h-11 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold"
                   disabled={!formData.preferredDate || formData.adults + formData.children >= getAvailableSlots(formData.preferredDate)}
               >
                 +
@@ -759,7 +759,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               <button 
                 type="button"
                   onClick={() => setFormData({...formData, children: Math.max(0, formData.children - 1)})}
-                  className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold"
+                  className="w-11 h-11 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold"
               >
                 -
               </button>
@@ -767,7 +767,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               <button 
                 type="button"
                   onClick={() => setFormData({...formData, children: Math.min(getAvailableSlots(formData.preferredDate) - formData.adults, formData.children + 1)})}
-                  className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold"
+                  className="w-11 h-11 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold"
                   disabled={!formData.preferredDate || formData.adults + formData.children >= getAvailableSlots(formData.preferredDate)}
               >
                 +
@@ -944,8 +944,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
           <div className="rounded-lg border border-emerald-100 bg-emerald-50/60 px-3 py-2 text-xs text-emerald-900 space-y-1">
             <p>Free cancellation up to 24 hours before departure.</p>
             {isNorthernLightsTour && (
-              <p>Northern Lights guarantee applies — see Terms for the exact promise.</p>
+              <p>Northern Lights guarantee: free return trip if no lights appear — see Terms for details.</p>
             )}
+            <p>After payment you receive a confirmation email with pickup details.</p>
           </div>
           
           {!isStripeConfigured && (

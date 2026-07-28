@@ -129,7 +129,7 @@ const NorthernLightsTours: React.FC = () => {
 
                 {/* Features */}
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {tour.features.map((feature, index) => (
+                  {(tour.features ?? []).map((feature, index) => (
                     <span
                       key={index}
                       className="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-medium border border-emerald-500/20"
@@ -166,7 +166,7 @@ const NorthernLightsTours: React.FC = () => {
             </div>
             <div className="flex items-start">
               <span className="text-emerald-400 mr-2">✓</span>
-              <span>Full refund if Northern Lights don't appear</span>
+              <span>Guaranteed tour includes a free return trip if lights don’t appear (see Terms)</span>
             </div>
             <div className="flex items-start">
               <span className="text-emerald-400 mr-2">✓</span>

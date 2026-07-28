@@ -112,13 +112,13 @@ const SnowshoeRental: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8 lg:py-12">
         {/* Quick Info - More compact on mobile */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-12">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-12">
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Duration</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">Customized</p>
+            <p className="text-gray-300 text-sm sm:text-base">Flexible rental</p>
           </div>
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
@@ -126,7 +126,7 @@ const SnowshoeRental: React.FC = () => {
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Group Size</h3>
             </div>
-            <p className="text-gray-300 text-sm sm:text-base">Max {tourData.max_capacity} people</p>
+            <p className="text-gray-300 text-sm sm:text-base">Individual or groups</p>
           </div>
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
@@ -135,6 +135,14 @@ const SnowshoeRental: React.FC = () => {
               <h3 className="text-white font-semibold text-sm sm:text-base">Location</h3>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Rovaniemi, Lapland</p>
+          </div>
+
+          <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10 col-span-2 sm:col-span-1">
+            <div className="flex items-center mb-2 sm:mb-3">
+              <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
+              <h3 className="text-white font-semibold text-sm sm:text-base">Delivery</h3>
+            </div>
+            <p className="text-gray-300 text-sm sm:text-base">To your lodging</p>
           </div>
         </div>
 
@@ -195,7 +203,7 @@ const SnowshoeRental: React.FC = () => {
 
           {/* Right Column - Booking Form (Wider) */}
           <div className="lg:col-span-2">
-            <div className="sticky top-6">
+            <div className="sticky top-28">
               <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
                 <h2 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4 sm:mb-6 text-center">Book Your Adventure</h2>
                 {loading ? (
