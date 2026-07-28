@@ -13,6 +13,9 @@ const NorthernLightsTours: React.FC = () => {
       image: "/nortti1.jpg",
       duration: "2–12 hours (typically ~6h)",
       groupSize: "Max 8 people per vehicle",
+      location: "Rovaniemi, Lapland",
+      features: ["Professional guide", "Hotel pickup", "Photography guidance", "Warm drinks and snacks"],
+      route: "/northern-lights-tour",
       badge: "Most Popular"
     },
     {
