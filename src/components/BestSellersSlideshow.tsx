@@ -9,7 +9,7 @@ const BestSellersSlideshow: React.FC = () => {
     {
       id: 1,
       title: "Guaranteed Northern Lights Tour",
-      description: "Chase the magical Aurora Borealis with our expert guides. 100% money-back guarantee if you don't see the lights!",
+      description: "Chase the magical Aurora Borealis with our expert guides. If no lights are visible, free return trip on the next available date.",
       image: "/nortti1.jpg",
       route: "/northern-lights-tour",
       badge: "BEST SELLER"

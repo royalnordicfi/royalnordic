@@ -35,6 +35,7 @@ import TransportationRovaniemiLevi from './components/TransportationRovaniemiLev
 import TransportationCustomized from './components/TransportationCustomized';
 import TransportationCategory from './components/TransportationCategory';
 import PaymentSuccess from './components/PaymentSuccess';
+import PaymentCancelled from './components/PaymentCancelled';
 import CryptoPaymentSuccess from './components/CryptoPaymentSuccess';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsConditions from './components/TermsConditions';
@@ -111,6 +112,7 @@ function App() {
           <Route path="/transportation-customized" element={<TransportationCustomized />} />
           
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-cancelled" element={<PaymentCancelled />} />
           <Route path="/crypto-payment-success" element={<CryptoPaymentSuccess />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />

@@ -96,15 +96,20 @@
     }
   }
   
-  /* Touch-friendly button sizes */
+  /* Touch-friendly button sizes — exclude dense booking calendar day cells */
   @media (max-width: 640px) {
-    button {
+    button:not(.booking-calendar-day) {
       min-height: 44px;
       min-width: 44px;
     }
     
     .tour-card {
       touch-action: manipulation;
+    }
+
+    .booking-calendar-day {
+      min-height: 2.75rem;
+      min-width: 0;
     }
   }
 }

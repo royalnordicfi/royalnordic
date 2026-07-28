@@ -8,7 +8,7 @@ const NorthernLightsTours: React.FC = () => {
     {
       id: 1,
       name: "Guaranteed Northern Lights Tour",
-      description: "Chase the Aurora Borealis with our expert guides. We guarantee you'll see the lights or get a full refund!",
+      description: "Chase the Aurora Borealis with our expert guides. If no lights are visible, free return trip on the next available date.",
       image: "/nortti1.jpg",
       duration: "1-10 hours",
       groupSize: "Small group experience",
@@ -17,6 +17,7 @@ const NorthernLightsTours: React.FC = () => {
       route: "/northern-lights-tour",
       badge: "Most Popular",
       bookingMode: "instant" as const,
+      fromPrice: 179,
     },
     {
       id: 2,
@@ -30,6 +31,7 @@ const NorthernLightsTours: React.FC = () => {
       route: "/family-friendly-northern-lights",
       badge: "Family Favorite",
       bookingMode: "instant" as const,
+      fromPrice: 79,
     },
     {
       id: 3,
@@ -140,12 +142,16 @@ const NorthernLightsTours: React.FC = () => {
                 </div>
 
                 {/* CTA */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-800">
+                <div className="flex items-center justify-between gap-3 pt-4 border-t border-gray-800">
                   <span className="text-emerald-400 font-semibold group-hover:translate-x-2 transition-transform">
                     {tour.bookingMode === 'inquiry' ? 'Request quote →' : 'Book online →'}
                   </span>
-                  <span className="text-xs text-gray-500">
-                    {tour.bookingMode === 'inquiry' ? 'Inquiry only' : 'Instant checkout'}
+                  <span className="text-xs text-gray-300 shrink-0">
+                    {'fromPrice' in tour && tour.fromPrice
+                      ? `From €${tour.fromPrice}`
+                      : tour.bookingMode === 'inquiry'
+                        ? 'Quote'
+                        : 'Instant checkout'}
                   </span>
                 </div>
               </div>
@@ -169,7 +175,7 @@ const NorthernLightsTours: React.FC = () => {
             </div>
             <div className="flex items-start">
               <span className="text-emerald-400 mr-2">✓</span>
-              <span>Full refund if Northern Lights don't appear</span>
+              <span>Free return trip if Northern Lights don't appear</span>
             </div>
             <div className="flex items-start">
               <span className="text-emerald-400 mr-2">✓</span>
