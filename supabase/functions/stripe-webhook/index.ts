@@ -461,12 +461,16 @@ Deno.serve(async (req) => {
             tour_date_id: parseInt(metadata.tour_date_id),
             customer_name: metadata.customer_name,
             customer_email: session.customer_email,
-            customer_phone: metadata.customer_phone || '',
+            customer_phone: metadata.phone || metadata.customer_phone || '',
             adults: parseInt(metadata.adults),
             children: parseInt(metadata.children),
             total_price: session.amount_total / 100,
             stripe_payment_intent_id: session.payment_intent,
             status: 'confirmed',
+            payment_status: 'paid',
+            payment_type: 'card',
+            source: 'direct_website',
+            pickup_location: metadata.pickup_location || null,
             special_requests: metadata.special_requests || ''
           })
           .select()
