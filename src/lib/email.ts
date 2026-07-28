@@ -244,7 +244,7 @@ function generateCustomerConfirmationHTML(booking: BookingNotificationData): str
           <h3>📋 Your Booking Details</h3>
           <p><strong>Booking ID:</strong> #${booking.bookingId}</p>
           <p><strong>Tour:</strong> ${booking.tourName}</p>
-          <p><strong>Date:</strong> ${formatTourDateForDisplay(booking.tourDate, 'en-US', 'long')}${booking.tourName === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : booking.tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}</p>
+          <p><strong>Date:</strong> ${formatTourDateForDisplay(booking.tourDate, 'en-US', 'long')}${booking.tourName === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : booking.tourName === 'Northern Lights Tour' || booking.tourName === 'Guaranteed Northern Lights Tour' ? ' at 18:30' : ''}</p>
           <p><strong>Status:</strong> <span class="status-confirmed">CONFIRMED</span></p>
         </div>
         
@@ -299,7 +299,7 @@ Your tour has been successfully confirmed. We're excited to show you the magic o
 📋 Your Booking Details:
 - Booking ID: #${booking.bookingId}
 - Tour: ${booking.tourName}
-- Date: ${formatTourDateForDisplay(booking.tourDate, 'en-US', 'long')}${booking.tourName === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : booking.tourName === 'Northern Lights Tour' ? ' at 20:00' : ''}
+- Date: ${formatTourDateForDisplay(booking.tourDate, 'en-US', 'long')}${booking.tourName === 'Family-Friendly Northern Lights Tour' ? ' at 21:00' : booking.tourName === 'Northern Lights Tour' || booking.tourName === 'Guaranteed Northern Lights Tour' ? ' at 18:30' : ''}
 - Status: CONFIRMED
 
 👥 Your Group:

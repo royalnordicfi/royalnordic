@@ -809,7 +809,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
                     if (tourName.includes('Family-Friendly Northern Lights')) {
                       return `${dateString} at 21:00`
                     } else if (tourName.includes('Northern Lights')) {
-                      return `${dateString} at 20:00`
+                      return `${dateString} at 18:30`
                     }
                     return dateString
                   })()}

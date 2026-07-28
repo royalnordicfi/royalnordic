@@ -53,9 +53,9 @@ const NorthernLightsTour = () => {
 
   const itinerary = [
     {
-      time: '~20:00',
+      time: '18:30',
       activity: 'Pickup',
-      description: 'Exact pickup time is confirmed after booking. Please be ready 10–30 minutes before.'
+      description: 'Standard pickup from 18:30. Exact pickup time is confirmed after booking — please be ready 10–30 minutes before.'
     },
     {
       activity: 'Aurora hunt',
@@ -122,9 +122,6 @@ const NorthernLightsTour = () => {
             </h1>
             <p className="text-sm sm:text-lg md:text-xl lg:text-2xl text-white font-clean max-w-2xl sm:max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-2xl px-2">
               Chase the Aurora Borealis from Rovaniemi with expert guides, hotel pickup, and photography guidance under the Arctic sky.
-            </p>
-            <p className="mt-4 text-sm text-emerald-200/90 font-clean">
-              ★★★★★ 4.8 · 110+ verified GetYourGuide reviews
             </p>
           </div>
         </div>
@@ -223,18 +220,6 @@ const NorthernLightsTour = () => {
                   </li>
                 ))}
               </ul>
-              <p className="mt-4 text-xs text-gray-400">
-                Also listed on{' '}
-                <a
-                  href="https://www.getyourguide.com/en-gb/rovaniemi-l2653/rovaniemi-revontulit-ja-valokuvausretki-t629222/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2"
-                >
-                  GetYourGuide
-                </a>
-                {' '}(4.8 · 110+ reviews).
-              </p>
             </div>
 
             {/* Itinerary */}

@@ -163,20 +163,9 @@ const Reviews = () => {
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-luxury font-bold text-white mb-4">
             What Our Guests Say
           </h2>
-          <p className="text-emerald-300 font-clean text-base sm:text-lg mb-3">
-            ★★★★★ 4.8 average · 110+ verified reviews on GetYourGuide
-          </p>
           <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto">
             Real guests, real aurora hunts — hear from people who experienced Lapland with Royal Nordic
           </p>
-          <a
-            href="https://www.getyourguide.com/en-gb/rovaniemi-l2653/rovaniemi-revontulit-ja-valokuvausretki-t629222/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block mt-4 text-sm text-emerald-400 hover:text-emerald-300 underline underline-offset-2"
-          >
-            View Guaranteed Northern Lights on GetYourGuide
-          </a>
         </div>
 
         {/* Reviews Carousel */}

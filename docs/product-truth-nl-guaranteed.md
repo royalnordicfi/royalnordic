@@ -11,11 +11,11 @@ Sources compared 2026-07-28:
 | Field | Website (after polish) | GetYourGuide | Match | Notes |
 |---|---|---|---|---|
 | Title | Guaranteed Northern Lights Tour | Rovaniemi: Guaranteed Northern Lights & Photography Tour | Partial | Direct keeps short title; subtitle mentions photography guidance |
-| Rating | 4.8 · 110+ shown | 4.8 · 110 reviews | Aligned | Attribution to GYG |
+| Rating | Not shown live (variable) | 4.8 · 110 reviews | N/A | Do not hardcode live GYG ratings on website |
 | Adult price | €179 | From ~€106 (dynamic) | Channel OK | No auto price change |
 | Child price | €129 | Confirm supplier panel (€79 seen in UI) | Open | Founder confirm child tier on GYG |
 | Duration | 2–10h, typically ~6h | Headline 6h; details 2–10h | Aligned | |
-| Pickup | Confirmed after booking; typically evening | Pickup available; ready 10–30 min before | Aligned | |
+| Pickup | From **18:30**; exact time confirmed after booking | Pickup available; ready 10–30 min before | Aligned | |
 | Languages | English & Finnish | English, Finnish | Aligned | |
 | Capacity | Max 16 | Small / private options | Soft | |
 | Photography | Guidance from guide (not claiming delivered gallery) | Professional photos included | **Open** | Confirm if direct bookings still receive edited photos |
