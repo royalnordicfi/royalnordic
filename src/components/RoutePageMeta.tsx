@@ -31,7 +31,7 @@ const META: Record<string, { title: string; description: string; ogImage?: strin
   '/ranua-zoo': {
     title: 'Ranua Wildlife Park Tour from Rovaniemi | Royal Nordic',
     description:
-      'Visit Ranua Zoo — polar bears, arctic foxes, and Nordic wildlife — with hotel pickup from Rovaniemi.',
+      '5-hour Ranua Wildlife Park day trip from Rovaniemi: hotel pickup, entrance tickets, polar bears and 50+ Arctic species. Free cancellation 24h.',
   },
   '/korouoma-canyon': {
     title: 'Korouoma Canyon Tour from Rovaniemi | Royal Nordic',
