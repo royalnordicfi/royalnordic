@@ -6,6 +6,14 @@ import { createCheckoutSession, redirectToCheckout } from '../lib/stripe'
 import { createCryptoCheckout, redirectToCryptoCheckout } from '../lib/crypto'
 import { supabase } from '../lib/supabase'
 import type { TourDate } from '../lib/supabase'
+import {
+  buildMondayFirstMonthGrid,
+  formatTourDateLong,
+  formatTourDateShort,
+  todayTourDateISO,
+  tourDateToLocalDate,
+  WEEKDAY_HEADERS_MON_FIRST,
+} from '../lib/tourDate'
 
 interface BookingFormProps {
   tourId: number
@@ -192,112 +200,72 @@ const BookingForm: React.FC<BookingFormProps> = ({
   // Helper function to check if a date is in season (works across multiple years)
   const isDateInSeason = (dateString: string): boolean => {
     if (!seasonStart || !seasonEnd) return true // No season restriction
-    
-    const dateObj = new Date(dateString)
+
+    const dateObj = tourDateToLocalDate(dateString)
     const dateYear = dateObj.getFullYear()
-    
+
     // Parse season dates (format: "MM-DD")
     const [startMonth, startDay] = seasonStart.split('-').map(Number)
     const [endMonth, endDay] = seasonEnd.split('-').map(Number)
-    
-    // Create season start and end dates
-    const seasonStartThisYear = new Date(dateYear, startMonth - 1, startDay)
-    const seasonEndThisYear = new Date(dateYear, endMonth - 1, endDay)
-    const seasonStartPrevYear = new Date(dateYear - 1, startMonth - 1, startDay)
-    const seasonEndNextYear = new Date(dateYear + 1, endMonth - 1, endDay)
-    
+
+    // Create season start and end dates (local calendar noon)
+    const seasonStartThisYear = new Date(dateYear, startMonth - 1, startDay, 12)
+    const seasonEndThisYear = new Date(dateYear, endMonth - 1, endDay, 12)
+    const seasonStartPrevYear = new Date(dateYear - 1, startMonth - 1, startDay, 12)
+    const seasonEndNextYear = new Date(dateYear + 1, endMonth - 1, endDay, 12)
+
     // Check if season spans year boundary (e.g., Sep to Apr)
     if (endMonth < startMonth) {
-      // Season spans across year boundary
-      // Check if date is in the season that started in previous year and ends this year
       const inPrevYearSeason = dateObj >= seasonStartPrevYear && dateObj <= seasonEndThisYear
-      // Check if date is in the season that starts this year and ends next year
       const inThisYearSeason = dateObj >= seasonStartThisYear && dateObj <= seasonEndNextYear
       return inPrevYearSeason || inThisYearSeason
     } else {
-      // Season within same year (e.g., Dec 1 to Dec 31)
       return dateObj >= seasonStartThisYear && dateObj <= seasonEndThisYear
     }
   }
 
-  // Get calendar grid for current month
+  // Get calendar grid for current month (Monday-first; date-only ISO cells)
   const getCalendarGrid = () => {
     const year = currentMonth.getFullYear()
     const month = currentMonth.getMonth()
-    const firstDay = new Date(Date.UTC(year, month, 1))
-    const lastDay = new Date(Date.UTC(year, month + 1, 0))
-    const startDate = new Date(firstDay)
-    const endDate = new Date(lastDay)
-    
-    
-    // Get available dates for this month
-    const monthDates = availability.filter(date => {
-      const dateObj = new Date(date.date)
-      return dateObj >= startDate && dateObj <= endDate
-    })
-    
-    // Apply season filtering if seasonStart and seasonEnd are provided
-    // Note: We still show all dates in the calendar, but filter database results
+    const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}-`
+
+    const monthDates = availability.filter((date) => date.date.startsWith(monthPrefix))
+
     let filteredDates = monthDates
     if (seasonStart && seasonEnd) {
-      filteredDates = monthDates.filter(date => isDateInSeason(date.date))
+      filteredDates = monthDates.filter((date) => isDateInSeason(date.date))
     }
-    
-    // Create a map for faster lookup
-    const dateMap = new Map()
-    filteredDates.forEach(date => {
+
+    const dateMap = new Map<string, TourDate>()
+    filteredDates.forEach((date) => {
       dateMap.set(date.date, date)
     })
-    
 
-    // Create calendar grid
-    const grid = []
-    const firstDayOfWeek = firstDay.getUTCDay()
-    const daysInMonth = lastDay.getUTCDate()
-    
-    // Use simple date comparison to avoid timezone issues
-    const today = new Date()
-    const todayString = today.toISOString().split('T')[0] // Get YYYY-MM-DD format
-    
+    const todayString = todayTourDateISO()
+    const base = buildMondayFirstMonthGrid(year, month)
 
-    // Add empty cells for days before the first of the month
-    for (let i = 0; i < firstDayOfWeek; i++) {
-      grid.push(null)
-    }
-
-    // Add ALL days of the month (professional approach)
-    for (let day = 1; day <= daysInMonth; day++) {
-      // Use UTC to avoid timezone offset issues
-      const dateString = new Date(Date.UTC(year, month, day)).toISOString().split('T')[0]
+    return base.map((cell) => {
+      if (cell === null) return null
+      const { day, date: dateString } = cell
       const dateData = dateMap.get(dateString)
-      
-      
-      // Check if date is in the past (before today)
       const isPastDate = dateString < todayString
-      
-      // Check if date is in season (works across multiple years)
       const inSeason = seasonStart && seasonEnd ? isDateInSeason(dateString) : true
-      
-      // Determine date status:
-      // - isPastDate: Past dates (gray, disabled)
-      // - !inSeason: Out of season (gray, disabled) 
-      // - isFullBooked: Dates with 0 remaining slots (red, shows authenticity)
-      // - isAvailable: Dates that can be booked (white, clickable)
-      const isFullBooked = dateData && dateData.remaining_slots !== undefined && dateData.remaining_slots === 0
-      const isAvailable = !isPastDate && inSeason && dateData && (dateData.remaining_slots || 0) > 0
-      
-      grid.push({
+      const isFullBooked =
+        dateData && dateData.remaining_slots !== undefined && dateData.remaining_slots === 0
+      const isAvailable =
+        !isPastDate && inSeason && dateData && (dateData.remaining_slots || 0) > 0
+
+      return {
         day,
         date: dateString,
-        available: isAvailable,
+        available: Boolean(isAvailable),
         remainingSlots: dateData?.remaining_slots ?? 0,
         isPastDate,
         isOutOfSeason: seasonStart && seasonEnd ? !inSeason : false,
-        isFullBooked
-      })
-    }
-
-    return grid
+        isFullBooked: Boolean(isFullBooked),
+      }
+    })
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -395,16 +363,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
       const discount = getDiscountAmount(subtotal)
       const totalPrice = subtotal - discount
       
-      const tourDate = (() => {
-        const [year, month, day] = formData.preferredDate.split('-').map(Number)
-        const date = new Date(year, month - 1, day)
-        return date.toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          month: 'long', 
-          day: 'numeric',
-          year: 'numeric'
-        })
-      })()
+      const tourDate = formatTourDateLong(formData.preferredDate)
+      const tourDateIso = formData.preferredDate
 
       // Create Stripe Checkout Session
       const checkoutData = {
@@ -415,6 +375,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         metadata: {
           tour_id: tourId.toString(),
           tour_date_id: tourDateId.toString(),
+          tour_date_iso: tourDateIso,
           customer_name: formData.fullName,
           customer_email: formData.email,
           adults: formData.adults.toString(),
@@ -438,6 +399,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         children: formData.children.toString(),
         total_price: totalPrice.toString(),
         tour_date: tourDate,
+        tour_date_iso: tourDateIso,
         tour_name: tourName,
         phone: formData.phone,
         special_requests: formData.specialRequests
@@ -514,16 +476,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
       const discount = getDiscountAmount(subtotal)
       const totalPrice = subtotal - discount
       
-      const tourDate = (() => {
-        const [year, month, day] = formData.preferredDate.split('-').map(Number)
-        const date = new Date(year, month - 1, day)
-        return date.toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          month: 'long', 
-          day: 'numeric',
-          year: 'numeric'
-        })
-      })()
+      const tourDate = formatTourDateLong(formData.preferredDate)
+      const tourDateIso = formData.preferredDate
 
       // Create crypto booking request
       const cryptoBookingData = {
@@ -540,6 +494,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         discount_code: formData.discountCode.trim().toUpperCase(),
         tour_name: tourName,
         tour_date: tourDate,
+        tour_date_iso: tourDateIso,
         crypto_type: cryptoFormData.cryptoType,
         special_requests: cryptoFormData.specialRequests,
         payment_type: 'crypto'
@@ -572,6 +527,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           children: formData.children.toString(),
           total_price: totalPrice.toString(),
           tour_date: tourDate,
+          tour_date_iso: tourDateIso,
           tour_name: tourName,
           crypto_type: cryptoFormData.cryptoType,
           special_requests: cryptoFormData.specialRequests
@@ -632,7 +588,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           
           {/* Simple Date Picker */}
           <div className="grid grid-cols-7 gap-1 mb-3">
-            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+            {WEEKDAY_HEADERS_MON_FIRST.map(day => (
               <div key={day} className="text-center text-xs font-medium text-gray-500 py-1">
                 {day}
               </div>
@@ -754,7 +710,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
             {/* Available Slots Info */}
             {formData.preferredDate && (
               <div className="text-xs text-blue-600 bg-blue-50 border border-blue-200 rounded p-2">
-                Available slots for {new Date(formData.preferredDate).toLocaleDateString()}: {getAvailableSlots(formData.preferredDate)} people
+                Available slots for {formatTourDateShort(formData.preferredDate)}: {getAvailableSlots(formData.preferredDate)} people
               </div>
             )}
             
@@ -846,14 +802,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 <span className="text-gray-600">Selected Date:</span>
                 <span className="text-gray-800 font-medium">
                   {(() => {
-                    const [year, month, day] = formData.preferredDate.split('-').map(Number)
-                    const date = new Date(year, month - 1, day)
-                    const dateString = date.toLocaleDateString('en-US', { 
-                      weekday: 'long', 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })
+                    const dateString = formatTourDateLong(formData.preferredDate)
                     // Add start time for Northern Lights tours
                     if (tourName.includes('Family-Friendly Northern Lights')) {
                       return `${dateString} at 21:00`
@@ -1050,16 +999,7 @@ const CryptoPaymentModal: React.FC<{
               <h4 className="font-semibold text-gray-900 mb-2">Booking Summary</h4>
               <div className="text-sm text-gray-600 space-y-1">
                 <p><strong>Tour:</strong> {tourName}</p>
-                <p><strong>Date:</strong> {formData.preferredDate ? (() => {
-                  const [year, month, day] = formData.preferredDate.split('-').map(Number)
-                  const date = new Date(year, month - 1, day)
-                  return date.toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    month: 'long', 
-                    day: 'numeric',
-                    year: 'numeric'
-                  })
-                })() : 'Not selected'}</p>
+                <p><strong>Date:</strong> {formData.preferredDate ? formatTourDateLong(formData.preferredDate) : 'Not selected'}</p>
                 <p><strong>Participants:</strong> {formData.adults} adults, {formData.children} children</p>
                 <p><strong>Total:</strong> €{calculateTotal()}</p>
               </div>

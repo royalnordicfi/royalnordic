@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase'
+import { todayTourDateISO } from '../lib/tourDate'
 import type {
   BookingEvent,
   BookingSource,
@@ -542,7 +543,7 @@ export async function fetchCustomersDerived(): Promise<Customer[]> {
     }
   }
 
-  const today = new Date().toISOString().slice(0, 10)
+  const today = todayTourDateISO()
   return Array.from(byEmail.values())
     .map(({ _dates, ...c }) => ({
       ...c,

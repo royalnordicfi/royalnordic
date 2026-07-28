@@ -3,6 +3,13 @@ import { Save, RefreshCw } from 'lucide-react'
 import { updateTourAvailability } from '../lib/api'
 import { supabase } from '../lib/supabase'
 import type { TourDate } from '../lib/supabase'
+import {
+  WEEKDAY_HEADERS_MON_FIRST,
+  buildMondayFirstMonthGrid,
+  formatTourDateShort,
+  todayTourDateISO,
+  tourDateToLocalDate,
+} from '../lib/tourDate'
 
 interface AdminAvailabilityProps {
   tourId: number
@@ -68,82 +75,52 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
     setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))
   }
 
-  // Get calendar grid for current month
+  // Get calendar grid for current month (Monday-first; date-only ISO cells)
   const getCalendarGrid = () => {
     const year = currentMonth.getFullYear()
     const month = currentMonth.getMonth()
-    
-    // Use UTC to avoid timezone offset issues
-    const firstDay = new Date(Date.UTC(year, month, 1))
-    const lastDay = new Date(Date.UTC(year, month + 1, 0))
-    const startDate = new Date(firstDay)
-    const endDate = new Date(lastDay)
-    
-    // Get available dates for this month
-    const monthDates = availability.filter(date => {
-      const dateObj = new Date(date.date)
-      return dateObj >= startDate && dateObj <= endDate
-    })
-    
-    // Create a map for faster lookup
-    const dateMap = new Map()
-    monthDates.forEach(date => {
-      dateMap.set(date.date, date)
-    })
+    const todayString = todayTourDateISO()
+    const dateMap = new Map(availability.map((d) => [d.date, d]))
 
-    // Create calendar grid
-    const grid = []
-    const firstDayOfWeek = firstDay.getUTCDay()
-    const daysInMonth = lastDay.getUTCDate()
+    return buildMondayFirstMonthGrid(year, month).map((cell) => {
+      if (cell === null) return null
 
-    // Add empty cells for days before the first of the month
-    for (let i = 0; i < firstDayOfWeek; i++) {
-      grid.push(null)
-    }
-
-    // Add ALL days of the month (professional approach)
-    for (let day = 1; day <= daysInMonth; day++) {
-      // Use UTC to avoid timezone offset issues
-      const dateString = new Date(Date.UTC(year, month, day)).toISOString().split('T')[0]
+      const { day, date: dateString } = cell
       const dateData = dateMap.get(dateString)
-      
-      // Check if date is in the past
-      const today = new Date()
-      const todayString = today.toISOString().split('T')[0]
-      const isPastDate = dateString < todayString
-      
-      // Check if date is in season (for Northern Lights: Sep 15 - Apr 15, Snowshoe: Nov 1 - Apr 1)
+
       let inSeason = true
-      if (tourId === 1) { // Northern Lights
-        const date = new Date(dateString)
-        const month = date.getMonth() + 1
+      if (tourId === 1) {
+        // Northern Lights: Sep 15 - Apr 15
+        const date = tourDateToLocalDate(dateString)
+        const m = date.getMonth() + 1
         const dayOfMonth = date.getDate()
-        inSeason = (month === 9 && dayOfMonth >= 15) || 
-                   (month >= 10 && month <= 12) || 
-                   (month >= 1 && month <= 3) || 
-                   (month === 4 && dayOfMonth <= 15)
-      } else if (tourId === 2) { // Snowshoe
-        const date = new Date(dateString)
-        const month = date.getMonth() + 1
+        inSeason =
+          (m === 9 && dayOfMonth >= 15) ||
+          (m >= 10 && m <= 12) ||
+          (m >= 1 && m <= 3) ||
+          (m === 4 && dayOfMonth <= 15)
+      } else if (tourId === 2) {
+        // Snowshoe: Nov 1 - Apr 1
+        const date = tourDateToLocalDate(dateString)
+        const m = date.getMonth() + 1
         const dayOfMonth = date.getDate()
-        inSeason = (month === 11 && dayOfMonth >= 1) || 
-                   (month === 12) || 
-                   (month >= 1 && month <= 3) || 
-                   (month === 4 && dayOfMonth <= 1)
+        inSeason =
+          (m === 11 && dayOfMonth >= 1) ||
+          m === 12 ||
+          (m >= 1 && m <= 3) ||
+          (m === 4 && dayOfMonth <= 1)
       }
-      
-      grid.push({
+
+      return {
         day,
         date: dateString,
         available: dateData ? dateData.remaining_slots > 0 : false,
         remainingSlots: dateData?.remaining_slots || 0,
         hasData: !!dateData,
-        isPastDate,
-        inSeason
-      })
-    }
-
-    return grid
+        isPastDate: dateString < todayString,
+        inSeason,
+      }
+    })
   }
 
   // Handle date selection
@@ -308,7 +285,7 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
 
           {/* Calendar Grid */}
           <div className="grid grid-cols-7 gap-1 mb-4">
-            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+            {WEEKDAY_HEADERS_MON_FIRST.map(day => (
               <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
                 {day}
               </div>
@@ -357,7 +334,7 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
         {isEditing && selectedDate && (
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Edit Availability for {new Date(selectedDate).toLocaleDateString()}
+              Edit Availability for {formatTourDateShort(selectedDate)}
             </h3>
             
             <div className="space-y-4">

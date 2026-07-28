@@ -429,14 +429,26 @@ app.post('/api/admin/setup', (req, res) => {
         const childTotal = tourData.child_price * bookingDetails.children;
         const totalPrice = adultTotal + childTotal;
 
-        // Format date
-        const tourDate = new Date(tourData.tour_date);
-        const formattedDate = tourDate.toLocaleDateString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        });
+        // Format date (date-only ISO — never parse as UTC midnight)
+        const tourDateRaw = tourData.tour_date;
+        let formattedDate = tourDateRaw;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(String(tourDateRaw))) {
+          const [y, m, d] = String(tourDateRaw).split('-').map(Number);
+          formattedDate = new Date(y, m - 1, d, 12).toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+        } else {
+          const tourDate = new Date(tourDateRaw);
+          formattedDate = tourDate.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+        }
 
         // Send confirmation email
         const response = await fetch('https://api.resend.com/emails', {

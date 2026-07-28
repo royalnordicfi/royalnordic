@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { fetchOpsBookings, fetchProducts } from '../adminApi'
 import type { OpsBooking, Product } from '../types'
 import { SOURCE_LABELS, type BookingSource } from '../types'
+import { todayTourDateISO } from '../../lib/tourDate'
 
 export default function RevenuePage() {
   const [bookings, setBookings] = useState<OpsBooking[]>([])
@@ -17,7 +18,7 @@ export default function RevenuePage() {
       .catch((e) => setError(e instanceof Error ? e.message : 'Failed'))
   }, [])
 
-  const today = new Date().toISOString().slice(0, 10)
+  const today = todayTourDateISO()
   const commissionByTour = useMemo(() => {
     const m = new Map<number, number | null>()
     for (const p of products) m.set(p.id, p.commission_percent ?? null)

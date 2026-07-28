@@ -26,6 +26,7 @@ import {
 import AdminLogin from './AdminLogin'
 import AdminAvailability from './AdminAvailability'
 import type { Booking } from '../lib/supabase'
+import { formatTourDateLong } from '../lib/tourDate'
 
 interface AdminBooking extends Booking {
   tours: { name: string }
@@ -209,8 +210,11 @@ const AdminPanel: React.FC = () => {
       .reduce((sum, b) => sum + b.adults + b.children, 0)
   }
 
-  // Format date
+  // Format date (date-only ISO must not use UTC midnight parsing)
   const formatDate = (dateString: string) => {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      return formatTourDateLong(dateString, 'fi-FI')
+    }
     return new Date(dateString).toLocaleDateString('fi-FI', {
       year: 'numeric',
       month: 'long',
