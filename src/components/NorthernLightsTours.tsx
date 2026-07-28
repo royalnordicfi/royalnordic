@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Users, Clock, MapPin, Star } from 'lucide-react';
 import Footer from './Footer';
+import { SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS } from '../lib/productVisibility';
 
 const NorthernLightsTours: React.FC = () => {
   const tours = [
@@ -29,18 +30,20 @@ const NorthernLightsTours: React.FC = () => {
       route: "/family-friendly-northern-lights",
       badge: "Family Favorite"
     },
-    {
-      id: 3,
-      name: "Monster Truck Northern Lights Experience",
-      description: "Aurora hunting aboard a giant monster truck. Partner experience — request availability and a quote.",
-      image: "/monsteri1.jpg",
-      duration: "3 hours",
-      groupSize: "Flexible",
-      location: "Rovaniemi, Lapland",
-      features: ["Professional guide and driver", "Specially built monster truck", "Remote viewing locations", "No experience required"],
-      route: "/monster-truck-northern-lights",
-      badge: "Request availability"
-    }
+    ...(SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS
+      ? [{
+          id: 3,
+          name: "Monster Truck Northern Lights Experience",
+          description: "Aurora hunting aboard a giant monster truck. Partner experience — request availability and a quote.",
+          image: "/monsteri1.jpg",
+          duration: "3 hours",
+          groupSize: "Flexible",
+          location: "Rovaniemi, Lapland",
+          features: ["Professional guide and driver", "Specially built monster truck", "Remote viewing locations", "No experience required"],
+          route: "/monster-truck-northern-lights",
+          badge: "Request availability"
+        }]
+      : [])
   ];
 
   return (

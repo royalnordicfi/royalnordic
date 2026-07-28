@@ -21,7 +21,7 @@ const META: Record<string, { title: string; description: string; ogImage?: strin
   '/northern-lights-tours': {
     title: 'Northern Lights Tours Rovaniemi | Royal Nordic',
     description:
-      'Compare guaranteed, family-friendly, and partner aurora experiences from Royal Nordic in Rovaniemi, Finnish Lapland.',
+      'Compare guaranteed and family-friendly aurora experiences from Royal Nordic in Rovaniemi, Finnish Lapland.',
   },
   '/ice-fishing': {
     title: 'Ice Fishing Tour Rovaniemi | Royal Nordic',

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
+import { SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS } from '../lib/productVisibility';
 
 const BestSellersSlideshow: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -36,16 +37,18 @@ const BestSellersSlideshow: React.FC = () => {
       mode: "inquiry" as const,
       cta: "Request availability"
     },
-    {
-      id: 4,
-      title: "Monster Truck Northern Lights Experience",
-      description: "Aurora hunting aboard a giant monster truck. Partner experience — request availability and a quote.",
-      image: "/monsteri1.jpg",
-      route: "/monster-truck-northern-lights",
-      badge: "REQUEST ONLY",
-      mode: "inquiry" as const,
-      cta: "Request availability"
-    }
+    ...(SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS
+      ? [{
+          id: 4,
+          title: "Monster Truck Northern Lights Experience",
+          description: "Aurora hunting aboard a giant monster truck. Partner experience — request availability and a quote.",
+          image: "/monsteri1.jpg",
+          route: "/monster-truck-northern-lights",
+          badge: "REQUEST ONLY",
+          mode: "inquiry" as const,
+          cta: "Request availability"
+        }]
+      : [])
   ];
 
   useEffect(() => {
