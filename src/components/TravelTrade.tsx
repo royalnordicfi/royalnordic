@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import {
   ArrowLeft,
   CheckCircle,
-  Handshake,
+  Briefcase,
   Sparkles,
   Users,
   Compass,
@@ -127,7 +127,7 @@ const TravelTrade: React.FC = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-10 sm:space-y-14">
         <section className="bg-white/5 border border-white/10 rounded-2xl p-5 sm:p-8">
           <div className="flex items-center gap-3 mb-4">
-            <Handshake className="text-emerald-400" size={22} />
+            <Briefcase className="text-emerald-400" size={22} />
             <h2 className="text-2xl font-luxury font-bold text-white">Why partner with Royal Nordic</h2>
           </div>
           <ul className="space-y-3">
