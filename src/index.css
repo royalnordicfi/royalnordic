@@ -177,3 +177,57 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #059669;
 }
+
+/* Fullscreen mobile navigation */
+.rn-mobile-nav {
+  pointer-events: none;
+}
+
+.rn-mobile-nav.is-open {
+  pointer-events: auto;
+}
+
+.rn-mobile-nav__panel {
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+  transition:
+    opacity 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.rn-mobile-nav.is-open .rn-mobile-nav__panel {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.rn-mobile-nav__item,
+.rn-mobile-nav__footer {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  transition:
+    opacity 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.rn-mobile-nav.is-open .rn-mobile-nav__item,
+.rn-mobile-nav.is-open .rn-mobile-nav__footer {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+html.mobile-nav-open .whatsapp-widget {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rn-mobile-nav__panel,
+  .rn-mobile-nav__item,
+  .rn-mobile-nav__footer {
+    transition: opacity 160ms ease !important;
+    transform: none !important;
+  }
+}

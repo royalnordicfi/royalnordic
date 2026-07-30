@@ -1,82 +1,35 @@
-import React from 'react';
-import { MessageCircle } from 'lucide-react';
+import React, { useRef } from 'react'
+import { MessageCircle } from 'lucide-react'
 
 const WhatsAppWidget = () => {
-  // Your WhatsApp direct link
-  const whatsappUrl = 'https://wa.me/message/32DREESZC5QUB1';
-  
-  // Debug: Check if component is rendering
-  console.log('WhatsAppWidget rendered, URL:', whatsappUrl);
+  const whatsappUrl = 'https://wa.me/message/32DREESZC5QUB1'
+  const lockedUntil = useRef(0)
 
-  const handleWhatsAppClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('WhatsApp button clicked!', whatsappUrl);
-    
-    // Prevent multiple clicks
-    if (e.target.disabled) return;
-    e.target.disabled = true;
-    
-    // Re-enable after a short delay
-    setTimeout(() => {
-      e.target.disabled = false;
-    }, 1000);
-    
-    // Try multiple methods to ensure it works
-    try {
-      if (window.open) {
-        const newWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-        if (!newWindow) {
-          console.log('Popup blocked, trying direct navigation');
-          window.location.href = whatsappUrl;
-        } else {
-          console.log('WhatsApp opened in new window');
-        }
-      } else {
-        console.log('window.open not available, using direct navigation');
-        window.location.href = whatsappUrl;
-      }
-    } catch (error) {
-      console.error('Error opening WhatsApp:', error);
-      window.location.href = whatsappUrl;
+  const handleWhatsAppClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const now = Date.now()
+    if (now < lockedUntil.current) return
+    lockedUntil.current = now + 1000
+
+    const newWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer')
+    if (!newWindow) {
+      window.location.href = whatsappUrl
     }
-  };
+  }
 
   return (
-    <>
-      {/* WhatsApp Button */}
-      <div className="fixed bottom-6 right-6 z-[9999] pointer-events-auto">
-        <button
-          onClick={handleWhatsAppClick}
-          className="bg-green-500 hover:bg-green-600 active:bg-green-700 text-white p-5 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 active:scale-95 group cursor-pointer select-none relative"
-          style={{ 
-            minWidth: '60px', 
-            minHeight: '60px',
-            zIndex: 9999,
-            pointerEvents: 'auto'
-          }}
-          aria-label="Open WhatsApp chat"
-        >
-          <MessageCircle size={32} className="group-hover:animate-pulse" />
-          
-          {/* Online indicator dot */}
-          <div 
-            className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-lg animate-pulse"
-            style={{ zIndex: 10000 }}
-          >
-            <div className="w-full h-full bg-red-500 rounded-full animate-ping opacity-75"></div>
-          </div>
-        </button>
-        
-        {/* Pulse animation ring */}
-        <div 
-          className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-20 pointer-events-none"
-          style={{ zIndex: 9998 }}
-        ></div>
-      </div>
+    <div className="whatsapp-widget fixed bottom-6 right-6 z-[60] pointer-events-auto transition-opacity duration-300">
+      <button
+        type="button"
+        onClick={handleWhatsAppClick}
+        className="bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white p-4 rounded-full shadow-xl transition-transform duration-300 hover:scale-105 active:scale-95 min-h-[56px] min-w-[56px] flex items-center justify-center"
+        aria-label="Open WhatsApp chat"
+      >
+        <MessageCircle size={28} />
+      </button>
+    </div>
+  )
+}
 
-    </>
-  );
-};
-
-export default WhatsAppWidget;
+export default WhatsAppWidget

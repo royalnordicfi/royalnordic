@@ -67,6 +67,11 @@ const META: Record<
     title: 'Customized Private Tours Lapland | Royal Nordic',
     description: 'Request a tailored Lapland experience — private groups, flexible itineraries, quote within 24 hours.',
   },
+  '/travel-trade': {
+    title: 'Partner With Royal Nordic | Travel Trade Lapland',
+    description:
+      'Travel agency and B2B partnerships for premium Rovaniemi tours — Northern Lights, daytime experiences, private itineraries, and transfers.',
+  },
   '/snowmobile-safari': {
     title: 'Snowmobile Safari Rovaniemi | Request Availability | Royal Nordic',
     description: 'Partner snowmobile safari near Rovaniemi. Request availability and a personalized quote.',
