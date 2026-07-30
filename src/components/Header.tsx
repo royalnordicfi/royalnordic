@@ -1,20 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import {
-  Menu,
-  X,
-  Phone,
-  Mail,
-  Instagram,
-  Home,
-  Sparkles,
-  Compass,
-  Car,
-  Briefcase,
-  Info,
-  BookOpen,
-  MessageCircle,
-} from 'lucide-react'
+import { Menu, X, Phone, Mail, Instagram } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 
 const WHATSAPP_URL = 'https://wa.me/message/32DREESZC5QUB1'
@@ -24,77 +10,19 @@ const TIKTOK_URL = 'https://www.tiktok.com/@royalnordic'
 type NavItem = {
   id: string
   label: string
-  subtitle: string
-  icon: React.ComponentType<{ className?: string; size?: number }>
   action: 'home' | 'section' | 'route'
   target: string
 }
 
 const NAV_ITEMS: NavItem[] = [
-  {
-    id: 'home',
-    label: 'Home',
-    subtitle: 'Premium Lapland experiences from Rovaniemi',
-    icon: Home,
-    action: 'home',
-    target: '/',
-  },
-  {
-    id: 'tours',
-    label: 'Tours',
-    subtitle: 'Northern Lights, ice fishing & Arctic day trips',
-    icon: Sparkles,
-    action: 'section',
-    target: 'tours',
-  },
-  {
-    id: 'customized',
-    label: 'Customized Experiences',
-    subtitle: 'Private itineraries tailored to your group',
-    icon: Compass,
-    action: 'route',
-    target: '/customized-tour',
-  },
-  {
-    id: 'transportation',
-    label: 'Transportation',
-    subtitle: 'Private transfers across Finnish Lapland',
-    icon: Car,
-    action: 'section',
-    target: 'transportation',
-  },
-  {
-    id: 'partners',
-    label: 'Partner With Us',
-    subtitle: 'Travel trade & agency partnerships',
-    icon: Briefcase,
-    action: 'route',
-    target: '/travel-trade',
-  },
-  {
-    id: 'about',
-    label: 'About',
-    subtitle: 'Local guides. Small groups. Royal Nordic.',
-    icon: Info,
-    action: 'section',
-    target: 'about',
-  },
-  {
-    id: 'blog',
-    label: 'Blog',
-    subtitle: 'Lapland travel guides & winter tips',
-    icon: BookOpen,
-    action: 'route',
-    target: '/blog',
-  },
-  {
-    id: 'contact',
-    label: 'Contact',
-    subtitle: 'Speak with our team in Rovaniemi',
-    icon: MessageCircle,
-    action: 'section',
-    target: 'contact',
-  },
+  { id: 'home', label: 'Home', action: 'home', target: '/' },
+  { id: 'tours', label: 'Tours', action: 'section', target: 'tours' },
+  { id: 'customized', label: 'Customized Experiences', action: 'route', target: '/customized-tour' },
+  { id: 'transportation', label: 'Transportation', action: 'section', target: 'transportation' },
+  { id: 'partners', label: 'Partner With Us', action: 'route', target: '/travel-trade' },
+  { id: 'about', label: 'About Us', action: 'section', target: 'about' },
+  { id: 'blog', label: 'Blog', action: 'route', target: '/blog' },
+  { id: 'contact', label: 'Contact Us', action: 'section', target: 'contact' },
 ]
 
 const Header = () => {
@@ -107,6 +35,7 @@ const Header = () => {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const openButtonRef = useRef<HTMLButtonElement>(null)
   const scrollLockY = useRef(0)
+  const afterCloseRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -152,9 +81,14 @@ const Header = () => {
     })
   }, [lockBodyScroll])
 
-  const closeMenu = useCallback(() => {
+  const closeMenu = useCallback((after?: () => void) => {
+    if (!isMenuMounted) {
+      after?.()
+      return
+    }
+    afterCloseRef.current = after ?? null
     setIsMenuOpen(false)
-  }, [])
+  }, [isMenuMounted])
 
   const toggleMenu = () => {
     if (isMenuOpen || isMenuMounted) closeMenu()
@@ -166,8 +100,14 @@ const Header = () => {
     const timer = window.setTimeout(() => {
       setIsMenuMounted(false)
       unlockBodyScroll()
-      openButtonRef.current?.focus()
-    }, 420)
+      const next = afterCloseRef.current
+      afterCloseRef.current = null
+      if (next) {
+        requestAnimationFrame(() => next())
+      } else {
+        openButtonRef.current?.focus()
+      }
+    }, 380)
     return () => window.clearTimeout(timer)
   }, [isMenuMounted, isMenuOpen, unlockBodyScroll])
 
@@ -182,7 +122,6 @@ const Header = () => {
         return
       }
       if (event.key !== 'Tab' || !menuRef.current) return
-
       const focusable = menuRef.current.querySelectorAll<HTMLElement>(
         'a[href], button:not([disabled])'
       )
@@ -202,43 +141,44 @@ const Header = () => {
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [isMenuOpen, closeMenu])
 
-  useEffect(() => () => {
-    document.documentElement.classList.remove('mobile-nav-open')
-    document.body.style.position = ''
-    document.body.style.top = ''
-    document.body.style.left = ''
-    document.body.style.right = ''
-    document.body.style.width = ''
-    document.body.style.overflow = ''
-  }, [])
-
-  const goHome = () => {
-    closeMenu()
-    navigate('/')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  useEffect(
+    () => () => {
+      document.documentElement.classList.remove('mobile-nav-open')
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.left = ''
+      document.body.style.right = ''
+      document.body.style.width = ''
+      document.body.style.overflow = ''
+    },
+    []
+  )
 
   const scrollToSection = (sectionId: string) => {
     if (sectionId === 'home') {
       if (location.pathname !== '/') navigate('/')
-      window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), location.pathname !== '/' ? 120 : 0)
+      window.setTimeout(
+        () => window.scrollTo({ top: 0, behavior: 'smooth' }),
+        location.pathname !== '/' ? 120 : 0
+      )
       return
     }
     const run = () => {
       const element = document.getElementById(sectionId)
-      if (element) element.scrollIntoView({ behavior: 'smooth' })
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
     }
     if (location.pathname !== '/') {
       navigate('/')
-      window.setTimeout(run, 120)
+      window.setTimeout(run, 150)
     } else {
       run()
     }
   }
 
   const handleNavItem = (item: NavItem) => {
-    closeMenu()
-    window.setTimeout(() => {
+    closeMenu(() => {
       if (item.action === 'home') {
         navigate('/')
         window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -247,7 +187,7 @@ const Header = () => {
       } else {
         navigate(item.target)
       }
-    }, 80)
+    })
   }
 
   const BrandMark = ({
@@ -259,7 +199,15 @@ const Header = () => {
   }) => (
     <button
       type="button"
-      onClick={onNavigate ?? goHome}
+      onClick={
+        onNavigate ??
+        (() => {
+          closeMenu(() => {
+            navigate('/')
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          })
+        })
+      }
       className={`flex flex-col ${centered ? 'items-center' : 'items-start sm:items-center'} space-y-0.5 min-h-[44px] bg-transparent border-0 p-0 cursor-pointer`}
       aria-label="Royal Nordic home"
     >
@@ -281,129 +229,128 @@ const Header = () => {
     createPortal(
       <div
         ref={menuRef}
-        className={`rn-mobile-nav fixed inset-0 z-[100] md:hidden ${isMenuOpen ? 'is-open' : ''}`}
+        className={`rn-mobile-nav fixed inset-0 z-[100] md:hidden bg-black ${isMenuOpen ? 'is-open' : ''}`}
         id="mobile-fullscreen-nav"
         role="dialog"
         aria-modal="true"
         aria-label="Main navigation"
       >
-        <div className="rn-mobile-nav__panel absolute inset-0 bg-black flex flex-col">
-          <div className="flex items-center justify-between px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 border-b border-white/10">
-            <BrandMark centered={false} onNavigate={() => { closeMenu(); navigate('/') }} />
+        <div className="rn-mobile-nav__panel absolute inset-0 bg-black flex flex-col min-h-[100dvh] h-[100dvh]">
+          <div className="flex items-center justify-between px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 border-b border-gray-800/80 bg-black shrink-0">
+            <BrandMark
+              centered={false}
+              onNavigate={() =>
+                closeMenu(() => {
+                  navigate('/')
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                })
+              }
+            />
             <button
               ref={closeButtonRef}
               type="button"
-              onClick={closeMenu}
-              className="text-white/90 hover:text-emerald-400 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full"
+              onClick={() => closeMenu()}
+              className="text-gray-300 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
               aria-label="Close menu"
             >
-              <X size={26} />
+              <X size={24} />
             </button>
           </div>
 
-          <nav className="flex-1 overflow-y-auto overscroll-contain px-4 py-6">
-            <ul className="space-y-1">
-              {NAV_ITEMS.map((item, index) => {
-                const Icon = item.icon
-                return (
+          <div className="flex-1 overflow-y-auto overscroll-contain bg-black px-4 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+            <nav>
+              <ul className="space-y-1">
+                {NAV_ITEMS.map((item, index) => (
                   <li
                     key={item.id}
                     className="rn-mobile-nav__item"
-                    style={{ transitionDelay: isMenuOpen ? `${80 + index * 45}ms` : '0ms' }}
+                    style={{ transitionDelay: isMenuOpen ? `${60 + index * 35}ms` : '0ms' }}
                   >
                     <button
                       type="button"
                       onClick={() => handleNavItem(item)}
-                      className="w-full flex items-start gap-4 rounded-xl px-3 py-3.5 text-left hover:bg-white/5 active:bg-white/10 transition-colors min-h-[64px]"
+                      className="block w-full px-3 py-3 text-left text-white hover:text-emerald-400 transition-colors duration-200 font-luxury font-bold text-lg tracking-wider uppercase min-h-[48px]"
                     >
-                      <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
-                        <Icon size={18} />
-                      </span>
-                      <span className="min-w-0 flex-1 pt-0.5">
-                        <span className="block font-luxury text-xl text-white tracking-wide">
-                          {item.label}
-                        </span>
-                        <span className="mt-0.5 block text-sm text-gray-400 font-clean leading-snug">
-                          {item.subtitle}
-                        </span>
-                      </span>
+                      {item.label}
                     </button>
                   </li>
-                )
-              })}
-            </ul>
-          </nav>
+                ))}
+              </ul>
+            </nav>
 
-          <div
-            className="rn-mobile-nav__footer border-t border-white/10 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] space-y-4"
-            style={{ transitionDelay: isMenuOpen ? '420ms' : '0ms' }}
-          >
-            <div className="grid grid-cols-5 gap-2">
+            <div
+              className="rn-mobile-nav__item pt-6 mt-4 border-t border-gray-700 space-y-3"
+              style={{ transitionDelay: isMenuOpen ? '320ms' : '0ms' }}
+            >
               <a
                 href="tel:+3584578345138"
-                className="flex flex-col items-center justify-center gap-1 rounded-xl bg-white/5 border border-white/10 py-3 text-gray-300 hover:text-emerald-400 hover:border-emerald-500/40 transition-colors min-h-[64px]"
-                aria-label="Call Royal Nordic"
+                className="flex items-center justify-center space-x-2 text-sm text-gray-300 hover:text-emerald-400 min-h-[44px]"
               >
-                <Phone size={18} />
-                <span className="text-[10px] uppercase tracking-wider">Phone</span>
+                <Phone size={16} />
+                <span>+358 45 78345138</span>
               </a>
               <a
                 href="mailto:contact@royalnordic.fi"
-                className="flex flex-col items-center justify-center gap-1 rounded-xl bg-white/5 border border-white/10 py-3 text-gray-300 hover:text-emerald-400 hover:border-emerald-500/40 transition-colors min-h-[64px]"
-                aria-label="Email Royal Nordic"
+                className="flex items-center justify-center space-x-2 text-sm text-gray-300 hover:text-emerald-400 min-h-[44px]"
               >
-                <Mail size={18} />
-                <span className="text-[10px] uppercase tracking-wider">Email</span>
-              </a>
-              <a
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col items-center justify-center gap-1 rounded-xl bg-white/5 border border-white/10 py-3 text-gray-300 hover:text-pink-400 hover:border-pink-500/40 transition-colors min-h-[64px]"
-                aria-label="Instagram"
-              >
-                <Instagram size={18} />
-                <span className="text-[10px] uppercase tracking-wider">IG</span>
-              </a>
-              <a
-                href={TIKTOK_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col items-center justify-center gap-1 rounded-xl bg-white/5 border border-white/10 py-3 text-gray-300 hover:text-white hover:border-white/30 transition-colors min-h-[64px]"
-                aria-label="TikTok"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
-                </svg>
-                <span className="text-[10px] uppercase tracking-wider">TikTok</span>
+                <Mail size={16} />
+                <span>contact@royalnordic.fi</span>
               </a>
               <a
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-col items-center justify-center gap-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 py-3 text-emerald-400 hover:bg-emerald-500/25 transition-colors min-h-[64px]"
-                aria-label="WhatsApp"
+                className="flex items-center justify-center space-x-2 text-sm text-emerald-400 hover:text-emerald-300 min-h-[44px]"
               >
-                <MessageCircle size={18} />
-                <span className="text-[10px] uppercase tracking-wider">Chat</span>
+                <span>Chat on WhatsApp</span>
               </a>
             </div>
 
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div
+              className="rn-mobile-nav__item flex items-center justify-center space-x-8 pt-4"
+              style={{ transitionDelay: isMenuOpen ? '360ms' : '0ms' }}
+            >
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-pink-500 transition-colors duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label="Follow us on Instagram"
+              >
+                <Instagram size={24} />
+              </a>
+              <a
+                href={TIKTOK_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-white transition-colors duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label="Follow us on TikTok"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+                </svg>
+              </a>
+            </div>
+
+            <div
+              className="rn-mobile-nav__item pt-6 space-y-3"
+              style={{ transitionDelay: isMenuOpen ? '400ms' : '0ms' }}
+            >
               <button
                 type="button"
                 onClick={() => handleNavItem(NAV_ITEMS.find((i) => i.id === 'partners')!)}
-                className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-medium text-white hover:border-emerald-500/40 hover:text-emerald-300 transition-colors min-h-[48px]"
+                className="w-full rounded-lg border border-gray-600 bg-transparent px-4 py-3 text-sm font-medium text-white hover:border-emerald-500/50 hover:text-emerald-300 transition-colors min-h-[48px]"
               >
                 Become a Partner
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  closeMenu()
-                  window.setTimeout(() => navigate('/customized-tour'), 80)
-                }}
-                className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-500 transition-colors min-h-[48px]"
+                onClick={() =>
+                  closeMenu(() => {
+                    navigate('/customized-tour')
+                  })
+                }
+                className="w-full rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-500 transition-colors min-h-[48px]"
               >
                 Request Custom Tour
               </button>
@@ -424,7 +371,6 @@ const Header = () => {
         }`}
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-          {/* Mobile header */}
           <div className="md:hidden relative flex items-center justify-end h-20">
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <BrandMark centered />
@@ -442,10 +388,14 @@ const Header = () => {
             </button>
           </div>
 
-          {/* Desktop header */}
           <div className="hidden md:flex justify-between items-center h-24 pt-1">
             <div className="flex-shrink-0 pl-2">
-              <BrandMark />
+              <BrandMark
+                onNavigate={() => {
+                  navigate('/')
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }}
+              />
             </div>
 
             <nav className="flex items-center space-x-3 lg:space-x-5">

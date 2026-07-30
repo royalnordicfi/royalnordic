@@ -4,7 +4,7 @@ import BlogPost from '../BlogPost';
 const BestTimeNorthernLights: React.FC = () => {
   const post = {
     id: 1,
-    title: "Best Time to See Northern Lights in Lapland 2025",
+    title: "Best Time to See Northern Lights in Lapland",
     slug: "best-time-northern-lights-lapland-2025",
     excerpt: "Discover the optimal months and conditions for witnessing the magical Aurora Borealis in Finnish Lapland. Complete guide with weather patterns and viewing tips.",
     content: `
@@ -69,9 +69,9 @@ const BestTimeNorthernLights: React.FC = () => {
 
       <h2 class="text-2xl font-bold text-white mb-4 mt-8">Solar Activity Cycle</h2>
       <p class="text-gray-300 mb-6 leading-relaxed">
-        The Northern Lights follow an 11-year solar cycle. We're currently in a period of 
-        <strong class="text-emerald-400">increasing solar activity</strong>, making 2025 an excellent year 
-        for Northern Lights viewing in Lapland.
+        The Northern Lights follow an 11-year solar cycle. Periods of
+        <strong class="text-emerald-400"> higher solar activity</strong> bring stronger aurora displays —
+        excellent conditions for Northern Lights viewing in Lapland.
       </p>
 
       <h2 class="text-2xl font-bold text-white mb-4 mt-8">Planning Your Trip</h2>

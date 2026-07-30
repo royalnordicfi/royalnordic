@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, Clock, Tag } from 'lucide-react';
+import { ArrowLeft, Clock, Tag } from 'lucide-react';
 import Footer from './Footer';
 
 interface BlogPostProps {
@@ -10,7 +10,7 @@ interface BlogPostProps {
     slug: string;
     content: string;
     excerpt: string;
-    date: string;
+    date?: string;
     readTime: string;
     category: string;
     author: string;
@@ -78,16 +78,6 @@ const BlogPost: React.FC<BlogPostProps> = ({ post }) => {
             </h1>
             
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4 lg:space-x-6 text-gray-300 text-xs sm:text-sm md:text-base px-4">
-              <div className="flex items-center">
-                <Calendar size={14} className="mr-1 sm:mr-2" />
-                <span className="text-center">
-                  {new Date(post.date).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </span>
-              </div>
               <div className="flex items-center">
                 <Clock size={14} className="mr-1 sm:mr-2" />
                 <span>{post.readTime}</span>

@@ -201,8 +201,7 @@ body {
   transform: translate3d(0, 0, 0);
 }
 
-.rn-mobile-nav__item,
-.rn-mobile-nav__footer {
+.rn-mobile-nav__item {
   opacity: 0;
   transform: translate3d(0, 14px, 0);
   transition:
@@ -211,8 +210,7 @@ body {
   will-change: opacity, transform;
 }
 
-.rn-mobile-nav.is-open .rn-mobile-nav__item,
-.rn-mobile-nav.is-open .rn-mobile-nav__footer {
+.rn-mobile-nav.is-open .rn-mobile-nav__item {
   opacity: 1;
   transform: translate3d(0, 0, 0);
 }
@@ -225,8 +223,7 @@ html.mobile-nav-open .whatsapp-widget {
 
 @media (prefers-reduced-motion: reduce) {
   .rn-mobile-nav__panel,
-  .rn-mobile-nav__item,
-  .rn-mobile-nav__footer {
+  .rn-mobile-nav__item {
     transition: opacity 160ms ease !important;
     transform: none !important;
   }
