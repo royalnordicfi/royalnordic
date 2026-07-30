@@ -139,9 +139,7 @@ At Royal Nordic, we specialize in authentic Lapland experiences with:
 
 Lapland's winter activities offer something for every type of traveler - from peaceful nature experiences to adrenaline-pumping adventures. The key is choosing activities that match your interests and fitness level while leaving time to simply enjoy the magical Arctic atmosphere.
 
-Whether you're chasing the Northern Lights, exploring frozen wilderness on snowshoes, or trying traditional ice fishing, Lapland promises unforgettable winter memories.
-
-**Ready to start your Arctic adventure?** Browse our tours and book your Lapland experience today!`,
+Whether you're chasing the Northern Lights, exploring frozen wilderness on snowshoes, or trying traditional ice fishing, Lapland promises unforgettable winter memories.`,
     sections: [
       {
         title: "Northern Lights Hunting",

@@ -111,23 +111,6 @@ const WhatToPackLapland: React.FC = () => {
         <li>Expensive jewelry (can get lost in the snow)</li>
         <li>Too many electronics (focus on the experience)</li>
       </ul>
-
-      <div class="bg-gray-800/50 rounded-lg p-6 my-8">
-        <h3 class="text-lg font-semibold text-white mb-3">Ready for Your Lapland Adventure?</h3>
-        <p class="text-gray-300 mb-4">
-          Now that you know what to pack, book your Lapland tour with Royal Nordic. Our expert guides 
-          will ensure you have an unforgettable Arctic experience, whether you're chasing the Northern Lights 
-          or exploring the winter wilderness.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4">
-          <a href="/northern-lights-tour" class="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105">
-            Book Northern Lights Tour
-          </a>
-          <a href="/snowshoe-rental" class="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105">
-            Book Snowshoe Adventure
-          </a>
-        </div>
-      </div>
     `,
     date: "2025-09-24",
     readTime: "4 min read",

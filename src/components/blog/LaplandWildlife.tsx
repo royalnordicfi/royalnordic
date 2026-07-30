@@ -175,18 +175,6 @@ const LaplandWildlife: React.FC = () => {
         <li>Respect the animals' space and comfort</li>
         <li>Capture both close-ups and environmental shots</li>
       </ul>
-
-      <div class="bg-gray-800/50 rounded-lg p-6 my-8">
-        <h3 class="text-lg font-semibold text-white mb-3">Experience Lapland Wildlife</h3>
-        <p class="text-gray-300 mb-4">
-          Join our Nordic Animals of Ranua Zoo tour and discover Finland's incredible wildlife with 
-          an expert guide. Learn about Arctic animals, their behaviors, and conservation efforts 
-          while enjoying a memorable day at the northernmost zoo in the world.
-        </p>
-        <a href="/ranua-zoo" class="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105">
-          Book Ranua Zoo Tour
-        </a>
-      </div>
     `,
     date: "2025-09-22",
     readTime: "4 min read",

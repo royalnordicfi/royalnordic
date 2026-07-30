@@ -383,9 +383,7 @@ const BestTimeVisitLapland: React.FC = () => {
 
 The "best" time to visit Lapland depends entirely on your priorities. Want guaranteed winter wonderland with Northern Lights? Choose December-February. Seeking value and fewer crowds? November or April are perfect. Prefer warmer weather and midnight sun? June-July deliver.
 
-The key is matching your visit to your interests, budget, and tolerance for cold and darkness. Whatever you choose, Lapland promises unforgettable experiences year-round.
-
-**Ready to plan your Lapland adventure?** Browse our seasonal tours and find the perfect time for your Arctic journey!`,
+The key is matching your visit to your interests, budget, and tolerance for cold and darkness. Whatever you choose, Lapland promises unforgettable experiences year-round.`,
     sections: []
   };
 

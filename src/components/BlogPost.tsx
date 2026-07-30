@@ -17,8 +17,15 @@ interface BlogPostProps {
   };
 }
 
-// Simple markdown to HTML converter
+// Simple markdown to HTML converter (skip when content is already HTML)
+const looksLikeHtml = (content: string): boolean =>
+  /<\/?(?:p|div|h[1-6]|ul|ol|li|a|strong)\b/i.test(content)
+
 const markdownToHtml = (markdown: string): string => {
+  if (looksLikeHtml(markdown)) {
+    return markdown.trim()
+  }
+
   return markdown
     // Headers
     .replace(/^### (.*$)/gim, '<h3 class="text-xl font-semibold text-white mb-3 mt-6">$1</h3>')

@@ -273,9 +273,7 @@ Many Lapland tour operators (including Royal Nordic) provide thermal clothing fo
 
 Dressing properly for Lapland's Arctic winter is all about understanding the layering system and choosing the right materials. With the right preparation, you'll stay comfortable and warm, allowing you to fully enjoy the magical winter wonderland.
 
-Remember: There's no such thing as bad weather, only inappropriate clothing! With this guide, you're ready to embrace Lapland's winter like a local.
-
-**Planning your Lapland adventure?** Check out our winter tours and experience the Arctic in comfort!`,
+Remember: There's no such thing as bad weather, only inappropriate clothing! With this guide, you're ready to embrace Lapland's winter like a local.`,
     sections: []
   };
 
