@@ -46,6 +46,8 @@ import SnowmobileSafari from './components/SnowmobileSafari';
 import BestSellersSlideshow from './components/BestSellersSlideshow';
 import MonsterTruckNorthernLights from './components/MonsterTruckNorthernLights';
 import RoutePageMeta from './components/RoutePageMeta';
+import RouteJsonLd from './components/seo/RouteJsonLd';
+import TravelTrade from './components/TravelTrade';
 
 function App() {
   return (
@@ -53,6 +55,7 @@ function App() {
       <div className="App">
         <ScrollToTop />
         <RoutePageMeta />
+        <RouteJsonLd />
         <Header />
         
         <Routes>
@@ -90,6 +93,7 @@ function App() {
           <Route path="/ranua-zoo" element={<RanuaZooTour />} />
           <Route path="/korouoma-canyon" element={<KorouomaTour />} />
           <Route path="/customized-tour" element={<CustomizedTour />} />
+          <Route path="/travel-trade" element={<TravelTrade />} />
           <Route path="/snowmobile-safari" element={<SnowmobileSafari />} />
           <Route
             path="/monster-truck-northern-lights"

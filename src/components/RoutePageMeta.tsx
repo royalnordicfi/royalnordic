@@ -30,7 +30,7 @@ const META: Record<
     ogImage: 'https://royalnordic.fi/nortti5.jpg',
   },
   '/ice-fishing': {
-    title: 'Ice Fishing Tour Rovaniemi | Royal Nordic',
+    title: 'Ice Fishing Rovaniemi | Lapland Day Trip | Royal Nordic',
     description:
       'Traditional Lapland ice fishing on frozen lakes near Rovaniemi with guide, equipment, and hot drinks. Free cancellation 24h. Book online.',
     ogImage: 'https://royalnordic.fi/icefishing2.jpg',
@@ -42,7 +42,7 @@ const META: Record<
     ogImage: 'https://royalnordic.fi/ranua1.jpg',
   },
   '/korouoma-canyon': {
-    title: 'Korouoma Canyon Tour from Rovaniemi | Royal Nordic',
+    title: 'Korouoma Canyon Tour from Rovaniemi | Frozen Waterfalls | Royal Nordic',
     description:
       '6-hour canyon hike to frozen waterfalls from Rovaniemi: hotel pickup, English & Finnish guide, campfire picnic. Free cancellation 24h. Book & pay securely.',
     ogImage: 'https://royalnordic.fi/korouoma1.jpg',
@@ -54,8 +54,8 @@ const META: Record<
     ogImage: 'https://royalnordic.fi/snowshoe1.jpg',
   },
   '/daytime-experiences': {
-    title: 'Daytime Experiences Lapland | Royal Nordic',
-    description: 'Ice fishing, Ranua Zoo, Korouoma Canyon, and snowmobile safari options from Rovaniemi.',
+    title: 'Lapland Day Trips from Rovaniemi | Royal Nordic',
+    description: 'Ice fishing, Ranua Wildlife Park, Korouoma Canyon, and snowmobile safari options — daytime excursions from Rovaniemi.',
     ogImage: 'https://royalnordic.fi/icefishing3.jpg',
   },
   '/renting-equipment': {
@@ -66,6 +66,11 @@ const META: Record<
   '/customized-tour': {
     title: 'Customized Private Tours Lapland | Royal Nordic',
     description: 'Request a tailored Lapland experience — private groups, flexible itineraries, quote within 24 hours.',
+  },
+  '/travel-trade': {
+    title: 'Partner With Royal Nordic | Travel Trade Lapland',
+    description:
+      'Travel agency and B2B partnerships for premium Rovaniemi tours — Northern Lights, daytime experiences, private itineraries, and transfers.',
   },
   '/snowmobile-safari': {
     title: 'Snowmobile Safari Rovaniemi | Request Availability | Royal Nordic',

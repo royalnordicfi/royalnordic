@@ -35,13 +35,28 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/northern-lights-tours" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
-                  Northern Lights Tours
+                <Link to="/northern-lights-tour" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
+                  Guaranteed Northern Lights
                 </Link>
               </li>
               <li>
-                <Link to="/daytime-experiences" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
-                  Daytime Experiences
+                <Link to="/family-friendly-northern-lights" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
+                  Family Northern Lights
+                </Link>
+              </li>
+              <li>
+                <Link to="/ice-fishing" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
+                  Ice Fishing Rovaniemi
+                </Link>
+              </li>
+              <li>
+                <Link to="/ranua-zoo" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
+                  Ranua Wildlife Park
+                </Link>
+              </li>
+              <li>
+                <Link to="/korouoma-canyon" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
+                  Korouoma Canyon Tour
                 </Link>
               </li>
               <li>
@@ -52,6 +67,11 @@ const Footer: React.FC = () => {
               <li>
                 <Link to="/customized-tour" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
                   Customized Tours
+                </Link>
+              </li>
+              <li>
+                <Link to="/travel-trade" className="text-gray-300 hover:text-white transition-colors text-sm font-clean">
+                  Partner With Us
                 </Link>
               </li>
               <li>

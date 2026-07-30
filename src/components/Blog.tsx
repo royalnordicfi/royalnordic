@@ -140,9 +140,9 @@ const Blog: React.FC = () => {
           </div>
           
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-luxury font-bold mb-6 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-luxury font-bold mb-6 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
               Lapland Travel Guide & Tips
-            </h2>
+            </h1>
             <p className="text-gray-300 text-lg sm:text-xl max-w-3xl mx-auto font-clean leading-relaxed">
               Discover everything you need to know about visiting Lapland, from Northern Lights viewing to Arctic adventures.
             </p>

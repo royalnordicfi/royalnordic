@@ -13,7 +13,7 @@ const RentingEquipment: React.FC = () => {
       duration: "Flexible rental periods",
       groupSize: "Individual or groups",
       location: "Rovaniemi, Lapland",
-      features: ["Premium equipment", "Flexible duration", "Trail maps included", "Expert advice"],
+      features: ["Premium equipment", "Flexible duration", "Delivery to lodging", "Expert advice"],
       route: "/snowshoe-rental"
     }
   ];

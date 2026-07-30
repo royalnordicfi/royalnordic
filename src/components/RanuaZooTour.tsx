@@ -5,6 +5,8 @@ import ImageSlideshow from './ImageSlideshow';
 import BookingForm from './BookingForm';
 import Footer from './Footer';
 import { getAllTours } from '../lib/api';
+import ProductFaq from './seo/ProductFaq';
+import RelatedTours from './seo/RelatedTours';
 
 const RANUA_MAX_CAPACITY = 16;
 
@@ -81,6 +83,29 @@ const RanuaZooTour = () => {
     'Free cancellation up to 24 hours before departure.',
   ];
 
+  const faqs = [
+    {
+      question: 'What is included in the Ranua tour?',
+      answer:
+        'Hotel pickup and drop-off from Rovaniemi, entrance tickets to Ranua Wildlife Park, and an English & Finnish guide. Meals and personal expenses are not included.',
+    },
+    {
+      question: 'How long is the day trip?',
+      answer:
+        'About 5 hours overall, including transfers and time to explore polar bears and 50+ Arctic species at the park.',
+    },
+    {
+      question: 'Is it good for families?',
+      answer:
+        'Yes. The tour is a popular family daytime experience. Child pricing is available, and the park has walking paths suitable for a relaxed visit.',
+    },
+    {
+      question: 'What should we wear?',
+      answer:
+        'Warm clothing and comfortable shoes for outdoor walking. Winter clothing rental is not included.',
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-black">
       <div className="relative">
@@ -118,7 +143,7 @@ const RanuaZooTour = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Duration</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Duration</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">About 5 hours</p>
           </div>
@@ -126,7 +151,7 @@ const RanuaZooTour = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Group Size</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Group Size</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Max {RANUA_MAX_CAPACITY} people</p>
           </div>
@@ -134,7 +159,7 @@ const RanuaZooTour = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
               <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Location</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Location</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Ranua Wildlife Park</p>
           </div>
@@ -142,7 +167,7 @@ const RanuaZooTour = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10 col-span-2 sm:col-span-1">
             <div className="flex items-center mb-2 sm:mb-3">
               <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Languages</h3>
+              <p className="text-white font-semibold text-sm sm:text-base">Languages</p>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">English &amp; Finnish</p>
           </div>
@@ -223,6 +248,28 @@ const RanuaZooTour = () => {
                 ))}
               </div>
             </div>
+
+            <ProductFaq items={faqs} schemaId="ranua-faq" />
+
+            <RelatedTours
+              links={[
+                {
+                  to: '/family-friendly-northern-lights',
+                  label: 'Family-Friendly Northern Lights Tour',
+                  description: 'A shorter evening aurora experience designed for families.',
+                },
+                {
+                  to: '/korouoma-canyon',
+                  label: 'Korouoma Canyon Winter Adventure',
+                  description: 'Frozen waterfalls and a campfire picnic on a guided canyon day.',
+                },
+                {
+                  to: '/blog/lapland-wildlife-animals-ranua-zoo',
+                  label: 'Lapland wildlife guide',
+                  description: 'Learn more about Arctic animals and Ranua Wildlife Park.',
+                },
+              ]}
+            />
           </div>
 
           <div className="lg:col-span-2">
