@@ -1,6 +1,7 @@
 // import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS } from './lib/productVisibility';
+import ActiveTourGate from './components/ActiveTourGate';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Tours from './components/Tours';
@@ -87,14 +88,56 @@ function App() {
             <Route path="/northern-lights-tours" element={<NorthernLightsTours />} />
             <Route path="/renting-equipment" element={<RentingEquipment />} />
             <Route path="/daytime-experiences" element={<DaytimeExperiences />} />
-            <Route path="/family-friendly-northern-lights" element={<FamilyFriendlyNorthernLights />} />
+            <Route
+              path="/family-friendly-northern-lights"
+              element={
+                <ActiveTourGate tourId={8}>
+                  <FamilyFriendlyNorthernLights />
+                </ActiveTourGate>
+              }
+            />
           
-          {/* Tour Detail Pages */}
-          <Route path="/northern-lights-tour" element={<NorthernLightsTour />} />
-          <Route path="/snowshoe-rental" element={<SnowshoeRental />} />
-          <Route path="/ice-fishing" element={<IceFishingTour />} />
-          <Route path="/ranua-zoo" element={<RanuaZooTour />} />
-          <Route path="/korouoma-canyon" element={<KorouomaTour />} />
+          {/* Tour Detail Pages — gated by product is_active in admin */}
+          <Route
+            path="/northern-lights-tour"
+            element={
+              <ActiveTourGate tourId={1}>
+                <NorthernLightsTour />
+              </ActiveTourGate>
+            }
+          />
+          <Route
+            path="/snowshoe-rental"
+            element={
+              <ActiveTourGate tourId={2}>
+                <SnowshoeRental />
+              </ActiveTourGate>
+            }
+          />
+          <Route
+            path="/ice-fishing"
+            element={
+              <ActiveTourGate tourId={4}>
+                <IceFishingTour />
+              </ActiveTourGate>
+            }
+          />
+          <Route
+            path="/ranua-zoo"
+            element={
+              <ActiveTourGate tourId={5}>
+                <RanuaZooTour />
+              </ActiveTourGate>
+            }
+          />
+          <Route
+            path="/korouoma-canyon"
+            element={
+              <ActiveTourGate tourId={6}>
+                <KorouomaTour />
+              </ActiveTourGate>
+            }
+          />
           <Route path="/customized-tour" element={<CustomizedTour />} />
           <Route path="/travel-trade" element={<TravelTrade />} />
           <Route path="/snowmobile-safari" element={<SnowmobileSafari />} />
@@ -127,7 +170,14 @@ function App() {
           <Route path="/transportation-rovaniemi-levi" element={<TransportationRovaniemiLevi />} />
           <Route path="/transportation-customized" element={<TransportationCustomized />} />
           
-          <Route path="/payment-test" element={<PaymentTestTour />} />
+          <Route
+            path="/payment-test"
+            element={
+              <ActiveTourGate tourId={9}>
+                <PaymentTestTour />
+              </ActiveTourGate>
+            }
+          />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/crypto-payment-success" element={<CryptoPaymentSuccess />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />

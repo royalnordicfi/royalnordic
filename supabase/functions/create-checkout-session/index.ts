@@ -27,6 +27,27 @@ serve(async (req) => {
       throw new Error('Missing required fields')
     }
 
+    const tourId = parseInt(String(metadata?.tour_id || ''), 10)
+    if (tourId) {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')
+      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+      if (supabaseUrl && supabaseServiceKey) {
+        const supabase = createClient(supabaseUrl, supabaseServiceKey)
+        const { data: tourRow, error: tourError } = await supabase
+          .from('tours')
+          .select('id, is_active')
+          .eq('id', tourId)
+          .maybeSingle()
+        if (tourError) {
+          console.error('Tour lookup failed:', tourError)
+          throw new Error('Unable to verify tour')
+        }
+        if (!tourRow || tourRow.is_active === false) {
+          throw new Error('This experience is no longer available for booking')
+        }
+      }
+    }
+
     // Server-side promo validation (must match src/config/winterPromotion.ts)
     const PROMO_ENABLED = true
     const PROMO_CODE = 'WINTER20'

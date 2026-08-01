@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { fetchProducts, updateProduct } from '../adminApi'
+import { fetchProducts, setProductActive, updateProduct } from '../adminApi'
 import type { Product } from '../types'
 import { Badge } from '../components/Badge'
 import { formatEuroAmount, validateTourPrices } from '../../lib/tourPricing'
+import { TOUR_PUBLIC_PAGES } from '../../lib/productVisibility'
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -11,6 +12,7 @@ export default function ProductsPage() {
   const [editing, setEditing] = useState<Product | null>(null)
   const [baseline, setBaseline] = useState<Product | null>(null)
   const [saving, setSaving] = useState(false)
+  const [removingId, setRemovingId] = useState<number | null>(null)
 
   const load = () =>
     fetchProducts()
@@ -105,13 +107,55 @@ export default function ProductsPage() {
     }
   }
 
+  const removeOrRestore = async (product: Product, makeActive: boolean) => {
+    const label = product.public_name || product.name
+    const publicPath = TOUR_PUBLIC_PAGES[product.id]?.path
+    if (!makeActive) {
+      const ok = window.confirm(
+        `Remove "${label}" from the website?\n\n` +
+          `This hides the product and its public page` +
+          (publicPath ? ` (${publicPath})` : '') +
+          `. Existing bookings stay in the admin. You can restore it later.`,
+      )
+      if (!ok) return
+    } else {
+      const ok = window.confirm(
+        `Restore "${label}" on the website?\n\n` +
+          `The product and its public page will be visible and bookable again.`,
+      )
+      if (!ok) return
+    }
+
+    setError('')
+    setMsg('')
+    setRemovingId(product.id)
+    try {
+      await setProductActive(product.id, makeActive)
+      setMsg(
+        makeActive
+          ? `"${label}" restored — page is public again.`
+          : `"${label}" removed from the website (page hidden).`,
+      )
+      if (editing?.id === product.id) {
+        setEditing(null)
+        setBaseline(null)
+      }
+      await load()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to update product visibility')
+    } finally {
+      setRemovingId(null)
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div>
         <h1 className="text-xl font-bold">Products</h1>
         <p className="text-sm text-gray-600">
           Canonical tour prices in EUR (VAT included). Changes update calendar, booking summary, and
-          checkout after refresh — no redeploy required.
+          checkout after refresh — no redeploy required. Remove a product to hide its whole public
+          page; you can restore it anytime.
         </p>
       </div>
 
@@ -239,49 +283,77 @@ export default function ProductsPage() {
               }
             />
           </Field>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={editing.is_active !== false}
-              onChange={(e) => setEditing({ ...editing, is_active: e.target.checked })}
-            />
-            Active
-          </label>
-          <div className="flex gap-2">
+          <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs text-zinc-600">
+            Website status:{' '}
+            <strong className="text-zinc-900">
+              {editing.is_active === false ? 'Removed (page hidden)' : 'Live'}
+            </strong>
+            {TOUR_PUBLIC_PAGES[editing.id]?.path
+              ? ` · ${TOUR_PUBLIC_PAGES[editing.id].path}`
+              : ''}
+          </div>
+          <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={save}
-              disabled={saving}
-              className="flex-1 bg-emerald-700 text-white py-2.5 rounded-lg font-semibold disabled:opacity-60"
+              disabled={saving || removingId === editing.id}
+              className="flex-1 min-w-[8rem] bg-emerald-700 text-white py-2.5 rounded-lg font-semibold disabled:opacity-60"
             >
               {saving ? 'Saving…' : 'Save'}
             </button>
             <button
               type="button"
               onClick={cancelEdit}
-              disabled={saving}
+              disabled={saving || removingId === editing.id}
               className="px-4 border rounded-lg disabled:opacity-60"
             >
               Cancel
             </button>
+            {editing.is_active === false ? (
+              <button
+                type="button"
+                onClick={() => removeOrRestore(editing, true)}
+                disabled={saving || removingId === editing.id}
+                className="px-4 rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-900 text-sm font-medium disabled:opacity-60"
+              >
+                {removingId === editing.id ? 'Restoring…' : 'Restore on website'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => removeOrRestore(editing, false)}
+                disabled={saving || removingId === editing.id}
+                className="px-4 rounded-lg border border-red-300 bg-red-50 text-red-800 text-sm font-medium disabled:opacity-60"
+              >
+                {removingId === editing.id ? 'Removing…' : 'Remove from website'}
+              </button>
+            )}
           </div>
         </div>
       ) : (
         <ul className="space-y-2">
           {products.map((p) => (
-            <li key={p.id}>
+            <li
+              key={p.id}
+              className="bg-white border border-gray-200 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center gap-3"
+            >
               <button
                 type="button"
                 onClick={() => startEdit(p)}
-                className="w-full text-left bg-white border border-gray-200 rounded-lg p-3"
+                className="flex-1 text-left min-w-0"
               >
                 <div className="flex justify-between gap-2">
                   <div>
                     <div className="font-semibold text-sm">{p.public_name || p.name}</div>
-                    <div className="text-xs text-gray-500">Internal: {p.name}</div>
+                    <div className="text-xs text-gray-500">
+                      Internal: {p.name}
+                      {TOUR_PUBLIC_PAGES[p.id]?.path
+                        ? ` · ${TOUR_PUBLIC_PAGES[p.id].path}`
+                        : ''}
+                    </div>
                   </div>
                   <Badge tone={p.is_active === false ? 'gray' : 'green'}>
-                    {p.is_active === false ? 'Inactive' : 'Active'}
+                    {p.is_active === false ? 'Removed' : 'Live'}
                   </Badge>
                 </div>
                 <div className="text-xs text-gray-600 mt-2">
@@ -290,6 +362,25 @@ export default function ProductsPage() {
                   {p.duration_text ? ` · ${p.duration_text}` : ''}
                 </div>
               </button>
+              {p.is_active === false ? (
+                <button
+                  type="button"
+                  onClick={() => removeOrRestore(p, true)}
+                  disabled={removingId === p.id}
+                  className="shrink-0 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-900 disabled:opacity-60"
+                >
+                  {removingId === p.id ? 'Restoring…' : 'Restore'}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => removeOrRestore(p, false)}
+                  disabled={removingId === p.id}
+                  className="shrink-0 rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-xs font-medium text-red-800 disabled:opacity-60"
+                >
+                  {removingId === p.id ? 'Removing…' : 'Remove'}
+                </button>
+              )}
             </li>
           ))}
         </ul>

@@ -1,22 +1,35 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Users, Clock, MapPin } from 'lucide-react';
 import Footer from './Footer';
+import { fetchActiveTourIds } from '../lib/productVisibility';
+
+const ALL_RENTALS = [
+  {
+    id: 1,
+    tourId: 2,
+    name: "Quality Snowshoe Rental",
+    description: "Explore Lapland's winter wonderland at your own pace with our premium snowshoe rentals. Perfect for independent adventurers!",
+    image: "/snowshoe1.jpg",
+    duration: "Flexible rental periods",
+    groupSize: "Individual or groups",
+    location: "Rovaniemi, Lapland",
+    features: ["Premium equipment", "Flexible duration", "Delivery to lodging", "Expert advice"],
+    route: "/snowshoe-rental"
+  }
+];
 
 const RentingEquipment: React.FC = () => {
-  const rentals = [
-    {
-      id: 1,
-      name: "Quality Snowshoe Rental",
-      description: "Explore Lapland's winter wonderland at your own pace with our premium snowshoe rentals. Perfect for independent adventurers!",
-      image: "/snowshoe1.jpg",
-      duration: "Flexible rental periods",
-      groupSize: "Individual or groups",
-      location: "Rovaniemi, Lapland",
-      features: ["Premium equipment", "Flexible duration", "Delivery to lodging", "Expert advice"],
-      route: "/snowshoe-rental"
-    }
-  ];
+  const [activeIds, setActiveIds] = useState<Set<number> | null>(null)
+
+  useEffect(() => {
+    fetchActiveTourIds().then(setActiveIds)
+  }, [])
+
+  const rentals = useMemo(() => {
+    if (!activeIds) return ALL_RENTALS
+    return ALL_RENTALS.filter((r) => activeIds.has(r.tourId))
+  }, [activeIds])
 
   return (
     <div className="min-h-screen bg-black">
@@ -47,6 +60,11 @@ const RentingEquipment: React.FC = () => {
 
       {/* Rentals Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+        {rentals.length === 0 && (
+          <p className="text-center text-gray-400 font-clean">
+            No equipment rentals are available right now.
+          </p>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
           {rentals.map((rental) => (
             <Link

@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Check } from 'lucide-react'
+import { isTourPubliclyActive } from '../lib/productVisibility'
 
 const HIGHLIGHTS = [
   'Northern Lights Guarantee',
@@ -11,6 +13,14 @@ const HIGHLIGHTS = [
 ]
 
 const FeaturedExperience = () => {
+  const [visible, setVisible] = useState(true)
+
+  useEffect(() => {
+    isTourPubliclyActive(1).then(setVisible)
+  }, [])
+
+  if (!visible) return null
+
   return (
     <section
       id="featured-experience"

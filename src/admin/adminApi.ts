@@ -881,6 +881,13 @@ export async function updateProduct(id: number, patch: Partial<Product>): Promis
   if (error) throw new Error(error.message)
 }
 
+/** Soft-remove (or restore) a product. Inactive products are hidden from the public site/pages. */
+export async function setProductActive(id: number, isActive: boolean): Promise<void> {
+  await requireAdmin()
+  const { error } = await supabase.from('tours').update({ is_active: isActive }).eq('id', id)
+  if (error) throw new Error(error.message)
+}
+
 export async function fetchGuides(): Promise<Guide[]> {
   await requireAdmin()
   const { data, error } = await supabase.from('guides').select('*').order('name')

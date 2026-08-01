@@ -1,57 +1,73 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Users, Clock, MapPin, Star } from 'lucide-react';
 import Footer from './Footer';
+import { fetchActiveTourIds } from '../lib/productVisibility';
+
+const ALL_EXPERIENCES = [
+  {
+    id: 1,
+    tourId: 4 as number | null,
+    name: "Ice Fishing Experience",
+    description: "Experience traditional Lapland ice fishing on pristine frozen lakes with expert guidance. Perfect for all skill levels!",
+    image: "/icefishing2.jpg",
+    duration: "3-4 hours",
+    groupSize: "Max 8 people",
+    location: "Rovaniemi, Lapland",
+    features: ["Professional guide", "All equipment", "Hot drinks", "Traditional techniques"],
+    route: "/ice-fishing"
+  },
+  {
+    id: 2,
+    tourId: 5 as number | null,
+    name: "Nordic Animals of Ranua Zoo",
+    description: "Day trip from Rovaniemi to Ranua Wildlife Park — polar bears and 50+ Arctic species, transfers and tickets included.",
+    image: "/ranua1.jpg",
+    duration: "About 5 hours",
+    groupSize: "Max 16 people",
+    location: "Ranua, Lapland",
+    features: ["Hotel pickup", "Zoo tickets", "Polar bears & Arctic wildlife", "English & Finnish"],
+    route: "/ranua-zoo",
+    badge: "Family Favorite"
+  },
+  {
+    id: 3,
+    tourId: 6 as number | null,
+    name: "Korouoma Canyon Winter Adventure",
+    description: "6-hour canyon hike to frozen waterfalls from Rovaniemi — hotel pickup, guided trails, and a campfire picnic with hot drinks.",
+    image: "/korouoma1.jpg",
+    duration: "6 hours",
+    groupSize: "Max 8 people per vehicle",
+    location: "Korouoma Canyon, Lapland",
+    features: ["Hotel pickup", "Professional guide", "Campfire picnic", "Hot drinks"],
+    route: "/korouoma-canyon",
+    badge: "Adventure"
+  },
+  {
+    id: 4,
+    tourId: null as number | null,
+    name: "Snowmobile Safari",
+    description: "Snowmobile through Lapland wilderness. Partner experience — request availability and a quote.",
+    image: "/snowmobiling.jpg",
+    duration: "0.5h, 1h, 2h, or 3h",
+    location: "Rovaniemi, Lapland",
+    features: ["Professional guide", "All equipment", "Safety briefing", "Scenic routes"],
+    route: "/snowmobile-safari",
+    badge: "Request availability"
+  }
+];
 
 const DaytimeExperiences: React.FC = () => {
-  const experiences = [
-    {
-      id: 1,
-      name: "Ice Fishing Experience",
-      description: "Experience traditional Lapland ice fishing on pristine frozen lakes with expert guidance. Perfect for all skill levels!",
-      image: "/icefishing2.jpg",
-      duration: "3-4 hours",
-      groupSize: "Max 8 people",
-      location: "Rovaniemi, Lapland",
-      features: ["Professional guide", "All equipment", "Hot drinks", "Traditional techniques"],
-      route: "/ice-fishing"
-    },
-    {
-      id: 2,
-      name: "Nordic Animals of Ranua Zoo",
-      description: "Day trip from Rovaniemi to Ranua Wildlife Park — polar bears and 50+ Arctic species, transfers and tickets included.",
-      image: "/ranua1.jpg",
-      duration: "About 5 hours",
-      groupSize: "Max 16 people",
-      location: "Ranua, Lapland",
-      features: ["Hotel pickup", "Zoo tickets", "Polar bears & Arctic wildlife", "English & Finnish"],
-      route: "/ranua-zoo",
-      badge: "Family Favorite"
-    },
-    {
-      id: 3,
-      name: "Korouoma Canyon Winter Adventure",
-      description: "6-hour canyon hike to frozen waterfalls from Rovaniemi — hotel pickup, guided trails, and a campfire picnic with hot drinks.",
-      image: "/korouoma1.jpg",
-      duration: "6 hours",
-      groupSize: "Max 8 people per vehicle",
-      location: "Korouoma Canyon, Lapland",
-      features: ["Hotel pickup", "Professional guide", "Campfire picnic", "Hot drinks"],
-      route: "/korouoma-canyon",
-      badge: "Adventure"
-    },
-    {
-      id: 4,
-      name: "Snowmobile Safari",
-      description: "Snowmobile through Lapland wilderness. Partner experience — request availability and a quote.",
-      image: "/snowmobiling.jpg",
-      duration: "0.5h, 1h, 2h, or 3h",
-      location: "Rovaniemi, Lapland",
-      features: ["Professional guide", "All equipment", "Safety briefing", "Scenic routes"],
-      route: "/snowmobile-safari",
-      badge: "Request availability"
-    }
-  ];
+  const [activeIds, setActiveIds] = useState<Set<number> | null>(null)
+
+  useEffect(() => {
+    fetchActiveTourIds().then(setActiveIds)
+  }, [])
+
+  const experiences = useMemo(() => {
+    if (!activeIds) return ALL_EXPERIENCES
+    return ALL_EXPERIENCES.filter((e) => e.tourId == null || activeIds.has(e.tourId))
+  }, [activeIds])
 
   return (
     <div className="min-h-screen bg-black">

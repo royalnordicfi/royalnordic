@@ -1,50 +1,64 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Users, Clock, MapPin, Star } from 'lucide-react';
 import Footer from './Footer';
-import { SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS } from '../lib/productVisibility';
+import { fetchActiveTourIds, SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS } from '../lib/productVisibility';
+
+const ALL_TOURS = [
+  {
+    id: 1,
+    tourId: 1,
+    name: "Guaranteed Northern Lights Tour",
+    description: "Chase the Aurora Borealis with expert guides, hotel pickup, and a Northern Lights guarantee.",
+    image: "/nortti1.jpg",
+    duration: "2–12 hours (typically ~6h)",
+    groupSize: "Max 8 people per vehicle",
+    location: "Rovaniemi, Lapland",
+    features: ["Professional guide", "Hotel pickup", "Photography guidance", "Warm drinks and snacks"],
+    route: "/northern-lights-tour",
+    badge: "Most Popular"
+  },
+  {
+    id: 2,
+    tourId: 8,
+    name: "Family-Friendly Northern Lights Tour",
+    description: "2-hour family aurora evening from Rovaniemi with hotel pickup and warm drinks. Northern Lights not guaranteed.",
+    image: "/family1.jpg",
+    duration: "2 hours",
+    groupSize: "Max 16 people",
+    location: "Rovaniemi, Lapland",
+    features: ["Hotel pickup", "English & Finnish guide", "Hot drinks & snacks", "Shorter format"],
+    route: "/family-friendly-northern-lights",
+    badge: "Family Favorite"
+  },
+  ...(SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS
+    ? [{
+        id: 3,
+        tourId: null as number | null,
+        name: "Monster Truck Northern Lights Experience",
+        description: "Aurora hunting aboard a giant monster truck. Partner experience — request availability and a quote.",
+        image: "/monsteri1.jpg",
+        duration: "3 hours",
+        groupSize: "Flexible",
+        location: "Rovaniemi, Lapland",
+        features: ["Professional guide and driver", "Specially built monster truck", "Remote viewing locations", "No experience required"],
+        route: "/monster-truck-northern-lights",
+        badge: "Request availability"
+      }]
+    : [])
+];
 
 const NorthernLightsTours: React.FC = () => {
-  const tours = [
-    {
-      id: 1,
-      name: "Guaranteed Northern Lights Tour",
-      description: "Chase the Aurora Borealis with expert guides, hotel pickup, and a Northern Lights guarantee.",
-      image: "/nortti1.jpg",
-      duration: "2–12 hours (typically ~6h)",
-      groupSize: "Max 8 people per vehicle",
-      location: "Rovaniemi, Lapland",
-      features: ["Professional guide", "Hotel pickup", "Photography guidance", "Warm drinks and snacks"],
-      route: "/northern-lights-tour",
-      badge: "Most Popular"
-    },
-    {
-      id: 2,
-      name: "Family-Friendly Northern Lights Tour",
-      description: "2-hour family aurora evening from Rovaniemi with hotel pickup and warm drinks. Northern Lights not guaranteed.",
-      image: "/family1.jpg",
-      duration: "2 hours",
-      groupSize: "Max 16 people",
-      location: "Rovaniemi, Lapland",
-      features: ["Hotel pickup", "English & Finnish guide", "Hot drinks & snacks", "Shorter format"],
-      route: "/family-friendly-northern-lights",
-      badge: "Family Favorite"
-    },
-    ...(SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS
-      ? [{
-          id: 3,
-          name: "Monster Truck Northern Lights Experience",
-          description: "Aurora hunting aboard a giant monster truck. Partner experience — request availability and a quote.",
-          image: "/monsteri1.jpg",
-          duration: "3 hours",
-          groupSize: "Flexible",
-          location: "Rovaniemi, Lapland",
-          features: ["Professional guide and driver", "Specially built monster truck", "Remote viewing locations", "No experience required"],
-          route: "/monster-truck-northern-lights",
-          badge: "Request availability"
-        }]
-      : [])
-  ];
+  const [activeIds, setActiveIds] = useState<Set<number> | null>(null)
+
+  useEffect(() => {
+    fetchActiveTourIds().then(setActiveIds)
+  }, [])
+
+  const tours = useMemo(() => {
+    if (!activeIds) return ALL_TOURS
+    return ALL_TOURS.filter((t) => t.tourId == null || activeIds.has(t.tourId))
+  }, [activeIds])
 
   return (
     <div className="min-h-screen bg-black">
