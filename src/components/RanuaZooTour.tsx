@@ -6,8 +6,6 @@ import BookingForm from './BookingForm';
 import Footer from './Footer';
 import { getAllTours } from '../lib/api';
 import ProductFaq from './seo/ProductFaq';
-import RelatedTours from './seo/RelatedTours';
-
 const RANUA_MAX_CAPACITY = 16;
 
 const RanuaZooTour = () => {
@@ -97,7 +95,7 @@ const RanuaZooTour = () => {
     {
       question: 'Is it good for families?',
       answer:
-        'Yes. The tour is a popular family daytime experience. Child pricing is available, and the park has walking paths suitable for a relaxed visit.',
+        'Yes. The tour is a popular family daytime experience. Child pricing applies for ages 0–17, and the park has walking paths suitable for a relaxed visit.',
     },
     {
       question: 'What should we wear?',
@@ -250,26 +248,6 @@ const RanuaZooTour = () => {
             </div>
 
             <ProductFaq items={faqs} schemaId="ranua-faq" />
-
-            <RelatedTours
-              links={[
-                {
-                  to: '/family-friendly-northern-lights',
-                  label: 'Family-Friendly Northern Lights Tour',
-                  description: 'A shorter evening aurora experience designed for families.',
-                },
-                {
-                  to: '/korouoma-canyon',
-                  label: 'Korouoma Canyon Winter Adventure',
-                  description: 'Frozen waterfalls and a campfire picnic on a guided canyon day.',
-                },
-                {
-                  to: '/blog/lapland-wildlife-animals-ranua-zoo',
-                  label: 'Lapland wildlife guide',
-                  description: 'Learn more about Arctic animals and Ranua Wildlife Park.',
-                },
-              ]}
-            />
           </div>
 
           <div className="lg:col-span-2">

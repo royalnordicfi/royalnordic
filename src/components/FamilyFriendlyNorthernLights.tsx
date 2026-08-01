@@ -5,7 +5,6 @@ import ImageSlideshow from './ImageSlideshow';
 import Footer from './Footer';
 import BookingForm from './BookingForm';
 import ProductFaq from './seo/ProductFaq';
-import RelatedTours from './seo/RelatedTours';
 import { getAllTours } from '../lib/api';
 
 const FamilyFriendlyNorthernLights: React.FC = () => {
@@ -65,7 +64,7 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
     {
       question: 'Is it suitable for children?',
       answer:
-        'Yes — the format is designed for families and all ages. Child pricing applies for ages 0–14. Bring warm outdoor layers for viewing stops.',
+        'Yes — the format is designed for families and all ages. Child pricing applies for ages 0–17. Bring warm outdoor layers for viewing stops.',
     },
     {
       question: 'How long is the tour?',
@@ -247,26 +246,6 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
             </div>
 
             <ProductFaq items={faqs} schemaId="family-nl-faq" />
-
-            <RelatedTours
-              links={[
-                {
-                  to: '/northern-lights-tour',
-                  label: 'Guaranteed Northern Lights Tour',
-                  description: 'Longer aurora hunt with a free return trip if no lights appear (see Terms).',
-                },
-                {
-                  to: '/ranua-zoo',
-                  label: 'Ranua Wildlife Park Tour',
-                  description: 'A family-friendly daytime wildlife excursion from Rovaniemi.',
-                },
-                {
-                  to: '/northern-lights-tours',
-                  label: 'All Northern Lights tours',
-                  description: 'Compare guaranteed and family-friendly aurora experiences.',
-                },
-              ]}
-            />
           </div>
 
           <div className="lg:col-span-2">

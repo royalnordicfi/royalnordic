@@ -6,8 +6,6 @@ import BookingForm from './BookingForm';
 import Footer from './Footer';
 import { getAllTours } from '../lib/api';
 import ProductFaq from './seo/ProductFaq';
-import RelatedTours from './seo/RelatedTours';
-
 const SnowshoeRental: React.FC = () => {
   // const navigate = useNavigate();
   const [tourData, setTourData] = useState({
@@ -68,6 +66,11 @@ const SnowshoeRental: React.FC = () => {
       question: 'What is included?',
       answer:
         'Professional snowshoe equipment, a safety briefing, delivery and pickup, and local area recommendations for exploring near Rovaniemi.',
+    },
+    {
+      question: 'Is this suitable for children?',
+      answer:
+        'Yes. Children are welcome with an adult. Child pricing applies for ages 0–17.',
     },
   ];
 
@@ -226,26 +229,6 @@ const SnowshoeRental: React.FC = () => {
             </div>
 
             <ProductFaq items={faqs} schemaId="snowshoe-faq" />
-
-            <RelatedTours
-              links={[
-                {
-                  to: '/northern-lights-tour',
-                  label: 'Guaranteed Northern Lights Tour',
-                  description: 'Pair daytime snowshoeing with a dedicated aurora hunt from Rovaniemi.',
-                },
-                {
-                  to: '/korouoma-canyon',
-                  label: 'Korouoma Canyon Winter Adventure',
-                  description: 'A guided outdoor day with frozen waterfalls and a campfire picnic.',
-                },
-                {
-                  to: '/blog/snowshoe-adventure-exploring-lapland-wilderness',
-                  label: 'Snowshoe adventure tips',
-                  description: 'Practical ideas for exploring Lapland’s winter trails.',
-                },
-              ]}
-            />
           </div>
 
           {/* Right Column - Booking Form (Wider) */}

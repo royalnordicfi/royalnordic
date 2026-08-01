@@ -6,8 +6,6 @@ import BookingForm from './BookingForm';
 import Footer from './Footer';
 import { getAllTours } from '../lib/api';
 import ProductFaq from './seo/ProductFaq';
-import RelatedTours from './seo/RelatedTours';
-
 const KORUOMA_MAX_CAPACITY = 16;
 
 const KorouomaTour = () => {
@@ -101,6 +99,11 @@ const KorouomaTour = () => {
       question: 'Is hotel pickup included?',
       answer:
         'Yes. Hotel pickup and drop-off from Rovaniemi are included, along with an English & Finnish guide and a warm vehicle.',
+    },
+    {
+      question: 'Is this suitable for children?',
+      answer:
+        'Children are welcome with an adult if they can manage a moderate outdoor winter hike. Child pricing applies for ages 0–17.',
     },
   ];
 
@@ -276,26 +279,6 @@ const KorouomaTour = () => {
             </div>
 
             <ProductFaq items={faqs} schemaId="korouoma-faq" />
-
-            <RelatedTours
-              links={[
-                {
-                  to: '/ice-fishing',
-                  label: 'Ice Fishing Experience',
-                  description: 'Traditional fishing on frozen lakes near Rovaniemi with guide and equipment.',
-                },
-                {
-                  to: '/ranua-zoo',
-                  label: 'Ranua Wildlife Park Tour',
-                  description: 'Arctic wildlife day trip with hotel pickup from Rovaniemi.',
-                },
-                {
-                  to: '/daytime-experiences',
-                  label: 'All daytime experiences',
-                  description: 'Compare Lapland day trips and outdoor adventures from Rovaniemi.',
-                },
-              ]}
-            />
           </div>
 
           {/* Right Column - Booking Form */}

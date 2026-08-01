@@ -6,8 +6,6 @@ import BookingForm from './BookingForm';
 import Footer from './Footer';
 import { getAllTours } from '../lib/api';
 import ProductFaq from './seo/ProductFaq';
-import RelatedTours from './seo/RelatedTours';
-
 const IceFishingTour = () => {
   const [tourData, setTourData] = useState({
     adult_price: 119,
@@ -75,6 +73,11 @@ const IceFishingTour = () => {
       question: 'When can I book?',
       answer:
         'This experience runs in the ice fishing season, typically mid-December through mid-March when lakes near Rovaniemi are safely frozen.',
+    },
+    {
+      question: 'Is this suitable for children?',
+      answer:
+        'Children are welcome with an adult. Child pricing applies for ages 0–17. Dress warmly — the experience is outdoors on frozen lakes.',
     },
   ];
 
@@ -255,26 +258,6 @@ const IceFishingTour = () => {
             </div>
 
             <ProductFaq items={faqs} schemaId="ice-faq" />
-
-            <RelatedTours
-              links={[
-                {
-                  to: '/korouoma-canyon',
-                  label: 'Korouoma Canyon Winter Adventure',
-                  description: 'A guided daytime hike to frozen waterfalls with a campfire picnic.',
-                },
-                {
-                  to: '/ranua-zoo',
-                  label: 'Ranua Wildlife Park Tour',
-                  description: 'Meet Arctic animals on a family-friendly day trip from Rovaniemi.',
-                },
-                {
-                  to: '/blog/traditional-ice-fishing-finnish-lapland',
-                  label: 'Traditional ice fishing in Lapland',
-                  description: 'What to expect on a winter fishing day in Finnish Lapland.',
-                },
-              ]}
-            />
           </div>
 
           {/* Right Column - Booking Form */}

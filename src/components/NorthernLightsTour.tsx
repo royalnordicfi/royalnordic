@@ -6,8 +6,6 @@ import BookingForm from './BookingForm';
 import Footer from './Footer';
 import { getAllTours } from '../lib/api';
 import ProductFaq from './seo/ProductFaq';
-import RelatedTours from './seo/RelatedTours';
-
 const NorthernLightsTour = () => {
   // const navigate = useNavigate();
   const [tourData, setTourData] = useState({
@@ -101,7 +99,7 @@ const NorthernLightsTour = () => {
     {
       question: 'Is this suitable for children?',
       answer:
-        'Children are welcome. Child pricing applies for ages 0–14. The evening can be long and cold outdoors, so warm clothing and stamina matter more than age alone.',
+        'Children are welcome. Child pricing applies for ages 0–17. The evening can be long and cold outdoors, so warm clothing and stamina matter more than age alone.',
     },
     {
       question: 'When is the season?',
@@ -112,17 +110,6 @@ const NorthernLightsTour = () => {
 
   // const pricing = [
   //   {
-  //     option: "Adult (15+ years)",
-  //     price: "€149",
-  //     includes: ["All equipment", "Professional guide", "Hot drinks & snacks", "Transportation"]
-  //   },
-  //   {
-  //     option: "Child (0-14 years)",
-  //     price: "€129",
-  //     includes: ["All equipment", "Professional guide", "Hot drinks & snacks", "Transportation"]
-  //   }
-  // ];
-
   return (
     <div className="min-h-screen bg-black">
 
@@ -281,26 +268,6 @@ const NorthernLightsTour = () => {
             </div>
 
             <ProductFaq items={faqs} schemaId="nl-faq" />
-
-            <RelatedTours
-              links={[
-                {
-                  to: '/family-friendly-northern-lights',
-                  label: 'Family-Friendly Northern Lights Tour',
-                  description: 'A shorter 2-hour aurora evening designed for families and all ages.',
-                },
-                {
-                  to: '/daytime-experiences',
-                  label: 'Daytime Experiences in Lapland',
-                  description: 'Ice fishing, Ranua Wildlife Park, Korouoma Canyon, and more from Rovaniemi.',
-                },
-                {
-                  to: '/blog/best-time-northern-lights-lapland-2025',
-                  label: 'Best time for Northern Lights in Lapland',
-                  description: 'Season tips for planning your aurora trip to Finnish Lapland.',
-                },
-              ]}
-            />
           </div>
 
           {/* Right Column - Booking Form (Wider) */}

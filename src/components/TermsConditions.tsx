@@ -44,7 +44,7 @@ const TermsConditions: React.FC = () => {
             <section>
               <h2 className="text-xl font-semibold text-white mb-3">4. Tour Requirements and Safety</h2>
               <div className="space-y-3 text-sm">
-                <p><strong>Age Requirements:</strong> Children under 15 must be accompanied by an adult. Some tours may have minimum age requirements.</p>
+                <p><strong>Age Requirements:</strong> Child pricing applies for ages 0–17. Children under 18 must be accompanied by an adult. Some tours may have additional fitness or outdoor requirements.</p>
                 <p><strong>Health and Fitness:</strong> Participants should be in good health and able to participate in outdoor activities. Please inform us of any medical conditions or special requirements.</p>
                 <p><strong>Equipment:</strong> We provide all necessary safety equipment. Participants must follow safety instructions provided by our guides.</p>
                 <p><strong>Weather Preparation:</strong> Participants are responsible for dressing appropriately for Arctic weather conditions.</p>

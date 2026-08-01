@@ -763,7 +763,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Adult</label>
-              <p className="text-xs text-gray-500 mb-2">Age 15 - 90</p>
+              <p className="text-xs text-gray-500 mb-2">Age 18 - 90</p>
             <div className="flex items-center space-x-3">
               <button 
                 type="button"
@@ -787,7 +787,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Child</label>
-              <p className="text-xs text-gray-500 mb-2">Age 0 - 14</p>
+              <p className="text-xs text-gray-500 mb-2">Age 0 - 17</p>
             <div className="flex items-center space-x-3">
               <button 
                 type="button"
