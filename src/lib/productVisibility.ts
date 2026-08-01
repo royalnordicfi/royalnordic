@@ -40,11 +40,6 @@ export const TOUR_PUBLIC_PAGES: Record<
     fallbackPath: '/northern-lights-tours',
     label: 'Family-Friendly Northern Lights Tour',
   },
-  9: {
-    path: '/payment-test',
-    fallbackPath: '/',
-    label: 'Payment Test €1',
-  },
 }
 
 export function tourIdForPublicPath(pathname: string): number | null {

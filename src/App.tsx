@@ -38,7 +38,6 @@ import TransportationCustomized from './components/TransportationCustomized';
 import TransportationCategory from './components/TransportationCategory';
 import PaymentSuccess from './components/PaymentSuccess';
 import CryptoPaymentSuccess from './components/CryptoPaymentSuccess';
-import PaymentTestTour from './components/PaymentTestTour';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsConditions from './components/TermsConditions';
 import ScrollToTop from './components/ScrollToTop';
@@ -170,15 +169,8 @@ function App() {
           <Route path="/transportation-rovaniemi-levi" element={<TransportationRovaniemiLevi />} />
           <Route path="/transportation-customized" element={<TransportationCustomized />} />
           
-          <Route
-            path="/payment-test"
-            element={
-              <ActiveTourGate tourId={9}>
-                <PaymentTestTour />
-              </ActiveTourGate>
-            }
-          />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-test" element={<Navigate to="/" replace />} />
           <Route path="/crypto-payment-success" element={<CryptoPaymentSuccess />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
