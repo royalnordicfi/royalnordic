@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { sendBookingNotification, sendCustomerConfirmation } from './email'
+import { validateTourPrices } from './tourPricing'
 import type { Tour, TourDate, Booking } from './supabase'
 
 async function requireAdminSession() {
@@ -103,14 +104,20 @@ export async function getAllTours() {
   return data || []
 }
 
-// Update tour pricing API
+// Update tour pricing API (admin session + RLS; prefer admin Products page)
 export async function updateTourPricing(tourId: number, adultPrice: number, childPrice: number, maxCapacity: number) {
+  await requireAdminSession()
+  const prices = validateTourPrices(adultPrice, childPrice)
+  if (!Number.isInteger(maxCapacity) || maxCapacity < 1 || maxCapacity > 100) {
+    throw new Error('Capacity must be an integer between 1 and 100')
+  }
+
   const { error } = await supabase
     .from('tours')
-    .update({ 
-      adult_price: adultPrice,
-      child_price: childPrice,
-      max_capacity: maxCapacity
+    .update({
+      adult_price: prices.adult_price,
+      child_price: prices.child_price,
+      max_capacity: maxCapacity,
     })
     .eq('id', tourId)
 

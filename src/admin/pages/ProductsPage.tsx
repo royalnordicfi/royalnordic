@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react'
 import { fetchProducts, updateProduct } from '../adminApi'
 import type { Product } from '../types'
 import { Badge } from '../components/Badge'
+import { formatEuroAmount, validateTourPrices } from '../../lib/tourPricing'
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [error, setError] = useState('')
   const [msg, setMsg] = useState('')
   const [editing, setEditing] = useState<Product | null>(null)
+  const [baseline, setBaseline] = useState<Product | null>(null)
+  const [saving, setSaving] = useState(false)
 
   const load = () =>
     fetchProducts()
@@ -18,18 +21,66 @@ export default function ProductsPage() {
     load()
   }, [])
 
+  const startEdit = (product: Product) => {
+    setError('')
+    setMsg('')
+    setEditing({ ...product })
+    setBaseline({ ...product })
+  }
+
+  const cancelEdit = () => {
+    setEditing(null)
+    setBaseline(null)
+    setError('')
+  }
+
   const save = async () => {
-    if (!editing) return
+    if (!editing || saving) return
     setMsg('')
     setError('')
+
+    let prices
+    try {
+      prices = validateTourPrices(Number(editing.adult_price), Number(editing.child_price))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Invalid prices')
+      return
+    }
+
+    const cap = Number(editing.max_capacity)
+    if (!Number.isInteger(cap) || cap < 1 || cap > 100) {
+      setError('Capacity must be an integer between 1 and 100')
+      return
+    }
+
+    if (baseline) {
+      const adultDelta = Math.abs(prices.adult_price - Number(baseline.adult_price))
+      const childDelta = Math.abs(prices.child_price - Number(baseline.child_price))
+      const largeChange =
+        adultDelta >= 50 ||
+        childDelta >= 50 ||
+        (Number(baseline.adult_price) > 0 && adultDelta / Number(baseline.adult_price) >= 0.5) ||
+        (Number(baseline.child_price) > 0 && childDelta / Number(baseline.child_price) >= 0.5)
+      if (largeChange) {
+        const ok = window.confirm(
+          `Confirm price change for "${editing.public_name || editing.name}"?\n\n` +
+            `Adult: €${formatEuroAmount(Number(baseline.adult_price))} → €${formatEuroAmount(prices.adult_price)}\n` +
+            `Child: €${formatEuroAmount(Number(baseline.child_price))} → €${formatEuroAmount(prices.child_price)}\n\n` +
+            'This updates live booking prices on royalnordic.fi.',
+        )
+        if (!ok) return
+      }
+    }
+
+    setSaving(true)
     try {
       await updateProduct(editing.id, {
         name: editing.name,
         public_name: editing.public_name,
         description: editing.description,
-        adult_price: Number(editing.adult_price),
-        child_price: Number(editing.child_price),
-        max_capacity: Number(editing.max_capacity),
+        adult_price: prices.adult_price,
+        child_price: prices.child_price,
+        max_capacity: cap,
         is_active: editing.is_active,
         duration_text: editing.duration_text,
         inclusions: editing.inclusions,
@@ -40,11 +91,17 @@ export default function ProductsPage() {
             ? null
             : Number(editing.commission_percent),
       })
-      setMsg('Product saved')
+      setMsg(
+        `Saved prices: adult €${formatEuroAmount(prices.adult_price)}, child €${formatEuroAmount(prices.child_price)} (EUR, VAT incl.)`,
+      )
       setEditing(null)
+      setBaseline(null)
       await load()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Save failed — apply migration 016 for ops fields')
+      // Keep editing form values so the admin does not lose input.
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -52,7 +109,10 @@ export default function ProductsPage() {
     <div className="space-y-4">
       <div>
         <h1 className="text-xl font-bold">Products</h1>
-        <p className="text-sm text-gray-600">Existing tours only — no invented products.</p>
+        <p className="text-sm text-gray-600">
+          Canonical tour prices in EUR (VAT included). Changes update calendar, booking summary, and
+          checkout after refresh — no redeploy required.
+        </p>
       </div>
 
       {error && (
@@ -89,9 +149,12 @@ export default function ProductsPage() {
             />
           </Field>
           <div className="grid grid-cols-2 gap-2">
-            <Field label="Adult price €">
+            <Field label="Adult price € (VAT incl.)">
               <input
                 type="number"
+                min={0}
+                max={10000}
+                step="0.01"
                 className="w-full border rounded-lg px-3 py-2 text-sm"
                 value={editing.adult_price}
                 onChange={(e) =>
@@ -99,9 +162,12 @@ export default function ProductsPage() {
                 }
               />
             </Field>
-            <Field label="Child price €">
+            <Field label="Child price € (VAT incl.)">
               <input
                 type="number"
+                min={0}
+                max={10000}
+                step="0.01"
                 className="w-full border rounded-lg px-3 py-2 text-sm"
                 value={editing.child_price}
                 onChange={(e) =>
@@ -110,9 +176,13 @@ export default function ProductsPage() {
               />
             </Field>
           </div>
+          <p className="text-xs text-gray-500">Currency is fixed to EUR.</p>
           <Field label="Capacity">
             <input
               type="number"
+              min={1}
+              max={100}
+              step={1}
               className="w-full border rounded-lg px-3 py-2 text-sm"
               value={editing.max_capacity}
               onChange={(e) =>
@@ -181,14 +251,16 @@ export default function ProductsPage() {
             <button
               type="button"
               onClick={save}
-              className="flex-1 bg-emerald-700 text-white py-2.5 rounded-lg font-semibold"
+              disabled={saving}
+              className="flex-1 bg-emerald-700 text-white py-2.5 rounded-lg font-semibold disabled:opacity-60"
             >
-              Save
+              {saving ? 'Saving…' : 'Save'}
             </button>
             <button
               type="button"
-              onClick={() => setEditing(null)}
-              className="px-4 border rounded-lg"
+              onClick={cancelEdit}
+              disabled={saving}
+              className="px-4 border rounded-lg disabled:opacity-60"
             >
               Cancel
             </button>
@@ -200,7 +272,7 @@ export default function ProductsPage() {
             <li key={p.id}>
               <button
                 type="button"
-                onClick={() => setEditing(p)}
+                onClick={() => startEdit(p)}
                 className="w-full text-left bg-white border border-gray-200 rounded-lg p-3"
               >
                 <div className="flex justify-between gap-2">
@@ -213,7 +285,8 @@ export default function ProductsPage() {
                   </Badge>
                 </div>
                 <div className="text-xs text-gray-600 mt-2">
-                  €{p.adult_price} adult · cap {p.max_capacity}
+                  Adult €{formatEuroAmount(Number(p.adult_price))} · Child €
+                  {formatEuroAmount(Number(p.child_price))} · cap {p.max_capacity}
                   {p.duration_text ? ` · ${p.duration_text}` : ''}
                 </div>
               </button>

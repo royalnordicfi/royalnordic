@@ -24,8 +24,8 @@ const NorthernLightsTour = () => {
         const northernLightsTour = tours.find(tour => tour.id === 1);
         if (northernLightsTour) {
           setTourData({
-            adult_price: 149,
-            child_price: 129,
+            adult_price: Number(northernLightsTour.adult_price) || 149,
+            child_price: Number(northernLightsTour.child_price) || 129,
             max_capacity: northernLightsTour.max_capacity || 16
           });
         }

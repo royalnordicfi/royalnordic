@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Clock, Users, MapPin, CheckCircle, XCircle } from 'lucide-react';
 import ImageSlideshow from './ImageSlideshow';
@@ -6,8 +6,34 @@ import Footer from './Footer';
 import BookingForm from './BookingForm';
 import ProductFaq from './seo/ProductFaq';
 import RelatedTours from './seo/RelatedTours';
+import { getAllTours } from '../lib/api';
 
 const FamilyFriendlyNorthernLights: React.FC = () => {
+  const [tourData, setTourData] = useState({
+    adult_price: 79,
+    child_price: 59,
+    max_capacity: 16,
+  });
+
+  useEffect(() => {
+    const loadTourData = async () => {
+      try {
+        const tours = await getAllTours();
+        const familyTour = tours.find((tour) => tour.id === 8);
+        if (familyTour) {
+          setTourData({
+            adult_price: Number(familyTour.adult_price) || 79,
+            child_price: Number(familyTour.child_price) || 59,
+            max_capacity: familyTour.max_capacity || 16,
+          });
+        }
+      } catch (error) {
+        console.error('Error loading tour data:', error);
+      }
+    };
+    loadTourData();
+  }, []);
+
   const tourImages = [
     '/family1.jpg',
     '/family2.jpg',
@@ -250,9 +276,9 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
                 <BookingForm
                   tourId={8}
                   tourName="Family-Friendly Northern Lights Tour"
-                  adultPrice={79}
-                  childPrice={59}
-                  maxCapacity={16}
+                  adultPrice={tourData.adult_price}
+                  childPrice={tourData.child_price}
+                  maxCapacity={tourData.max_capacity}
                   seasonStart="09-15"
                   seasonEnd="04-15"
                 />

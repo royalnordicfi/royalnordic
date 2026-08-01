@@ -20,6 +20,7 @@ import {
   markCodeAppliedThisSession,
   trackWinterPromoEvent,
 } from '../lib/winterPromotion'
+import { formatEuroAmount } from '../lib/tourPricing'
 
 interface BookingFormProps {
   tourId: number
@@ -69,6 +70,14 @@ const BookingForm: React.FC<BookingFormProps> = ({
     cryptoType: 'bitcoin',
     specialRequests: ''
   })
+  // Prefer live tours.* prices from availability API; props are fallback only.
+  const [liveAdultPrice, setLiveAdultPrice] = useState(adultPrice)
+  const [liveChildPrice, setLiveChildPrice] = useState(childPrice)
+
+  useEffect(() => {
+    setLiveAdultPrice(adultPrice)
+    setLiveChildPrice(childPrice)
+  }, [adultPrice, childPrice])
 
   const isNorthernLightsTour = tourName === 'Guaranteed Northern Lights Tour'
 
@@ -112,6 +121,13 @@ const BookingForm: React.FC<BookingFormProps> = ({
         throw new Error(error.message)
       }
       
+      if (typeof data.adultPrice === 'number' && Number.isFinite(data.adultPrice)) {
+        setLiveAdultPrice(data.adultPrice)
+      }
+      if (typeof data.childPrice === 'number' && Number.isFinite(data.childPrice)) {
+        setLiveChildPrice(data.childPrice)
+      }
+
       // Transform the response to match the expected format
       const transformedData = data.availableDates.map((date: any, index: number) => {
         // Debug: Log any malformed dates
@@ -360,7 +376,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
   // }
 
   const calculateTotal = () => {
-    const subtotal = (formData.adults * adultPrice) + (formData.children * childPrice)
+    const subtotal = (formData.adults * liveAdultPrice) + (formData.children * liveChildPrice)
     const discount = getDiscountAmount(subtotal)
     return subtotal - discount
   }
@@ -407,7 +423,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         throw new Error(`Only ${availableSlots} slots available for this date`)
       }
 
-      const subtotal = (formData.adults * adultPrice) + (formData.children * childPrice)
+      const subtotal = (formData.adults * liveAdultPrice) + (formData.children * liveChildPrice)
       const discount = getDiscountAmount(subtotal)
       const totalPrice = subtotal - discount
       if (discount > 0) {
@@ -520,7 +536,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
       }
       
       const tourDateId = selectedDateData.id || Date.now()
-      const subtotal = (formData.adults * adultPrice) + (formData.children * childPrice)
+      const subtotal = (formData.adults * liveAdultPrice) + (formData.children * liveChildPrice)
       const discount = getDiscountAmount(subtotal)
       const totalPrice = subtotal - discount
       if (discount > 0) {
@@ -664,11 +680,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
           <div className="grid grid-cols-7 gap-1">
             {availability.length > 0 ? getCalendarGrid().map((day, index) => {
               if (day === null) {
-                return <div key={`empty-${index}`} className="h-12 sm:h-14"></div>
+                return <div key={`empty-${index}`} className="h-14 sm:h-16"></div>
               }
               
               const { day: calendarDay, date, available, remainingSlots, isPastDate, isOutOfSeason, isFullBooked } = day
               const isAvailable = available && remainingSlots >= (formData.adults + formData.children)
+              const isSelected = formData.preferredDate === date
+              const priceClass = isSelected
+                ? 'text-emerald-100'
+                : isAvailable
+                ? 'text-emerald-700'
+                : 'text-gray-400'
               
               
               return (
@@ -681,8 +703,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
                     clearFieldError('preferredDate')
                     setError('')
                   }}
-                  className={`h-12 sm:h-14 rounded text-sm font-medium transition-colors ${
-                    formData.preferredDate === date
+                  className={`h-14 sm:h-16 rounded text-sm font-medium transition-colors flex flex-col items-center justify-center px-0.5 leading-none ${
+                    isSelected
                       ? 'bg-emerald-600 text-white'
                       : isPastDate
                       ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
@@ -698,27 +720,31 @@ const BookingForm: React.FC<BookingFormProps> = ({
                   }`}
                   disabled={!isAvailable}
                 >
-                  <div className="text-xs sm:text-sm font-semibold">{calendarDay}</div>
-                  <div className="hidden sm:block text-xs text-emerald-600 font-semibold">€{adultPrice}</div>
+                  <div className="text-[11px] sm:text-sm font-semibold">{calendarDay}</div>
+                  {!isPastDate && (
+                    <div className={`text-[9px] sm:text-xs font-semibold mt-0.5 ${priceClass}`}>
+                      €{formatEuroAmount(liveAdultPrice)}
+                    </div>
+                  )}
                   {isAvailable && (
-                    <div className={`text-[9px] sm:text-[10px] leading-tight ${
-                      formData.preferredDate === date ? 'text-emerald-100' : 'text-gray-500'
+                    <div className={`text-[8px] sm:text-[10px] mt-0.5 ${
+                      isSelected ? 'text-emerald-100' : 'text-gray-500'
                     }`}>
                       {remainingSlots} left
                     </div>
                   )}
                   {isFullBooked && (
-                    <div className="text-[10px] sm:text-xs text-red-600 font-semibold">FULL</div>
+                    <div className="text-[8px] sm:text-[10px] text-red-600 font-semibold mt-0.5">FULL</div>
                   )}
                   {isOutOfSeason && (
-                    <div className="hidden sm:block text-xs text-gray-500">Closed</div>
+                    <div className="text-[8px] sm:text-[10px] text-gray-500 mt-0.5">Closed</div>
                   )}
                 </button>
               )
             }) : (
               // Show loading state when availability data is not loaded
               Array.from({ length: 35 }, (_, index) => (
-                <div key={`loading-${index}`} className="h-12 sm:h-14 bg-gray-100 rounded animate-pulse"></div>
+                <div key={`loading-${index}`} className="h-14 sm:h-16 bg-gray-100 rounded animate-pulse"></div>
               ))
             )}
           </div>
@@ -755,7 +781,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               >
                 +
               </button>
-                <span className="text-sm text-gray-500 ml-auto">€{adultPrice} (VAT incl.)</span>
+                <span className="text-sm text-gray-500 ml-auto">€{formatEuroAmount(liveAdultPrice)} (VAT incl.)</span>
               </div>
           </div>
           
@@ -779,7 +805,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               >
                 +
               </button>
-                <span className="text-sm text-gray-500 ml-auto">€{childPrice} (VAT incl.)</span>
+                <span className="text-sm text-gray-500 ml-auto">€{formatEuroAmount(liveChildPrice)} (VAT incl.)</span>
               </div>
             </div>
             
@@ -915,17 +941,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
               </div>
             )}
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Adults ({formData.adults} × €{adultPrice})</span>
-              <span className="text-gray-800 font-medium">€{formData.adults * adultPrice}</span>
+              <span className="text-gray-600">Adults ({formData.adults} × €{formatEuroAmount(liveAdultPrice)})</span>
+              <span className="text-gray-800 font-medium">€{formatEuroAmount(formData.adults * liveAdultPrice)}</span>
             </div>
             {formData.children > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Children ({formData.children} × €{childPrice})</span>
-                <span className="text-gray-800 font-medium">€{formData.children * childPrice}</span>
+                <span className="text-gray-600">Children ({formData.children} × €{formatEuroAmount(liveChildPrice)})</span>
+                <span className="text-gray-800 font-medium">€{formatEuroAmount(formData.children * liveChildPrice)}</span>
               </div>
             )}
             {(() => {
-              const subtotal = (formData.adults * adultPrice) + (formData.children * childPrice)
+              const subtotal = (formData.adults * liveAdultPrice) + (formData.children * liveChildPrice)
               const discount = getDiscountAmount(subtotal)
               return discount > 0 ? (
                 <>

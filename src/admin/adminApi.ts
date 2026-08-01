@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase'
 import { todayTourDateISO } from '../lib/tourDate'
 import { sendCustomerConfirmationStrict } from '../lib/email'
+import { validateTourPrices } from '../lib/tourPricing'
 import type {
   AssignmentConflict,
   BookingEmail,
@@ -856,7 +857,27 @@ export async function fetchProducts(): Promise<Product[]> {
 
 export async function updateProduct(id: number, patch: Partial<Product>): Promise<void> {
   await requireAdmin()
-  const { error } = await supabase.from('tours').update(patch).eq('id', id)
+
+  const next: Partial<Product> = { ...patch }
+  if (next.adult_price != null || next.child_price != null) {
+    const current = await supabase.from('tours').select('adult_price, child_price').eq('id', id).single()
+    if (current.error) throw new Error(current.error.message)
+    const prices = validateTourPrices(
+      Number(next.adult_price ?? current.data?.adult_price),
+      Number(next.child_price ?? current.data?.child_price),
+    )
+    next.adult_price = prices.adult_price
+    next.child_price = prices.child_price
+  }
+  if (next.max_capacity != null) {
+    const cap = Number(next.max_capacity)
+    if (!Number.isInteger(cap) || cap < 1 || cap > 100) {
+      throw new Error('Capacity must be an integer between 1 and 100')
+    }
+    next.max_capacity = cap
+  }
+
+  const { error } = await supabase.from('tours').update(next).eq('id', id)
   if (error) throw new Error(error.message)
 }
 
