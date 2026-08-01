@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
+  countOpenTransportationRequests,
   detectAssignmentConflicts,
   detectCapacityConflicts,
   fetchOpsBookings,
@@ -23,16 +24,25 @@ function addDaysISO(iso: string, days: number) {
 export default function HomePage() {
   const [bookings, setBookings] = useState<OpsBooking[]>([])
   const [notes, setNotes] = useState<OpsNote[]>([])
+  const [openRequests, setOpenRequests] = useState(0)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [schemaHint, setSchemaHint] = useState(false)
 
-  useEffect(() => {
-    setLoading(true)
-    Promise.all([fetchOpsBookings(), fetchOpsNotes('open').catch(() => [] as OpsNote[])])
-      .then(([b, n]) => {
+  const load = (mode: 'initial' | 'refresh' = 'refresh') => {
+    if (mode === 'initial') setLoading(true)
+    else setRefreshing(true)
+    Promise.all([
+      fetchOpsBookings(),
+      fetchOpsNotes('open').catch(() => [] as OpsNote[]),
+      countOpenTransportationRequests().catch(() => 0),
+    ])
+      .then(([b, n, reqs]) => {
         setBookings(b)
         setNotes(n)
+        setOpenRequests(reqs)
+        setError('')
       })
       .catch((e) => {
         const msg = e instanceof Error ? e.message : 'Failed to load'
@@ -41,7 +51,14 @@ export default function HomePage() {
           setSchemaHint(true)
         }
       })
-      .finally(() => setLoading(false))
+      .finally(() => {
+        setLoading(false)
+        setRefreshing(false)
+      })
+  }
+
+  useEffect(() => {
+    load('initial')
   }, [])
 
   const today = todayTourDateISO()
@@ -127,6 +144,16 @@ export default function HomePage() {
       }
     }
 
+    const weekEnd = addDaysISO(today, 7)
+    const weekBookings = active.filter((b) => {
+      const d = b.tour_dates?.date || ''
+      return d >= today && d <= weekEnd
+    })
+    const weekRevenue = weekBookings
+      .filter((b) => b.payment_status === 'paid' || b.status === 'confirmed')
+      .reduce((s, b) => s + Number(b.total_price || 0), 0)
+    const weekGuests = weekBookings.reduce((s, b) => s + b.adults + b.children, 0)
+
     return {
       todayBookings,
       tomorrowBookings,
@@ -142,18 +169,50 @@ export default function HomePage() {
       urgentNotes,
       dueNotes,
       nextAction,
+      weekBookings: weekBookings.length,
+      weekRevenue,
+      weekGuests,
     }
   }, [bookings, notes, today, tomorrow])
 
-  if (loading) return <p className="text-gray-600 text-sm">Loading operations…</p>
+  if (loading) return <p className="text-zinc-500 text-sm">Loading operations…</p>
 
   return (
-    <div className="space-y-5">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight">Ops today</h1>
-        <p className="text-sm text-gray-500">
-          {weekdayForTourDate(today)} {today} · what needs action
-        </p>
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight">Ops today</h1>
+          <p className="text-sm text-zinc-500">
+            {weekdayForTourDate(today)} {today} · what needs action
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => load('refresh')}
+          disabled={refreshing}
+          className="rounded-md border border-zinc-300 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 disabled:opacity-50"
+        >
+          {refreshing ? 'Refreshing…' : 'Refresh'}
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <StatCard label="Today guests" value={String(stats.guestsToday)} />
+        <StatCard label="Today tours" value={String(stats.todayBookings.length)} />
+        <StatCard label="7-day bookings" value={String(stats.weekBookings)} />
+        <StatCard
+          label="7-day revenue"
+          value={`€${stats.weekRevenue.toLocaleString('en-GB', { maximumFractionDigits: 0 })}`}
+        />
+      </div>
+
+      <div className="flex flex-wrap gap-1.5">
+        <QuickLink to="/manual" label="+ Booking" primary />
+        <QuickLink to="/availability" label="Availability" />
+        <QuickLink to="/calendar" label="Calendar" />
+        <QuickLink to="/requests" label={openRequests > 0 ? `Requests (${openRequests})` : 'Requests'} />
+        <QuickLink to="/products" label="Products" />
+        <QuickLink to="/bookings" label="All bookings" />
       </div>
 
       {error && (
@@ -197,6 +256,7 @@ export default function HomePage() {
           />
           <AttentionRow label="Customer issues / gaps" count={stats.customerIssues.length} to="/bookings" />
           <AttentionRow label="Urgent / due notes" count={stats.urgentNotes.length + stats.dueNotes.length} to="/notes" />
+          <AttentionRow label="Transport requests" count={openRequests} to="/requests" />
         </div>
       </section>
 
@@ -290,17 +350,49 @@ function AttentionRow({
 }) {
   const body = (
     <div
-      className={`flex justify-between items-center rounded-xl px-3 py-2.5 text-sm border ${
+      className={`flex justify-between items-center rounded-lg px-3 py-2 text-sm border ${
         count > 0
           ? 'bg-amber-50 border-amber-200 text-amber-950'
-          : 'bg-white border-gray-200 text-gray-600'
+          : 'bg-white border-zinc-200 text-zinc-600'
       }`}
     >
       <span className="font-medium">{label}</span>
-      <span className={`font-semibold tabular-nums ${count > 0 ? 'text-amber-800' : 'text-gray-400'}`}>
+      <span className={`font-semibold tabular-nums ${count > 0 ? 'text-amber-800' : 'text-zinc-400'}`}>
         {count}
       </span>
     </div>
   )
   return to && count > 0 ? <Link to={to}>{body}</Link> : body
+}
+
+function StatCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2">
+      <div className="text-[10px] uppercase tracking-wide text-zinc-400 font-semibold">{label}</div>
+      <div className="text-lg font-semibold tabular-nums text-zinc-900 mt-0.5">{value}</div>
+    </div>
+  )
+}
+
+function QuickLink({
+  to,
+  label,
+  primary,
+}: {
+  to: string
+  label: string
+  primary?: boolean
+}) {
+  return (
+    <Link
+      to={to}
+      className={`rounded-md px-2.5 py-1.5 text-xs font-medium ${
+        primary
+          ? 'bg-emerald-700 text-white hover:bg-emerald-600'
+          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50'
+      }`}
+    >
+      {label}
+    </Link>
+  )
 }

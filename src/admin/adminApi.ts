@@ -888,6 +888,48 @@ export async function setProductActive(id: number, isActive: boolean): Promise<v
   if (error) throw new Error(error.message)
 }
 
+export async function fetchTransportationRequests(
+  status?: string,
+): Promise<import('./types').TransportationRequest[]> {
+  await requireAdmin()
+  let q = supabase
+    .from('transportation_requests')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(200)
+  if (status && status !== 'all') {
+    q = q.eq('status', status)
+  }
+  const { data, error } = await q
+  if (error) {
+    if (error.message.includes('transportation_requests') || error.code === '42P01') return []
+    throw new Error(error.message)
+  }
+  return (data || []) as import('./types').TransportationRequest[]
+}
+
+export async function updateTransportationRequestStatus(
+  id: number,
+  status: string,
+): Promise<void> {
+  await requireAdmin()
+  const { error } = await supabase
+    .from('transportation_requests')
+    .update({ status })
+    .eq('id', id)
+  if (error) throw new Error(error.message)
+}
+
+export async function countOpenTransportationRequests(): Promise<number> {
+  await requireAdmin()
+  const { count, error } = await supabase
+    .from('transportation_requests')
+    .select('id', { count: 'exact', head: true })
+    .in('status', ['new', 'quoted'])
+  if (error) return 0
+  return count || 0
+}
+
 export async function fetchGuides(): Promise<Guide[]> {
   await requireAdmin()
   const { data, error } = await supabase.from('guides').select('*').order('name')

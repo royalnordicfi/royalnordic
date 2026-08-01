@@ -21,8 +21,11 @@ export default function BookingsPage() {
   const source = params.get('source') || 'all'
   const attention = params.get('attention') || ''
 
-  const load = () => {
-    setLoading(true)
+  const [refreshing, setRefreshing] = useState(false)
+
+  const load = (soft = false) => {
+    if (soft && rows.length > 0) setRefreshing(true)
+    else setLoading(true)
     fetchOpsBookings({
       status,
       source,
@@ -31,29 +34,44 @@ export default function BookingsPage() {
     })
       .then(setRows)
       .catch((e) => setError(e instanceof Error ? e.message : 'Failed'))
-      .finally(() => setLoading(false))
+      .finally(() => {
+        setLoading(false)
+        setRefreshing(false)
+      })
   }
 
   useEffect(() => {
-    load()
+    load(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, source, attention])
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Bookings</h1>
-          {attention && (
-            <p className="text-xs text-amber-700 mt-0.5">Filter: {attention}</p>
-          )}
+          <p className="text-xs text-zinc-500 mt-0.5">
+            {rows.length} shown
+            {attention ? ` · filter: ${attention}` : ''}
+            {refreshing ? ' · updating…' : ''}
+          </p>
         </div>
-        <Link
-          to="/manual"
-          className="bg-emerald-700 text-white text-sm font-medium px-3 py-2 rounded-lg"
-        >
-          + Manual
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => load(true)}
+            disabled={refreshing}
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium disabled:opacity-50"
+          >
+            Refresh
+          </button>
+          <Link
+            to="/manual"
+            className="bg-emerald-700 text-white text-sm font-medium px-3 py-2 rounded-lg"
+          >
+            + Manual
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">

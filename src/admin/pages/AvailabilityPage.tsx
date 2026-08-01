@@ -24,22 +24,22 @@ export default function AvailabilityPage() {
   )
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900">Availability</h1>
-        <p className="mt-1 text-sm text-zinc-600">
-          Open or close calendar dates and set capacity for each bookable tour.
+        <h1 className="text-xl font-semibold tracking-tight text-zinc-900">Availability</h1>
+        <p className="mt-0.5 text-sm text-zinc-500">
+          Compact calendar · remaining/capacity per day · refresh stays on-screen
         </p>
       </div>
 
       {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
           {error}
         </div>
       )}
 
       {products.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-0.5 px-0.5">
           {products.map((p) => {
             const label = p.public_name || p.name
             const active = p.id === tourId
@@ -48,10 +48,10 @@ export default function AvailabilityPage() {
                 key={p.id}
                 type="button"
                 onClick={() => setTourId(p.id)}
-                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                className={`shrink-0 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                   active
                     ? 'bg-zinc-900 text-white'
-                    : 'border border-zinc-300 bg-white text-zinc-800 hover:bg-zinc-50'
+                    : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50'
                 }`}
               >
                 {label}

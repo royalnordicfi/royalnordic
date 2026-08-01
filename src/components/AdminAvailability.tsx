@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { Save, RefreshCw } from 'lucide-react'
-import { updateTourAvailability } from '../lib/api'
-import { supabase } from '../lib/supabase'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { RefreshCw, Save } from 'lucide-react'
+import { getTourAvailability, updateTourAvailability } from '../lib/api'
 import type { TourDate } from '../lib/supabase'
 import {
   WEEKDAY_HEADERS_MON_FIRST,
@@ -19,6 +18,32 @@ interface AdminAvailabilityProps {
   embedded?: boolean
 }
 
+function inSeasonForTour(tourId: number, dateString: string): boolean {
+  if (tourId === 1) {
+    const date = tourDateToLocalDate(dateString)
+    const m = date.getMonth() + 1
+    const dayOfMonth = date.getDate()
+    return (
+      (m === 9 && dayOfMonth >= 15) ||
+      (m >= 10 && m <= 12) ||
+      (m >= 1 && m <= 3) ||
+      (m === 4 && dayOfMonth <= 15)
+    )
+  }
+  if (tourId === 2) {
+    const date = tourDateToLocalDate(dateString)
+    const m = date.getMonth() + 1
+    const dayOfMonth = date.getDate()
+    return (
+      (m === 11 && dayOfMonth >= 1) ||
+      m === 12 ||
+      (m >= 1 && m <= 3) ||
+      (m === 4 && dayOfMonth <= 1)
+    )
+  }
+  return true
+}
+
 const AdminAvailability: React.FC<AdminAvailabilityProps> = ({
   tourId,
   tourName,
@@ -26,417 +51,412 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({
   embedded = false,
 }) => {
   const [availability, setAvailability] = useState<TourDate[]>([])
-  const [loading, setLoading] = useState(true)
+  const [initialLoading, setInitialLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-
-  const [currentMonth, setCurrentMonth] = useState(new Date())
+  const [currentMonth, setCurrentMonth] = useState(() => new Date())
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
-  const [editingSlots, setEditingSlots] = useState<number>(0)
+  const [editingSlots, setEditingSlots] = useState(0)
   const [isEditing, setIsEditing] = useState(false)
 
-  const loadAvailability = useCallback(async () => {
-    try {
-      setLoading(true)
-      const { data, error } = await supabase.functions.invoke('get-tour-availability', {
-        body: { tourId }
-      })
-      
-      if (error) {
-        throw new Error(error.message)
-      }
-      
-      const transformedData = data.availableDates.map((date: any) => ({
-        id: date.id,
-        tour_id: tourId,
-        date: date.date,
-        available_slots: date.totalSlots,
-        total_booked: date.bookedSlots,
-        remaining_slots: date.availableSpots
-      }))
-      
-      setAvailability(transformedData)
-    } catch (err) {
-      console.error('Availability error:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load availability')
-    } finally {
-      setLoading(false)
-    }
-  }, [tourId])
+  const loadAvailability = useCallback(
+    async (mode: 'initial' | 'refresh', month: Date) => {
+      try {
+        setError('')
+        if (mode === 'initial') setInitialLoading(true)
+        else setRefreshing(true)
 
+        // Only load a tight window around the visible month (fast path)
+        const y = month.getFullYear()
+        const m = month.getMonth()
+        const start = new Date(y, m - 1, 1)
+        const end = new Date(y, m + 2, 0)
+        const startISO = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-01`
+        const endISO = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`
+
+        const rows = await getTourAvailability(tourId, startISO, endISO)
+        setAvailability((prev) => {
+          const map = new Map(prev.map((d) => [d.date, d]))
+          for (const row of rows as TourDate[]) map.set(row.date, row)
+          return Array.from(map.values()).sort((a, b) => a.date.localeCompare(b.date))
+        })
+      } catch (err) {
+        console.error('Availability error:', err)
+        setError(err instanceof Error ? err.message : 'Failed to load availability')
+      } finally {
+        setInitialLoading(false)
+        setRefreshing(false)
+      }
+    },
+    [tourId],
+  )
+
+  const loadedTourRef = React.useRef<number | null>(null)
   useEffect(() => {
-    loadAvailability()
+    const firstForTour = loadedTourRef.current !== tourId
+    if (firstForTour) {
+      loadedTourRef.current = tourId
+      setSelectedDate(null)
+      setIsEditing(false)
+      setAvailability([])
+      void loadAvailability('initial', currentMonth)
+    } else {
+      void loadAvailability('refresh', currentMonth)
+    }
   }, [tourId, currentMonth, loadAvailability])
 
-  // Get month name and year
-  const getMonthYearString = () => {
-    return currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-  }
+  const dateMap = useMemo(() => new Map(availability.map((d) => [d.date, d])), [availability])
+  const todayString = todayTourDateISO()
 
-  // Navigate to previous month
-  const goToPreviousMonth = () => {
-    setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))
-  }
-
-  // Navigate to next month
-  const goToNextMonth = () => {
-    setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))
-  }
-
-  // Get calendar grid for current month (Monday-first; date-only ISO cells)
-  const getCalendarGrid = () => {
+  const calendarGrid = useMemo(() => {
     const year = currentMonth.getFullYear()
     const month = currentMonth.getMonth()
-    const todayString = todayTourDateISO()
-    const dateMap = new Map(availability.map((d) => [d.date, d]))
-
     return buildMondayFirstMonthGrid(year, month).map((cell) => {
       if (cell === null) return null
-
       const { day, date: dateString } = cell
       const dateData = dateMap.get(dateString)
-
-      let inSeason = true
-      if (tourId === 1) {
-        // Northern Lights: Sep 15 - Apr 15
-        const date = tourDateToLocalDate(dateString)
-        const m = date.getMonth() + 1
-        const dayOfMonth = date.getDate()
-        inSeason =
-          (m === 9 && dayOfMonth >= 15) ||
-          (m >= 10 && m <= 12) ||
-          (m >= 1 && m <= 3) ||
-          (m === 4 && dayOfMonth <= 15)
-      } else if (tourId === 2) {
-        // Snowshoe: Nov 1 - Apr 1
-        const date = tourDateToLocalDate(dateString)
-        const m = date.getMonth() + 1
-        const dayOfMonth = date.getDate()
-        inSeason =
-          (m === 11 && dayOfMonth >= 1) ||
-          m === 12 ||
-          (m >= 1 && m <= 3) ||
-          (m === 4 && dayOfMonth <= 1)
-      }
-
+      const remaining = dateData
+        ? dateData.available_slots - (dateData.total_booked || 0)
+        : 0
+      const booked = dateData?.total_booked || 0
+      const inSeason = inSeasonForTour(tourId, dateString)
       return {
         day,
         date: dateString,
-        available: dateData ? dateData.remaining_slots > 0 : false,
-        remainingSlots: dateData?.remaining_slots || 0,
+        remaining,
+        booked,
+        capacity: dateData?.available_slots ?? null,
         hasData: !!dateData,
         isPastDate: dateString < todayString,
         inSeason,
+        available: !!dateData && remaining > 0,
       }
     })
-  }
+  }, [currentMonth, dateMap, tourId, todayString])
 
-  // Handle date selection
-  const handleDateClick = (date: string, currentSlots: number) => {
+  const monthLabel = currentMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+
+  const monthStats = useMemo(() => {
+    let open = 0
+    let full = 0
+    let empty = 0
+    let guests = 0
+    for (const cell of calendarGrid) {
+      if (!cell || cell.isPastDate || !cell.inSeason) continue
+      if (!cell.hasData) empty += 1
+      else if (cell.remaining <= 0) full += 1
+      else open += 1
+      guests += cell.booked
+    }
+    return { open, full, empty, guests }
+  }, [calendarGrid])
+
+  const handleDateClick = (date: string, remaining: number, capacity: number | null) => {
     setSelectedDate(date)
-    setEditingSlots(currentSlots)
+    // Edit total capacity; show current capacity or remaining if no row yet
+    setEditingSlots(capacity != null ? capacity : remaining || maxCapacity)
     setIsEditing(true)
   }
 
-  // Save availability changes
-  const handleSaveAvailability = async () => {
-    if (!selectedDate) return
-
-    try {
-      setLoading(true)
-      setError('')
-      
-      // Use the new Supabase function
-      const { data, error } = await supabase.functions.invoke('update-tour-availability', {
-        body: { 
-          tourId, 
-          date: selectedDate, 
-          availableSlots: editingSlots 
+  const applyLocalUpdate = (date: string, availableSlots: number) => {
+    setAvailability((prev) => {
+      const idx = prev.findIndex((d) => d.date === date)
+      if (idx >= 0) {
+        const next = [...prev]
+        const booked = next[idx].total_booked || 0
+        next[idx] = {
+          ...next[idx],
+          available_slots: availableSlots,
+          remaining_slots: availableSlots - booked,
         }
-      })
-      
-      if (error) {
-        throw new Error(error.message)
+        return next
       }
-      
-      // Update local state
-      const existingIndex = availability.findIndex(d => d.date === selectedDate)
-      if (existingIndex >= 0) {
-        // Update existing date
-        const updated = [...availability]
-        updated[existingIndex] = { 
-          ...updated[existingIndex], 
-          available_slots: editingSlots,
-          remaining_slots: editingSlots - (updated[existingIndex].total_booked || 0)
-        }
-        setAvailability(updated)
-      } else {
-        // Add new date
-        const newDate: TourDate = {
-          id: Date.now(), // Temporary ID
+      return [
+        ...prev,
+        {
+          id: Date.now(),
           tour_id: tourId,
-          date: selectedDate,
-          available_slots: editingSlots,
+          date,
+          available_slots: availableSlots,
           total_booked: 0,
-          remaining_slots: editingSlots,
-          created_at: new Date().toISOString()
-        }
-        setAvailability(prev => [...prev, newDate])
-      }
-      
+          remaining_slots: availableSlots,
+          created_at: new Date().toISOString(),
+        },
+      ]
+    })
+  }
+
+  const persistSlots = async (date: string, availableSlots: number) => {
+    setSaving(true)
+    setError('')
+    try {
+      await updateTourAvailability(tourId, date, availableSlots)
+      applyLocalUpdate(date, availableSlots)
       setIsEditing(false)
       setSelectedDate(null)
-    } catch (err: any) {
-      setError(err.message || 'Failed to update availability')
-      console.error('Save error:', err)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update availability')
     } finally {
-      setLoading(false)
+      setSaving(false)
     }
   }
 
-  // Delete availability for a date
-  const handleDeleteAvailability = async (date: string) => {
+  const fillVisibleMonth = async () => {
+    const targets = calendarGrid.filter(
+      (c): c is NonNullable<typeof c> =>
+        !!c && !c.isPastDate && c.inSeason && (!c.hasData || (c.capacity ?? 0) < maxCapacity),
+    )
+    if (targets.length === 0) return
+    const ok = window.confirm(
+      `Set capacity to ${maxCapacity} for ${targets.length} date(s) in ${monthLabel}? Existing bookings are kept.`,
+    )
+    if (!ok) return
+    setSaving(true)
+    setError('')
     try {
-      setLoading(true)
-      setError('')
-      
-      // Use the new Supabase function to set slots to 0
-      const { data, error } = await supabase.functions.invoke('update-tour-availability', {
-        body: { 
-          tourId, 
-          date: date, 
-          availableSlots: 0 
-        }
-      })
-      
-      if (error) {
-        throw new Error(error.message)
+      for (const cell of targets) {
+        await updateTourAvailability(tourId, cell.date, maxCapacity)
+        applyLocalUpdate(cell.date, maxCapacity)
       }
-      
-      // Remove from local state
-      setAvailability(prev => prev.filter(d => d.date !== date))
-    } catch (err: any) {
-      setError(err.message || 'Failed to delete availability')
-      console.error('Delete error:', err)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Bulk update failed')
     } finally {
-      setLoading(false)
+      setSaving(false)
     }
   }
 
-  if (loading) {
+  if (initialLoading) {
     return (
-      <div className={`${embedded ? 'py-12' : 'min-h-screen bg-gray-50'} flex items-center justify-center`}>
-        <div className="text-center">
-          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Loading availability...</p>
-        </div>
+      <div className="py-10 flex items-center justify-center gap-2 text-sm text-zinc-500">
+        <RefreshCw className="w-4 h-4 animate-spin" />
+        Loading calendar…
       </div>
     )
   }
 
   return (
-    <div className={embedded ? '' : 'min-h-screen bg-gray-50'}>
+    <div className={embedded ? 'space-y-3' : 'min-h-screen bg-gray-50 p-4 space-y-3'}>
       {!embedded && (
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Tour Availability Management</h1>
-              <p className="text-gray-600">{tourName} - Manage available slots by date</p>
-            </div>
-            <button
-              onClick={loadAvailability}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Refresh
-            </button>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-semibold">Availability</h1>
+            <p className="text-sm text-zinc-600">{tourName}</p>
           </div>
         </div>
-      </div>
       )}
 
-      <div className={embedded ? 'space-y-6' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}>
-        {embedded && (
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-sm text-zinc-600">
-              Set open slots per date for <span className="font-medium text-zinc-900">{tourName}</span>
-            </p>
-            <button
-              type="button"
-              onClick={loadAvailability}
-              className="inline-flex items-center gap-2 rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Refresh
-            </button>
-          </div>
-        )}
-        {/* Error Display */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <div className="flex">
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">Error</h3>
-                <div className="mt-2 text-sm text-red-700">
-                  <p>{error}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Calendar */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Calendar</h2>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={goToPreviousMonth}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                ←
-              </button>
-              <span className="text-lg font-semibold text-gray-900">{getMonthYearString()}</span>
-              <button
-                onClick={goToNextMonth}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                →
-              </button>
-            </div>
-          </div>
-
-          {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-1 mb-4">
-            {WEEKDAY_HEADERS_MON_FIRST.map(day => (
-              <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
-                {day}
-              </div>
-            ))}
-          </div>
-          
-          <div className="grid grid-cols-7 gap-1">
-            {getCalendarGrid().map((day, index) => {
-              if (day === null) {
-                return <div key={`empty-${index}`} className="h-16"></div>
-              }
-              
-              const { day: calendarDay, date, available, remainingSlots, hasData, isPastDate, inSeason } = day
-              
-              return (
-                <button
-                  key={date} 
-                  type="button"
-                  onClick={() => !isPastDate && inSeason && handleDateClick(date, remainingSlots)}
-                  disabled={isPastDate || !inSeason}
-                  className={`h-16 rounded text-sm font-medium transition-colors border ${
-                    selectedDate === date
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : isPastDate
-                      ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60'
-                      : !inSeason
-                      ? 'bg-gray-200 text-gray-500 border-gray-200 cursor-not-allowed opacity-60'
-                      : available
-                      ? 'bg-green-50 text-green-900 border-green-200 hover:bg-green-100'
-                      : hasData
-                      ? 'bg-red-50 text-red-900 border-red-200 hover:bg-red-100'
-                      : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
-                  }`}
-                >
-                  <div className="text-xs font-bold">{calendarDay}</div>
-                  <div className="text-xs">
-                    {isPastDate ? 'Past' : !inSeason ? 'Closed' : hasData ? `${remainingSlots} slots` : 'No data'}
-                  </div>
-                </button>
-              )
-            })}
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-600">
+          <span>
+            <strong className="text-zinc-900">{monthStats.open}</strong> open
+          </span>
+          <span>
+            <strong className="text-zinc-900">{monthStats.full}</strong> full
+          </span>
+          <span>
+            <strong className="text-zinc-900">{monthStats.empty}</strong> unset
+          </span>
+          <span>
+            <strong className="text-zinc-900">{monthStats.guests}</strong> booked
+          </span>
         </div>
-
-        {/* Edit Panel */}
-        {isEditing && selectedDate && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Edit Availability for {formatTourDateShort(selectedDate)}
-            </h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Available Slots
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  max={maxCapacity}
-                  value={editingSlots}
-                  onChange={(e) => setEditingSlots(parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Maximum capacity: {maxCapacity} people
-                </p>
-              </div>
-              
-              <div className="flex space-x-3">
-                <button
-                  onClick={handleSaveAvailability}
-                  disabled={loading}
-                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Changes
-                </button>
-                
-                <button
-                  onClick={() => handleDeleteAvailability(selectedDate)}
-                  disabled={loading}
-                  className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
-                >
-                  Delete Date
-                </button>
-                
-                <button
-                  onClick={() => {
-                    setIsEditing(false)
-                    setSelectedDate(null)
-                  }}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Legend */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Legend</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-6 h-6 bg-green-50 border border-green-200 rounded"></div>
-              <span className="text-sm text-gray-700">Available (has slots)</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-6 h-6 bg-red-50 border border-red-200 rounded"></div>
-              <span className="text-sm text-gray-700">Full booked (0 slots)</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-6 h-6 bg-gray-50 border border-gray-200 rounded"></div>
-              <span className="text-sm text-gray-700">No availability data</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-6 h-6 bg-gray-200 border border-gray-200 rounded opacity-60"></div>
-              <span className="text-sm text-gray-700">Out of season (closed)</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-6 h-6 bg-gray-100 border border-gray-200 rounded opacity-60"></div>
-              <span className="text-sm text-gray-700">Past dates (read-only)</span>
-            </div>
-          </div>
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => void fillVisibleMonth()}
+            disabled={saving}
+            className="rounded-md border border-zinc-300 bg-white px-2.5 py-1 text-xs font-medium text-zinc-800 hover:bg-zinc-50 disabled:opacity-50"
+          >
+            Fill month @ {maxCapacity}
+          </button>
+          <button
+            type="button"
+            onClick={() => void loadAvailability('refresh', currentMonth)}
+            disabled={refreshing || saving}
+            className="inline-flex items-center gap-1.5 rounded-md border border-zinc-300 bg-white px-2.5 py-1 text-xs font-medium text-zinc-800 hover:bg-zinc-50 disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+            {refreshing ? 'Updating…' : 'Refresh'}
+          </button>
         </div>
       </div>
+
+      {error && (
+        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800">
+          {error}
+        </div>
+      )}
+
+      <div className="rounded-lg border border-zinc-200 bg-white p-3 shadow-sm">
+        <div className="mb-2 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() =>
+              setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))
+            }
+            className="rounded px-2 py-1 text-sm text-zinc-700 hover:bg-zinc-100"
+          >
+            ←
+          </button>
+          <span className="text-sm font-semibold text-zinc-900">{monthLabel}</span>
+          <button
+            type="button"
+            onClick={() =>
+              setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))
+            }
+            className="rounded px-2 py-1 text-sm text-zinc-700 hover:bg-zinc-100"
+          >
+            →
+          </button>
+        </div>
+
+        <div className="mb-1 grid grid-cols-7 gap-0.5">
+          {WEEKDAY_HEADERS_MON_FIRST.map((day) => (
+            <div key={day} className="py-0.5 text-center text-[10px] font-medium uppercase text-zinc-400">
+              {day}
+            </div>
+          ))}
+        </div>
+
+        <div className={`grid grid-cols-7 gap-0.5 ${refreshing ? 'opacity-70' : ''}`}>
+          {calendarGrid.map((day, index) => {
+            if (day === null) {
+              return <div key={`empty-${index}`} className="h-9 sm:h-10" />
+            }
+
+            const { day: calendarDay, date, available, remaining, booked, capacity, hasData, isPastDate, inSeason } =
+              day
+
+            return (
+              <button
+                key={date}
+                type="button"
+                onClick={() =>
+                  !isPastDate && inSeason && handleDateClick(date, remaining, capacity)
+                }
+                disabled={isPastDate || !inSeason || saving}
+                title={
+                  hasData
+                    ? `${date}: ${booked} booked / ${capacity} capacity (${remaining} left)`
+                    : `${date}: no capacity set`
+                }
+                className={`h-9 sm:h-10 rounded border px-0.5 text-[11px] leading-tight transition-colors ${
+                  selectedDate === date
+                    ? 'border-emerald-700 bg-emerald-700 text-white'
+                    : isPastDate
+                      ? 'cursor-not-allowed border-zinc-100 bg-zinc-50 text-zinc-300'
+                      : !inSeason
+                        ? 'cursor-not-allowed border-zinc-100 bg-zinc-100 text-zinc-400'
+                        : available
+                          ? 'border-emerald-200 bg-emerald-50 text-emerald-950 hover:bg-emerald-100'
+                          : hasData
+                            ? 'border-red-200 bg-red-50 text-red-900 hover:bg-red-100'
+                            : 'border-zinc-200 bg-white text-zinc-500 hover:bg-zinc-50'
+                }`}
+              >
+                <div className="font-semibold">{calendarDay}</div>
+                <div className="truncate text-[10px] opacity-90">
+                  {isPastDate
+                    ? '—'
+                    : !inSeason
+                      ? 'off'
+                      : hasData
+                        ? `${remaining}/${capacity}`
+                        : '·'}
+                </div>
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-zinc-500">
+          <span className="inline-flex items-center gap-1">
+            <span className="h-2.5 w-2.5 rounded border border-emerald-200 bg-emerald-50" /> Open
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="h-2.5 w-2.5 rounded border border-red-200 bg-red-50" /> Full
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="h-2.5 w-2.5 rounded border border-zinc-200 bg-white" /> Unset
+          </span>
+          <span>Cell shows remaining/capacity</span>
+        </div>
+      </div>
+
+      {isEditing && selectedDate && (
+        <div className="rounded-lg border border-zinc-200 bg-white p-3 shadow-sm space-y-3">
+          <div>
+            <h3 className="text-sm font-semibold text-zinc-900">
+              {formatTourDateShort(selectedDate)}
+            </h3>
+            <p className="text-xs text-zinc-500">
+              Set total capacity for the day (bookings already made are kept).
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-1.5">
+            {[0, Math.min(4, maxCapacity), Math.min(8, maxCapacity), maxCapacity]
+              .filter((v, i, arr) => arr.indexOf(v) === i)
+              .map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => setEditingSlots(n)}
+                  className={`rounded-md px-2.5 py-1 text-xs font-medium border ${
+                    editingSlots === n
+                      ? 'border-zinc-900 bg-zinc-900 text-white'
+                      : 'border-zinc-300 bg-white text-zinc-800 hover:bg-zinc-50'
+                  }`}
+                >
+                  {n === 0 ? 'Close' : `${n} slots`}
+                </button>
+              ))}
+          </div>
+
+          <label className="block">
+            <span className="mb-1 block text-xs text-zinc-500">Capacity</span>
+            <input
+              type="number"
+              min={0}
+              max={Math.max(maxCapacity, 100)}
+              value={editingSlots}
+              onChange={(e) => setEditingSlots(parseInt(e.target.value, 10) || 0)}
+              className="w-full max-w-[12rem] rounded-md border border-zinc-300 px-3 py-1.5 text-sm"
+            />
+          </label>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => void persistSlots(selectedDate, editingSlots)}
+              disabled={saving}
+              className="inline-flex items-center gap-1.5 rounded-md bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+            >
+              <Save className="w-3.5 h-3.5" />
+              {saving ? 'Saving…' : 'Save'}
+            </button>
+            <button
+              type="button"
+              onClick={() => void persistSlots(selectedDate, 0)}
+              disabled={saving}
+              className="rounded-md border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-800 disabled:opacity-50"
+            >
+              Close day
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsEditing(false)
+                setSelectedDate(null)
+              }}
+              className="rounded-md border border-zinc-300 px-3 py-1.5 text-xs text-zinc-700"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

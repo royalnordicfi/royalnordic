@@ -13,6 +13,7 @@ import RevenuePage from './admin/pages/RevenuePage'
 import ImportPage from './admin/pages/ImportPage'
 import NotesPage from './admin/pages/NotesPage'
 import AvailabilityPage from './admin/pages/AvailabilityPage'
+import RequestsPage from './admin/pages/RequestsPage'
 
 /**
  * Operator console — only mounted when hostname is admin.royalnordic.fi
@@ -42,6 +43,7 @@ function AdminApp() {
           <Route path="manual" element={<ManualBookingPage />} />
           <Route path="calendar" element={<CalendarPage />} />
           <Route path="availability" element={<AvailabilityPage />} />
+          <Route path="requests" element={<RequestsPage />} />
           <Route path="products" element={<ProductsPage />} />
           <Route path="fleet" element={<FleetPage />} />
           <Route path="customers" element={<CustomersPage />} />

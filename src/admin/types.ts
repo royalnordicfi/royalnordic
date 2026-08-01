@@ -211,6 +211,22 @@ export const NOTE_PRIORITY_LABELS: Record<OpsNotePriority, string> = {
   urgent: 'Urgent',
 }
 
+export type TransportationRequest = {
+  id: number
+  name: string
+  email: string
+  phone: string | null
+  service_type: string
+  destination: string | null
+  pickup_details: string | null
+  preferred_date: string | null
+  preferred_time: string | null
+  group_size: string | null
+  additional_info: string | null
+  status: string
+  created_at: string
+}
+
 /** Weekday label for a YYYY-MM-DD tour date (local calendar day). */
 export function weekdayForTourDate(dateISO: string): string {
   const [y, m, d] = dateISO.split('-').map(Number)
