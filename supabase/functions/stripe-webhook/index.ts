@@ -1,7 +1,10 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'https://esm.sh/stripe@14.5.0?target=deno'
-import { formatTourDateForDisplay } from '../_shared/tourDate.ts'
+import {
+  buildAdminBookingAlertEmail,
+  buildCustomerConfirmationEmail,
+} from '../_shared/bookingEmails.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -230,78 +233,29 @@ async function sendEmailNotification(
   type: 'admin' | 'customer',
 ) {
   const resendApiKey = Deno.env.get('RESEND_API_KEY')
-  const gmailUser = Deno.env.get('GMAIL_USER')
-  const gmailPassword = Deno.env.get('GMAIL_APP_PASSWORD')
-
-  if (!resendApiKey && !gmailUser) {
-    console.log('No email service configured, cannot send email')
+  if (!resendApiKey) {
+    console.log('RESEND_API_KEY not configured, cannot send email')
     return
   }
 
   try {
-    const nlTime =
-      bookingData.tourName === 'Northern Lights Tour' ||
-      bookingData.tourName === 'Guaranteed Northern Lights Tour'
-        ? ' at 18:30'
-        : ''
-    const dateLabel = `${formatTourDateForDisplay(bookingData.tourDate, 'fi-FI', 'short')}${nlTime}`
-
     const emailData =
       type === 'admin'
-        ? {
-            from: 'Royal Nordic <contact@royalnordic.fi>',
-            to: ['royalnordicfi@gmail.com', 'contact@royalnordic.fi'],
-            subject: `New Booking: ${bookingData.tourName} - ${bookingData.customerName}`,
-            html: `
-          <h2>New Booking Alert</h2>
-          <p><strong>Booking ID:</strong> #${bookingData.bookingId}</p>
-          <p><strong>Tour:</strong> ${bookingData.tourName}</p>
-          <p><strong>Date:</strong> ${dateLabel}</p>
-          <p><strong>Name:</strong> ${bookingData.customerName}</p>
-          <p><strong>Email:</strong> ${bookingData.customerEmail}</p>
-          <p><strong>Phone:</strong> ${bookingData.customerPhone || 'Not provided'}</p>
-          <p><strong>Adults:</strong> ${bookingData.adults}</p>
-          <p><strong>Children:</strong> ${bookingData.children}</p>
-          <p><strong>Total:</strong> €${bookingData.totalPrice}</p>
-          ${bookingData.specialRequests ? `<p><strong>Special Requests:</strong> ${bookingData.specialRequests}</p>` : ''}
-        `,
-            text: `New booking #${bookingData.bookingId}: ${bookingData.tourName} on ${dateLabel} for ${bookingData.customerName} (€${bookingData.totalPrice})`,
-          }
-        : {
-            from: 'Royal Nordic <contact@royalnordic.fi>',
-            to: [bookingData.customerEmail],
-            subject: `Booking Confirmed: ${bookingData.tourName} - Royal Nordic`,
-            html: `
-          <h1>Booking Confirmed</h1>
-          <p>Dear ${bookingData.customerName},</p>
-          <p>Thank you for booking with Royal Nordic.</p>
-          <p><strong>Booking ID:</strong> #${bookingData.bookingId}</p>
-          <p><strong>Tour:</strong> ${bookingData.tourName}</p>
-          <p><strong>Date:</strong> ${dateLabel}</p>
-          <p><strong>Adults:</strong> ${bookingData.adults}</p>
-          <p><strong>Children:</strong> ${bookingData.children}</p>
-          <p><strong>Total:</strong> €${bookingData.totalPrice}</p>
-          <p>Questions? contact@royalnordic.fi · +358 45 78345138</p>
-        `,
-            text: `Booking confirmed #${bookingData.bookingId}: ${bookingData.tourName} on ${dateLabel}. Total €${bookingData.totalPrice}.`,
-          }
+        ? buildAdminBookingAlertEmail(bookingData)
+        : buildCustomerConfirmationEmail(bookingData)
 
-    if (resendApiKey) {
-      const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${resendApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(emailData),
-      })
-      if (!response.ok) {
-        console.error(`Failed to send ${type} email via Resend:`, await response.text())
-      } else {
-        console.log(`${type} email sent via Resend`)
-      }
-    } else if (gmailUser && gmailPassword) {
-      console.log(`Would send ${type} email via Gmail to:`, emailData.to)
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(emailData),
+    })
+    if (!response.ok) {
+      console.error(`Failed to send ${type} email via Resend:`, await response.text())
+    } else {
+      console.log(`${type} email sent via Resend`)
     }
   } catch (error) {
     console.error(`Error sending ${type} email:`, error)
