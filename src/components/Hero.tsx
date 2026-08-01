@@ -3,11 +3,14 @@ import { ChevronDown } from 'lucide-react';
 
 const Hero = () => {
   const scrollToTours = () => {
-    const element = document.getElementById('tours');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+    document.getElementById('tours')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const scrollToFeatured = () => {
+    const element =
+      document.getElementById('featured-experience') ?? document.getElementById('tours')
+    element?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   return (
     <section 
@@ -67,9 +70,11 @@ const Hero = () => {
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
-        <button 
-          onClick={scrollToTours}
+        <button
+          type="button"
+          onClick={scrollToFeatured}
           className="animate-bounce text-white/60 hover:text-emerald-400 transition-colors duration-300"
+          aria-label="Scroll to featured experience"
         >
           <ChevronDown size={32} />
         </button>

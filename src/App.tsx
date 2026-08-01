@@ -43,7 +43,7 @@ import ScrollToTop from './components/ScrollToTop';
 import WhatsAppWidget from './components/WhatsAppWidget';
 import SaleModal from './components/SaleModal';
 import SnowmobileSafari from './components/SnowmobileSafari';
-import BestSellersSlideshow from './components/BestSellersSlideshow';
+import FeaturedExperience from './components/FeaturedExperience';
 import MonsterTruckNorthernLights from './components/MonsterTruckNorthernLights';
 import RoutePageMeta from './components/RoutePageMeta';
 import RouteJsonLd from './components/seo/RouteJsonLd';
@@ -64,7 +64,7 @@ function App() {
             <>
               <SaleModal />
               <Hero />
-              <BestSellersSlideshow />
+              <FeaturedExperience />
               <div id="tours">
                 <Tours />
               </div>
