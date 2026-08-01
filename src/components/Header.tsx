@@ -364,11 +364,12 @@ const Header = () => {
   return (
     <>
       <header
-        className={`fixed w-full z-50 transition-all duration-500 ${
+        className={`fixed left-0 right-0 z-50 w-full transition-all duration-500 ${
           isScrolled
             ? 'bg-black/95 backdrop-blur-xl shadow-2xl border-b border-gray-700'
             : 'bg-transparent'
         }`}
+        style={{ top: 'var(--rn-promo-bar-height, 0px)' }}
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
           <div className="md:hidden relative flex items-center justify-end h-20">

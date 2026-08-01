@@ -23,6 +23,9 @@ serve(async (req) => {
       adults,
       children,
       total_price,
+      subtotal,
+      discount,
+      discount_code,
       tour_name,
       tour_date,
       crypto_type,
@@ -33,6 +36,28 @@ serve(async (req) => {
     // Validate required fields
     if (!tour_id || !tour_date_id || !customer_name || !customer_email || !adults || !total_price) {
       throw new Error('Missing required fields')
+    }
+
+    // Server-side promo validation (must match src/config/winterPromotion.ts)
+    const PROMO_ENABLED = true
+    const PROMO_CODE = 'WINTER20'
+    const PROMO_PERCENT = 20
+    if (subtotal != null) {
+      const sub = Number(subtotal)
+      const claimedDiscount = Number(discount || 0)
+      const code = String(discount_code || '').trim().toUpperCase()
+      const charged = Number(total_price)
+      const expectedDiscount =
+        PROMO_ENABLED && code === PROMO_CODE
+          ? Math.round(sub * (PROMO_PERCENT / 100) * 100) / 100
+          : 0
+      const expectedTotal = Math.round((sub - expectedDiscount) * 100) / 100
+      if (Math.abs(claimedDiscount - expectedDiscount) > 0.02) {
+        throw new Error('Invalid discount code or discount amount')
+      }
+      if (Math.abs(charged - expectedTotal) > 0.02) {
+        throw new Error('Payment amount does not match pricing rules')
+      }
     }
 
     // Create Supabase client
