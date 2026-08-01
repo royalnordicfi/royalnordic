@@ -13,3 +13,7 @@ entrypoint = "./functions/contact-form/index.ts"
 [functions.omega-operational-read]
 enabled = true
 verify_jwt = false
+
+[functions.stripe-webhook]
+enabled = true
+verify_jwt = false

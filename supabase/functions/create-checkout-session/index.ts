@@ -56,15 +56,12 @@ serve(async (req) => {
     })
 
     const session = await stripe.createCheckoutSession({
-      // Only methods enabled on the Royal Nordic Stripe account.
+      // Methods active on the current Stripe account (acct_1Sx7hXCFu64j1T1g).
       payment_method_types: [
         'card',
-        'sepa_debit',
         'klarna',
-        'ideal',
         'bancontact',
         'eps',
-        'p24',
       ],
       line_items: [
         {

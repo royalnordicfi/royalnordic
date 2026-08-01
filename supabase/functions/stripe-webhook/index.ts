@@ -1,530 +1,309 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import Stripe from 'https://esm.sh/stripe@14.5.0?target=deno'
 import { formatTourDateForDisplay } from '../_shared/tourDate.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    // Skip signature verification for now to fix 401 errors
-    const signature = req.headers.get('stripe-signature') || 'test'
-    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || 'test'
-    
-    console.log('Processing webhook without signature verification')
+    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
+    if (!webhookSecret) {
+      throw new Error('STRIPE_WEBHOOK_SECRET not configured')
+    }
 
-    const event = await parseWebhookPayload(req, signature, webhookSecret)
-    console.log('Received webhook event:', event.type)
+    const signature = req.headers.get('stripe-signature')
+    if (!signature) {
+      throw new Error('Missing stripe-signature header')
+    }
+
+    const body = await req.text()
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+      apiVersion: '2023-10-16',
+      httpClient: Stripe.createFetchHttpClient(),
+    })
+
+    const event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret)
+    console.log('Verified webhook event:', event.id, event.type)
 
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object
-      
-      // Extract metadata from the session
-      const {
-        tour_id,
-        tour_date_id,
-        customer_name,
-        customer_email,
-        adults,
-        children,
-        total_price,
-        phone,
-        special_requests
-      } = session.metadata
+      const session = event.data.object as Stripe.Checkout.Session
 
-      console.log('Received metadata:', session.metadata)
+      if (session.payment_status !== 'paid') {
+        console.log('Ignoring unpaid checkout session', session.id, session.payment_status)
+        return json({ received: true, ignored: 'not_paid' })
+      }
 
-      // Create Supabase client
+      const metadata = session.metadata || {}
+      const tourId = parseInt(String(metadata.tour_id || ''), 10)
+      const tourDateId = parseInt(String(metadata.tour_date_id || ''), 10)
+      const adults = parseInt(String(metadata.adults || '0'), 10)
+      const children = parseInt(String(metadata.children || '0'), 10)
+      const customerName = String(metadata.customer_name || '').trim()
+      const customerEmail = String(
+        metadata.customer_email || session.customer_email || session.customer_details?.email || '',
+      ).trim()
+      const phone = String(metadata.phone || metadata.customer_phone || '')
+      const specialRequests = String(metadata.special_requests || '')
+      const paymentIntentId =
+        typeof session.payment_intent === 'string'
+          ? session.payment_intent
+          : session.payment_intent?.id || null
+
+      if (!tourId || !tourDateId || !customerName || !customerEmail || !paymentIntentId) {
+        throw new Error('Missing required checkout metadata')
+      }
+
+      const totalPrice =
+        typeof session.amount_total === 'number'
+          ? session.amount_total / 100
+          : parseFloat(String(metadata.total_price || '0'))
+
       const supabaseUrl = Deno.env.get('SUPABASE_URL')!
       const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
       const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-      console.log('Creating booking with data:', {
-        tour_id: parseInt(tour_id),
-        tour_date_id: parseInt(tour_date_id),
-        customer_name,
-        customer_email,
-        adults: parseInt(adults),
-        children: parseInt(children),
-        total_price: parseFloat(total_price),
-        status: 'confirmed',
-        stripe_payment_intent_id: session.payment_intent
-      })
+      // Idempotency: same PaymentIntent must not create duplicate bookings.
+      const { data: existing, error: existingError } = await supabase
+        .from('bookings')
+        .select('id')
+        .eq('stripe_payment_intent_id', paymentIntentId)
+        .maybeSingle()
 
-      // First, check availability and update slots
+      if (existingError) {
+        console.error('Error checking existing booking:', existingError)
+        throw new Error('Failed to check existing booking')
+      }
+
+      if (existing?.id) {
+        console.log('Booking already exists for payment intent', paymentIntentId, existing.id)
+        return json({ success: true, booking_id: existing.id, duplicate: true })
+      }
+
       const { data: dateData, error: dateError } = await supabase
         .from('tour_dates')
         .select('available_slots, total_booked')
-        .eq('id', parseInt(tour_date_id))
+        .eq('id', tourDateId)
         .single()
 
-      if (dateError) {
+      if (dateError || !dateData) {
         console.error('Error fetching date data:', dateError)
         throw new Error('Date not found')
       }
 
-      const remainingSlots = dateData.available_slots - dateData.total_booked
-      const requestedSlots = parseInt(adults) + parseInt(children)
-
+      const remainingSlots = dateData.available_slots - (dateData.total_booked || 0)
+      const requestedSlots = adults + children
       if (requestedSlots > remainingSlots) {
-        console.error('Not enough slots available')
+        console.error('Not enough slots available', { remainingSlots, requestedSlots })
         throw new Error(`Only ${remainingSlots} slots available`)
       }
 
-      // Create booking record
-      const { data: booking, error: bookingError } = await supabase
-        .from('bookings')
-        .insert({
-          tour_id: parseInt(tour_id),
-          tour_date_id: parseInt(tour_date_id),
-          customer_name,
-          customer_email,
-          customer_phone: phone || '',
-          adults: parseInt(adults),
-          children: parseInt(children),
-          total_price: parseFloat(total_price),
-          status: 'confirmed',
-          special_requests: special_requests || '',
-          stripe_payment_intent_id: session.payment_intent
-        })
-        .select()
-        .single()
-
-      if (bookingError) {
-        console.error('Error creating booking:', bookingError)
-        throw new Error('Failed to create booking')
+      const insertPayload: Record<string, unknown> = {
+        tour_id: tourId,
+        tour_date_id: tourDateId,
+        customer_name: customerName,
+        customer_email: customerEmail,
+        customer_phone: phone,
+        adults,
+        children,
+        total_price: totalPrice,
+        status: 'confirmed',
+        special_requests: specialRequests,
+        stripe_payment_intent_id: paymentIntentId,
+        payment_status: 'paid',
+        source: 'direct_website',
       }
 
-      // Update available slots
+      let { data: booking, error: bookingError } = await supabase
+        .from('bookings')
+        .insert(insertPayload)
+        .select('id')
+        .single()
+
+      // Older schemas may not have payment_status/source — retry without them.
+      if (
+        bookingError &&
+        (bookingError.message.includes('payment_status') || bookingError.message.includes('source'))
+      ) {
+        delete insertPayload.payment_status
+        delete insertPayload.source
+        ;({ data: booking, error: bookingError } = await supabase
+          .from('bookings')
+          .insert(insertPayload)
+          .select('id')
+          .single())
+      }
+
+      if (bookingError || !booking) {
+        // Race: another delivery inserted the same PI.
+        if (bookingError?.message?.toLowerCase().includes('duplicate')) {
+          const { data: raced } = await supabase
+            .from('bookings')
+            .select('id')
+            .eq('stripe_payment_intent_id', paymentIntentId)
+            .maybeSingle()
+          if (raced?.id) {
+            return json({ success: true, booking_id: raced.id, duplicate: true })
+          }
+        }
+        console.error('Error creating booking:', bookingError)
+        throw new Error(bookingError?.message || 'Failed to create booking')
+      }
+
       const { error: updateError } = await supabase
         .from('tour_dates')
-        .update({ total_booked: dateData.total_booked + requestedSlots })
-        .eq('id', parseInt(tour_date_id))
+        .update({ total_booked: (dateData.total_booked || 0) + requestedSlots })
+        .eq('id', tourDateId)
 
       if (updateError) {
         console.error('Error updating slots:', updateError)
-        // Don't fail the booking if slot update fails
       }
 
-      // Get tour and date information for email
-      const { data: tourData } = await supabase
-        .from('tours')
-        .select('name')
-        .eq('id', parseInt(tour_id))
-        .single()
-
+      const { data: tourData } = await supabase.from('tours').select('name').eq('id', tourId).single()
       const { data: dateDataForEmail } = await supabase
         .from('tour_dates')
         .select('date')
-        .eq('id', parseInt(tour_date_id))
+        .eq('id', tourDateId)
         .single()
 
-      // Send booking confirmation emails
       if (tourData && dateDataForEmail) {
         const emailData = {
           bookingId: booking.id,
-          customerName: customer_name,
-          customerEmail: customer_email,
-          customerPhone: phone || '',
+          customerName,
+          customerEmail,
+          customerPhone: phone,
           tourName: tourData.name,
           tourDate: dateDataForEmail.date,
-          adults: parseInt(adults),
-          children: parseInt(children),
-          totalPrice: parseFloat(total_price),
-          specialRequests: special_requests || '',
+          adults,
+          children,
+          totalPrice,
+          specialRequests,
           paymentStatus: 'confirmed' as const,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         }
-
-        // Send notification to Royal Nordic staff
         await sendEmailNotification(emailData, 'admin')
-        
-        // Send confirmation to customer
         await sendEmailNotification(emailData, 'customer')
       }
 
-      return new Response(
-        JSON.stringify({ success: true, booking_id: booking.id }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+      return json({ success: true, booking_id: booking.id })
     }
 
-    return new Response(
-      JSON.stringify({ received: true }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
-
+    return json({ received: true })
   } catch (error) {
     console.error('Webhook error:', error)
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-    )
+    return new Response(JSON.stringify({ error: (error as Error).message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 400,
+    })
   }
 })
 
-// Parse webhook payload with signature verification
-async function parseWebhookPayload(req: Request, signature: string, webhookSecret: string) {
-  const payload = await req.text()
-  
-  try {
-    // For now, skip signature verification to fix the 401 error
-    // TODO: Implement proper Stripe signature verification
-    const event = JSON.parse(payload)
-    return event
-  } catch (error) {
-    throw new Error('Invalid webhook payload')
-  }
+function json(payload: Record<string, unknown>, status = 200) {
+  return new Response(JSON.stringify(payload), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    status,
+  })
 }
 
-// Unified email sending function
-async function sendEmailNotification(bookingData: any, type: 'admin' | 'customer') {
+async function sendEmailNotification(
+  bookingData: {
+    bookingId: number
+    customerName: string
+    customerEmail: string
+    customerPhone?: string
+    tourName: string
+    tourDate: string
+    adults: number
+    children: number
+    totalPrice: number
+    specialRequests?: string
+    paymentStatus: 'confirmed'
+    createdAt: string
+  },
+  type: 'admin' | 'customer',
+) {
   const resendApiKey = Deno.env.get('RESEND_API_KEY')
   const gmailUser = Deno.env.get('GMAIL_USER')
   const gmailPassword = Deno.env.get('GMAIL_APP_PASSWORD')
-  
-  console.log(`Resend API key found for ${type} email:`, resendApiKey ? 'YES' : 'NO')
-  console.log(`Gmail credentials found for ${type} email:`, gmailUser && gmailPassword ? 'YES' : 'NO')
-  
+
   if (!resendApiKey && !gmailUser) {
     console.log('No email service configured, cannot send email')
     return
   }
 
   try {
-    let emailData: any = {}
+    const nlTime =
+      bookingData.tourName === 'Northern Lights Tour' ||
+      bookingData.tourName === 'Guaranteed Northern Lights Tour'
+        ? ' at 18:30'
+        : ''
+    const dateLabel = `${formatTourDateForDisplay(bookingData.tourDate, 'fi-FI', 'short')}${nlTime}`
 
-    if (type === 'admin') {
-      emailData = {
-        from: 'Royal Nordic <contact@royalnordic.fi>',
-        to: ['royalnordicfi@gmail.com', 'contact@royalnordic.fi'],
-        subject: `New Booking: ${bookingData.tourName} - ${bookingData.customerName}`,
-        html: `
-          <h2>🌟 New Booking Alert</h2>
-          <h3>📋 Booking Details</h3>
+    const emailData =
+      type === 'admin'
+        ? {
+            from: 'Royal Nordic <contact@royalnordic.fi>',
+            to: ['royalnordicfi@gmail.com', 'contact@royalnordic.fi'],
+            subject: `New Booking: ${bookingData.tourName} - ${bookingData.customerName}`,
+            html: `
+          <h2>New Booking Alert</h2>
           <p><strong>Booking ID:</strong> #${bookingData.bookingId}</p>
           <p><strong>Tour:</strong> ${bookingData.tourName}</p>
-          <p><strong>Date:</strong> ${formatTourDateForDisplay(bookingData.tourDate, 'fi-FI', 'short')}${bookingData.tourName === 'Northern Lights Tour' || bookingData.tourName === 'Guaranteed Northern Lights Tour' ? ' at 18:30' : ''}</p>
-          <p><strong>Status:</strong> ${bookingData.paymentStatus.toUpperCase()}</p>
-          
-          <h3>👥 Customer Information</h3>
+          <p><strong>Date:</strong> ${dateLabel}</p>
           <p><strong>Name:</strong> ${bookingData.customerName}</p>
           <p><strong>Email:</strong> ${bookingData.customerEmail}</p>
           <p><strong>Phone:</strong> ${bookingData.customerPhone || 'Not provided'}</p>
-          
-          <h3>💰 Pricing</h3>
           <p><strong>Adults:</strong> ${bookingData.adults}</p>
           <p><strong>Children:</strong> ${bookingData.children}</p>
           <p><strong>Total:</strong> €${bookingData.totalPrice}</p>
-          
-          ${bookingData.specialRequests ? `
-          <h3>📝 Special Requests</h3>
-          <p>${bookingData.specialRequests}</p>
-          ` : ''}
-          
-          <p><strong>⏰ Booking Time:</strong> ${new Date(bookingData.createdAt).toLocaleString('fi-FI')}</p>
+          ${bookingData.specialRequests ? `<p><strong>Special Requests:</strong> ${bookingData.specialRequests}</p>` : ''}
         `,
-        text: `
-New Booking Alert - Royal Nordic Tours
-
-📋 Booking Details:
-- Booking ID: #${bookingData.bookingId}
-- Tour: ${bookingData.tourName}
-- Date: ${formatTourDateForDisplay(bookingData.tourDate, 'fi-FI', 'short')}${bookingData.tourName === 'Northern Lights Tour' || bookingData.tourName === 'Guaranteed Northern Lights Tour' ? ' at 18:30' : ''}
-- Status: ${bookingData.paymentStatus.toUpperCase()}
-
-👥 Customer Information:
-- Name: ${bookingData.customerName}
-- Email: ${bookingData.customerEmail}
-- Phone: ${bookingData.customerPhone || 'Not provided'}
-
-💰 Pricing:
-- Adults: ${bookingData.adults}
-- Children: ${bookingData.children}
-- Total: €${bookingData.totalPrice}
-
-${bookingData.specialRequests ? `📝 Special Requests: ${bookingData.specialRequests}` : ''}
-
-⏰ Booking Time: ${new Date(bookingData.createdAt).toLocaleString('fi-FI')}
-        `
-      }
-    } else {
-      emailData = {
-        from: 'Royal Nordic <contact@royalnordic.fi>',
-        to: [bookingData.customerEmail, 'contact@royalnordic.fi'],
-        subject: `Booking Confirmed: ${bookingData.tourName} - Royal Nordic`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f9fa;">
-            <div style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #1f2937 0%, #374151 100%);">
-              <h1 style="color: white; margin: 0 0 10px 0; font-size: 36px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">Royal Nordic</h1>
-              <p style="color: #9ca3af; margin: 0; font-size: 16px; font-style: italic;">Finnish Lapland Adventures</p>
-            </div>
-            
-            <div style="background-color: white; padding: 40px 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-              <h1 style="color: #1f2937; margin-bottom: 25px; font-size: 28px; text-align: center;">Booking Confirmed! 🎉</h1>
-              
-              <p style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px;">
-                Dear <strong>${bookingData.customerName}</strong>,
-              </p>
-              
-              <p style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px;">
-                Thank you for booking your Lapland adventure with Royal Nordic! We're excited to welcome you to the magical world of Finnish Lapland.
-              </p>
-              
-              <div style="background-color: #f3f4f6; padding: 25px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #059669;">
-                <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 18px;">Your Booking Details:</h3>
-                <p style="color: #4b5563; margin: 8px 0;"><strong>Booking ID:</strong> #${bookingData.bookingId}</p>
-                <p style="color: #4b5563; margin: 8px 0;"><strong>Tour:</strong> ${bookingData.tourName}</p>
-                <p style="color: #4b5563; margin: 8px 0;"><strong>Date:</strong> ${formatTourDateForDisplay(bookingData.tourDate, 'fi-FI', 'short')}${bookingData.tourName === 'Northern Lights Tour' || bookingData.tourName === 'Guaranteed Northern Lights Tour' ? ' at 18:30' : ''}</p>
-                <p style="color: #4b5563; margin: 8px 0;"><strong>Adults:</strong> ${bookingData.adults}</p>
-                <p style="color: #4b5563; margin: 8px 0;"><strong>Children:</strong> ${bookingData.children}</p>
-                <p style="color: #4b5563; margin: 8px 0;"><strong>Total Amount:</strong> €${bookingData.totalPrice}</p>
-                ${bookingData.specialRequests ? `<p style="color: #4b5563; margin: 8px 0;"><strong>Special Requests:</strong> ${bookingData.specialRequests}</p>` : ''}
-              </div>
-              
-              <div style="background-color: #ecfdf5; padding: 20px; border-radius: 8px; margin: 25px 0; border: 1px solid #a7f3d0;">
-                <p style="color: #065f46; margin: 0; font-size: 16px; text-align: center;">
-                  <strong>✅ Your booking is confirmed!</strong>
-                </p>
-              </div>
-              
-              <p style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px;">
-                <strong>What happens next?</strong>
-              </p>
-              
-              <ul style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px; padding-left: 20px;">
-                <li>You'll receive detailed tour information 24 hours before your adventure</li>
-                <li>Meet your guide at the designated location</li>
-                <li>Enjoy your unforgettable Lapland experience!</li>
-              </ul>
-              
-              <p style="color: #4b5563; line-height: 1.7; margin-bottom: 30px; font-size: 16px;">
-                If you have any questions or need to make changes, please contact us at <a href="mailto:contact@royalnordic.fi" style="color: #059669; text-decoration: none; font-weight: 600;">contact@royalnordic.fi</a> or call +358 45 78345138.
-              </p>
-              
-              <p style="color: #4b5563; line-height: 1.7; margin-bottom: 30px; font-size: 16px;">
-                Best regards,<br>
-                <strong>The Royal Nordic Team</strong>
-              </p>
-            </div>
-            
-            <div style="text-align: center; padding: 30px 20px; background-color: #1f2937; color: white;">
-              <h3 style="margin-bottom: 20px; font-size: 18px;">Contact Information</h3>
-              <div style="display: inline-block; text-align: left;">
-                <p style="margin: 8px 0; font-size: 14px;">
-                  📧 <a href="mailto:contact@royalnordic.fi" style="color: #10b981; text-decoration: none;">contact@royalnordic.fi</a>
-                </p>
-                <p style="margin: 8px 0; font-size: 14px;">
-                  📞 <a href="tel:+3584578345138" style="color: #10b981; text-decoration: none;">+358 45 78345138</a>
-                </p>
-                <p style="margin: 8px 0; font-size: 14px;">
-                  🌍 <a href="https://royalnordic.fi" style="color: #10b981; text-decoration: none;">royalnordic.fi</a>
-                </p>
-              </div>
-              <p style="margin: 20px 0 0 0; font-size: 12px; color: #9ca3af;">
-                Rovaniemi, Finnish Lapland
-              </p>
-            </div>
-          </div>
+            text: `New booking #${bookingData.bookingId}: ${bookingData.tourName} on ${dateLabel} for ${bookingData.customerName} (€${bookingData.totalPrice})`,
+          }
+        : {
+            from: 'Royal Nordic <contact@royalnordic.fi>',
+            to: [bookingData.customerEmail],
+            subject: `Booking Confirmed: ${bookingData.tourName} - Royal Nordic`,
+            html: `
+          <h1>Booking Confirmed</h1>
+          <p>Dear ${bookingData.customerName},</p>
+          <p>Thank you for booking with Royal Nordic.</p>
+          <p><strong>Booking ID:</strong> #${bookingData.bookingId}</p>
+          <p><strong>Tour:</strong> ${bookingData.tourName}</p>
+          <p><strong>Date:</strong> ${dateLabel}</p>
+          <p><strong>Adults:</strong> ${bookingData.adults}</p>
+          <p><strong>Children:</strong> ${bookingData.children}</p>
+          <p><strong>Total:</strong> €${bookingData.totalPrice}</p>
+          <p>Questions? contact@royalnordic.fi · +358 45 78345138</p>
         `,
-        text: `
-Booking Confirmed - Royal Nordic Tours
+            text: `Booking confirmed #${bookingData.bookingId}: ${bookingData.tourName} on ${dateLabel}. Total €${bookingData.totalPrice}.`,
+          }
 
-Dear ${bookingData.customerName},
-
-Thank you for booking your Lapland adventure with Royal Nordic! We're excited to welcome you to the magical world of Finnish Lapland.
-
-Your Booking Details:
-- Booking ID: #${bookingData.bookingId}
-- Tour: ${bookingData.tourName}
-- Date: ${formatTourDateForDisplay(bookingData.tourDate, 'fi-FI', 'short')}${bookingData.tourName === 'Northern Lights Tour' || bookingData.tourName === 'Guaranteed Northern Lights Tour' ? ' at 18:30' : ''}
-- Adults: ${bookingData.adults}
-- Children: ${bookingData.children}
-- Total Amount: €${bookingData.totalPrice}
-${bookingData.specialRequests ? `- Special Requests: ${bookingData.specialRequests}` : ''}
-
-✅ Your booking is confirmed!
-
-What happens next?
-- You'll receive detailed tour information 24 hours before your adventure
-- Meet your guide at the designated location
-- Enjoy your unforgettable Lapland experience!
-
-If you have any questions or need to make changes, please contact us at contact@royalnordic.fi or call +358 45 78345138.
-
-Best regards,
-The Royal Nordic Team
-
-Contact Information:
-📧 contact@royalnordic.fi
-📞 +358 45 78345138
-🌍 royalnordic.fi
-Rovaniemi, Finnish Lapland
-        `
-      }
-    }
-
-    // Try Resend first, then fallback to Gmail SMTP
     if (resendApiKey) {
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${resendApiKey}`,
+          Authorization: `Bearer ${resendApiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(emailData),
       })
-
       if (!response.ok) {
-        const error = await response.text()
-        console.error(`Failed to send ${type} email via Resend:`, error)
-        // Fallback to Gmail if Resend fails
-        if (gmailUser && gmailPassword) {
-          await sendViaGmail(emailData, type)
-        }
+        console.error(`Failed to send ${type} email via Resend:`, await response.text())
       } else {
-        console.log(`${type} email sent successfully via Resend`)
+        console.log(`${type} email sent via Resend`)
       }
     } else if (gmailUser && gmailPassword) {
-      await sendViaGmail(emailData, type)
+      console.log(`Would send ${type} email via Gmail to:`, emailData.to)
     }
   } catch (error) {
     console.error(`Error sending ${type} email:`, error)
   }
 }
-
-// Gmail SMTP fallback function
-async function sendViaGmail(emailData: any, type: string) {
-  const gmailUser = Deno.env.get('GMAIL_USER')
-  const gmailPassword = Deno.env.get('GMAIL_APP_PASSWORD')
-  
-  if (!gmailUser || !gmailPassword) {
-    console.log('Gmail credentials not available')
-    return
-  }
-
-  try {
-    // For now, just log that we would send via Gmail
-    // In a real implementation, you'd use a SMTP library
-    console.log(`Would send ${type} email via Gmail to:`, emailData.to)
-    console.log(`Subject: ${emailData.subject}`)
-    console.log(`${type} email would be sent via Gmail SMTP`)
-  } catch (error) {
-    console.error(`Error sending ${type} email via Gmail:`, error)
-  }
-}
-
-// Main function
-Deno.serve(async (req) => {
-  // Handle CORS
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
-  }
-
-  try {
-    const body = await req.text()
-    const signature = req.headers.get('stripe-signature')
-    
-    if (!signature) {
-      throw new Error('Missing stripe-signature header')
-    }
-
-    // Verify webhook signature
-    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
-    if (!webhookSecret) {
-      throw new Error('Missing STRIPE_WEBHOOK_SECRET')
-    }
-
-    const event = JSON.parse(body)
-    
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object
-      
-      if (session.payment_status === 'paid') {
-        const metadata = session.metadata
-        
-        if (!metadata.tour_id || !metadata.tour_date_id) {
-          throw new Error('Missing required metadata')
-        }
-
-        // Create booking
-        const { data: booking, error: bookingError } = await supabase
-          .from('bookings')
-          .insert({
-            tour_id: parseInt(metadata.tour_id),
-            tour_date_id: parseInt(metadata.tour_date_id),
-            customer_name: metadata.customer_name,
-            customer_email: session.customer_email,
-            customer_phone: metadata.customer_phone || '',
-            adults: parseInt(metadata.adults),
-            children: parseInt(metadata.children),
-            total_price: session.amount_total / 100,
-            stripe_payment_intent_id: session.payment_intent,
-            status: 'confirmed',
-            special_requests: metadata.special_requests || ''
-          })
-          .select()
-          .single()
-
-        if (bookingError) {
-          throw new Error(`Failed to create booking: ${bookingError.message}`)
-        }
-
-        // Get tour and date info for email
-        const { data: tourData } = await supabase
-          .from('tours')
-          .select('name, adult_price, child_price')
-          .eq('id', metadata.tour_id)
-          .single()
-
-        const { data: dateData } = await supabase
-          .from('tour_dates')
-          .select('date')
-          .eq('id', metadata.tour_date_id)
-          .single()
-
-        // Prepare email data
-        const emailData = {
-          bookingId: booking.id,
-          tourName: tourData?.name || 'Tour',
-          customerName: metadata.customer_name,
-          customerEmail: session.customer_email,
-          tourDate: dateData?.date || metadata.tour_date,
-          adults: parseInt(metadata.adults),
-          children: parseInt(metadata.children),
-          totalPrice: session.amount_total / 100,
-          specialRequests: metadata.special_requests || '',
-          paymentStatus: 'confirmed' as const,
-          createdAt: new Date().toISOString()
-        }
-
-        // Send notification to Royal Nordic staff
-        await sendEmailNotification(emailData, 'admin')
-        
-        // Send confirmation to customer
-        await sendEmailNotification(emailData, 'customer')
-      }
-    }
-
-    return new Response(
-      JSON.stringify({ success: true }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
-  } catch (error) {
-    console.error('Webhook error:', error)
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        status: 400, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    )
-  }
-})
