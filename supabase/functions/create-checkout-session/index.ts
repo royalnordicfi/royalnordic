@@ -27,6 +27,29 @@ serve(async (req) => {
       throw new Error('Missing required fields')
     }
 
+    // Server-side promo validation (must match src/config/winterPromotion.ts)
+    const PROMO_ENABLED = true
+    const PROMO_CODE = 'WINTER20'
+    const PROMO_PERCENT = 20
+    const subtotal = Number(metadata?.subtotal)
+    const claimedDiscount = Number(metadata?.discount || 0)
+    const code = String(metadata?.discount_code || '').trim().toUpperCase()
+    const charged = Number(amount)
+
+    if (Number.isFinite(subtotal) && subtotal >= 0) {
+      const expectedDiscount =
+        PROMO_ENABLED && code === PROMO_CODE
+          ? Math.round(subtotal * (PROMO_PERCENT / 100) * 100) / 100
+          : 0
+      const expectedTotal = Math.round((subtotal - expectedDiscount) * 100) / 100
+      if (Math.abs(claimedDiscount - expectedDiscount) > 0.02) {
+        throw new Error('Invalid discount code or discount amount')
+      }
+      if (Math.abs(charged - expectedTotal) > 0.02) {
+        throw new Error('Payment amount does not match pricing rules')
+      }
+    }
+
     // Create Stripe Checkout Session
     const stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2023-10-16',
@@ -54,7 +77,7 @@ serve(async (req) => {
               name: tour_name,
               description: `Tour on ${tour_date}`,
             },
-            unit_amount: Math.round(amount * 100), // Convert to cents
+            unit_amount: Math.round(charged * 100), // Convert to cents
           },
           quantity: 1,
         },

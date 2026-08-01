@@ -41,13 +41,14 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsConditions from './components/TermsConditions';
 import ScrollToTop from './components/ScrollToTop';
 import WhatsAppWidget from './components/WhatsAppWidget';
-import SaleModal from './components/SaleModal';
 import SnowmobileSafari from './components/SnowmobileSafari';
 import BestSellersSlideshow from './components/BestSellersSlideshow';
 import MonsterTruckNorthernLights from './components/MonsterTruckNorthernLights';
 import RoutePageMeta from './components/RoutePageMeta';
 import RouteJsonLd from './components/seo/RouteJsonLd';
 import TravelTrade from './components/TravelTrade';
+import PromotionAnnouncementBar from './components/PromotionAnnouncementBar';
+import WinterPromoPopup from './components/WinterPromoPopup';
 
 function App() {
   return (
@@ -56,13 +57,14 @@ function App() {
         <ScrollToTop />
         <RoutePageMeta />
         <RouteJsonLd />
+        <PromotionAnnouncementBar />
         <Header />
+        <WinterPromoPopup />
         
         <Routes>
           {/* Homepage */}
           <Route path="/" element={
             <>
-              <SaleModal />
               <Hero />
               <BestSellersSlideshow />
               <div id="tours">

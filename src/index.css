@@ -228,3 +228,36 @@ html.mobile-nav-open .whatsapp-widget {
     transform: none !important;
   }
 }
+
+/* Winter promo announcement bar */
+.rn-promo-bar {
+  box-sizing: border-box;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rn-promo-bar__static {
+    display: none;
+  }
+
+  .rn-promo-bar__marquee {
+    display: block;
+  }
+
+  .rn-promo-bar__track {
+    animation: rn-promo-marquee 36s linear infinite;
+  }
+
+  .rn-promo-bar:hover .rn-promo-bar__track,
+  .rn-promo-bar:focus-within .rn-promo-bar__track {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes rn-promo-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}

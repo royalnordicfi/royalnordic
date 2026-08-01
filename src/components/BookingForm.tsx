@@ -13,6 +13,13 @@ import {
   tourDateToLocalDate,
   WEEKDAY_HEADERS_MON_FIRST,
 } from '../lib/tourDate'
+import { WINTER_PROMOTION } from '../config/winterPromotion'
+import {
+  getWinterDiscountAmount,
+  isValidWinterPromoCode,
+  markCodeAppliedThisSession,
+  trackWinterPromoEvent,
+} from '../lib/winterPromotion'
 
 interface BookingFormProps {
   tourId: number
@@ -359,31 +366,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
   }
 
   const getDiscountAmount = (subtotal: number) => {
-    // Check if discount code is valid and sale is active
-    const now = new Date()
-    const saleStart = new Date('2025-12-02')
-    const saleEnd = new Date('2025-12-16')
-    saleEnd.setHours(23, 59, 59, 999)
-
-    const isSaleActive = now >= saleStart && now <= saleEnd
-    const isValidCode = formData.discountCode.trim().toUpperCase() === 'DECEMBER15'
-
-    if (isSaleActive && isValidCode) {
-      return subtotal * 0.15 // 15% discount
-    }
-    return 0
+    return getWinterDiscountAmount(subtotal, formData.discountCode)
   }
 
   const isDiscountValid = () => {
-    const now = new Date()
-    const saleStart = new Date('2025-12-02')
-    const saleEnd = new Date('2025-12-16')
-    saleEnd.setHours(23, 59, 59, 999)
-
-    const isSaleActive = now >= saleStart && now <= saleEnd
-    const isValidCode = formData.discountCode.trim().toUpperCase() === 'DECEMBER15'
-
-    return isSaleActive && isValidCode
+    return isValidWinterPromoCode(formData.discountCode)
   }
 
   const getAvailableSlots = (date: string) => {
@@ -423,6 +410,14 @@ const BookingForm: React.FC<BookingFormProps> = ({
       const subtotal = (formData.adults * adultPrice) + (formData.children * childPrice)
       const discount = getDiscountAmount(subtotal)
       const totalPrice = subtotal - discount
+      if (discount > 0) {
+        markCodeAppliedThisSession()
+        trackWinterPromoEvent('winter20_code_applied', {
+          tour_name: tourName,
+          discount,
+        })
+      }
+      trackWinterPromoEvent('winter20_booking_started', { tour_name: tourName })
       
       const tourDate = formatTourDateLong(formData.preferredDate)
       const tourDateIso = formData.preferredDate
@@ -528,6 +523,18 @@ const BookingForm: React.FC<BookingFormProps> = ({
       const subtotal = (formData.adults * adultPrice) + (formData.children * childPrice)
       const discount = getDiscountAmount(subtotal)
       const totalPrice = subtotal - discount
+      if (discount > 0) {
+        markCodeAppliedThisSession()
+        trackWinterPromoEvent('winter20_code_applied', {
+          tour_name: tourName,
+          discount,
+          payment: 'crypto',
+        })
+      }
+      trackWinterPromoEvent('winter20_booking_started', {
+        tour_name: tourName,
+        payment: 'crypto',
+      })
       
       const tourDate = formatTourDateLong(formData.preferredDate)
       const tourDateIso = formData.preferredDate
@@ -865,9 +872,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
               name="discountCode"
               value={formData.discountCode}
               onChange={handleChange}
-              placeholder="Enter code (e.g. DECEMBER15)"
+              placeholder={`Enter code (e.g. ${WINTER_PROMOTION.discountCode})`}
               className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm uppercase"
               style={{ textTransform: 'uppercase' }}
+              autoComplete="off"
             />
             {isDiscountValid() && (
               <div className="flex items-center px-3 bg-emerald-50 border border-emerald-200 rounded-lg">
@@ -876,7 +884,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
             )}
           </div>
           {formData.discountCode && !isDiscountValid() && (
-            <p className="text-xs text-red-600 mt-1">Invalid code or sale period has ended</p>
+            <p className="text-xs text-red-600 mt-1">Invalid code or promotion is not active</p>
+          )}
+          {isDiscountValid() && (
+            <p className="text-xs text-emerald-700 mt-1">
+              {WINTER_PROMOTION.discountPercent}% off eligible direct booking
+            </p>
           )}
         </div>
 
@@ -921,7 +934,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
                     <span className="text-gray-800 font-medium">€{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-emerald-600 font-semibold">Discount (15%):</span>
+                    <span className="text-emerald-600 font-semibold">
+                      Discount ({WINTER_PROMOTION.discountPercent}% · {WINTER_PROMOTION.discountCode}):
+                    </span>
                     <span className="text-emerald-600 font-semibold">-€{discount.toFixed(2)}</span>
                   </div>
                 </>
