@@ -11,6 +11,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
 }
 
+type SupabaseClient = ReturnType<typeof createClient>
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -122,6 +124,7 @@ serve(async (req) => {
         stripe_payment_intent_id: paymentIntentId,
         payment_status: 'paid',
         source: 'direct_website',
+        email_status: 'queued',
       }
 
       let { data: booking, error: bookingError } = await supabase
@@ -130,13 +133,16 @@ serve(async (req) => {
         .select('id')
         .single()
 
-      // Older schemas may not have payment_status/source — retry without them.
+      // Older schemas may not have newer columns — retry without them.
       if (
         bookingError &&
-        (bookingError.message.includes('payment_status') || bookingError.message.includes('source'))
+        (bookingError.message.includes('payment_status') ||
+          bookingError.message.includes('source') ||
+          bookingError.message.includes('email_status'))
       ) {
         delete insertPayload.payment_status
         delete insertPayload.source
+        delete insertPayload.email_status
         ;({ data: booking, error: bookingError } = await supabase
           .from('bookings')
           .insert(insertPayload)
@@ -146,7 +152,10 @@ serve(async (req) => {
 
       if (bookingError || !booking) {
         // Race: another delivery inserted the same PI.
-        if (bookingError?.message?.toLowerCase().includes('duplicate')) {
+        if (
+          bookingError?.message?.toLowerCase().includes('duplicate') ||
+          bookingError?.code === '23505'
+        ) {
           const { data: raced } = await supabase
             .from('bookings')
             .select('id')
@@ -159,6 +168,13 @@ serve(async (req) => {
         console.error('Error creating booking:', bookingError)
         throw new Error(bookingError?.message || 'Failed to create booking')
       }
+
+      const bookingRef = `RN-${booking.id}`
+      await supabase
+        .from('bookings')
+        .update({ booking_ref: bookingRef })
+        .eq('id', booking.id)
+        .is('booking_ref', null)
 
       const { error: updateError } = await supabase
         .from('tour_dates')
@@ -191,11 +207,12 @@ serve(async (req) => {
           paymentStatus: 'confirmed' as const,
           createdAt: new Date().toISOString(),
         }
-        await sendEmailNotification(emailData, 'admin')
-        await sendEmailNotification(emailData, 'customer')
+        const adminOk = await sendEmailNotification(emailData, 'admin')
+        const customerOk = await sendEmailNotification(emailData, 'customer')
+        await markEmailStatus(supabase, booking.id, customerEmail, customerOk, adminOk)
       }
 
-      return json({ success: true, booking_id: booking.id })
+      return json({ success: true, booking_id: booking.id, booking_ref: bookingRef })
     }
 
     return json({ received: true })
@@ -215,6 +232,52 @@ function json(payload: Record<string, unknown>, status = 200) {
   })
 }
 
+async function markEmailStatus(
+  supabase: SupabaseClient,
+  bookingId: number,
+  customerEmail: string,
+  customerOk: boolean,
+  adminOk: boolean,
+) {
+  const now = new Date().toISOString()
+  const status = customerOk ? 'sent' : 'failed'
+  const errorMessage = customerOk
+    ? null
+    : adminOk
+      ? 'Customer confirmation failed'
+      : 'Customer and admin emails failed'
+
+  const { error } = await supabase
+    .from('bookings')
+    .update({
+      email_status: status,
+      email_last_sent_at: customerOk ? now : null,
+      email_last_error: errorMessage,
+      updated_at: now,
+    })
+    .eq('id', bookingId)
+
+  if (error) {
+    console.error('Failed to update email_status:', error)
+  }
+
+  try {
+    await supabase.from('booking_emails').insert([
+      {
+        booking_id: bookingId,
+        template_key: 'customer_confirmation',
+        to_email: customerEmail,
+        status: customerOk ? 'sent' : 'failed',
+        provider_message_id: null,
+        error_message: customerOk ? null : 'Resend failed',
+        created_by: 'stripe-webhook',
+      },
+    ])
+  } catch (logError) {
+    console.error('Failed to log booking_emails:', logError)
+  }
+}
+
 async function sendEmailNotification(
   bookingData: {
     bookingId: number
@@ -231,11 +294,11 @@ async function sendEmailNotification(
     createdAt: string
   },
   type: 'admin' | 'customer',
-) {
+): Promise<boolean> {
   const resendApiKey = Deno.env.get('RESEND_API_KEY')
   if (!resendApiKey) {
     console.log('RESEND_API_KEY not configured, cannot send email')
-    return
+    return false
   }
 
   try {
@@ -254,10 +317,12 @@ async function sendEmailNotification(
     })
     if (!response.ok) {
       console.error(`Failed to send ${type} email via Resend:`, await response.text())
-    } else {
-      console.log(`${type} email sent via Resend`)
+      return false
     }
+    console.log(`${type} email sent via Resend`)
+    return true
   } catch (error) {
     console.error(`Error sending ${type} email:`, error)
+    return false
   }
 }

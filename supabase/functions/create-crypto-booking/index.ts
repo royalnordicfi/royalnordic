@@ -1,6 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { formatTourDateForDisplay } from '../_shared/tourDate.ts'
+import {
+  buildCryptoBookingEmail,
+  displayTourName,
+} from '../_shared/bookingEmails.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -186,12 +190,12 @@ async function sendEmailNotification(bookingData: any, type: 'admin' | 'customer
       emailData = {
         from: 'Royal Nordic <contact@royalnordic.fi>',
         to: ['royalnordicfi@gmail.com', 'contact@royalnordic.fi'],
-        subject: `New Crypto Booking: ${bookingData.tourName} - ${bookingData.customerName}`,
+        subject: `New Crypto Booking: ${displayTourName(bookingData.tourName)} - ${bookingData.customerName}`,
         html: `
           <h2>🪙 New Crypto Booking Alert</h2>
           <h3>📋 Booking Details</h3>
           <p><strong>Booking ID:</strong> #${bookingData.bookingId}</p>
-          <p><strong>Tour:</strong> ${bookingData.tourName}</p>
+          <p><strong>Tour:</strong> ${displayTourName(bookingData.tourName)}</p>
           <p><strong>Date:</strong> ${formatTourDateForDisplay(bookingData.tourDate, 'fi-FI', 'short')}</p>
           <p><strong>Status:</strong> ${bookingData.paymentStatus.toUpperCase()}</p>
           <p><strong>Payment Type:</strong> <span style="color: #059669; font-weight: bold;">CRYPTOCURRENCY</span></p>
@@ -251,149 +255,25 @@ This is a crypto payment booking! You need to contact the customer to provide wa
         `
       }
     } else {
+      const customerMail = buildCryptoBookingEmail({
+        bookingId: bookingData.bookingId,
+        customerName: bookingData.customerName,
+        customerEmail: bookingData.customerEmail,
+        customerPhone: bookingData.customerPhone,
+        tourName: bookingData.tourName,
+        tourDate: bookingData.tourDate,
+        adults: bookingData.adults,
+        children: bookingData.children,
+        totalPrice: bookingData.totalPrice,
+        specialRequests: bookingData.specialRequests,
+        cryptoType: bookingData.cryptoType,
+      })
       emailData = {
-        from: 'Royal Nordic <contact@royalnordic.fi>',
-        to: [bookingData.customerEmail, 'contact@royalnordic.fi'],
-        subject: `Crypto Booking Confirmed: ${bookingData.tourName} - Royal Nordic`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f9fa;">
-            <div style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #1f2937 0%, #374151 100%);">
-              <h1 style="color: white; margin: 0 0 10px 0; font-size: 36px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">Royal Nordic</h1>
-              <p style="color: #9ca3af; margin: 0; font-size: 16px; font-style: italic;">Finnish Lapland Adventures</p>
-            </div>
-            
-            <div style="background-color: white; padding: 40px 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-              <h1 style="color: #1f2937; margin-bottom: 25px; font-size: 28px; text-align: center;">Crypto Booking Confirmed! 🪙</h1>
-              
-              <p style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px;">
-                Dear <strong>${bookingData.customerName}</strong>,
-              </p>
-              
-              <p style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px;">
-                Thank you for booking your Lapland adventure with Royal Nordic! We're excited to welcome you to the magical world of Finnish Lapland.
-              </p>
-              
-              <div style="background-color: #f3f4f6; padding: 25px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #059669;">
-                <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 18px;">Your Booking Details:</h3>
-                <p style="color: #4b5563; margin: 8px 0;"><strong>Booking ID:</strong> #${bookingData.bookingId}</p>
-                <p style="color: #4b5563; margin: 8px 0;"><strong>Tour:</strong> ${bookingData.tourName}</p>
-                <p style="color: #4b5563; margin: 8px 0;"><strong>Date:</strong> ${formatTourDateForDisplay(bookingData.tourDate, 'fi-FI', 'short')}</p>
-                <p style="color: #4b5563; margin: 8px 0;"><strong>Adults:</strong> ${bookingData.adults}</p>
-                <p style="color: #4b5563; margin: 8px 0;"><strong>Children:</strong> ${bookingData.children}</p>
-                <p style="color: #4b5563; margin: 8px 0;"><strong>Total Amount:</strong> €${bookingData.totalPrice}</p>
-                <p style="color: #4b5563; margin: 8px 0;"><strong>Payment Method:</strong> <span style="color: #059669; font-weight: bold;">${bookingData.cryptoType.toUpperCase()}</span></p>
-                ${bookingData.specialRequests ? `<p style="color: #4b5563; margin: 8px 0;"><strong>Special Requests:</strong> ${bookingData.specialRequests}</p>` : ''}
-              </div>
-              
-              <div style="background-color: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 25px 0;">
-                <h3 style="color: #92400e; margin-top: 0; margin-bottom: 15px;">🪙 Crypto Payment Instructions</h3>
-                <p style="color: #92400e; margin-bottom: 10px;">
-                  <strong>You will soon receive a separate email with:</strong>
-                </p>
-                <ul style="color: #92400e; margin: 0; padding-left: 20px;">
-                  <li>Wallet address for ${bookingData.cryptoType.toUpperCase()}</li>
-                  <li>Exact amount to send</li>
-                  <li>Payment confirmation instructions</li>
-                </ul>
-                <p style="color: #92400e; margin-top: 15px; margin-bottom: 0;">
-                  <strong>Please wait for our payment instructions before sending any crypto payments.</strong>
-                </p>
-              </div>
-              
-              <div style="background-color: #ecfdf5; padding: 20px; border-radius: 8px; margin: 25px 0; border: 1px solid #a7f3d0;">
-                <p style="color: #065f46; margin: 0; font-size: 16px; text-align: center;">
-                  <strong>✅ Your booking is confirmed!</strong>
-                </p>
-              </div>
-              
-              <p style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px;">
-                <strong>What happens next?</strong>
-              </p>
-              
-              <ul style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px; padding-left: 20px;">
-                <li>You'll receive crypto payment instructions within 24 hours</li>
-                <li>Complete your crypto payment as instructed</li>
-                <li>You'll receive detailed tour information 24 hours before your adventure</li>
-                <li>Meet your guide at the designated location</li>
-                ${bookingData.tourName.includes('Snowshoe') ? '<li>All equipment and safety gear will be provided</li>' : ''}
-                <li>Enjoy your unforgettable Lapland experience!</li>
-              </ul>
-              
-              <p style="color: #4b5563; line-height: 1.7; margin-bottom: 30px; font-size: 16px;">
-                If you have any questions or need to make changes, please contact us at <a href="mailto:contact@royalnordic.fi" style="color: #059669; text-decoration: none; font-weight: 600;">contact@royalnordic.fi</a> or call +358 45 78345138.
-              </p>
-              
-              <p style="color: #4b5563; line-height: 1.7; margin-bottom: 30px; font-size: 16px;">
-                Best regards,<br>
-                <strong>The Royal Nordic Team</strong>
-              </p>
-            </div>
-            
-            <div style="text-align: center; padding: 30px 20px; background-color: #1f2937; color: white;">
-              <h3 style="margin-bottom: 20px; font-size: 18px;">Contact Information</h3>
-              <div style="display: inline-block; text-align: left;">
-                <p style="margin: 8px 0; font-size: 14px;">
-                  📧 <a href="mailto:contact@royalnordic.fi" style="color: #10b981; text-decoration: none;">contact@royalnordic.fi</a>
-                </p>
-                <p style="margin: 8px 0; font-size: 14px;">
-                  📞 <a href="tel:+3584578345138" style="color: #10b981; text-decoration: none;">+358 45 78345138</a>
-                </p>
-                <p style="margin: 8px 0; font-size: 14px;">
-                  🌍 <a href="https://royalnordic.fi" style="color: #10b981; text-decoration: none;">royalnordic.fi</a>
-                </p>
-              </div>
-              <p style="margin: 20px 0 0 0; font-size: 12px; color: #9ca3af;">
-                Rovaniemi, Finnish Lapland
-              </p>
-            </div>
-          </div>
-        `,
-        text: `
-Crypto Booking Confirmed - Royal Nordic Tours
-
-Dear ${bookingData.customerName},
-
-Thank you for booking your Lapland adventure with Royal Nordic! We're excited to welcome you to the magical world of Finnish Lapland.
-
-Your Booking Details:
-- Booking ID: #${bookingData.bookingId}
-- Tour: ${bookingData.tourName}
-- Date: ${formatTourDateForDisplay(bookingData.tourDate, 'fi-FI', 'short')}
-- Adults: ${bookingData.adults}
-- Children: ${bookingData.children}
-- Total Amount: €${bookingData.totalPrice}
-- Payment Method: ${bookingData.cryptoType.toUpperCase()}
-${bookingData.specialRequests ? `- Special Requests: ${bookingData.specialRequests}` : ''}
-
-🪙 CRYPTO PAYMENT INSTRUCTIONS:
-You will soon receive a separate email with:
-- Wallet address for ${bookingData.cryptoType.toUpperCase()}
-- Exact amount to send
-- Payment confirmation instructions
-
-Please wait for our payment instructions before sending any crypto payments.
-
-✅ Your booking is confirmed!
-
-What happens next?
-- You'll receive crypto payment instructions within 24 hours
-- Complete your crypto payment as instructed
-- You'll receive detailed tour information 24 hours before your adventure
-- Meet your guide at the designated location
-${bookingData.tourName.includes('Snowshoe') ? '- All equipment and safety gear will be provided' : ''}
-- Enjoy your unforgettable Lapland experience!
-
-If you have any questions or need to make changes, please contact us at contact@royalnordic.fi or call +358 45 78345138.
-
-Best regards,
-The Royal Nordic Team
-
-Contact Information:
-📧 contact@royalnordic.fi
-📞 +358 45 78345138
-🌍 royalnordic.fi
-Rovaniemi, Finnish Lapland
-        `
+        from: customerMail.from,
+        to: customerMail.to,
+        subject: customerMail.subject,
+        html: customerMail.html,
+        text: customerMail.text,
       }
     }
 

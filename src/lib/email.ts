@@ -57,9 +57,10 @@ export async function sendBookingNotification(bookingData: BookingNotificationDa
 
 // Send booking confirmation to customer
 export async function sendCustomerConfirmation(bookingData: BookingNotificationData) {
+  const experience = displayTourName(bookingData.tourName)
   const confirmation: EmailNotification = {
     to: [bookingData.customerEmail],
-    subject: `Booking confirmed — ${bookingData.tourName} | Royal Nordic`,
+    subject: `Booking confirmed — ${experience} | Royal Nordic`,
     html: generateCustomerConfirmationHTML(bookingData),
     text: generateCustomerConfirmationText(bookingData)
   }
@@ -89,9 +90,10 @@ export async function sendCustomerConfirmation(bookingData: BookingNotificationD
 
 /** Same template as sendCustomerConfirmation, but throws on failure (admin ops). */
 export async function sendCustomerConfirmationStrict(bookingData: BookingNotificationData) {
+  const experience = displayTourName(bookingData.tourName)
   const confirmation: EmailNotification = {
     to: [bookingData.customerEmail],
-    subject: `Booking confirmed — ${bookingData.tourName} | Royal Nordic`,
+    subject: `Booking confirmed — ${experience} | Royal Nordic`,
     html: generateCustomerConfirmationHTML(bookingData),
     text: generateCustomerConfirmationText(bookingData)
   }
@@ -243,12 +245,27 @@ function getChildPrice(tourName: string): number {
   return prices[tourName] || 0
 }
 
+/** Keep in sync with supabase/functions/_shared/bookingEmails.ts */
+function displayTourName(tourName: string): string {
+  if (tourName === 'Northern Lights Tour') return 'Guaranteed Northern Lights Tour'
+  return tourName
+}
+
+function escapeHtml(value: string): string {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
 function tourTimeSuffix(tourName: string): string {
-  if (tourName.includes('Family-Friendly Northern Lights')) return ' at 21:00'
+  const name = displayTourName(tourName)
+  if (name.includes('Family-Friendly Northern Lights')) return ' at 21:00'
   if (
-    tourName === 'Northern Lights Tour' ||
-    tourName === 'Guaranteed Northern Lights Tour' ||
-    tourName.includes('Northern Lights')
+    name === 'Northern Lights Tour' ||
+    name === 'Guaranteed Northern Lights Tour' ||
+    name.includes('Northern Lights')
   ) {
     return ' at 18:30'
   }
@@ -267,6 +284,7 @@ function guestSummary(booking: BookingNotificationData): string {
 
 // Generate customer confirmation HTML (kept aligned with stripe-webhook shared template)
 function generateCustomerConfirmationHTML(booking: BookingNotificationData): string {
+  const experience = displayTourName(booking.tourName)
   const dateLabel = formatCustomerDate(booking)
   const guests = guestSummary(booking)
   const total =
@@ -289,18 +307,18 @@ function generateCustomerConfirmationHTML(booking: BookingNotificationData): str
           <td style="padding:32px 28px 8px;font-family:Arial,Helvetica,sans-serif;">
             <h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;color:#18181b;">Your booking is confirmed</h1>
             <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#3f3f46;">
-              Hi ${booking.customerName}, thank you for booking with Royal Nordic.
+              Hi ${escapeHtml(booking.customerName)}, thank you for booking with Royal Nordic.
               Payment is received and your place is reserved.
             </p>
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#fafafa;border:1px solid #e4e4e7;margin:0 0 24px;">
               <tr><td style="padding:20px 20px 8px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:#71717a;font-weight:700;">Booking details</td></tr>
               <tr><td style="padding:0 20px 20px;font-size:14px;line-height:1.7;color:#27272a;">
                 <strong>Booking ID:</strong> #${booking.bookingId}<br />
-                <strong>Experience:</strong> ${booking.tourName}<br />
-                <strong>Date:</strong> ${dateLabel}<br />
-                <strong>Guests:</strong> ${guests}<br />
-                <strong>Total paid:</strong> €${total}
-                ${booking.specialRequests ? `<br /><strong>Notes:</strong> ${booking.specialRequests}` : ''}
+                <strong>Experience:</strong> ${escapeHtml(experience)}<br />
+                <strong>Date:</strong> ${escapeHtml(dateLabel)}<br />
+                <strong>Guests:</strong> ${escapeHtml(guests)}<br />
+                <strong>Total paid:</strong> €${escapeHtml(total)}
+                ${booking.specialRequests ? `<br /><strong>Notes:</strong> ${escapeHtml(booking.specialRequests)}` : ''}
               </td></tr>
             </table>
             <h2 style="margin:0 0 10px;font-size:16px;color:#18181b;">What happens next</h2>
@@ -324,7 +342,7 @@ function generateCustomerConfirmationHTML(booking: BookingNotificationData): str
         <tr>
           <td style="padding:20px 28px;border-top:1px solid #e4e4e7;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.5;color:#a1a1aa;text-align:center;">
             Royal Nordic · Rovaniemi, Finnish Lapland<br />
-            This confirmation was sent to ${booking.customerEmail}
+            This email was sent to ${escapeHtml(booking.customerEmail)}
           </td>
         </tr>
       </table>
@@ -335,6 +353,7 @@ function generateCustomerConfirmationHTML(booking: BookingNotificationData): str
 }
 
 function generateCustomerConfirmationText(booking: BookingNotificationData): string {
+  const experience = displayTourName(booking.tourName)
   const dateLabel = formatCustomerDate(booking)
   const guests = guestSummary(booking)
   const total =
@@ -348,7 +367,7 @@ Thank you for booking with Royal Nordic. Payment is received and your place is r
 
 BOOKING DETAILS
 Booking ID: #${booking.bookingId}
-Experience: ${booking.tourName}
+Experience: ${experience}
 Date: ${dateLabel}
 Guests: ${guests}
 Total paid: €${total}

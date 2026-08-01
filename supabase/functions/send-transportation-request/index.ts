@@ -1,5 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import {
+  buildRequestReceivedEmail,
+  escapeHtml,
+  type DetailRow,
+} from '../_shared/bookingEmails.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -7,7 +12,6 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -32,7 +36,6 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     const supabase = supabaseUrl && supabaseServiceKey ? createClient(supabaseUrl, supabaseServiceKey) : null
 
-    // Get Resend API key from environment
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
 
     if (!resendApiKey) {
@@ -43,7 +46,6 @@ serve(async (req) => {
       )
     }
 
-    // Persist request for admin visibility
     if (supabase) {
       const { error: insertError } = await supabase
         .from('transportation_requests')
@@ -70,29 +72,54 @@ serve(async (req) => {
       console.warn('Supabase credentials missing, skipping database persistence')
     }
 
-    // Construct email content for transportation request
+    const safeName = String(name || 'there')
+    const safeEmail = String(email || '')
+    const safePhone = phone ? String(phone) : 'Not provided'
+    const safeService = String(serviceType || 'Private Transportation')
+    const safeDestination = String(destination || 'Not specified')
+    const safePickup = String(pickupDetails || 'Not provided')
+    const safeDate = preferredDate ? String(preferredDate) : 'Not provided'
+    const safeTime = preferredTime ? String(preferredTime) : 'Not provided'
+    const safeGroup = groupSize ? String(groupSize) : 'Not specified'
+    const safeInfo = additionalInfo ? String(additionalInfo) : 'N/A'
+
     const emailContent = `
-Transportation Request - ${serviceType}
+Transportation Request - ${safeService}
 
 Customer Details:
-- Name: ${name}
-- Email: ${email}
-- Phone: ${phone || 'Not provided'}
-- Destination: ${destination}
-- Pickup Details: ${pickupDetails || 'Not provided'}
-- Preferred Date: ${preferredDate || 'Not provided'}
-- Preferred Time: ${preferredTime || 'Not provided'}
-- Group Size: ${groupSize || 'Not specified'}
+- Name: ${safeName}
+- Email: ${safeEmail}
+- Phone: ${safePhone}
+- Destination: ${safeDestination}
+- Pickup Details: ${safePickup}
+- Preferred Date: ${safeDate}
+- Preferred Time: ${safeTime}
+- Group Size: ${safeGroup}
 
 Additional Information:
-${additionalInfo || 'N/A'}
+${safeInfo}
 
 This request was submitted through your website's transportation form.
     `.trim()
 
-    // Send email using Resend API
+    const details: DetailRow[] = [
+      { label: 'Service', value: safeService },
+      { label: 'Destination', value: safeDestination },
+      { label: 'Pickup', value: safePickup },
+      { label: 'Preferred date', value: safeDate },
+      { label: 'Preferred time', value: safeTime },
+      { label: 'Group size', value: safeGroup },
+      { label: 'Additional information', value: safeInfo },
+    ]
+
+    const customerEmail = buildRequestReceivedEmail({
+      kind: 'transportation',
+      customerName: safeName,
+      customerEmail: safeEmail,
+      details,
+    })
+
     try {
-      // Send notification email to business
       const businessResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -102,19 +129,19 @@ This request was submitted through your website's transportation form.
         body: JSON.stringify({
           from: 'Royal Nordic <contact@royalnordic.fi>',
           to: to || ['royalnordicfi@gmail.com', 'contact@royalnordic.fi'],
-          subject: subject || `Transportation Request - ${serviceType} - ROYAL NORDIC`,
+          subject: subject || `Transportation Request - ${safeService} - ROYAL NORDIC`,
           html: `
-            <h2>Transportation Request - ${serviceType}</h2>
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
-            <p><strong>Destination:</strong> ${destination}</p>
-            <p><strong>Pickup Details:</strong> ${pickupDetails || 'Not provided'}</p>
-            ${preferredDate ? `<p><strong>Preferred Date:</strong> ${preferredDate}</p>` : ''}
-            ${preferredTime ? `<p><strong>Preferred Time:</strong> ${preferredTime}</p>` : ''}
-            ${groupSize ? `<p><strong>Group Size:</strong> ${groupSize}</p>` : ''}
+            <h2>Transportation Request - ${escapeHtml(safeService)}</h2>
+            <p><strong>Name:</strong> ${escapeHtml(safeName)}</p>
+            <p><strong>Email:</strong> ${escapeHtml(safeEmail)}</p>
+            <p><strong>Phone:</strong> ${escapeHtml(safePhone)}</p>
+            <p><strong>Destination:</strong> ${escapeHtml(safeDestination)}</p>
+            <p><strong>Pickup Details:</strong> ${escapeHtml(safePickup)}</p>
+            <p><strong>Preferred Date:</strong> ${escapeHtml(safeDate)}</p>
+            <p><strong>Preferred Time:</strong> ${escapeHtml(safeTime)}</p>
+            <p><strong>Group Size:</strong> ${escapeHtml(safeGroup)}</p>
             <p><strong>Additional Information:</strong></p>
-            <p>${additionalInfo || 'N/A'}</p>
+            <p style="white-space:pre-wrap;">${escapeHtml(safeInfo)}</p>
             <hr>
             <p><em>This request was submitted through your website's transportation form.</em></p>
           `,
@@ -122,7 +149,6 @@ This request was submitted through your website's transportation form.
         }),
       })
 
-      // Send thank you email to customer
       const customerResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -130,126 +156,16 @@ This request was submitted through your website's transportation form.
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Royal Nordic <contact@royalnordic.fi>',
-          to: [email],
-          subject: `Thank you for your Transportation Request - Royal Nordic!`,
-          html: `
-            <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; background-color: #ffffff;">
-              <!-- Header -->
-              <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); padding: 40px 20px; text-align: center; color: white;">
-                <h1 style="margin: 0; font-size: 28px; font-weight: bold;">ROYAL NORDIC</h1>
-                <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Finnish Lapland Adventures</p>
-              </div>
-              
-              <!-- Main Content -->
-              <div style="padding: 40px 30px; background-color: #ffffff;">
-                <h2 style="color: #065f46; margin-bottom: 25px; font-size: 24px; text-align: center;">
-                  Transportation Request Received!
-                </h2>
-                
-                <p style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px;">
-                  Dear ${name},
-                </p>
-                
-                <p style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px;">
-                  Thank you for choosing Royal Nordic for your transportation needs in Lapland! We're excited to help you travel comfortably and safely throughout our beautiful region.
-                </p>
-                
-                <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #10b981;">
-                  <h3 style="color: #065f46; margin: 0 0 15px 0; font-size: 18px;">Your Transportation Request:</h3>
-                  <p style="color: #4b5563; margin: 8px 0; font-size: 16px;"><strong>Destination:</strong> ${destination}</p>
-                  <p style="color: #4b5563; margin: 8px 0; font-size: 16px;"><strong>Service:</strong> ${serviceType}</p>
-                  <p style="color: #4b5563; margin: 8px 0; font-size: 16px;"><strong>Additional Information:</strong></p>
-                  <p style="color: #4b5563; margin: 8px 0; font-size: 16px;">${additionalInfo}</p>
-                </div>
-                
-                <div style="background-color: #ecfdf5; padding: 20px; border-radius: 8px; margin: 25px 0; border: 1px solid #a7f3d0;">
-                  <p style="color: #065f46; margin: 0; font-size: 16px; text-align: center;">
-                    <strong>⏰ We'll be in touch soon with your personalized quote</strong>
-                  </p>
-                </div>
-                
-                <p style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px;">
-                  Our professional team will carefully review your transportation requirements and provide you with:
-                </p>
-                
-                <ul style="color: #4b5563; line-height: 1.7; margin-bottom: 20px; font-size: 16px; padding-left: 20px;">
-                  <li>Detailed pricing based on your specific route and requirements</li>
-                  <li>Flexible scheduling options that work for you</li>
-                  <li>Professional driver with local knowledge</li>
-                  <li>Comfortable vehicle suitable for your group size</li>
-                  <li>All necessary arrangements and special requests</li>
-                </ul>
-                
-                <p style="color: #4b5563; line-height: 1.7; margin-bottom: 30px; font-size: 16px;">
-                  In the meantime, feel free to explore our other services at <a href="https://royalnordic.fi" style="color: #059669; text-decoration: none; font-weight: 600;">royalnordic.fi</a>.
-                </p>
-                
-                <p style="color: #4b5563; line-height: 1.7; margin-bottom: 30px; font-size: 16px;">
-                  Best regards,<br>
-                  <strong>The Royal Nordic Team</strong>
-                </p>
-              </div>
-              
-              <!-- Footer -->
-              <div style="text-align: center; padding: 30px 20px; background-color: #1f2937; color: white;">
-                <h3 style="margin-bottom: 20px; font-size: 18px;">Contact Information</h3>
-                <div style="display: inline-block; text-align: left;">
-                  <p style="margin: 8px 0; font-size: 14px;">
-                    📧 <a href="mailto:contact@royalnordic.fi" style="color: #10b981; text-decoration: none;">contact@royalnordic.fi</a>
-                  </p>
-                  <p style="margin: 8px 0; font-size: 14px;">
-                    📞 <a href="tel:+3584578345138" style="color: #10b981; text-decoration: none;">+358 45 78345138</a>
-                  </p>
-                  <p style="margin: 8px 0; font-size: 14px;">
-                    🌍 <a href="https://royalnordic.fi" style="color: #10b981; text-decoration: none;">royalnordic.fi</a>
-                  </p>
-                </div>
-                <p style="margin: 20px 0 0 0; font-size: 12px; color: #9ca3af;">
-                  Rovaniemi, Finnish Lapland
-                </p>
-              </div>
-            </div>
-          `,
-          text: `
-Thank you for your Transportation Request - Royal Nordic!
-
-Dear ${name},
-
-Thank you for choosing Royal Nordic for your transportation needs in Lapland! We're excited to help you travel comfortably and safely throughout our beautiful region.
-
-We have received your transportation request and our professional team will review it carefully. We'll be in touch soon with your personalized quote.
-
-Your Transportation Request:
-- Destination: ${destination}
-- Service: ${serviceType}
-- Additional Information: ${additionalInfo}
-
-Our professional team will carefully review your transportation requirements and provide you with:
-- Detailed pricing based on your specific route and requirements
-- Flexible scheduling options that work for you
-- Professional driver with local knowledge
-- Comfortable vehicle suitable for your group size
-- All necessary arrangements and special requests
-
-In the meantime, feel free to explore our other services at royalnordic.fi.
-
-Best regards,
-The Royal Nordic Team
-
-Contact Information:
-📧 contact@royalnordic.fi
-📞 +358 45 78345138
-🌍 royalnordic.fi
-Rovaniemi, Finnish Lapland
-          `,
+          from: customerEmail.from,
+          to: customerEmail.to,
+          subject: customerEmail.subject,
+          html: customerEmail.html,
+          text: customerEmail.text,
         }),
       })
 
       console.log('Business response status:', businessResponse.status)
       console.log('Customer response status:', customerResponse.status)
-      
-      // Always return success - emails are being sent
       console.log('Transportation request emails sent successfully')
       return new Response(
         JSON.stringify({ success: true, message: 'Transportation request emails sent successfully' }),

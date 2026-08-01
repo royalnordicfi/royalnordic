@@ -59,12 +59,11 @@ export async function updateTourAvailability(tourId: number, date: string, avail
   }
 
   if (existingDate) {
-    // Update existing date
+    // Update capacity only — never reset total_booked (preserves real bookings)
     const { error: updateError } = await supabase
       .from('tour_dates')
-      .update({ 
+      .update({
         available_slots: availableSlots,
-        total_booked: 0 // Reset booked slots when updating availability
       })
       .eq('id', existingDate.id)
 

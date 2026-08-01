@@ -15,9 +15,16 @@ interface AdminAvailabilityProps {
   tourId: number
   tourName: string
   maxCapacity: number
+  /** When true, omit full-page chrome for embedding in AdminApp */
+  embedded?: boolean
 }
 
-const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName, maxCapacity }) => {
+const AdminAvailability: React.FC<AdminAvailabilityProps> = ({
+  tourId,
+  tourName,
+  maxCapacity,
+  embedded = false,
+}) => {
   const [availability, setAvailability] = useState<TourDate[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -217,7 +224,7 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className={`${embedded ? 'py-12' : 'min-h-screen bg-gray-50'} flex items-center justify-center`}>
         <div className="text-center">
           <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
           <p className="text-gray-600">Loading availability...</p>
@@ -227,8 +234,8 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+    <div className={embedded ? '' : 'min-h-screen bg-gray-50'}>
+      {!embedded && (
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
@@ -246,8 +253,24 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({ tourId, tourName,
           </div>
         </div>
       </div>
+      )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className={embedded ? 'space-y-6' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}>
+        {embedded && (
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm text-zinc-600">
+              Set open slots per date for <span className="font-medium text-zinc-900">{tourName}</span>
+            </p>
+            <button
+              type="button"
+              onClick={loadAvailability}
+              className="inline-flex items-center gap-2 rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Refresh
+            </button>
+          </div>
+        )}
         {/* Error Display */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">

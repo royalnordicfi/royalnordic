@@ -14,6 +14,7 @@ const nav = [
   { to: '/bookings', label: 'Bookings' },
   { to: '/manual', label: 'New booking' },
   { to: '/calendar', label: 'Calendar' },
+  { to: '/availability', label: 'Availability' },
   { to: '/notes', label: 'Notes' },
   { to: '/products', label: 'Products' },
   { to: '/fleet', label: 'Guides & vehicles' },
