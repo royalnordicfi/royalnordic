@@ -56,18 +56,15 @@ serve(async (req) => {
     })
 
     const session = await stripe.createCheckoutSession({
+      // Only methods enabled on the Royal Nordic Stripe account.
       payment_method_types: [
-        'card', 
-        'sepa_debit', 
-        'pay_by_bank',
+        'card',
+        'sepa_debit',
         'klarna',
-        'afterpay_clearpay',
         'ideal',
         'bancontact',
         'eps',
-        'giropay',
         'p24',
-        'sofort'
       ],
       line_items: [
         {
@@ -123,29 +120,35 @@ class Stripe {
   }
 
   async createCheckoutSession(params: any) {
+    const body = new URLSearchParams({
+      'line_items[0][price_data][currency]': params.line_items[0].price_data.currency,
+      'line_items[0][price_data][product_data][name]': params.line_items[0].price_data.product_data.name,
+      'line_items[0][price_data][product_data][description]': params.line_items[0].price_data.product_data.description,
+      'line_items[0][price_data][unit_amount]': params.line_items[0].price_data.unit_amount.toString(),
+      'line_items[0][quantity]': params.line_items[0].quantity.toString(),
+      'mode': params.mode,
+      'success_url': params.success_url,
+      'cancel_url': params.cancel_url,
+      'customer_email': params.customer_email,
+      'billing_address_collection': params.billing_address_collection,
+      'phone_number_collection[enabled]': params.phone_number_collection.enabled.toString(),
+      ...Object.fromEntries(
+        Object.entries(params.metadata).map(([key, value]) => [`metadata[${key}]`, String(value ?? '')])
+      ),
+    })
+
+    // Stripe expects repeated keys, not a comma-joined value.
+    for (const type of params.payment_method_types) {
+      body.append('payment_method_types[]', type)
+    }
+
     const response = await fetch(`${this.baseURL}/checkout/sessions`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.secretKey}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        'payment_method_types[]': params.payment_method_types.join(','),
-        'line_items[0][price_data][currency]': params.line_items[0].price_data.currency,
-        'line_items[0][price_data][product_data][name]': params.line_items[0].price_data.product_data.name,
-        'line_items[0][price_data][product_data][description]': params.line_items[0].price_data.product_data.description,
-        'line_items[0][price_data][unit_amount]': params.line_items[0].price_data.unit_amount.toString(),
-        'line_items[0][quantity]': params.line_items[0].quantity.toString(),
-        'mode': params.mode,
-        'success_url': params.success_url,
-        'cancel_url': params.cancel_url,
-        'customer_email': params.customer_email,
-        'billing_address_collection': params.billing_address_collection,
-        'phone_number_collection[enabled]': params.phone_number_collection.enabled.toString(),
-        ...Object.fromEntries(
-          Object.entries(params.metadata).map(([key, value]) => [`metadata[${key}]`, value as string])
-        ),
-      }),
+      body,
     })
 
     if (!response.ok) {
