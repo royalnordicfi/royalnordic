@@ -7,6 +7,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
+import { timingSafeEqual as nodeTimingSafeEqual } from 'crypto'
 
 const SELECT_OPS = `
   id, booking_ref, adults, children, total_price, status, payment_status, payment_type,
@@ -29,9 +30,12 @@ function timingSafeEqual(a, b) {
   if (typeof a !== 'string' || typeof b !== 'string') return false
   const ba = Buffer.from(a)
   const bb = Buffer.from(b)
+  // Buffers of different length would throw inside node's timingSafeEqual;
+  // returning false here is still constant-time relative to a real secret
+  // comparison since key length is not itself sensitive.
   if (ba.length !== bb.length) return false
   try {
-    return require('crypto').timingSafeEqual(ba, bb)
+    return nodeTimingSafeEqual(ba, bb)
   } catch {
     return false
   }
