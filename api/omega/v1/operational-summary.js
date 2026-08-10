@@ -4,6 +4,18 @@
  *
  * Auth: Authorization: Bearer <OMEGA_API_KEY>  OR  x-omega-api-key: <OMEGA_API_KEY>
  * Env: OMEGA_API_KEY, SUPABASE_URL (or VITE_SUPABASE_URL), SUPABASE_SERVICE_ROLE_KEY
+ *
+ * Transport: Web Handler (Request/Response) -- Vercel's current documented
+ * zero-config shape for non-Next.js /api functions ("Vercel Functions use a
+ * Web Handler, which consists of the request parameter that is an instance
+ * of the web standard Request API"). Previously this used the legacy Node
+ * (req, res) helper-style signature as an ESM default export; that
+ * combination (ESM + Node helpers, no `builds` entry to hint the runtime)
+ * is not the flagship-documented pattern and produced a platform-level 404
+ * in production even though the file was correctly deployed. Only the
+ * transport layer below changed -- every business-logic function
+ * (buildOperationalSummary, buildIssues, mapBooking, timingSafeEqual, etc.)
+ * is unchanged.
  */
 
 import { createClient } from '@supabase/supabase-js'
@@ -19,11 +31,15 @@ const SELECT_OPS = `
   vehicles ( id, name, passenger_capacity, status, is_active )
 `
 
-function json(res, status, body) {
-  res.setHeader('Cache-Control', 'no-store')
-  res.setHeader('Content-Type', 'application/json')
-  res.setHeader('X-Omega-Integration', 'royal-nordic-read-v1')
-  return res.status(status).json(body)
+function json(status, body) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Cache-Control': 'no-store',
+      'Content-Type': 'application/json',
+      'X-Omega-Integration': 'royal-nordic-read-v1',
+    },
+  })
 }
 
 function timingSafeEqual(a, b) {
@@ -41,11 +57,11 @@ function timingSafeEqual(a, b) {
   }
 }
 
-function extractApiKey(req) {
-  const header = req.headers.authorization || req.headers.Authorization || ''
+function extractApiKey(request) {
+  const header = request.headers.get('authorization') || ''
   const bearer = String(header).match(/^Bearer\s+(.+)$/i)
   if (bearer?.[1]) return bearer[1].trim()
-  const x = req.headers['x-omega-api-key'] || req.headers['X-Omega-Api-Key']
+  const x = request.headers.get('x-omega-api-key')
   if (x) return String(x).trim()
   return null
 }
@@ -359,74 +375,81 @@ export async function buildOperationalSummary({ supabase, adminBase, horizonDays
   }
 }
 
-export default async function handler(req, res) {
-  if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', '*')
-    res.setHeader('Access-Control-Allow-Headers', 'authorization, x-omega-api-key, content-type')
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
-    return res.status(204).end()
-  }
+export default {
+  async fetch(request) {
+    if (request.method === 'OPTIONS') {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'authorization, x-omega-api-key, content-type',
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        },
+      })
+    }
 
-  if (req.method !== 'GET') {
-    return json(res, 405, { ok: false, error: 'method_not_allowed' })
-  }
+    if (request.method !== 'GET') {
+      return json(405, { ok: false, error: 'method_not_allowed' })
+    }
 
-  const expected = process.env.OMEGA_API_KEY?.trim() || process.env.ROYAL_NORDIC_OMEGA_API_KEY?.trim()
-  if (!expected) {
-    return json(res, 503, {
-      ok: false,
-      error: 'misconfigured',
-      detail: 'OMEGA_API_KEY not set on Royal Nordic',
-    })
-  }
+    const expected = process.env.OMEGA_API_KEY?.trim() || process.env.ROYAL_NORDIC_OMEGA_API_KEY?.trim()
+    if (!expected) {
+      return json(503, {
+        ok: false,
+        error: 'misconfigured',
+        detail: 'OMEGA_API_KEY not set on Royal Nordic',
+      })
+    }
 
-  const provided = extractApiKey(req)
-  if (!provided || !timingSafeEqual(provided, expected)) {
-    return json(res, 401, { ok: false, error: 'unauthorized' })
-  }
+    const provided = extractApiKey(request)
+    if (!provided || !timingSafeEqual(provided, expected)) {
+      return json(401, { ok: false, error: 'unauthorized' })
+    }
 
-  const supabaseUrl =
-    process.env.SUPABASE_URL?.trim() || process.env.VITE_SUPABASE_URL?.trim()
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
-  if (!supabaseUrl || !serviceKey) {
-    return json(res, 503, {
-      ok: false,
-      error: 'misconfigured',
-      detail: 'SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY required',
-    })
-  }
+    const supabaseUrl =
+      process.env.SUPABASE_URL?.trim() || process.env.VITE_SUPABASE_URL?.trim()
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
+    if (!supabaseUrl || !serviceKey) {
+      return json(503, {
+        ok: false,
+        error: 'misconfigured',
+        detail: 'SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY required',
+      })
+    }
 
-  const adminBase =
-    process.env.ROYAL_NORDIC_ADMIN_URL?.trim() ||
-    process.env.ADMIN_PUBLIC_URL?.trim() ||
-    'https://admin.royalnordic.fi'
+    const adminBase =
+      process.env.ROYAL_NORDIC_ADMIN_URL?.trim() ||
+      process.env.ADMIN_PUBLIC_URL?.trim() ||
+      'https://admin.royalnordic.fi'
 
-  const started = Date.now()
-  try {
-    const supabase = createClient(supabaseUrl, serviceKey, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    })
-    const horizon = Math.min(
-      60,
-      Math.max(1, parseInt(String(req.query?.horizon_days || '14'), 10) || 14),
-    )
-    const summary = await buildOperationalSummary({
-      supabase,
-      adminBase,
-      horizonDays: horizon,
-    })
-    return json(res, 200, {
-      ok: true,
-      latency_ms: Date.now() - started,
-      ...summary,
-    })
-  } catch (err) {
-    console.error('[omega-operational-summary]', err?.message || err)
-    return json(res, 500, {
-      ok: false,
-      error: 'internal_error',
-      detail: 'Failed to build operational summary',
-      latency_ms: Date.now() - started,
-    })
-  }
+    const started = Date.now()
+    try {
+      const supabase = createClient(supabaseUrl, serviceKey, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      })
+      const url = new URL(request.url)
+      const horizon = Math.min(
+        60,
+        Math.max(1, parseInt(url.searchParams.get('horizon_days') || '14', 10) || 14),
+      )
+      const summary = await buildOperationalSummary({
+        supabase,
+        adminBase,
+        horizonDays: horizon,
+      })
+      return json(200, {
+        ok: true,
+        latency_ms: Date.now() - started,
+        ...summary,
+      })
+    } catch (err) {
+      console.error('[omega-operational-summary]', err?.message || err)
+      return json(500, {
+        ok: false,
+        error: 'internal_error',
+        detail: 'Failed to build operational summary',
+        latency_ms: Date.now() - started,
+      })
+    }
+  },
 }
