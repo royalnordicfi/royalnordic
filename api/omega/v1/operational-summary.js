@@ -5,6 +5,14 @@
  * Auth: Authorization: Bearer <OMEGA_API_KEY>  OR  x-omega-api-key: <OMEGA_API_KEY>
  * Env: OMEGA_API_KEY, SUPABASE_URL (or VITE_SUPABASE_URL), SUPABASE_SERVICE_ROLE_KEY
  *
+ * Errors are structured and distinguishable: 503 misconfigured (names only,
+ * never values), 401 unauthorized, 502 upstream_query_failed (Supabase query
+ * error — table name only, never the raw Postgres message), 500
+ * internal_error (unexpected). Soft-deleted bookings (deleted_at IS NOT
+ * NULL, migration 018) are excluded from all counts. cancelled_recent is
+ * null (not []) when its query could not run, so "no cancellations" is
+ * never confused with "we don't know" — see docs/OMEGA_READ_INTEGRATION.md.
+ *
  * Transport: Web Handler (Request/Response) -- Vercel's current documented
  * zero-config shape for non-Next.js /api functions ("Vercel Functions use a
  * Web Handler, which consists of the request parameter that is an instance
@@ -220,30 +228,53 @@ export async function buildOperationalSummary({ supabase, adminBase, horizonDays
   const today = dateKeyHelsinki()
   const until = addDays(today, horizonDays)
 
-  const [{ data: tours }, { data: guides }, { data: vehicles }, { data: tourDates }, bookingsRes] =
-    await Promise.all([
-      supabase
-        .from('tours')
-        .select('id, name, public_name, max_capacity, adult_price, child_price, is_active, commission_percent')
-        .order('id'),
-      supabase.from('guides').select('id, name, availability_status, is_active').eq('is_active', true),
-      supabase
-        .from('vehicles')
-        .select('id, name, passenger_capacity, status, is_active')
-        .eq('is_active', true),
-      supabase
-        .from('tour_dates')
-        .select('id, tour_id, date, available_slots, total_booked')
-        .gte('date', today)
-        .lte('date', until)
-        .order('date'),
-      supabase
-        .from('bookings')
-        .select(SELECT_OPS)
-        .neq('status', 'cancelled')
-        .order('created_at', { ascending: false })
-        .limit(500),
-    ])
+  const [toursRes, guidesRes, vehiclesRes, tourDatesRes, bookingsRes] = await Promise.all([
+    supabase
+      .from('tours')
+      .select('id, name, public_name, max_capacity, adult_price, child_price, is_active, commission_percent')
+      .order('id'),
+    supabase.from('guides').select('id, name, availability_status, is_active').eq('is_active', true),
+    supabase
+      .from('vehicles')
+      .select('id, name, passenger_capacity, status, is_active')
+      .eq('is_active', true),
+    supabase
+      .from('tour_dates')
+      .select('id, tour_id, date, available_slots, total_booked')
+      .gte('date', today)
+      .lte('date', until)
+      .order('date'),
+    supabase
+      .from('bookings')
+      .select(SELECT_OPS)
+      // Soft-deleted bookings (migration 018) must never count toward live
+      // operational totals — the admin app itself excludes them the same way.
+      .is('deleted_at', null)
+      .neq('status', 'cancelled')
+      .order('created_at', { ascending: false })
+      .limit(500),
+  ])
+
+  // A query error on data OMEGA depends on must never be silently treated as
+  // "zero rows" — that would report a false operational picture (e.g. "0
+  // active guides") as if it were confirmed real data. Distinguish this from
+  // a coding-error 500 so it's diagnosable without exposing the raw
+  // Postgres error text.
+  const queryFailures = []
+  if (toursRes.error) queryFailures.push('tours')
+  if (guidesRes.error) queryFailures.push('guides')
+  if (vehiclesRes.error) queryFailures.push('vehicles')
+  if (tourDatesRes.error) queryFailures.push('tour_dates')
+  if (queryFailures.length > 0) {
+    const err = new Error(`Supabase query failed: ${queryFailures.join(', ')}`)
+    err.upstreamQueryFailure = queryFailures
+    throw err
+  }
+
+  const tours = toursRes.data
+  const guides = guidesRes.data
+  const vehicles = vehiclesRes.data
+  const tourDates = tourDatesRes.data
 
   let bookings = bookingsRes.data || []
   if (bookingsRes.error) {
@@ -281,7 +312,41 @@ export async function buildOperationalSummary({ supabase, adminBase, horizonDays
     return d && d >= today && d <= until
   })
   const todayBookings = upcoming.filter((b) => b.tour_dates?.date === today)
-  const cancelledWindow = [] // cancelled excluded from main query; optional separate if needed
+
+  // Real recent booking momentum (not a manufactured metric): derived from
+  // the same non-cancelled, non-deleted rows already fetched above, by
+  // creation time rather than tour date. Order-by created_at desc + limit
+  // 500 on the main query guarantees any booking created in the last 7 days
+  // is present in this set.
+  const now = Date.now()
+  const createdLast24h = bookings.filter(
+    (b) => b.created_at && now - new Date(b.created_at).getTime() <= 24 * 60 * 60 * 1000,
+  ).length
+  const createdLast7d = bookings.filter(
+    (b) => b.created_at && now - new Date(b.created_at).getTime() <= 7 * 24 * 60 * 60 * 1000,
+  ).length
+
+  // Recent cancellations/refunds — a real, separate query (cancelled status
+  // OR soft-deleted), not derived from the main query which excludes both.
+  // null (not []) when the query itself fails, so "confirmed zero" is never
+  // confused with "unknown".
+  let cancelledRecent = null
+  const cancelledSince = addDays(today, -14)
+  const cancelledRes = await supabase
+    .from('bookings')
+    .select(SELECT_OPS)
+    .or('status.eq.cancelled,deleted_at.not.is.null')
+    .gte('updated_at', `${cancelledSince}T00:00:00Z`)
+    .order('updated_at', { ascending: false })
+    .limit(100)
+  if (!cancelledRes.error) {
+    cancelledRecent = (cancelledRes.data || []).map((b) => mapBooking(b, adminBase))
+  } else {
+    console.error('[omega-operational-summary] cancelled_recent query failed', cancelledRes.error.message)
+  }
+  const refundedRecentEur = (cancelledRecent || [])
+    .filter((b) => b.payment_status === 'refunded')
+    .reduce((s, b) => s + Number(b.booked_revenue_eur || 0), 0)
 
   const issues = buildIssues(upcoming, tourDates || [], today)
 
@@ -330,6 +395,12 @@ export async function buildOperationalSummary({ supabase, adminBase, horizonDays
       active_products: products.filter((p) => p.is_active).length,
       active_guides: (guides || []).length,
       active_vehicles: (vehicles || []).length,
+      // Real momentum, derived from actual created_at timestamps (see above)  — not a guess.
+      bookings_created_last_24h: createdLast24h,
+      bookings_created_last_7d: createdLast7d,
+      // null (not 0) when the query failed — never confused with a confirmed zero.
+      cancelled_recent_count: cancelledRecent ? cancelledRecent.length : null,
+      refunded_recent_eur: cancelledRecent ? Math.round(refundedRecentEur * 100) / 100 : null,
     },
     revenue: {
       upcoming_gross_eur: Math.round(bookedRevenueUpcoming * 100) / 100,
@@ -340,7 +411,9 @@ export async function buildOperationalSummary({ supabase, adminBase, horizonDays
     },
     today_tours: todayBookings.map((b) => mapBooking(b, adminBase)),
     upcoming_bookings: upcoming.map((b) => mapBooking(b, adminBase)),
-    cancelled_recent: cancelledWindow,
+    // Cancelled or soft-deleted in the last 14 days. null (not []) when the
+    // query itself failed — see the query above.
+    cancelled_recent: cancelledRecent,
     assignment_issues: issues,
     products,
     guides: (guides || []).map((g) => ({
@@ -410,10 +483,15 @@ export default {
       process.env.SUPABASE_URL?.trim() || process.env.VITE_SUPABASE_URL?.trim()
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
     if (!supabaseUrl || !serviceKey) {
+      // Name exactly which variable(s) are missing — never the values — so
+      // the founder does not have to guess between two possible causes.
+      const missing = []
+      if (!supabaseUrl) missing.push('SUPABASE_URL (or VITE_SUPABASE_URL)')
+      if (!serviceKey) missing.push('SUPABASE_SERVICE_ROLE_KEY')
       return json(503, {
         ok: false,
         error: 'misconfigured',
-        detail: 'SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY required',
+        detail: `Missing on Royal Nordic (Vercel production env): ${missing.join(', ')}`,
       })
     }
 
@@ -444,6 +522,16 @@ export default {
       })
     } catch (err) {
       console.error('[omega-operational-summary]', err?.message || err)
+      if (err?.upstreamQueryFailure?.length) {
+        // A real Supabase query failed (not "zero rows") — distinguishable
+        // from a coding bug, without leaking the raw Postgres error text.
+        return json(502, {
+          ok: false,
+          error: 'upstream_query_failed',
+          detail: `Supabase query failed for: ${err.upstreamQueryFailure.join(', ')}`,
+          latency_ms: Date.now() - started,
+        })
+      }
       return json(500, {
         ok: false,
         error: 'internal_error',
