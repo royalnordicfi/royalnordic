@@ -36,11 +36,11 @@
     },
     {
       "source": "/northern-lights-tour",
-      "destination": "/northern-lights-tour/index.html"
+      "destination": "/northern-lights-tour.html"
     },
     {
       "source": "/northern-lights-tour/",
-      "destination": "/northern-lights-tour/index.html"
+      "destination": "/northern-lights-tour.html"
     },
     {
       "source": "/(.*)",

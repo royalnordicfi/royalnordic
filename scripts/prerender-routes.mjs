@@ -238,9 +238,7 @@ function main() {
     )
   }
 
-  const outDir = path.join(distDir, 'northern-lights-tour')
-  fs.mkdirSync(outDir, { recursive: true })
-  const outPath = path.join(outDir, 'index.html')
+  const outPath = path.join(distDir, 'northern-lights-tour.html')
   fs.writeFileSync(outPath, html, 'utf8')
   console.log(`prerender-routes: wrote ${path.relative(root, outPath)}`)
 }
