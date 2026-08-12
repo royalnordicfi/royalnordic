@@ -241,6 +241,21 @@ function main() {
   const outPath = path.join(distDir, 'northern-lights-tour.html')
   fs.writeFileSync(outPath, html, 'utf8')
   console.log(`prerender-routes: wrote ${path.relative(root, outPath)}`)
+
+  // Vercel's Vite packaging keeps public/ HTML + dist/index.html+assets,
+  // but drops other HTML created only under dist/. Mirror into public/ so
+  // production serves the prerendered money-page document.
+  const publicPath = path.join(root, 'public', 'northern-lights-tour.html')
+  fs.writeFileSync(publicPath, html, 'utf8')
+  console.log(`prerender-routes: wrote ${path.relative(root, publicPath)}`)
+
+  // When `vercel build` has already created output/static, keep it in sync too.
+  const vercelStatic = path.join(root, '.vercel', 'output', 'static')
+  if (fs.existsSync(vercelStatic)) {
+    const vercelPath = path.join(vercelStatic, 'northern-lights-tour.html')
+    fs.writeFileSync(vercelPath, html, 'utf8')
+    console.log(`prerender-routes: wrote ${path.relative(root, vercelPath)}`)
+  }
 }
 
 main()
