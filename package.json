@@ -5,14 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender-routes.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "node server.js",
     "start:prod": "NODE_ENV=production node server.js",
     "deploy:build": "npm run build && npm run start:prod",
     "deploy": "npm run build",
-    "vercel-build": "npm run build"
+    "vercel-build": "npm run build",
+    "prerender": "node scripts/prerender-routes.mjs"
   },
   "dependencies": {
     "react": "^18.2.0",

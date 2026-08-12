@@ -1,17 +1,24 @@
-import { Clock, Users, MapPin, CheckCircle, ArrowLeft, XCircle } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Clock, Users, MapPin, CheckCircle, XCircle } from 'lucide-react';
+import { useState, useEffect, type MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
 import ImageSlideshow from './ImageSlideshow';
 import BookingForm from './BookingForm';
 import Footer from './Footer';
 import { getAllTours } from '../lib/api';
 import ProductFaq from './seo/ProductFaq';
+import {
+  GUARANTEED_NL_CATALOG_ADULT_PRICE,
+  GUARANTEED_NL_MAX_PER_VEHICLE,
+  GUARANTEED_NL_SEASON_END,
+  GUARANTEED_NL_SEASON_START,
+  guaranteedNlFaqs,
+} from '../seo/guaranteedNorthernLightsTour';
+
 const NorthernLightsTour = () => {
-  // const navigate = useNavigate();
   const [tourData, setTourData] = useState({
-    adult_price: 149,
+    adult_price: GUARANTEED_NL_CATALOG_ADULT_PRICE,
     child_price: 129,
-    max_capacity: 16
+    max_capacity: GUARANTEED_NL_MAX_PER_VEHICLE,
   });
   const [loading, setLoading] = useState(true);
 
@@ -22,14 +29,13 @@ const NorthernLightsTour = () => {
         const northernLightsTour = tours.find(tour => tour.id === 1);
         if (northernLightsTour) {
           setTourData({
-            adult_price: Number(northernLightsTour.adult_price) || 149,
+            adult_price: Number(northernLightsTour.adult_price) || GUARANTEED_NL_CATALOG_ADULT_PRICE,
             child_price: Number(northernLightsTour.child_price) || 129,
-            max_capacity: northernLightsTour.max_capacity || 16
+            max_capacity: northernLightsTour.max_capacity || GUARANTEED_NL_MAX_PER_VEHICLE,
           });
         }
       } catch (error) {
         console.error('Error loading tour data:', error);
-        // Keep default values if loading fails
       } finally {
         setLoading(false);
       }
@@ -37,6 +43,14 @@ const NorthernLightsTour = () => {
 
     loadTourData();
   }, []);
+
+  const scrollToBooking = (e?: MouseEvent<HTMLAnchorElement>) => {
+    e?.preventDefault();
+    const el = document.getElementById('book');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   const features = [
     'Northern Lights guarantee (see Terms for the exact promise)',
@@ -80,40 +94,10 @@ const NorthernLightsTour = () => {
     'Free cancellation up to 24 hours before departure.'
   ];
 
-  const faqs = [
-    {
-      question: 'What does the Northern Lights guarantee mean?',
-      answer:
-        'If no Northern Lights are visible during your tour, we offer a free return trip on the next available date. See our Terms & Conditions for the full promise.',
-    },
-    {
-      question: 'Where do you pick us up?',
-      answer:
-        'We offer hotel pickup and drop-off in the Rovaniemi area. Exact pickup time is confirmed after booking — please be ready 10–30 minutes before the standard 18:30 pickup window.',
-    },
-    {
-      question: 'How long is the tour?',
-      answer:
-        'Duration is flexible based on aurora forecasts — typically around six hours, and between about 2 and 12 hours when we need to travel farther for clearer skies.',
-    },
-    {
-      question: 'Is this suitable for children?',
-      answer:
-        'Children are welcome. Child pricing applies for ages 0–17. The evening can be long and cold outdoors, so warm clothing and stamina matter more than age alone.',
-    },
-    {
-      question: 'When is the season?',
-      answer:
-        'This aurora hunt runs in the Northern Lights season, typically from mid-September through mid-April from Rovaniemi in Finnish Lapland.',
-    },
-  ];
+  const displayPrice = loading ? GUARANTEED_NL_CATALOG_ADULT_PRICE : tourData.adult_price;
 
-  // const pricing = [
-  //   {
   return (
-    <div className="min-h-screen bg-black">
-
-
+    <div className="min-h-screen bg-black pb-24 lg:pb-0">
       {/* Header */}
       <div className="relative">
         <ImageSlideshow 
@@ -125,30 +109,39 @@ const NorthernLightsTour = () => {
         {/* Hero Content */}
         <div className="absolute inset-0 flex items-center justify-center z-10 pt-32 sm:pt-36 md:pt-32 lg:pt-28 xl:pt-24">
           <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-            <Link 
-              to="/northern-lights-tours" 
-              className="inline-flex items-center bg-emerald-500 text-white hover:bg-emerald-600 transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-8 sm:mb-12"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Northern Lights Tours
-            </Link>
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-luxury font-bold mb-4 sm:mb-6 leading-tight drop-shadow-2xl">
               <span className="bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent drop-shadow-2xl">
                 Guaranteed Northern Lights Tour
               </span>
             </h1>
-            <p className="text-sm sm:text-lg md:text-xl lg:text-2xl text-white font-clean max-w-2xl sm:max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-2xl px-2">
-              Chase the Aurora Borealis from Rovaniemi with expert guides, hotel pickup, and photography guidance under the Arctic sky.
+            <p className="text-sm sm:text-lg md:text-xl lg:text-2xl text-white font-clean max-w-2xl sm:max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-2xl px-2 mb-3 sm:mb-4">
+              Aurora tour from Rovaniemi — small group, hotel pickup, and a Northern Lights guarantee (free return trip if no lights appear — see Terms).
             </p>
+            <p className="text-xs sm:text-sm text-emerald-200/90 font-clean mb-6 sm:mb-8 drop-shadow-lg">
+              Rovaniemi, Finnish Lapland · From €{displayPrice} per adult · Book &amp; pay securely
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+              <a
+                href="#book"
+                onClick={scrollToBooking}
+                className="inline-flex items-center justify-center bg-emerald-500 text-white hover:bg-emerald-600 transition-all duration-300 font-medium px-6 py-3 rounded-lg text-base sm:text-lg shadow-lg shadow-emerald-500/30"
+              >
+                Book now
+              </a>
+              <Link
+                to="/northern-lights-tours"
+                className="inline-flex items-center text-white/80 hover:text-white transition-colors text-sm font-clean underline underline-offset-4"
+              >
+                Compare Northern Lights tours
+              </Link>
+            </div>
           </div>
         </div>
         
-        {/* Bottom transition overlay for smooth flow to content - positioned much lower to give more space for text */}
         <div className="absolute bottom-0 left-0 right-0 h-20 sm:h-24 md:h-28 bg-gradient-to-t from-black via-black/90 to-transparent z-10"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8 lg:py-12">
-        {/* Quick Info - More compact on mobile */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-12">
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
@@ -183,13 +176,8 @@ const NorthernLightsTour = () => {
           </div>
         </div>
 
-
-
-        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8">
-          {/* Left Column - Tour Details (Smaller) */}
-          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-            {/* About Section */}
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6 order-2 lg:order-1">
             <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">About This Tour</h2>
               <p className="text-gray-300 text-sm sm:text-base mb-3 sm:mb-4 font-clean">
@@ -205,9 +193,8 @@ const NorthernLightsTour = () => {
               </p>
             </div>
 
-            {/* Features */}
             <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">What's Included</h2>
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">What&apos;s Included</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 {features.map((feature, index) => (
                   <div key={index} className="flex items-start">
@@ -218,9 +205,8 @@ const NorthernLightsTour = () => {
               </div>
             </div>
 
-            {/* Exclusions */}
             <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">What's Not Included</h2>
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">What&apos;s Not Included</h2>
               <div className="space-y-2">
                 <div className="flex items-start">
                   <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
@@ -229,7 +215,6 @@ const NorthernLightsTour = () => {
               </div>
             </div>
 
-            {/* Know before you go */}
             <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">Know Before You Go</h2>
               <ul className="space-y-2">
@@ -242,7 +227,6 @@ const NorthernLightsTour = () => {
               </ul>
             </div>
 
-            {/* Itinerary */}
             <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">Tour Itinerary</h2>
               <div className="space-y-2 sm:space-y-3">
@@ -267,11 +251,11 @@ const NorthernLightsTour = () => {
               </div>
             </div>
 
-            <ProductFaq items={faqs} schemaId="nl-faq" />
+            <ProductFaq items={[...guaranteedNlFaqs]} schemaId="nl-faq" />
           </div>
 
-          {/* Right Column - Booking Form (Wider) */}
-          <div className="lg:col-span-2">
+          {/* Booking — first on mobile; sticky sidebar on desktop */}
+          <div className="lg:col-span-2 order-1 lg:order-2" id="book">
             <div className="sticky top-28">
               <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
                 <h2 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4 sm:mb-6 text-center">Book Your Tour</h2>
@@ -284,8 +268,8 @@ const NorthernLightsTour = () => {
                     adultPrice={tourData.adult_price}
                     childPrice={tourData.child_price}
                     maxCapacity={tourData.max_capacity}
-                    seasonStart="09-15"
-                    seasonEnd="04-15"
+                    seasonStart={GUARANTEED_NL_SEASON_START}
+                    seasonEnd={GUARANTEED_NL_SEASON_END}
                   />
                 )}
               </div>
@@ -293,7 +277,6 @@ const NorthernLightsTour = () => {
           </div>
         </div>
 
-        {/* Photo Gallery Section */}
         <div className="mt-12 sm:mt-16 lg:mt-20">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-luxury font-bold text-white mb-6 sm:mb-8 text-center bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
             Aurora Gallery
@@ -324,8 +307,24 @@ const NorthernLightsTour = () => {
         </div>
       </div>
       
-      {/* Footer */}
       <Footer />
+
+      {/* Mobile sticky book CTA — desktop uses sticky sidebar */}
+      <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden border-t border-white/10 bg-black/95 backdrop-blur-md px-4 py-3 safe-area-pb">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-white font-semibold text-sm truncate">Guaranteed Northern Lights</p>
+            <p className="text-emerald-300 text-xs font-clean">From €{displayPrice} · Rovaniemi</p>
+          </div>
+          <a
+            href="#book"
+            onClick={scrollToBooking}
+            className="shrink-0 inline-flex items-center justify-center bg-emerald-500 text-white hover:bg-emerald-600 font-medium px-5 py-2.5 rounded-lg text-sm"
+          >
+            Book now
+          </a>
+        </div>
+      </div>
     </div>
   );
 };

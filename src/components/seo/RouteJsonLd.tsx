@@ -1,6 +1,11 @@
 import { useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
 import JsonLd from './JsonLd'
+import {
+  buildGuaranteedNlBreadcrumbJsonLd,
+  buildGuaranteedNlProductJsonLd,
+  GUARANTEED_NL_PATH,
+} from '../../seo/guaranteedNorthernLightsTour'
 
 const SITE = 'https://royalnordic.fi'
 
@@ -48,19 +53,6 @@ type ProductDef = {
 }
 
 const PRODUCTS: ProductDef[] = [
-  {
-    path: '/northern-lights-tour',
-    name: 'Guaranteed Northern Lights Tour',
-    description:
-      'Small-group aurora hunt from Rovaniemi with hotel pickup, English and Finnish guides, and a Northern Lights guarantee (free return trip if no lights appear — see Terms).',
-    image: `${SITE}/nortti1.jpg`,
-    price: 149,
-    breadcrumbs: [
-      { name: 'Home', path: '/' },
-      { name: 'Northern Lights Tours', path: '/northern-lights-tours' },
-      { name: 'Guaranteed Northern Lights Tour', path: '/northern-lights-tour' },
-    ],
-  },
   {
     path: '/family-friendly-northern-lights',
     name: 'Family-Friendly Northern Lights Tour',
@@ -187,10 +179,18 @@ export default function RouteJsonLd() {
     []
   )
 
+  const isGuaranteedNl = pathname === GUARANTEED_NL_PATH
+
   return (
     <>
       <JsonLd id="organization" data={organization} />
       <JsonLd id="website" data={website} />
+      {isGuaranteedNl && (
+        <>
+          <JsonLd id="product" data={buildGuaranteedNlProductJsonLd()} />
+          <JsonLd id="breadcrumb" data={buildGuaranteedNlBreadcrumbJsonLd()} />
+        </>
+      )}
       {product && (
         <>
           <JsonLd id="product" data={productOffer(product)} />

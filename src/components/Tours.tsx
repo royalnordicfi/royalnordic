@@ -1,20 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, Mountain, Sun, Settings } from 'lucide-react';
-import { SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS } from '../lib/productVisibility';
 
 const Tours = () => {
-  const northernLightsCount = SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS ? 3 : 2;
-
   const categories = [
     {
       id: 1,
-      title: "Northern Lights Tours",
-      description: "Chase the Aurora Borealis with expert guides — including a guaranteed tour with a free return trip if the lights don’t appear (see Terms).",
+      title: "Guaranteed Northern Lights Tour",
+      description: "Our signature aurora hunt from Rovaniemi — hotel pickup, small groups, and a Northern Lights guarantee (free return trip if the lights don’t appear — see Terms).",
       icon: Sparkles,
       image: "/nortti5.jpg",
-      route: "/northern-lights-tours",
-      tourCount: `${northernLightsCount} tours available`
+      route: "/northern-lights-tour",
+      tourCount: "Book direct · Compare all NL tours on the category page"
     },
     {
       id: 2,

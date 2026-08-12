@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom'
 import { usePageMeta } from '../hooks/usePageMeta'
+import { guaranteedNlMeta } from '../seo/guaranteedNorthernLightsTour'
 
 const META: Record<
   string,
@@ -11,11 +12,10 @@ const META: Record<
       'Premium Lapland tours from Rovaniemi: guaranteed Northern Lights, ice fishing, Ranua Zoo, Korouoma Canyon, and private transfers. Book direct.',
     ogImage: 'https://royalnordic.fi/nortti1.jpg',
   },
-  '/northern-lights-tour': {
-    title: 'Guaranteed Northern Lights Tour Rovaniemi | Royal Nordic',
-    description:
-      'Small-group aurora hunt from Rovaniemi with hotel pickup, English & Finnish guides, flexible 2–12 hour duration. Free cancellation 24h. Book & pay securely.',
-    ogImage: 'https://royalnordic.fi/nortti1.jpg',
+  [guaranteedNlMeta.path]: {
+    title: guaranteedNlMeta.title,
+    description: guaranteedNlMeta.description,
+    ogImage: guaranteedNlMeta.ogImage,
   },
   '/family-friendly-northern-lights': {
     title: 'Family-Friendly Northern Lights Tour Rovaniemi | Royal Nordic',

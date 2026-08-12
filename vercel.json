@@ -35,6 +35,14 @@
       "destination": "/api/$1"
     },
     {
+      "source": "/northern-lights-tour",
+      "destination": "/northern-lights-tour/index.html"
+    },
+    {
+      "source": "/northern-lights-tour/",
+      "destination": "/northern-lights-tour/index.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
