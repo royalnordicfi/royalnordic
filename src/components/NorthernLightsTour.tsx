@@ -25,7 +25,7 @@ const GALLERY = [
   { src: '/nortti9.jpg', alt: 'Clear winter night during an aurora hunt' },
 ]
 
-const HIGHLIGHTS = [
+const INCLUDED = [
   'Northern Lights guarantee — free return trip if no lights appear (see Terms)',
   'Small group — max 8 people per vehicle',
   'Hotel pickup and drop-off in the Rovaniemi area',
@@ -100,7 +100,7 @@ const NorthernLightsTour = () => {
 
   return (
     <div className="rn-page pb-24 lg:pb-0">
-      <div className="rn-container rn-page-pad pb-12 pt-6 sm:pt-8">
+      <div className="rn-container rn-page-pad pb-10 pt-5 sm:pt-6">
         <nav className="mb-4 text-sm text-text-muted" aria-label="Breadcrumb">
           <ol className="flex flex-wrap items-center gap-2">
             <li><Link to="/" className="hover:text-white">Home</Link></li>
@@ -155,14 +155,24 @@ const NorthernLightsTour = () => {
             </section>
 
             <section>
-              <h2 className="font-display text-2xl font-semibold text-white">Highlights</h2>
+              <h2 className="font-display text-2xl font-semibold text-white">What&apos;s included</h2>
               <ul className="mt-4 space-y-2.5">
-                {HIGHLIGHTS.map((h) => (
+                {INCLUDED.map((h) => (
                   <li key={h} className="flex items-start gap-2.5 text-text-muted">
                     <CheckCircle className="mt-0.5 shrink-0 text-aurora" size={18} aria-hidden />
                     <span>{h}</span>
                   </li>
                 ))}
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="font-display text-2xl font-semibold text-white">Not included</h2>
+              <ul className="mt-3 space-y-2 text-sm text-text-muted">
+                <li className="flex gap-2">
+                  <XCircle size={16} className="mt-0.5 shrink-0 text-red-400" aria-hidden />
+                  Clothing and personal equipment (bring warm Arctic layers)
+                </li>
               </ul>
             </section>
 
@@ -179,37 +189,6 @@ const NorthernLightsTour = () => {
                   </div>
                 ))}
               </div>
-            </section>
-
-            <section className="grid gap-6 sm:grid-cols-2">
-              <div>
-                <h2 className="font-display text-2xl font-semibold text-white">What&apos;s included</h2>
-                <ul className="mt-3 space-y-2 text-sm text-text-muted">
-                  {HIGHLIGHTS.map((h) => (
-                    <li key={h} className="flex gap-2">
-                      <CheckCircle size={16} className="mt-0.5 shrink-0 text-aurora" aria-hidden />
-                      {h}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h2 className="font-display text-2xl font-semibold text-white">Not included</h2>
-                <ul className="mt-3 space-y-2 text-sm text-text-muted">
-                  <li className="flex gap-2">
-                    <XCircle size={16} className="mt-0.5 shrink-0 text-red-400" aria-hidden />
-                    Clothing and personal equipment (bring warm Arctic layers)
-                  </li>
-                </ul>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="font-display text-2xl font-semibold text-white">Pickup</h2>
-              <p className="mt-3 leading-relaxed text-text-muted">
-                Hotel pickup and drop-off in the Rovaniemi area. Exact pickup time is confirmed after
-                booking — please be ready 10–30 minutes before the standard 18:30 window.
-              </p>
             </section>
 
             <section>

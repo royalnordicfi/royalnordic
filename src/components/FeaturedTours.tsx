@@ -1,17 +1,8 @@
+import { Link } from 'react-router-dom'
 import TourCard from './TourCard'
 
+/** Supporting bookable tours — Guaranteed NL is featured above, not repeated here. */
 const TOURS = [
-  {
-    to: '/northern-lights-tour',
-    image: '/nortti1.jpg',
-    imageAlt: 'Northern Lights over Lapland forest',
-    title: 'Guaranteed Northern Lights Tour',
-    duration: '2–12 hours',
-    groupSize: 'Max 8 / vehicle',
-    pickup: true,
-    badge: 'Guaranteed',
-    priceFrom: 149,
-  },
   {
     to: '/family-friendly-northern-lights',
     image: '/family1.jpg',
@@ -27,7 +18,7 @@ const TOURS = [
     to: '/korouoma-canyon',
     image: '/korouoma1.jpg',
     imageAlt: 'Korouoma Canyon in winter',
-    title: 'Korouoma Canyon Winter Adventure',
+    title: 'Korouoma Canyon',
     duration: 'About 6 hours',
     groupSize: 'Small group',
     pickup: true,
@@ -49,13 +40,21 @@ const FeaturedTours = () => {
   return (
     <section className="rn-section bg-midnight">
       <div className="rn-container">
-        <div className="max-w-2xl">
-          <p className="rn-eyebrow">Featured tours</p>
-          <h2 className="mt-2 font-display text-3xl font-semibold text-white sm:text-4xl">
-            Bookable experiences
-          </h2>
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p className="rn-eyebrow">More experiences</p>
+            <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-3xl">
+              Day trips &amp; family evenings
+            </h2>
+          </div>
+          <Link
+            to="/daytime-experiences"
+            className="hidden text-sm font-semibold text-aurora-soft hover:underline sm:inline"
+          >
+            All day tours →
+          </Link>
         </div>
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-7 grid gap-4 sm:grid-cols-3">
           {TOURS.map((tour) => (
             <TourCard key={tour.to} {...tour} />
           ))}

@@ -13,8 +13,8 @@
   --rn-border-strong: rgba(255, 255, 255, 0.18);
 
   --rn-text: #f2f4f7;
-  --rn-text-muted: #9aa3b5;
-  --rn-text-dim: #6b7385;
+  --rn-text-muted: #aab3c4;
+  --rn-text-dim: #7a8498;
 
   --rn-aurora: #10b981;
   --rn-aurora-hover: #059669;
@@ -93,11 +93,11 @@
   }
 
   .rn-section {
-    @apply py-12 sm:py-16 lg:py-20;
+    @apply py-10 sm:py-14 lg:py-16;
   }
 
   .rn-section-tight {
-    @apply py-10 sm:py-12 lg:py-14;
+    @apply py-8 sm:py-10 lg:py-12;
   }
 
   .rn-eyebrow {
@@ -112,7 +112,7 @@
   }
 
   .rn-btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold tracking-wide transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 min-h-[44px];
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold tracking-wide transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 min-h-[44px];
   }
 
   .rn-btn-primary {
@@ -192,12 +192,28 @@
 }
 
 .whatsapp-widget {
-  bottom: calc(1.25rem + var(--mobile-book-bar, 0px) + env(safe-area-inset-bottom));
+  bottom: calc(1rem + var(--mobile-book-bar, 0px) + env(safe-area-inset-bottom));
+  right: 1rem;
 }
 
 @media (min-width: 1024px) {
   .whatsapp-widget {
     bottom: 1.5rem;
+    right: 1.5rem;
+  }
+}
+
+.whatsapp-widget button {
+  min-height: 48px;
+  min-width: 48px;
+  padding: 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .whatsapp-widget button {
+    min-height: 56px;
+    min-width: 56px;
+    padding: 1rem;
   }
 }
 

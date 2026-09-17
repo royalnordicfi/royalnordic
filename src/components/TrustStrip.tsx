@@ -20,11 +20,11 @@ const TrustStrip = () => {
 
   return (
     <section className="border-y border-white/10 bg-surface" aria-label="Why travellers book Royal Nordic">
-      <div className="rn-container grid gap-6 py-8 sm:grid-cols-2 sm:py-9 lg:grid-cols-4 lg:gap-8">
+      <div className="rn-container grid gap-5 py-6 sm:grid-cols-2 sm:gap-6 sm:py-7 lg:grid-cols-4">
         {items.map((item) => (
           <div key={item.title}>
-            <h2 className="text-sm font-semibold text-aurora-soft">{item.title}</h2>
-            <p className="mt-1.5 text-sm leading-relaxed text-text-muted">{item.text}</p>
+            <p className="text-sm font-semibold text-white">{item.title}</p>
+            <p className="mt-1 text-sm leading-relaxed text-text-muted">{item.text}</p>
           </div>
         ))}
       </div>

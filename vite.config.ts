@@ -31,4 +31,16 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  build: {
+    cssCodeSplit: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/lucide-react')) return 'icons'
+          if (id.includes('node_modules/@supabase')) return 'supabase'
+          if (id.includes('node_modules/@stripe')) return 'stripe'
+        },
+      },
+    },
+  },
 });

@@ -16,9 +16,6 @@ export type TourCardProps = {
   featured?: boolean
 }
 
-/**
- * Dark commerce card — photography first, compact meta, clear price.
- */
 const TourCard = ({
   to,
   image,
@@ -39,15 +36,15 @@ const TourCard = ({
   return (
     <Link
       to={to}
-      className={`group flex h-full flex-col overflow-hidden rounded-rn border border-white/10 bg-surface transition hover:border-aurora/40 hover:bg-surface-2 ${
-        featured ? 'sm:col-span-2 lg:col-span-2' : ''
+      className={`group flex h-full flex-col overflow-hidden rounded-rn bg-surface transition hover:bg-surface-2 ${
+        featured ? 'sm:col-span-2' : ''
       } ${className}`}
     >
-      <div className={`relative overflow-hidden bg-black ${featured ? 'aspect-[21/9] sm:aspect-[2.4/1]' : 'aspect-[4/3]'}`}>
+      <div className={`relative overflow-hidden bg-black ${featured ? 'aspect-[21/9] sm:aspect-[2.2/1]' : 'aspect-[16/11]'}`}>
         <img
           src={image}
           alt={imageAlt}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
           loading="lazy"
           decoding="async"
           onError={(e) => {
@@ -57,24 +54,28 @@ const TourCard = ({
             el.src = '/nortti1.jpg'
           }}
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-        {badge && <span className="rn-badge-aurora absolute left-3 top-3">{badge}</span>}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+        {badge && (
+          <span className="absolute left-3 top-3 rounded bg-black/65 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-aurora-soft backdrop-blur-sm">
+            {badge}
+          </span>
+        )}
       </div>
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <p className="text-xs font-medium text-text-dim">{location}</p>
-        <h3 className="mt-1 font-display text-xl font-semibold leading-snug text-white sm:text-2xl">
+      <div className="flex flex-1 flex-col px-4 py-3.5 sm:px-4 sm:py-4">
+        <p className="text-xs text-text-dim">{location}</p>
+        <h3 className="mt-0.5 font-display text-lg font-semibold leading-snug text-white sm:text-xl">
           {title}
         </h3>
-        {meta && <p className="mt-2 text-sm text-text-muted">{meta}</p>}
-        <div className="mt-auto flex items-end justify-between gap-3 pt-4">
+        {meta && <p className="mt-1.5 text-sm text-text-muted">{meta}</p>}
+        <div className="mt-auto flex items-baseline justify-between gap-3 pt-3">
           {typeof priceFrom === 'number' ? (
             <p className="text-sm text-text-muted">
-              From <span className="text-lg font-semibold text-white">€{priceFrom}</span>
+              From <span className="font-semibold text-white">€{priceFrom}</span>
             </p>
           ) : (
             <span />
           )}
-          <span className="text-sm font-semibold text-aurora-soft group-hover:underline">{ctaLabel}</span>
+          <span className="text-sm font-medium text-aurora-soft group-hover:underline">{ctaLabel}</span>
         </div>
       </div>
     </Link>

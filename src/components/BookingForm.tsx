@@ -632,8 +632,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
   return (
     <div className={chrome === 'embedded' ? 'max-w-lg mx-auto lg:mx-0' : 'bg-white rounded-xl shadow-xl p-6 max-w-lg mx-auto lg:mx-0'}>
       <div className={chrome === 'embedded' ? 'mb-4' : 'text-center mb-6'}>
-        <p className="text-gray-600 text-sm">
-          {chrome === 'embedded' ? '1. Choose a date · 2. Guests · 3. Your details · Book' : 'Select your preferred date and group size'}
+        <p className={chrome === 'embedded' ? 'text-panel-muted text-xs' : 'text-gray-600 text-sm'}>
+          {chrome === 'embedded' ? 'Date → Guests → Details → Pay' : 'Select your preferred date and group size'}
         </p>
       </div>
       

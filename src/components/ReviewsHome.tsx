@@ -22,23 +22,15 @@ const ReviewsHome = () => {
       <div className="rn-container">
         <div className="max-w-2xl">
           <p className="rn-eyebrow">Guest stories</p>
-          <h2 className="mt-2 font-display text-3xl font-semibold text-white sm:text-4xl">
+          <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-3xl">
             What travellers remember
           </h2>
-          <p className="mt-3 text-text-muted">
-            Real guest feedback from Northern Lights and Lapland experiences with our team.
-          </p>
         </div>
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
+        <div className="mt-7 grid gap-3 md:grid-cols-3">
           {REVIEWS.map((r) => (
-            <blockquote
-              key={r.quote.slice(0, 40)}
-              className="rounded-rn border border-white/10 bg-surface p-5"
-            >
+            <blockquote key={r.quote.slice(0, 40)} className="rounded-rn bg-surface p-4 sm:p-5">
               <p className="text-sm leading-relaxed text-text-muted">“{r.quote}”</p>
-              <footer className="mt-4 text-xs font-semibold uppercase tracking-wide text-text-dim">
-                {r.name}
-              </footer>
+              <footer className="mt-3 text-xs font-medium text-text-dim">{r.name}</footer>
             </blockquote>
           ))}
         </div>

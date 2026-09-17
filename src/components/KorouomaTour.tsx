@@ -176,9 +176,9 @@ const KorouomaTour = () => {
             <section>
               <h2 className="font-display text-2xl font-semibold text-white">About this experience</h2>
               <p className="mt-3 leading-relaxed text-text-muted">
-                Embark on a winter adventure through Korouoma Canyon — one of Lapland’s most stunning natural
-                wonders. We drive about 100 km from Rovaniemi, then hike snow-covered trails among towering
-                cliffs and frozen waterfalls.
+                A winter hike through Korouoma Canyon — one of Lapland’s most striking natural landscapes.
+                We drive about 100 km from Rovaniemi, then walk snow-covered trails among towering cliffs
+                and frozen waterfalls.
               </p>
               <p className="mt-3 leading-relaxed text-text-muted">
                 Along the way, enjoy a cozy campfire break with grilled snacks and hot drinks. Transport,

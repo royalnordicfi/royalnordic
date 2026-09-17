@@ -19,14 +19,14 @@ const WhatsAppWidget = () => {
   }
 
   return (
-    <div className="whatsapp-widget fixed bottom-6 right-6 z-[60] pointer-events-auto transition-opacity duration-300">
+    <div className="whatsapp-widget fixed z-[60] pointer-events-auto">
       <button
         type="button"
         onClick={handleWhatsAppClick}
-        className="bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white p-4 rounded-full shadow-xl transition-transform duration-300 hover:scale-105 active:scale-95 min-h-[56px] min-w-[56px] flex items-center justify-center"
+        className="flex items-center justify-center rounded-full bg-emerald-600 text-white shadow-lg transition hover:bg-emerald-500 active:bg-emerald-700"
         aria-label="Open WhatsApp chat"
       >
-        <MessageCircle size={28} />
+        <MessageCircle className="h-5 w-5 lg:h-7 lg:w-7" />
       </button>
     </div>
   )

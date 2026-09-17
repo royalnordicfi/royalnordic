@@ -55,7 +55,7 @@ const IceFishingTour = () => {
     'Professional local guide',
     'Fishing equipment',
     'Hot drinks and snacks by the fire',
-    'Good vibes',
+    'Information about local culture of Lapland',
     'Information about local culture of Lapland',
     'Small group experience (max 8 people)',
     'Multiple fishing spots',
