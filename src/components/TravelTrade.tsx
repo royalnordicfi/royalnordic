@@ -114,10 +114,12 @@ const TravelTrade: React.FC = () => {
         compact
       />
 
-      <main className="rn-container flex-1 pb-12 pt-8">
+      <main className="relative flex-1 bg-midnight pb-12 pt-2">
+        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-75" aria-hidden />
+        <div className="rn-container relative z-10 -mt-10 sm:-mt-12">
         <ExperienceBreadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Travel trade' }]} />
 
-        <div className="mx-auto mt-8 max-w-3xl space-y-14">
+        <div className="mx-auto mt-6 max-w-3xl space-y-14 sm:mt-8">
           <section className="rn-reveal">
             <p className="rn-eyebrow">Who we work with</p>
             <h2 className="mt-2 font-display text-2xl font-semibold text-white">Built for B2B partners</h2>
@@ -204,7 +206,7 @@ const TravelTrade: React.FC = () => {
           <section id="partnership-enquiry">
             <div className="rn-book-panel-light rn-reveal p-5 sm:p-8">
               <h2 className="font-display text-2xl font-semibold text-panel-ink">Partnership enquiry</h2>
-              <p className="mt-2 text-sm text-text-muted">
+              <p className="mt-2 text-sm text-panel-muted">
                 Prefer email? Write to{' '}
                 <a href="mailto:contact@royalnordic.fi" className="font-medium text-aurora-soft hover:underline">
                   contact@royalnordic.fi
@@ -280,7 +282,7 @@ const TravelTrade: React.FC = () => {
                 )}
               </form>
 
-              <div className="mt-8 flex flex-wrap gap-4 text-sm text-text-muted">
+              <div className="mt-8 flex flex-wrap gap-4 text-sm text-panel-muted">
                 <a href="mailto:contact@royalnordic.fi" className="inline-flex items-center gap-2 hover:text-aurora-soft">
                   <Mail size={16} aria-hidden /> contact@royalnordic.fi
                 </a>
@@ -290,6 +292,7 @@ const TravelTrade: React.FC = () => {
               </div>
             </div>
           </section>
+        </div>
         </div>
       </main>
 

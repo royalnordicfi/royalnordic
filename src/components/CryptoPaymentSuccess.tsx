@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { CheckCircle, Mail, Calendar, Users, Phone } from 'lucide-react'
+import { AlertTriangle, CheckCircle, Mail, Calendar, Users, Phone } from 'lucide-react'
 import { formatTourDateForDisplay } from '../lib/tourDate'
 import Footer from './Footer'
 
@@ -21,14 +21,15 @@ const CryptoPaymentSuccess: React.FC = () => {
 
   return (
     <div className="rn-page flex min-h-screen flex-col">
-      <div className="rn-section flex-1 bg-midnight pt-28 sm:pt-32">
-        <div className="rn-container max-w-lg">
+      <div className="rn-status-page">
+        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-80" aria-hidden />
+        <div className="rn-container relative w-full max-w-lg">
           {!bookingData ? (
-            <div className="rounded-rn border border-white/10 bg-surface p-8 text-center shadow-rn-soft">
-              <p className="text-3xl" aria-hidden>
-                ⚠️
-              </p>
-              <h1 className="mt-3 font-display text-xl font-semibold text-white">No booking data found</h1>
+            <div className="rn-prose-panel p-8 text-center">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/15">
+                <AlertTriangle className="h-6 w-6 text-amber-300" aria-hidden />
+              </div>
+              <h1 className="font-display text-xl font-semibold text-white">No booking data found</h1>
               <p className="mt-2 text-sm text-text-muted">
                 Return to the tour page and submit your crypto booking again.
               </p>
@@ -37,7 +38,7 @@ const CryptoPaymentSuccess: React.FC = () => {
               </Link>
             </div>
           ) : (
-            <div className="rounded-rn border border-white/10 bg-surface p-6 shadow-rn sm:p-8">
+            <div className="rn-prose-panel p-6 sm:p-8">
               <div className="text-center">
                 <CheckCircle className="mx-auto mb-4 h-14 w-14 text-aurora-soft" aria-hidden />
                 <h1 className="font-display text-2xl font-semibold text-white">Crypto booking submitted</h1>

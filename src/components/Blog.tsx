@@ -124,8 +124,16 @@ const Blog: React.FC = () => {
         compact
       />
 
-      <section className="rn-section bg-midnight">
-        <div className="rn-container">
+      <section className="rn-section-tight rn-hero-follow relative bg-midnight">
+        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-80" aria-hidden />
+        <div className="rn-container relative">
+          <div className="mb-7 max-w-2xl sm:mb-8">
+            <p className="rn-eyebrow">Guides</p>
+            <p className="mt-2 text-sm leading-relaxed text-text-muted sm:text-[15px]">
+              Seasonal advice for aurora season, packing, wildlife, and where to stay — updated for
+              visitors planning from Rovaniemi.
+            </p>
+          </div>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {blogPosts.map((post, i) => (
               <Link

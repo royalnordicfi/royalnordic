@@ -111,6 +111,31 @@
     @apply py-9 sm:py-12 lg:py-14;
   }
 
+  /** Pull content up after compact CategoryHero to avoid a dead band */
+  .rn-hero-follow {
+    @apply relative z-10 -mt-10 pt-0 sm:-mt-14 sm:pt-1;
+  }
+
+  /** Payment / confirmation / 404 — centered card with ambient fill */
+  .rn-status-page {
+    @apply relative flex flex-1 flex-col items-center justify-center px-4 py-10;
+    padding-top: calc(var(--rn-chrome-h) + 1.75rem);
+    padding-bottom: 3rem;
+    min-height: min(68vh, 40rem);
+    background: var(--rn-midnight);
+  }
+
+  .rn-prose-panel {
+    border-radius: var(--rn-radius);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background:
+      linear-gradient(165deg, rgba(18, 155, 108, 0.04) 0%, transparent 42%),
+      var(--rn-surface);
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.25),
+      0 24px 48px rgba(0, 0, 0, 0.35);
+  }
+
   .rn-eyebrow {
     @apply text-[11px] font-semibold uppercase tracking-[0.2em];
     color: var(--rn-aurora-soft);
@@ -651,6 +676,18 @@
   .rn-form-input:focus {
     border-color: rgba(18, 155, 108, 0.55);
     --tw-ring-color: rgba(18, 155, 108, 0.25);
+  }
+
+  select.rn-form-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2.25rem;
+  }
+
+  input[type='date'].rn-form-input {
+    color-scheme: light;
   }
 
   .rn-category-tile {

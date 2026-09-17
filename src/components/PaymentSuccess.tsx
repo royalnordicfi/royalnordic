@@ -28,7 +28,7 @@ const PaymentSuccess: React.FC = () => {
   }, [])
 
   const emptyState = (
-    <div className="rounded-rn border border-white/10 bg-surface p-8 text-center shadow-rn-soft">
+    <div className="rn-prose-panel p-8 text-center">
       <CheckCircle className="mx-auto mb-4 h-12 w-12 text-aurora-soft" aria-hidden />
       <h1 className="font-display text-xl font-semibold text-white">Looking for your confirmation?</h1>
       <p className="mt-2 text-sm text-text-muted">
@@ -43,12 +43,13 @@ const PaymentSuccess: React.FC = () => {
 
   return (
     <div className="rn-page flex min-h-screen flex-col">
-      <div className="rn-section flex-1 bg-midnight pt-28 sm:pt-32">
-        <div className="rn-container max-w-lg">
+      <div className="rn-status-page">
+        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-80" aria-hidden />
+        <div className="rn-container relative w-full max-w-lg">
           {!bookingData ? (
             emptyState
           ) : (
-            <div className="rounded-rn border border-white/10 bg-surface p-6 shadow-rn sm:p-8">
+            <div className="rn-prose-panel p-6 sm:p-8">
               <div className="text-center">
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-aurora/20">
                   <CheckCircle className="h-7 w-7 text-aurora-soft" aria-hidden />

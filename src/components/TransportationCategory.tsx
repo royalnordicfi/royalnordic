@@ -42,6 +42,7 @@ const TransportationCategory = () => {
       <section className="rn-section relative">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
         <div className="rn-container relative space-y-10">
+          <div className="mx-auto max-w-5xl">
           <div className="rn-card-grid lg:!grid-cols-2">
             {TRANSFERS.map((item) => (
               <TourCard
@@ -61,8 +62,9 @@ const TransportationCategory = () => {
               />
             ))}
           </div>
+          </div>
 
-          <div className="max-w-2xl border-y border-white/[0.08] py-8">
+          <div className="mx-auto max-w-2xl border-y border-white/[0.08] py-8">
             <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">How it works</h2>
             <p className="mt-3 text-sm leading-relaxed text-text-muted">
               Fixed-route Levi/Kittilä transfers are priced per vehicle. For airport pickups, ski

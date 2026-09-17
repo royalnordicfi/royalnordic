@@ -12,9 +12,10 @@ const TermsConditions: React.FC = () => {
         compact
       />
 
-      <div className="rn-section flex-1 bg-midnight">
-        <div className="rn-container max-w-3xl">
-          <div className="rounded-rn border border-white/10 bg-surface p-6 sm:p-8">
+      <div className="rn-section-tight rn-hero-follow relative flex-1 bg-midnight">
+        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-70" aria-hidden />
+        <div className="rn-container relative max-w-3xl">
+          <div className="rn-prose-panel p-6 sm:p-8">
             <div className="prose prose-invert max-w-none space-y-8 text-sm leading-relaxed text-text-muted [&_h2]:font-display [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-white [&_strong]:text-white">
               <section>
                 <h2>1. Acceptance of terms</h2>

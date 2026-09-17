@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type SyntheticEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -10,6 +10,13 @@ export type GalleryImage = {
 
 type ExperienceGalleryProps = {
   images: GalleryImage[]
+}
+
+const FALLBACK_IMAGE = '/nortti1.jpg'
+
+const onGalleryImageError = (e: SyntheticEvent<HTMLImageElement>) => {
+  if (e.currentTarget.src.includes(FALLBACK_IMAGE)) return
+  e.currentTarget.src = FALLBACK_IMAGE
 }
 
 const ExperienceGallery = ({ images }: ExperienceGalleryProps) => {
@@ -54,6 +61,7 @@ const ExperienceGallery = ({ images }: ExperienceGalleryProps) => {
                 className="aspect-[16/10] w-full object-cover"
                 style={img.position ? { objectPosition: img.position } : undefined}
                 loading={i === 0 ? 'eager' : 'lazy'}
+                onError={onGalleryImageError}
               />
             </button>
           ))}
@@ -88,6 +96,7 @@ const ExperienceGallery = ({ images }: ExperienceGalleryProps) => {
             className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.03]"
             style={primary.position ? { objectPosition: primary.position } : undefined}
             loading="eager"
+            onError={onGalleryImageError}
           />
           <span className="rn-gallery__veil" aria-hidden />
         </button>
@@ -104,6 +113,7 @@ const ExperienceGallery = ({ images }: ExperienceGalleryProps) => {
               className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.03]"
               style={img.position ? { objectPosition: img.position } : undefined}
               loading="lazy"
+              onError={onGalleryImageError}
             />
             <span className="rn-gallery__veil" aria-hidden />
             {i === side.length - 1 && count > 3 && (
@@ -161,6 +171,7 @@ const ExperienceGallery = ({ images }: ExperienceGalleryProps) => {
               src={images[lightbox].src}
               alt={images[lightbox].alt}
               className="relative z-[1] max-h-[85vh] max-w-[min(100%,56rem)] rounded object-contain"
+              onError={onGalleryImageError}
             />
             <p className="absolute bottom-5 left-1/2 z-10 -translate-x-1/2 text-xs text-white/60">
               {lightbox + 1} / {count}
