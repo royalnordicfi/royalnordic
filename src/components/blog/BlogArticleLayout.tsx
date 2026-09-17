@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Clock } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Clock } from 'lucide-react'
 import CategoryHero from '../CategoryHero'
 import Footer from '../Footer'
 
@@ -47,9 +47,6 @@ const markdownToHtml = (markdown: string): string => {
     .join('\n')
 }
 
-const ARTICLE_BODY =
-  'rn-article-body font-body text-[1.0625rem] leading-[1.75] text-text-muted [&_h2]:mb-4 [&_h2]:mt-10 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:text-white [&_h3]:mb-3 [&_h3]:mt-8 [&_h3]:font-display [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-white [&_p]:mb-5 [&_strong]:font-semibold [&_strong]:text-white [&_a]:text-aurora-soft [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:text-aurora [&_ul]:my-5 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5 [&_ol]:my-5 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-5 [&_li]:text-text-muted [&_img]:my-8 [&_img]:w-full [&_img]:rounded-rn'
-
 const BlogArticleLayout: React.FC<BlogArticleLayoutProps> = ({
   title,
   excerpt,
@@ -69,74 +66,77 @@ const BlogArticleLayout: React.FC<BlogArticleLayoutProps> = ({
         <div className="relative">
           <CategoryHero title={title} subtitle={excerpt} image={heroImage} compact />
           <div className="rn-container absolute left-0 right-0 top-0 z-20 pt-[calc(var(--rn-header-h)+var(--rn-promo-bar-height,0px)+1rem)] sm:pt-[calc(var(--rn-header-h)+var(--rn-promo-bar-height,0px)+1.25rem)]">
-            <Link
-              to="/blog"
-              className="inline-flex items-center gap-2 rounded-rn border border-white/15 bg-black/40 px-3 py-1.5 text-sm font-medium text-white/90 backdrop-blur-sm transition hover:border-aurora/40 hover:text-white"
-            >
+            <Link to="/blog" className="rn-article-back rn-reveal">
               <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden />
-              Back to blog
+              Back to guides
             </Link>
           </div>
         </div>
       ) : (
-        <header className="rn-container rn-page-pad max-w-[65ch] pb-6 pt-8 sm:pt-10">
-          <Link
-            to="/blog"
-            className="inline-flex items-center gap-2 text-sm font-medium text-text-muted transition hover:text-aurora-soft"
-          >
+        <header className="rn-container rn-page-pad rn-article-mast rn-reveal max-w-[42rem] pb-4 pt-8 sm:pt-10">
+          <Link to="/blog" className="rn-article-back rn-article-back--plain">
             <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden />
-            Back to blog
+            Back to guides
           </Link>
           <span className="rn-badge-aurora mt-6 inline-flex">{category}</span>
-          <h1 className="mt-4 font-display text-3xl font-semibold leading-tight text-white sm:text-4xl">
+          <h1 className="mt-4 font-display text-[clamp(1.75rem,4vw,2.35rem)] font-semibold leading-[1.12] text-white">
             {title}
           </h1>
-          <p className="mt-3 text-base leading-relaxed text-text-muted sm:text-lg">{excerpt}</p>
+          <p className="rn-article-dek mt-4">{excerpt}</p>
         </header>
       )}
 
-      <article className="rn-section-tight flex-1 bg-midnight">
-        <div className="rn-container mx-auto w-full max-w-[65ch]">
+      <article className="rn-section-tight relative flex-1 bg-midnight">
+        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-60" aria-hidden />
+        <div className="rn-container relative mx-auto w-full max-w-[42rem]">
           <div
-            className={`flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/10 pb-8 text-sm text-text-dim ${heroImage ? '' : 'pt-2'}`}
+            className={`rn-article-meta rn-reveal flex flex-wrap items-center gap-x-4 gap-y-2 ${heroImage ? 'pt-2' : ''}`}
           >
             {heroImage ? <span className="rn-badge-aurora">{category}</span> : null}
-            <span className="inline-flex items-center gap-1.5">
+            <span className="inline-flex items-center gap-1.5 text-sm text-text-dim">
               <Clock className="h-3.5 w-3.5" aria-hidden />
               {readTime}
             </span>
-            <span>{author}</span>
-            {date ? <time className="text-text-dim">{date}</time> : null}
+            <span className="text-sm text-text-dim">{author}</span>
+            {date ? (
+              <time className="text-sm text-text-dim" dateTime={date}>
+                {date}
+              </time>
+            ) : null}
           </div>
 
           <div
-            className={`${ARTICLE_BODY} pt-8`}
+            className="rn-article-body rn-reveal pt-8 sm:pt-10"
             dangerouslySetInnerHTML={{ __html: html }}
           />
 
           {relatedExperiences && relatedExperiences.length > 0 ? (
-            <aside className="mt-14 border-t border-white/10 pt-10">
-              <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">
-                Related experiences
-              </h2>
-              <p className="mt-2 text-sm text-text-muted">
-                Book a Royal Nordic tour that matches what you are planning in Lapland.
-              </p>
-              <ul className="mt-6 space-y-3">
+            <aside className="rn-article-related rn-reveal mt-14 sm:mt-16">
+              <div className="rn-article-related__head">
+                <p className="rn-eyebrow">Continue planning</p>
+                <h2 className="mt-2 font-display text-xl font-semibold text-white sm:text-2xl">
+                  Related experiences
+                </h2>
+                <p className="mt-2 max-w-md text-sm leading-relaxed text-text-muted">
+                  Tours that pair well with what you are reading — all depart from Rovaniemi.
+                </p>
+              </div>
+              <ul className="mt-6 grid gap-3 sm:grid-cols-2 sm:gap-4">
                 {relatedExperiences.map((item) => (
                   <li key={item.href}>
-                    <Link
-                      to={item.href}
-                      className="group block rounded-rn border border-white/10 bg-surface p-4 transition hover:border-aurora/35 hover:bg-surface-2 sm:p-5"
-                    >
-                      <span className="font-display text-lg font-semibold text-white group-hover:text-aurora-soft">
+                    <Link to={item.href} className="rn-article-related__card group">
+                      <span className="font-display text-base font-semibold leading-snug text-white transition group-hover:text-aurora-soft sm:text-lg">
                         {item.title}
                       </span>
                       {item.description ? (
-                        <span className="mt-1 block text-sm leading-relaxed text-text-muted">
+                        <span className="mt-1.5 block text-sm leading-relaxed text-text-muted">
                           {item.description}
                         </span>
                       ) : null}
+                      <ArrowUpRight
+                        className="rn-article-related__icon mt-3 h-4 w-4 text-aurora-soft/70 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-aurora-soft"
+                        aria-hidden
+                      />
                     </Link>
                   </li>
                 ))}

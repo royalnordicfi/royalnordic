@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronDown, Menu, X } from 'lucide-react'
@@ -151,7 +151,7 @@ const Header = () => {
       afterClose.current = null
       if (fn) requestAnimationFrame(fn)
       else openRef.current?.focus()
-    }, 260)
+    }, 340)
     return () => window.clearTimeout(t)
   }, [menuMounted, menuOpen, unlockScroll])
 
@@ -281,59 +281,58 @@ const Header = () => {
 
       {menuMounted &&
         createPortal(
-          <div className="fixed inset-0 z-[70] lg:hidden" role="dialog" aria-modal="true">
+          <div
+            className={`rn-mobile-drawer fixed inset-0 z-[70] lg:hidden ${menuOpen ? 'rn-mobile-drawer--open' : ''}`}
+            role="dialog"
+            aria-modal="true"
+          >
             <button
               type="button"
-              className={`absolute inset-0 bg-black/80 transition-opacity duration-300 ${
-                menuOpen ? 'opacity-100' : 'opacity-0'
-              }`}
+              className="rn-mobile-drawer__backdrop"
               aria-label="Close menu"
               onClick={() => closeMenu()}
             />
-            <div
-              className={`absolute inset-y-0 right-0 flex w-[min(100%,20rem)] flex-col border-l border-white/[0.08] bg-[#030706] transition-transform duration-300 ${
-                menuOpen ? 'translate-x-0' : 'translate-x-full'
-              }`}
-            >
-              <div className="flex items-center justify-between border-b border-white/[0.08] px-5 py-4">
-                <span className="font-display text-xl text-white">Menu</span>
+            <div className={`rn-mobile-drawer__panel ${menuOpen ? 'is-open' : ''}`}>
+              <div className="rn-mobile-drawer__head">
+                <span className="font-display text-lg tracking-wide text-white/95">Menu</span>
                 <button
                   ref={closeRef}
                   type="button"
-                  className="inline-flex min-h-[42px] min-w-[42px] items-center justify-center rounded border border-white/15 text-white"
+                  className="rn-mobile-drawer__close"
                   aria-label="Close menu"
                   onClick={() => closeMenu()}
                 >
                   <X size={18} />
                 </button>
               </div>
-              <nav className="flex flex-1 flex-col overflow-y-auto px-2 py-4" aria-label="Mobile">
-                <p className="px-4 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-aurora-soft/80">
-                  Experiences
-                </p>
-                {EXPERIENCES.map((item) => (
+              <nav className="rn-mobile-drawer__nav" aria-label="Mobile">
+                <p className="rn-mobile-drawer__label">Experiences</p>
+                {EXPERIENCES.map((item, i) => (
                   <button
                     key={item.to}
                     type="button"
                     onClick={() => go(item.to)}
-                    className="rounded px-4 py-3 text-left"
+                    className={`rn-mobile-drawer__link ${isActive(item.to) ? 'rn-mobile-drawer__link--active' : ''}`}
+                    style={{ '--rn-drawer-i': i } as React.CSSProperties}
                   >
-                    <span className="block text-base font-medium text-white">{item.label}</span>
-                    <span className="mt-0.5 block text-xs text-text-dim">{item.hint}</span>
+                    <span className="rn-mobile-drawer__link-title">{item.label}</span>
+                    <span className="rn-mobile-drawer__link-hint">{item.hint}</span>
                   </button>
                 ))}
-                <div className="my-3 mx-4 border-t border-white/[0.08]" />
+                <div className="rn-mobile-drawer__rule" aria-hidden />
                 <button
                   type="button"
                   onClick={() => go('/travel-trade')}
-                  className={`rounded px-4 py-3 text-left text-base font-medium ${
-                    isActive('/travel-trade') ? 'text-aurora-soft' : 'text-white'
+                  className={`rn-mobile-drawer__link rn-mobile-drawer__link--solo ${
+                    isActive('/travel-trade') ? 'rn-mobile-drawer__link--active' : ''
                   }`}
+                  style={{ '--rn-drawer-i': EXPERIENCES.length } as React.CSSProperties}
                 >
-                  Partner With Us
+                  <span className="rn-mobile-drawer__link-title">Partner With Us</span>
+                  <span className="rn-mobile-drawer__link-hint">Travel trade &amp; partnerships</span>
                 </button>
               </nav>
-              <div className="border-t border-white/[0.08] p-4">
+              <div className="rn-mobile-drawer__foot">
                 <Link to="/northern-lights-tour" onClick={() => closeMenu()} className="rn-btn-primary w-full">
                   Book a tour
                 </Link>

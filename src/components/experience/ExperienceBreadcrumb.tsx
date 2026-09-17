@@ -9,17 +9,20 @@ type Props = {
 
 export default function ExperienceBreadcrumb({ items, className = '' }: Props) {
   return (
-    <nav className={`text-sm text-text-muted ${className}`} aria-label="Breadcrumb">
-      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
+    <nav
+      className={`text-[11px] font-medium tracking-wide text-text-dim sm:text-xs ${className}`}
+      aria-label="Breadcrumb"
+    >
+      <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
         {items.map((item, i) => (
-          <li key={`${item.label}-${i}`} className="flex items-center gap-2">
-            {i > 0 && <span aria-hidden className="text-white/25">/</span>}
+          <li key={`${item.label}-${i}`} className="flex items-center gap-1.5">
+            {i > 0 && <span aria-hidden className="text-white/20">/</span>}
             {item.to ? (
-              <Link to={item.to} className="transition hover:text-white">
+              <Link to={item.to} className="transition hover:text-white/80">
                 {item.label}
               </Link>
             ) : (
-              <span className="text-white/85">{item.label}</span>
+              <span className="text-white/55">{item.label}</span>
             )}
           </li>
         ))}
