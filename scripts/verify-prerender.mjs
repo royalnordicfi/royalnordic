@@ -69,7 +69,18 @@ function main() {
     'rel="canonical" href="https://royalnordic.fi/northern-lights-tour"',
     'jsonld-product',
     '"@type": "Product"',
+    'prerender-nl-landmark',
   ]
+  if (moneyHtml.includes('rel="canonical" href="https://royalnordic.fi/"')) {
+    throw new Error(
+      'verify-prerender: money HTML still has homepage canonical — prerender did not run'
+    )
+  }
+  if (moneyHtml.includes('<title>Royal Nordic | Lavish Experiences')) {
+    throw new Error(
+      'verify-prerender: money HTML still has homepage title — prerender did not run'
+    )
+  }
   for (const needle of required) {
     if (!moneyHtml.includes(needle)) {
       throw new Error(`verify-prerender: money HTML missing required signal: ${needle}`)

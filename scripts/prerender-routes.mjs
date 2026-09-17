@@ -210,14 +210,8 @@ function buildNlJsonLd(date = new Date()) {
   ]
 }
 
-function main() {
-  const indexPath = path.join(distDir, 'index.html')
-  if (!fs.existsSync(indexPath)) {
-    console.error('prerender-routes: dist/index.html missing — run vite build first')
-    process.exit(1)
-  }
-
-  const baseHtml = fs.readFileSync(indexPath, 'utf8')
+/** Derive money-page HTML from a built index.html string (same asset hashes). */
+export function renderMoneyPageHtml(baseHtml) {
   const canonical = `${SITE}${PATH}`
   let html = replaceMeta(baseHtml, {
     title: TITLE,
@@ -242,25 +236,46 @@ function main() {
     </noscript>`
     )
   }
+  return html
+}
 
+/** Write money-page HTML to dist (+ public mirror for Vercel packaging quirks). */
+export function writeMoneyPageFiles(html) {
   const outPath = path.join(distDir, 'northern-lights-tour.html')
   fs.writeFileSync(outPath, html, 'utf8')
   console.log(`prerender-routes: wrote ${path.relative(root, outPath)}`)
 
-  // Vercel's Vite packaging keeps public/ HTML + dist/index.html+assets,
-  // but drops other HTML created only under dist/. Mirror into public/ so
-  // production serves the prerendered money-page document.
+  // Vercel's Vite packaging sometimes keeps public/ HTML + dist/index.html+assets,
+  // but drops other HTML created only under dist/. Mirror into public/ so the
+  // next packaging pass (and local preview) still serve the money document.
   const publicPath = path.join(root, 'public', 'northern-lights-tour.html')
   fs.writeFileSync(publicPath, html, 'utf8')
   console.log(`prerender-routes: wrote ${path.relative(root, publicPath)}`)
 
-  // When `vercel build` has already created output/static, keep it in sync too.
   const vercelStatic = path.join(root, '.vercel', 'output', 'static')
   if (fs.existsSync(vercelStatic)) {
     const vercelPath = path.join(vercelStatic, 'northern-lights-tour.html')
     fs.writeFileSync(vercelPath, html, 'utf8')
     console.log(`prerender-routes: wrote ${path.relative(root, vercelPath)}`)
   }
+  return outPath
 }
 
-main()
+function main() {
+  const indexPath = path.join(distDir, 'index.html')
+  if (!fs.existsSync(indexPath)) {
+    console.error('prerender-routes: dist/index.html missing — run vite build first')
+    process.exit(1)
+  }
+
+  const baseHtml = fs.readFileSync(indexPath, 'utf8')
+  const html = renderMoneyPageHtml(baseHtml)
+  writeMoneyPageFiles(html)
+}
+
+const isDirectRun =
+  process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+
+if (isDirectRun) {
+  main()
+}
