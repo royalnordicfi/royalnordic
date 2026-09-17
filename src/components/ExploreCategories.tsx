@@ -3,59 +3,64 @@ import { Link } from 'react-router-dom'
 const CATEGORIES = [
   {
     title: 'Northern Lights',
-    text: 'Guaranteed aurora hunts and family-friendly evenings from Rovaniemi.',
+    text: 'Guaranteed aurora hunts and family evenings from Rovaniemi.',
     to: '/northern-lights-tours',
-    image: '/nortti5.jpg',
+    image: '/nortti1.jpg',
   },
   {
     title: 'Day adventures',
     text: 'Ice fishing, Korouoma Canyon, Ranua Wildlife Park, and more.',
     to: '/daytime-experiences',
-    image: '/icefishing3.jpg',
+    image: '/korouoma1.jpg',
   },
   {
     title: 'Private & custom',
     text: 'Tailored itineraries for couples, families, and private groups.',
     to: '/customized-tour',
-    image: '/slideshow1.jpg',
+    image: '/nortti5.jpg',
   },
   {
     title: 'Transfers',
     text: 'Private transportation across Lapland, including Rovaniemi–Levi.',
     to: '/transportation',
-    image: '/transportation3.jpg',
+    image: '/transportation1.jpg',
   },
 ]
 
 const ExploreCategories = () => {
   return (
-    <section id="experiences" className="rn-section-frost">
+    <section id="experiences" className="rn-section bg-surface">
       <div className="rn-container">
         <div className="max-w-2xl">
-          <p className="rn-eyebrow !text-aurora-deep">Explore Royal Nordic</p>
-          <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl">
+          <p className="rn-eyebrow">Explore Royal Nordic</p>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-white sm:text-4xl">
             Choose how you want to experience Lapland
           </h2>
         </div>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:gap-5">
           {CATEGORIES.map((cat) => (
             <Link
-              key={cat.title}
+              key={cat.to}
               to={cat.to}
-              className="group relative isolate min-h-[18rem] overflow-hidden rounded-rn-lg"
+              className="group relative min-h-[220px] overflow-hidden rounded-rn border border-white/10 sm:min-h-[260px]"
             >
               <img
                 src={cat.image}
                 alt=""
-                className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                 loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.src = '/nortti1.jpg'
+                }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-midnight via-midnight/45 to-midnight/10" />
-              <div className="relative flex h-full flex-col justify-end p-5 text-snow">
-                <h3 className="font-display text-2xl font-semibold">{cat.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-snow/75">{cat.text}</p>
-                <span className="mt-4 text-sm font-semibold text-aurora-soft">Explore →</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/20" />
+              <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                <h3 className="font-display text-2xl font-semibold text-white">{cat.title}</h3>
+                <p className="mt-1.5 max-w-sm text-sm text-white/75">{cat.text}</p>
+                <span className="mt-3 inline-block text-sm font-semibold text-aurora-soft">
+                  Explore →
+                </span>
               </div>
             </Link>
           ))}

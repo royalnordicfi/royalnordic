@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import CategoryHero from './CategoryHero'
 import Footer from './Footer'
 
 const Blog: React.FC = () => {
@@ -116,62 +116,36 @@ const Blog: React.FC = () => {
   ]
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-black text-white">
-      <div
-        className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: 'url(/lights5.jpg)' }}
-        aria-hidden
-      >
-        <div className="absolute inset-0 bg-black/75" />
-      </div>
+    <div className="rn-page">
+      <CategoryHero
+        title="Lapland travel guides"
+        subtitle="Practical tips on Northern Lights, packing, wildlife, and winter activities — written for visitors to Rovaniemi."
+        image="/lights5.jpg"
+        compact
+      />
 
-      <main className="relative z-10 flex-1 pb-12 pt-36 sm:pb-16 sm:pt-40">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 text-center">
-            <Link
-              to="/"
-              className="inline-flex min-h-[44px] items-center rounded-lg border border-emerald-400 px-4 py-2 font-medium text-emerald-400 transition-colors hover:bg-emerald-400 hover:text-black"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Home
-            </Link>
-          </div>
-
-          <div className="mb-10 text-center sm:mb-12">
-            <h1 className="mb-4 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text font-luxury text-3xl font-bold text-transparent sm:text-4xl lg:text-5xl">
-              Lapland Travel Guide & Tips
-            </h1>
-            <p className="mx-auto max-w-2xl font-clean text-base leading-relaxed text-gray-300 sm:text-lg">
-              Practical guides to Northern Lights, winter travel, and Arctic experiences in Finnish Lapland.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+      <section className="rn-section bg-midnight">
+        <div className="rn-container">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {blogPosts.map((post) => (
               <Link
                 key={post.id}
                 to={`/blog/${post.slug}`}
-                className="group block rounded-lg border border-white/15 bg-black/55 p-5 backdrop-blur-sm transition-colors hover:border-emerald-400/40 hover:bg-black/70 sm:p-6"
+                className="group flex flex-col rounded-rn border border-white/10 bg-surface p-5 transition hover:border-aurora/35 hover:bg-surface-2 sm:p-6"
               >
-                <span className="mb-3 inline-block rounded-full bg-emerald-600/20 px-2.5 py-1 text-xs font-medium text-emerald-400">
-                  {post.category}
-                </span>
-                <h2 className="mb-2 font-luxury text-lg font-semibold leading-snug text-white transition-colors group-hover:text-emerald-400 sm:text-xl">
+                <span className="rn-badge-aurora w-fit">{post.category}</span>
+                <h2 className="mt-3 font-display text-lg font-semibold leading-snug text-white transition group-hover:text-aurora-soft sm:text-xl">
                   {post.title}
                 </h2>
-                <p className="mb-4 font-clean text-sm leading-relaxed text-gray-300 sm:text-base">
-                  {post.excerpt}
-                </p>
-                <p className="text-xs text-gray-500">{post.readTime}</p>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-text-muted">{post.excerpt}</p>
+                <p className="mt-4 text-xs text-text-dim">{post.readTime}</p>
               </Link>
             ))}
           </div>
         </div>
-      </main>
+      </section>
 
-      <div className="relative z-10">
-        <Footer />
-      </div>
+      <Footer />
     </div>
   )
 }

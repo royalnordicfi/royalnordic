@@ -149,7 +149,20 @@ const NorthernLightsPhotography: React.FC = () => {
     date: "2025-09-23",
     readTime: "6 min read",
     category: "Photography",
-    author: "Royal Nordic Team"
+    author: "Royal Nordic Team",
+    heroImage: "/lights1.jpg",
+    relatedExperiences: [
+      {
+        title: "Northern Lights tour",
+        href: "/northern-lights-tour",
+        description: "Photograph the aurora with guides who know dark-sky locations around Rovaniemi.",
+      },
+      {
+        title: "Family-friendly Northern Lights",
+        href: "/family-friendly-northern-lights",
+        description: "Shorter evening format if you are travelling with kids or first-time shooters.",
+      },
+    ],
   };
 
   return <BlogPost post={post} />;

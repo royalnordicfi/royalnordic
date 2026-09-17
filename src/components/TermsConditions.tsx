@@ -1,127 +1,142 @@
-import React from 'react';
-
-import { useNavigate } from 'react-router-dom';
-import Footer from './Footer';
+import React from 'react'
+import CategoryHero from './CategoryHero'
+import Footer from './Footer'
 
 const TermsConditions: React.FC = () => {
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen bg-black flex flex-col">
+    <div className="rn-page flex flex-col">
+      <CategoryHero
+        title="Terms & Conditions"
+        subtitle="Booking rules, cancellations, safety, and liability for Royal Nordic tours and services."
+        image="/nortti5.jpg"
+        compact
+      />
 
+      <div className="rn-section flex-1 bg-midnight">
+        <div className="rn-container max-w-3xl">
+          <div className="rounded-rn border border-white/10 bg-surface p-6 sm:p-8">
+            <div className="prose prose-invert max-w-none space-y-8 text-sm leading-relaxed text-text-muted [&_h2]:font-display [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-white [&_strong]:text-white">
+              <section>
+                <h2>1. Acceptance of terms</h2>
+                <p>
+                  By using the Royal Nordic website and booking our services, you agree to these Terms
+                  and Conditions. If you do not agree, please do not use our services.
+                </p>
+              </section>
 
-      <div className="max-w-4xl mx-auto px-4 py-24">
-        <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10">
-          <h1 className="text-3xl font-luxury font-bold text-white mb-8">Terms & Conditions</h1>
-          
-          <div className="space-y-6 text-gray-300">
-            <section>
-              <h2 className="text-xl font-semibold text-white mb-3">1. Acceptance of Terms</h2>
-              <p className="text-sm leading-relaxed">
-                By accessing and using the Royal Nordic website and services, you accept and agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our services.
-              </p>
-            </section>
+              <section>
+                <h2>2. Booking and reservations</h2>
+                <p>
+                  <strong>Confirmation:</strong> Bookings are subject to availability. A booking is
+                  confirmed once payment has been received and processed.
+                </p>
+                <p className="mt-2">
+                  <strong>Payment:</strong> Full payment is required at the time of booking via our
+                  secure payment processor, Stripe.
+                </p>
+                <p className="mt-2">
+                  <strong>Pricing:</strong> Prices are in euros (€) and include VAT unless stated
+                  otherwise. Prices may change without notice.
+                </p>
+              </section>
 
-            <section>
-              <h2 className="text-xl font-semibold text-white mb-3">2. Booking and Reservations</h2>
-              <div className="space-y-3 text-sm">
-                <p><strong>Booking Confirmation:</strong> All bookings are subject to availability and confirmation. A booking is only confirmed once payment has been received and processed.</p>
-                <p><strong>Payment:</strong> Full payment is required at the time of booking. We accept payments through our secure payment processor, Stripe.</p>
-                <p><strong>Pricing:</strong> All prices are quoted in Euros (€) and include VAT. Prices are subject to change without notice.</p>
-              </div>
-            </section>
+              <section>
+                <h2>3. Cancellation policy</h2>
+                <p>
+                  <strong>Free cancellation:</strong> Cancel more than 24 hours before the tour start
+                  for a full refund.
+                </p>
+                <p className="mt-2">
+                  <strong>Late cancellation:</strong> Cancellations within 24 hours of start time are
+                  non-refundable.
+                </p>
+                <p className="mt-2">
+                  <strong>Weather:</strong> We may cancel tours in unsafe conditions and offer a refund
+                  or reschedule.
+                </p>
+                <p className="mt-2">
+                  <strong>Northern Lights guarantee:</strong> On the eligible guaranteed tour, if no
+                  Northern Lights are visible, we offer a free return trip on the next available date
+                  (see tour page and these terms).
+                </p>
+              </section>
 
-            <section>
-              <h2 className="text-xl font-semibold text-white mb-3">3. Cancellation Policy</h2>
-              <div className="space-y-3 text-sm">
-                <p><strong>Free Cancellation:</strong> Cancellations made more than 24 hours before the tour start time are eligible for a full refund.</p>
-                <p><strong>Late Cancellation:</strong> Cancellations made within 24 hours of the tour start time are non-refundable.</p>
-                <p><strong>Weather Conditions:</strong> Tours may be cancelled due to extreme weather conditions. In such cases, we will offer a full refund or reschedule your tour.</p>
-                <p><strong>Northern Lights Guarantee:</strong> If no Northern Lights are visible during your tour, we offer a free return trip on the next available date.</p>
-              </div>
-            </section>
+              <section>
+                <h2>4. Tour requirements and safety</h2>
+                <p>
+                  Child pricing applies for ages 0–17. Minors must be accompanied by an adult. Tell us
+                  about medical conditions or mobility needs before the tour. Follow guide instructions
+                  and dress for Arctic weather.
+                </p>
+              </section>
 
-            <section>
-              <h2 className="text-xl font-semibold text-white mb-3">4. Tour Requirements and Safety</h2>
-              <div className="space-y-3 text-sm">
-                <p><strong>Age Requirements:</strong> Child pricing applies for ages 0–17. Children under 18 must be accompanied by an adult. Some tours may have additional fitness or outdoor requirements.</p>
-                <p><strong>Health and Fitness:</strong> Participants should be in good health and able to participate in outdoor activities. Please inform us of any medical conditions or special requirements.</p>
-                <p><strong>Equipment:</strong> We provide all necessary safety equipment. Participants must follow safety instructions provided by our guides.</p>
-                <p><strong>Weather Preparation:</strong> Participants are responsible for dressing appropriately for Arctic weather conditions.</p>
-              </div>
-            </section>
+              <section>
+                <h2>5. Liability and insurance</h2>
+                <p>
+                  Royal Nordic is not liable for injury or loss during tours except where caused by our
+                  negligence. We recommend travel insurance that covers outdoor activities.
+                </p>
+              </section>
 
-            <section>
-              <h2 className="text-xl font-semibold text-white mb-3">5. Liability and Insurance</h2>
-              <div className="space-y-3 text-sm">
-                <p><strong>Limitation of Liability:</strong> Royal Nordic is not liable for any personal injury, property damage, or other losses that occur during tours, except where caused by our negligence.</p>
-                <p><strong>Travel Insurance:</strong> We recommend that all participants have appropriate travel insurance covering outdoor activities and medical expenses.</p>
-                <p><strong>Force Majeure:</strong> We are not liable for any failure to perform due to circumstances beyond our control, including natural disasters, government actions, or other unforeseeable events.</p>
-              </div>
-            </section>
+              <section>
+                <h2>6. Photography and media</h2>
+                <p>
+                  Guides may take photos for promotional use; by joining a tour you consent to reasonable
+                  use of those images. Personal photos are welcome; respect other guests’ privacy.
+                </p>
+              </section>
 
-            <section>
-              <h2 className="text-xl font-semibold text-white mb-3">6. Photography and Media</h2>
-              <div className="space-y-3 text-sm">
-                <p><strong>Tour Photography:</strong> Our guides may take photos during tours for promotional purposes. By participating, you consent to the use of these images.</p>
-                <p><strong>Personal Photography:</strong> Participants are welcome to take personal photos, but must respect the privacy of other participants.</p>
-                <p><strong>Commercial Use:</strong> Any commercial use of photos taken during our tours requires written permission from Royal Nordic.</p>
-              </div>
-            </section>
+              <section>
+                <h2>7. Website and online services</h2>
+                <p>
+                  We aim to keep information accurate but cannot guarantee every detail is current.
+                  Maintenance or technical issues may temporarily affect the site or booking system.
+                </p>
+              </section>
 
-            <section>
-              <h2 className="text-xl font-semibold text-white mb-3">7. Website and Online Services</h2>
-              <div className="space-y-3 text-sm">
-                <p><strong>Accuracy:</strong> While we strive to provide accurate information, we cannot guarantee that all content on our website is error-free or up-to-date.</p>
-                <p><strong>Availability:</strong> Our website and booking system may be temporarily unavailable for maintenance or technical reasons.</p>
-                <p><strong>Security:</strong> We implement security measures to protect your personal information, but cannot guarantee complete security of online transactions.</p>
-              </div>
-            </section>
+              <section>
+                <h2>8. Intellectual property</h2>
+                <p>
+                  Website content, logos, and images belong to Royal Nordic and may not be copied or
+                  distributed without permission.
+                </p>
+              </section>
 
-            <section>
-              <h2 className="text-xl font-semibold text-white mb-3">8. Intellectual Property</h2>
-              <p className="text-sm leading-relaxed">
-                All content on our website, including text, images, logos, and design elements, is the property of Royal Nordic and is protected by copyright laws. Reproduction or distribution of this content without permission is prohibited.
-              </p>
-            </section>
+              <section>
+                <h2>9. Governing law</h2>
+                <p>
+                  These terms are governed by Finnish law. Disputes are handled in the courts of Finland.
+                </p>
+              </section>
 
-            <section>
-              <h2 className="text-xl font-semibold text-white mb-3">9. Governing Law</h2>
-              <p className="text-sm leading-relaxed">
-                These Terms and Conditions are governed by Finnish law. Any disputes arising from these terms or our services will be resolved in the courts of Finland.
-              </p>
-            </section>
+              <section>
+                <h2>10. Changes to terms</h2>
+                <p>
+                  We may update these terms at any time. Continued use of our services after changes
+                  constitutes acceptance.
+                </p>
+              </section>
 
-            <section>
-              <h2 className="text-xl font-semibold text-white mb-3">10. Changes to Terms</h2>
-              <p className="text-sm leading-relaxed">
-                We reserve the right to modify these Terms and Conditions at any time. Changes will be effective immediately upon posting on our website. Continued use of our services constitutes acceptance of any changes.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-xl font-semibold text-white mb-3">11. Contact Information</h2>
-              <p className="text-sm leading-relaxed">
-                For questions about these Terms and Conditions, please contact us:
-              </p>
-              <div className="mt-2 text-sm space-y-1">
-                <p>📧 Email: contact@royalnordic.fi</p>
-                <p>📞 Phone: +358 45 78345138</p>
-                <p>📍 Address: Rovaniemi, Lapland, Finland</p>
-              </div>
-            </section>
-
-            <section>
-              <p className="text-sm text-gray-400 mt-6">
-                <strong>Last updated:</strong> {new Date().toLocaleDateString()}
-              </p>
-            </section>
+              <section>
+                <h2>11. Contact</h2>
+                <p>Questions about these terms:</p>
+                <ul className="mt-2 list-none space-y-1 pl-0">
+                  <li>Email: contact@royalnordic.fi</li>
+                  <li>Phone: +358 45 78345138</li>
+                  <li>Address: Rovaniemi, Lapland, Finland</li>
+                </ul>
+                <p className="mt-4 text-text-dim">
+                  <strong>Last updated:</strong> {new Date().toLocaleDateString()}
+                </p>
+              </section>
+            </div>
           </div>
         </div>
       </div>
+
       <Footer />
     </div>
-  );
-};
+  )
+}
 
-export default TermsConditions;
+export default TermsConditions

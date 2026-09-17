@@ -74,72 +74,69 @@ const Contact = () => {
     }
   };
 
+  const inputClass =
+    'w-full rounded-lg border border-black/10 bg-white px-3 py-2.5 text-sm text-panel-ink placeholder:text-panel-muted focus:border-aurora focus:outline-none focus:ring-1 focus:ring-aurora/30';
+
   return (
-    <section 
-      id="contact" 
-      className="py-16 sm:py-20 relative bg-midnight"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-luxury font-bold mb-4 bg-gradient-to-r from-emerald-400 to-white bg-clip-text text-transparent italic">
-            CONTACT US
+    <section id="contact" className="rn-section border-t border-white/10 bg-midnight">
+      <div className="rn-container">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="rn-eyebrow">Contact</p>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-white sm:text-4xl">
+            Questions before you book?
           </h2>
-          <p className="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed font-clean">
-            Ready to embark on your Lapland adventure? Contact our local experts to plan your perfect Arctic experience.
+          <p className="rn-lede mx-auto mt-3">
+            Reach our Rovaniemi team by phone, email, or the form below. We usually reply within a
+            couple of hours during the day.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Contact Information */}
-          <div className="lg:col-span-1">
-            <h3 className="text-2xl font-luxury font-bold text-white mb-4">Get In Touch</h3>
-            
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-5 h-5 text-white" />
+        <div className="mt-10 grid gap-8 lg:grid-cols-3 lg:gap-10">
+          <div className="rounded-rn border border-white/10 bg-surface p-6 lg:col-span-1">
+            <h3 className="font-display text-xl font-semibold text-white">Get in touch</h3>
+
+            <div className="mt-6 space-y-5">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-aurora/15 text-aurora-soft">
+                  <Phone className="h-5 w-5" aria-hidden />
                 </div>
                 <div>
-                  <h4 className="text-white font-luxury font-semibold mb-1">Phone</h4>
-                  <p className="text-gray-300 font-clean">+358 45 78345138</p>
-                  <p className="text-gray-400 text-sm font-clean">Available 24/7 for emergencies</p>
+                  <h4 className="text-sm font-semibold text-white">Phone</h4>
+                  <p className="mt-0.5 text-sm text-text-muted">+358 45 78345138</p>
+                  <p className="text-xs text-text-dim">24/7 for urgent tour-day issues</p>
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3">
-                <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Mail className="w-5 h-5 text-white" />
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-aurora/15 text-aurora-soft">
+                  <Mail className="h-5 w-5" aria-hidden />
                 </div>
                 <div>
-                  <h4 className="text-white font-luxury font-semibold mb-1">Email</h4>
-                  <p className="text-gray-300 font-clean">contact@royalnordic.fi</p>
-                  <p className="text-gray-400 text-sm font-clean">Response within 2 hours</p>
+                  <h4 className="text-sm font-semibold text-white">Email</h4>
+                  <p className="mt-0.5 text-sm text-text-muted">contact@royalnordic.fi</p>
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3">
-                <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-white" />
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-aurora/15 text-aurora-soft">
+                  <MapPin className="h-5 w-5" aria-hidden />
                 </div>
                 <div>
-                  <h4 className="text-white font-luxury font-semibold mb-1">Location</h4>
-                  <p className="text-gray-300 font-clean">Rovaniemi, Finnish Lapland</p>
-                  <p className="text-gray-400 text-sm font-clean">Gateway to the Arctic</p>
+                  <h4 className="text-sm font-semibold text-white">Location</h4>
+                  <p className="mt-0.5 text-sm text-text-muted">Rovaniemi, Finnish Lapland</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Contact Form */}
-          <div className="lg:col-span-2 bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-600/50">
-            <h3 className="text-xl font-luxury font-bold text-white mb-4">Send us a Message</h3>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
+          <div className="rn-panel p-6 shadow-rn-soft lg:col-span-2 sm:p-8">
+            <h3 className="font-display text-xl font-semibold text-panel-ink">Send a message</h3>
+
+            <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-clean font-medium text-gray-300 mb-1">
-                    Full Name *
+                  <label htmlFor="name" className="mb-1 block text-sm font-medium text-panel-ink">
+                    Full name *
                   </label>
                   <input
                     type="text"
@@ -148,13 +145,13 @@ const Contact = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500 transition-colors duration-200 font-clean"
+                    className={inputClass}
                     placeholder="Your full name"
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-clean font-medium text-gray-300 mb-1">
-                    Email Address *
+                  <label htmlFor="email" className="mb-1 block text-sm font-medium text-panel-ink">
+                    Email *
                   </label>
                   <input
                     type="email"
@@ -163,15 +160,15 @@ const Contact = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500 transition-colors duration-200 font-clean"
-                    placeholder="your@email.com"
+                    className={inputClass}
+                    placeholder="you@email.com"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="phone" className="block text-sm font-clean font-medium text-gray-300 mb-1">
-                  Phone Number
+                <label htmlFor="phone" className="mb-1 block text-sm font-medium text-panel-ink">
+                  Phone
                 </label>
                 <input
                   type="tel"
@@ -179,13 +176,13 @@ const Contact = () => {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500 transition-colors duration-200 font-clean"
-                  placeholder="+47 123 45 678"
+                  className={inputClass}
+                  placeholder="+358 …"
                 />
               </div>
 
               <div>
-                <label htmlFor="message" className="block text-sm font-clean font-medium text-gray-300 mb-1">
+                <label htmlFor="message" className="mb-1 block text-sm font-medium text-panel-ink">
                   Message *
                 </label>
                 <textarea
@@ -195,51 +192,45 @@ const Contact = () => {
                   onChange={handleChange}
                   required
                   rows={4}
-                  className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500 transition-colors duration-200 font-clean"
-                  placeholder="Tell us about your desired Arctic experience..."
-                ></textarea>
+                  className={inputClass}
+                  placeholder="Dates, group size, or questions about a tour…"
+                />
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 disabled:from-emerald-400 disabled:to-emerald-300 text-white px-6 py-3 rounded-lg font-modern font-semibold text-base transition-all duration-300 transform hover:scale-105 disabled:scale-100 flex items-center justify-center space-x-2 shadow-lg hover:shadow-emerald-500/40 disabled:cursor-not-allowed"
-              >
+              <button type="submit" disabled={isSubmitting} className="rn-btn-primary w-full">
                 {isSubmitting ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Sending...</span>
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    Sending…
                   </>
                 ) : (
                   <>
-                    <span>Send Message</span>
-                    <Send className="w-4 h-4" />
+                    Send message
+                    <Send className="h-4 w-4" aria-hidden />
                   </>
                 )}
               </button>
             </form>
 
             {submitError && (
-              <div className="mt-4 text-center text-red-400 text-sm font-clean bg-red-900/20 border border-red-500/30 rounded-lg p-3">
-                <p className="font-semibold">Error sending message:</p>
-                <p>{submitError}</p>
-                <p className="mt-2 text-xs">Please try again or contact us directly at contact@royalnordic.fi</p>
+              <div className="mt-4 rounded-lg border border-red-500/30 bg-red-950/30 p-3 text-center text-sm text-red-300">
+                <p className="font-semibold">Could not send your message</p>
+                <p className="mt-1">{submitError}</p>
+                <p className="mt-2 text-xs text-red-400/90">
+                  Try again or email contact@royalnordic.fi directly.
+                </p>
               </div>
             )}
-            
+
             {showSuccess && (
-              <div className="mt-4 text-center text-green-400 text-sm font-clean bg-green-900/20 border border-green-500/30 rounded-lg p-3 transition-all duration-500 ease-out animate-in fade-in slide-in-from-top-2">
-                <p className="font-semibold">Message sent successfully!</p>
-                <p>We'll get back to you as soon as possible.</p>
-                <p className="mt-2 text-xs">Check your email for a confirmation message.</p>
+              <div className="mt-4 rounded-lg border border-aurora/30 bg-aurora/10 p-3 text-center text-sm text-aurora-soft">
+                <p className="font-semibold text-panel-ink">Message sent</p>
+                <p className="text-panel-muted">We will get back to you as soon as we can.</p>
               </div>
             )}
           </div>
         </div>
       </div>
-      
-      {/* Bottom fade transition overlay for smooth flow to footer */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/90 via-black/60 to-transparent pointer-events-none"></div>
     </section>
   );
 };

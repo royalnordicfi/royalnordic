@@ -11,6 +11,19 @@ const GlassIglooGuide: React.FC = () => {
     category: "Accommodation",
     excerpt: "Everything you need to know about staying in a glass igloo in Lapland. Compare resorts, prices, booking tips, and what to expect from this iconic Arctic experience.",
     heroImage: "/lights1.jpg",
+    author: "Royal Nordic Team",
+    relatedExperiences: [
+      {
+        title: "Northern Lights tour",
+        href: "/northern-lights-tour",
+        description: "Pair a glass igloo stay with a guided aurora hunt away from resort lights.",
+      },
+      {
+        title: "Customized tour",
+        href: "/customized-tour",
+        description: "Build a private itinerary that includes lodging and activities.",
+      },
+    ],
     content: `Sleeping under the Northern Lights in a glass igloo is one of Lapland's most sought-after experiences. Imagine lying in a warm, comfortable bed while watching the Aurora Borealis dance across the Arctic sky above you.
 
 ## What is a Glass Igloo?

@@ -1,22 +1,21 @@
 import TourCard from './TourCard'
-import { GUARANTEED_NL_CATALOG_ADULT_PRICE } from '../seo/guaranteedNorthernLightsTour'
 
 const TOURS = [
   {
     to: '/northern-lights-tour',
     image: '/nortti1.jpg',
-    imageAlt: 'Northern Lights over Lapland during a Royal Nordic tour',
+    imageAlt: 'Northern Lights over Lapland forest',
     title: 'Guaranteed Northern Lights Tour',
     duration: '2–12 hours',
     groupSize: 'Max 8 / vehicle',
     pickup: true,
     badge: 'Guaranteed',
-    priceFrom: GUARANTEED_NL_CATALOG_ADULT_PRICE,
+    priceFrom: 149,
   },
   {
     to: '/family-friendly-northern-lights',
     image: '/family1.jpg',
-    imageAlt: 'Family-friendly Northern Lights evening near Rovaniemi',
+    imageAlt: 'Family Northern Lights evening',
     title: 'Family-Friendly Northern Lights',
     duration: '2 hours',
     groupSize: 'Family format',
@@ -27,7 +26,7 @@ const TOURS = [
   {
     to: '/korouoma-canyon',
     image: '/korouoma1.jpg',
-    imageAlt: 'Frozen waterfalls at Korouoma Canyon',
+    imageAlt: 'Korouoma Canyon in winter',
     title: 'Korouoma Canyon Winter Adventure',
     duration: 'About 6 hours',
     groupSize: 'Small group',
@@ -37,7 +36,7 @@ const TOURS = [
   {
     to: '/ice-fishing',
     image: '/icefishing2.jpg',
-    imageAlt: 'Traditional ice fishing on a frozen lake near Rovaniemi',
+    imageAlt: 'Ice fishing on a frozen lake',
     title: 'Ice Fishing Experience',
     duration: '3–4 hours',
     groupSize: 'Max 8',
@@ -48,17 +47,15 @@ const TOURS = [
 
 const FeaturedTours = () => {
   return (
-    <section className="rn-section-snow" id="tours">
+    <section className="rn-section bg-midnight">
       <div className="rn-container">
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <div>
-            <p className="rn-eyebrow !text-aurora-deep">Featured tours</p>
-            <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl">
-              Bookable experiences
-            </h2>
-          </div>
+        <div className="max-w-2xl">
+          <p className="rn-eyebrow">Featured tours</p>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-white sm:text-4xl">
+            Bookable experiences
+          </h2>
         </div>
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {TOURS.map((tour) => (
             <TourCard key={tour.to} {...tour} />
           ))}

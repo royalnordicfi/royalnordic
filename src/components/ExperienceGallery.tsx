@@ -57,7 +57,7 @@ const ExperienceGallery = ({ images }: ExperienceGalleryProps) => {
         </div>
         <button
           type="button"
-          className="mt-3 text-sm font-semibold text-aurora-deep"
+          className="mt-3 text-sm font-semibold text-aurora-soft"
           onClick={() => setLightbox(0)}
         >
           View all photos ({images.length})

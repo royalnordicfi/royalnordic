@@ -9,46 +9,27 @@ type Props = {
 
 /**
  * Hides a tour marketing/booking page when the product is deactivated in admin.
+ * Fail-open: render immediately; only redirect once we confirm inactive.
  */
 export default function ActiveTourGate({ tourId, children }: Props) {
-  const [state, setState] = useState<'loading' | 'active' | 'inactive'>('loading')
+  const [inactive, setInactive] = useState(false)
   const fallback = TOUR_PUBLIC_PAGES[tourId]?.fallbackPath || '/'
 
   useEffect(() => {
     let cancelled = false
-    setState('loading')
-
-    const timeout = window.setTimeout(() => {
-      if (!cancelled) setState('active')
-    }, 2500)
-
     isTourPubliclyActive(tourId)
       .then((active) => {
-        if (!cancelled) setState(active ? 'active' : 'inactive')
+        if (!cancelled && !active) setInactive(true)
       })
       .catch(() => {
-        // Fail open so a flaky network never blanks a money page
-        if (!cancelled) setState('active')
+        // Fail open — never blank a money page on network error
       })
-      .finally(() => {
-        window.clearTimeout(timeout)
-      })
-
     return () => {
       cancelled = true
-      window.clearTimeout(timeout)
     }
   }, [tourId])
 
-  if (state === 'loading') {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center bg-snow text-sm text-ink-muted">
-        Loading…
-      </div>
-    )
-  }
-
-  if (state === 'inactive') {
+  if (inactive) {
     return <Navigate to={fallback} replace />
   }
 

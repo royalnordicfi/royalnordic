@@ -3,32 +3,35 @@
 @tailwind utilities;
 
 :root {
-  /* Arctic Editorial — midnight snow */
-  --rn-midnight: #0b1220;
-  --rn-midnight-soft: #121a2b;
-  --rn-navy: #162033;
-  --rn-snow: #f4f1ec;
-  --rn-snow-warm: #ebe6de;
-  --rn-frost: #e8eef2;
-  --rn-ink: #141a24;
-  --rn-ink-muted: #5b6577;
-  --rn-aurora: #1fa97a;
-  --rn-aurora-deep: #178a63;
-  --rn-ice: #7eb6c9;
-  --rn-amber: #c4a574;
-  --rn-white: #ffffff;
-  --rn-border-light: rgba(20, 26, 36, 0.1);
-  --rn-border-dark: rgba(244, 241, 236, 0.14);
+  /* Royal Nordic — dark Arctic identity (original soul, refined) */
+  --rn-black: #000000;
+  --rn-midnight: #070b12;
+  --rn-surface: #0e1420;
+  --rn-surface-2: #151c2b;
+  --rn-elevated: #1a2336;
+  --rn-border: rgba(255, 255, 255, 0.1);
+  --rn-border-strong: rgba(255, 255, 255, 0.18);
+
+  --rn-text: #f2f4f7;
+  --rn-text-muted: #9aa3b5;
+  --rn-text-dim: #6b7385;
+
+  --rn-aurora: #10b981;
+  --rn-aurora-hover: #059669;
+  --rn-aurora-soft: #6ee7b7;
+  --rn-ice: #7dd3fc;
+
+  --rn-panel: #f8fafc;
+  --rn-panel-ink: #0f172a;
+  --rn-panel-muted: #64748b;
 
   --rn-font-display: 'Cormorant Garamond', Georgia, serif;
-  --rn-font-body: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+  --rn-font-body: 'Inter', system-ui, sans-serif;
 
+  --rn-radius: 12px;
   --rn-radius-sm: 8px;
-  --rn-radius-md: 14px;
-  --rn-radius-lg: 20px;
-
   --rn-container: 72rem;
-  --rn-header-h: 4.25rem;
+  --rn-header-h: 4rem;
   --rn-promo-bar-height: 0px;
   --mobile-book-bar: 0px;
 }
@@ -37,7 +40,8 @@
   html {
     font-family: var(--rn-font-body);
     background-color: var(--rn-midnight);
-    color: var(--rn-snow);
+    color: var(--rn-text);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -47,6 +51,7 @@
   body {
     font-family: var(--rn-font-body);
     line-height: 1.6;
+    letter-spacing: 0.01em;
     background-color: var(--rn-midnight);
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
@@ -67,8 +72,9 @@
   h6 {
     font-family: var(--rn-font-display);
     font-weight: 600;
-    line-height: 1.15;
+    line-height: 1.2;
     letter-spacing: -0.02em;
+    color: var(--rn-text);
   }
 
   a {
@@ -76,7 +82,7 @@
   }
 
   ::selection {
-    background: color-mix(in srgb, var(--rn-aurora) 35%, transparent);
+    background: color-mix(in srgb, var(--rn-aurora) 40%, transparent);
   }
 }
 
@@ -87,45 +93,26 @@
   }
 
   .rn-section {
-    @apply py-16 sm:py-20 lg:py-24;
+    @apply py-12 sm:py-16 lg:py-20;
   }
 
-  .rn-section-dark {
-    @apply rn-section;
-    background: var(--rn-midnight);
-    color: var(--rn-snow);
-  }
-
-  .rn-section-snow {
-    @apply rn-section;
-    background: var(--rn-snow);
-    color: var(--rn-ink);
-  }
-
-  .rn-section-frost {
-    @apply rn-section;
-    background: var(--rn-frost);
-    color: var(--rn-ink);
+  .rn-section-tight {
+    @apply py-10 sm:py-12 lg:py-14;
   }
 
   .rn-eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.22em];
-    color: var(--rn-aurora);
-  }
-
-  .rn-display {
-    font-family: var(--rn-font-display);
-    @apply text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight;
+    @apply text-[11px] font-semibold uppercase tracking-[0.18em];
+    color: var(--rn-aurora-soft);
   }
 
   .rn-lede {
-    @apply text-base sm:text-lg leading-relaxed;
-    color: var(--rn-ink-muted);
-    max-width: 38rem;
+    @apply text-base leading-relaxed sm:text-lg;
+    color: var(--rn-text-muted);
+    max-width: 36rem;
   }
 
   .rn-btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold tracking-wide transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 min-h-[48px];
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold tracking-wide transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 min-h-[44px];
   }
 
   .rn-btn-primary {
@@ -133,78 +120,79 @@
     background: var(--rn-aurora);
   }
   .rn-btn-primary:hover {
-    background: var(--rn-aurora-deep);
+    background: var(--rn-aurora-hover);
   }
   .rn-btn-primary:focus-visible {
     outline-color: var(--rn-aurora);
   }
 
   .rn-btn-secondary {
-    @apply rn-btn border;
-    border-color: color-mix(in srgb, var(--rn-snow) 45%, transparent);
-    color: var(--rn-snow);
-    background: transparent;
+    @apply rn-btn border bg-transparent;
+    border-color: var(--rn-border-strong);
+    color: var(--rn-text);
   }
   .rn-btn-secondary:hover {
-    background: color-mix(in srgb, var(--rn-snow) 10%, transparent);
+    background: rgba(255, 255, 255, 0.06);
   }
 
-  .rn-btn-on-snow {
+  .rn-btn-panel {
     @apply rn-btn text-white;
-    background: var(--rn-midnight);
+    background: var(--rn-aurora);
   }
-  .rn-btn-on-snow:hover {
-    background: var(--rn-navy);
-  }
-
-  .rn-btn-ghost-on-snow {
-    @apply rn-btn border;
-    border-color: var(--rn-border-light);
-    color: var(--rn-ink);
-    background: transparent;
-  }
-  .rn-btn-ghost-on-snow:hover {
-    background: var(--rn-snow-warm);
+  .rn-btn-panel:hover {
+    background: var(--rn-aurora-hover);
   }
 
   .rn-badge {
-    @apply inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em];
+    @apply inline-flex items-center rounded-md px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide;
   }
 
   .rn-badge-aurora {
     @apply rn-badge;
-    background: color-mix(in srgb, var(--rn-aurora) 16%, transparent);
-    color: var(--rn-aurora-deep);
+    background: rgba(16, 185, 129, 0.18);
+    color: var(--rn-aurora-soft);
   }
 
-  .rn-badge-on-dark {
-    @apply rn-badge;
-    background: color-mix(in srgb, var(--rn-aurora) 22%, transparent);
-    color: #b7f0d5;
+  .rn-panel {
+    background: var(--rn-panel);
+    color: var(--rn-panel-ink);
+    border-radius: var(--rn-radius);
   }
 
-  .rn-card-photo {
-    @apply relative overflow-hidden;
-    border-radius: var(--rn-radius-lg);
+  .rn-surface {
+    background: var(--rn-surface);
+    border: 1px solid var(--rn-border);
+    border-radius: var(--rn-radius);
   }
 
-  .rn-card-photo img {
-    @apply h-full w-full object-cover transition-transform duration-700 ease-out;
+  .rn-page {
+    @apply min-h-screen;
+    background: var(--rn-midnight);
+    color: var(--rn-text);
   }
 
-  .rn-card-photo:hover img {
-    transform: scale(1.03);
+  .rn-page-pad {
+    padding-top: calc(var(--rn-header-h) + var(--rn-promo-bar-height, 0px));
+  }
+
+  /* Legacy aliases used across older pages */
+  .font-luxury,
+  .font-elegant {
+    font-family: var(--rn-font-display);
+    font-feature-settings: 'liga', 'kern';
+  }
+  .font-clean,
+  .font-modern {
+    font-family: var(--rn-font-body);
   }
 }
 
-/* Header offset with optional promo bar */
 .rn-page-pad-top {
   padding-top: calc(var(--rn-header-h) + var(--rn-promo-bar-height, 0px));
 }
 
-/* Mobile book bar clearance for WhatsApp */
 .whatsapp-widget {
-  bottom: calc(1.5rem + var(--mobile-book-bar, 0px) + env(safe-area-inset-bottom));
+  bottom: calc(1.25rem + var(--mobile-book-bar, 0px) + env(safe-area-inset-bottom));
 }
 
 @media (min-width: 1024px) {
@@ -213,7 +201,6 @@
   }
 }
 
-/* Promo bar marquee kept but quieter */
 @keyframes rn-marquee {
   0% {
     transform: translateX(0);
@@ -229,4 +216,13 @@
 .mobile-nav-open,
 .mobile-nav-open body {
   overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rn-marquee-track {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
 }

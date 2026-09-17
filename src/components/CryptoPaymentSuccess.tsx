@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { CheckCircle, Mail, Calendar, Users, Phone } from 'lucide-react'
 import { formatTourDateForDisplay } from '../lib/tourDate'
+import Footer from './Footer'
 
 const CryptoPaymentSuccess: React.FC = () => {
-  const navigate = useNavigate()
   const [bookingData, setBookingData] = useState<any>(null)
 
   useEffect(() => {
@@ -13,130 +13,96 @@ const CryptoPaymentSuccess: React.FC = () => {
     if (stored) {
       const data = JSON.parse(stored)
       setBookingData(data)
-      
+
       // Clear the stored data
       sessionStorage.removeItem('cryptoBooking')
     }
   }, [])
 
-  if (!bookingData) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden pt-20 pb-8 px-4">
-        {/* Northern Lights Background Effect */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-green-400/30 to-transparent animate-pulse"></div>
-          <div className="absolute top-1/4 left-1/4 w-1/2 h-1/4 bg-gradient-to-r from-emerald-400/20 to-teal-400/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute top-1/3 right-1/4 w-1/3 h-1/6 bg-gradient-to-l from-green-300/25 to-blue-300/25 rounded-full blur-2xl animate-pulse delay-500"></div>
-        </div>
-        
-        {/* Main Content */}
-        <div className="relative z-10 max-w-lg mx-auto">
-          <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-600/50 shadow-2xl text-center">
-            <div className="text-red-500 text-4xl mb-4">⚠️</div>
-            <h1 className="text-xl font-bold text-white mb-2">No Booking Data Found</h1>
-            <p className="text-gray-300 mb-6">Please return to the tours page and try again.</p>
-            <button
-              onClick={() => navigate('/')}
-              className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-            >
-              Back to Tours
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden pt-20 pb-8 px-4">
-      {/* Northern Lights Background Effect */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-green-400/30 to-transparent animate-pulse"></div>
-        <div className="absolute top-1/4 left-1/4 w-1/2 h-1/4 bg-gradient-to-r from-emerald-400/20 to-teal-400/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/3 right-1/4 w-1/3 h-1/6 bg-gradient-to-l from-green-300/25 to-blue-300/25 rounded-full blur-2xl animate-pulse delay-500"></div>
-      </div>
-      
-      {/* Main Content */}
-      <div className="relative z-10 max-w-lg mx-auto">
-        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-600/50 shadow-2xl">
-          {/* Success Icon */}
-          <div className="text-center mb-6">
-            <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-white mb-2">Crypto Booking Submitted!</h1>
-            <p className="text-gray-300 text-sm">Your booking request has been received</p>
-          </div>
-
-          {/* Booking Details */}
-          <div className="bg-gray-700/50 rounded-lg p-4 mb-4 border border-gray-600/50">
-            <h3 className="font-semibold text-white mb-3 text-sm">Booking Details</h3>
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center">
-                <span className="text-gray-300 font-medium">Tour: {bookingData.tour_name || 'Tour'}</span>
-              </div>
-              <div className="flex items-center">
-                <Calendar className="w-3 h-3 mr-2 text-green-400" />
-                <span className="text-gray-300">Date: {formatTourDateForDisplay(bookingData.tour_date_iso || bookingData.tour_date)}</span>
-              </div>
-              <div className="flex items-center">
-                <Users className="w-3 h-3 mr-2 text-green-400" />
-                <span className="text-gray-300">Participants: {bookingData.adults} adults, {bookingData.children} children</span>
-              </div>
-              <div className="flex items-center">
-                <span className="text-gray-300">Total: €{bookingData.total_price}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="text-gray-300">Payment: {bookingData.crypto_type?.toUpperCase() || 'Cryptocurrency'}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Payment Instructions */}
-          <div className="bg-emerald-900/20 border border-emerald-500/30 rounded-lg p-4 mb-4">
-            <div className="flex items-center mb-2">
-              <Mail className="w-4 h-4 mr-2 text-emerald-400" />
-              <h3 className="font-semibold text-white text-sm">Payment Instructions</h3>
-            </div>
-            <div className="text-emerald-400 text-xs">
-              <p className="mb-2">You will receive payment instructions via:</p>
-              <div className="space-y-1">
-                <div className="flex items-center">
-                  <span className="text-emerald-500 mr-2">📧</span>
-                  <span>Email: {bookingData.customer_email}</span>
-                </div>
-                {bookingData.customer_phone && (
-                  <div className="flex items-center">
-                    <Phone className="w-3 h-3 mr-2 text-emerald-500" />
-                    <span>Phone: {bookingData.customer_phone}</span>
-                  </div>
-                )}
-              </div>
-              <p className="mt-2 text-emerald-300">
-                We'll send you the wallet address and payment details within 24 hours.
+    <div className="rn-page flex min-h-screen flex-col">
+      <div className="rn-section flex-1 bg-midnight pt-28 sm:pt-32">
+        <div className="rn-container max-w-lg">
+          {!bookingData ? (
+            <div className="rounded-rn border border-white/10 bg-surface p-8 text-center shadow-rn-soft">
+              <p className="text-3xl" aria-hidden>
+                ⚠️
               </p>
+              <h1 className="mt-3 font-display text-xl font-semibold text-white">No booking data found</h1>
+              <p className="mt-2 text-sm text-text-muted">
+                Return to the tour page and submit your crypto booking again.
+              </p>
+              <Link to="/" className="rn-btn-primary mt-6 inline-flex">
+                Back to home
+              </Link>
             </div>
-          </div>
+          ) : (
+            <div className="rounded-rn border border-white/10 bg-surface p-6 shadow-rn sm:p-8">
+              <div className="text-center">
+                <CheckCircle className="mx-auto mb-4 h-14 w-14 text-aurora-soft" aria-hidden />
+                <h1 className="font-display text-2xl font-semibold text-white">Crypto booking submitted</h1>
+                <p className="mt-2 text-sm text-text-muted">We received your request and will follow up by email.</p>
+              </div>
 
-          {/* Next Steps */}
-          <div className="bg-gray-700/50 rounded-lg p-4 mb-4 border border-gray-600/50">
-            <h3 className="font-semibold text-white mb-2 text-sm">What's Next?</h3>
-            <ul className="text-xs text-gray-300 space-y-1">
-              <li>• Check your email for payment instructions</li>
-              <li>• Complete crypto payment within 48 hours</li>
-              <li>• Receive confirmation once payment is verified</li>
-              <li>• Meeting details sent before tour</li>
-              <li>• Contact us with any questions</li>
-            </ul>
-          </div>
+              <div className="mt-6 rounded-rn border border-white/10 bg-surface-2 p-4">
+                <h3 className="text-sm font-semibold text-white">Booking details</h3>
+                <div className="mt-3 space-y-2 text-xs text-text-muted">
+                  <p>
+                    <span className="text-text-dim">Tour:</span> {bookingData.tour_name || 'Tour'}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-3.5 w-3.5 text-aurora-soft" aria-hidden />
+                    <span>{formatTourDateForDisplay(bookingData.tour_date_iso || bookingData.tour_date)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="h-3.5 w-3.5 text-aurora-soft" aria-hidden />
+                    <span>
+                      {bookingData.adults} adults, {bookingData.children} children
+                    </span>
+                  </div>
+                  <p>Total: €{bookingData.total_price}</p>
+                  <p>Payment: {bookingData.crypto_type?.toUpperCase() || 'Cryptocurrency'}</p>
+                </div>
+              </div>
 
-          {/* Back Button */}
-          <button
-            onClick={() => navigate('/')}
-            className="w-full border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300 font-semibold py-3 px-4 rounded-lg text-sm"
-          >
-            Back to Home
-          </button>
+              <div className="mt-4 rounded-rn border border-aurora/25 bg-aurora/10 p-4">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-aurora-soft" aria-hidden />
+                  <h3 className="text-sm font-semibold text-white">Payment instructions</h3>
+                </div>
+                <div className="mt-2 text-xs text-text-muted">
+                  <p>We will send wallet details to:</p>
+                  <p className="mt-1 text-white">{bookingData.customer_email}</p>
+                  {bookingData.customer_phone && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <Phone className="h-3 w-3 text-aurora-soft" aria-hidden />
+                      <span>{bookingData.customer_phone}</span>
+                    </div>
+                  )}
+                  <p className="mt-2 text-aurora-soft">
+                    Expect payment details within 24 hours. Complete payment within 48 hours once received.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 rounded-rn border border-white/10 bg-surface-2 p-4">
+                <h3 className="text-sm font-semibold text-white">What happens next</h3>
+                <ul className="mt-2 space-y-1 text-xs text-text-muted">
+                  <li>Check email for payment instructions</li>
+                  <li>Send crypto within the stated window</li>
+                  <li>Final confirmation after payment is verified</li>
+                  <li>Meeting details before your tour</li>
+                </ul>
+              </div>
+
+              <Link to="/" className="rn-btn-secondary mt-6 flex w-full">
+                Back to home
+              </Link>
+            </div>
+          )}
         </div>
       </div>
+      <Footer />
     </div>
   )
 }

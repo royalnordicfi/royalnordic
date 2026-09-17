@@ -11,6 +11,19 @@ const LaplandHotelsGuide: React.FC = () => {
     category: "Accommodation",
     excerpt: "Complete guide to Lapland accommodations - from luxury hotels to cozy cabins. Find the perfect place to stay for your Arctic adventure in Rovaniemi and beyond.",
     heroImage: "/slideshow2.jpg",
+    author: "Royal Nordic Team",
+    relatedExperiences: [
+      {
+        title: "Northern Lights tour",
+        href: "/northern-lights-tour",
+        description: "Stay in Rovaniemi and join an evening aurora trip with local guides.",
+      },
+      {
+        title: "Customized tour",
+        href: "/customized-tour",
+        description: "Private planning help for stays, transfers, and activities.",
+      },
+    ],
     content: `Choosing the right accommodation can make or break your Lapland experience. From luxury hotels in Rovaniemi to remote wilderness cabins, Lapland offers diverse options for every budget and preference. This comprehensive guide helps you find the perfect place to stay for your Arctic adventure.
 
 ## Rovaniemi: The Gateway to Lapland

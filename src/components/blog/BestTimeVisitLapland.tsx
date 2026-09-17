@@ -11,6 +11,19 @@ const BestTimeVisitLapland: React.FC = () => {
     category: "Travel Guide",
     excerpt: "When should you visit Lapland? Complete month-by-month guide covering Northern Lights, activities, weather, crowds, and pricing for every season.",
     heroImage: "/lights6.jpg",
+    author: "Royal Nordic Team",
+    relatedExperiences: [
+      {
+        title: "Northern Lights tours",
+        href: "/northern-lights-tours",
+        description: "Plan aurora evenings around the season that fits your trip dates.",
+      },
+      {
+        title: "Daytime experiences",
+        href: "/daytime-experiences",
+        description: "Winter activities beyond the aurora — fishing, snowshoeing, and more.",
+      },
+    ],
     content: `Deciding when to visit Lapland can make or break your Arctic adventure. Each season offers unique experiences, from the magical polar nights of winter to the midnight sun of summer. This comprehensive guide breaks down every month to help you choose the perfect time for your Lapland journey.
 
 ## Quick Answer: Best Times by Interest

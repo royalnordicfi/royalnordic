@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, CheckCircle, Mail, Phone } from 'lucide-react'
+import { CheckCircle, Mail, Phone } from 'lucide-react'
+import CategoryHero from './CategoryHero'
 import Footer from './Footer'
 
 const TravelTrade: React.FC = () => {
@@ -13,6 +14,9 @@ const TravelTrade: React.FC = () => {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+
+  const inputClass =
+    'w-full rounded-lg border border-black/10 bg-white px-3 py-2.5 text-sm text-panel-ink placeholder:text-panel-muted focus:border-aurora focus:outline-none focus:ring-1 focus:ring-aurora/30'
 
   const reasons = [
     'Local operator based in Rovaniemi, Finnish Lapland',
@@ -90,39 +94,30 @@ const TravelTrade: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-black text-white">
-      <main className="flex-1">
-        <section className="relative overflow-hidden border-b border-white/10">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(16,185,129,0.14),_transparent_55%)]" />
-          <div className="relative mx-auto max-w-4xl px-4 pb-14 pt-32 sm:px-6 sm:pb-16 sm:pt-36 lg:px-8">
-            <Link
-              to="/"
-              className="mb-8 inline-flex min-h-[44px] items-center rounded-lg border border-white/20 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-emerald-400/50 hover:text-emerald-300"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Home
-            </Link>
-            <p className="mb-3 font-clean text-sm uppercase tracking-[0.18em] text-emerald-400">
-              Travel Trade
-            </p>
-            <h1 className="mb-4 font-luxury text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-              Partner With Royal Nordic
-            </h1>
-            <p className="max-w-2xl font-clean text-base leading-relaxed text-gray-300 sm:text-lg">
-              For travel agencies, DMCs, and B2B partners looking for premium Lapland experiences
-              from Rovaniemi — Northern Lights, daytime adventures, private itineraries, and
-              transfers.
-            </p>
-          </div>
-        </section>
+    <div className="rn-page flex min-h-screen flex-col">
+      <CategoryHero
+        title="Partner With Royal Nordic"
+        subtitle="For travel agencies, DMCs, and B2B partners looking for premium Lapland experiences from Rovaniemi."
+        image="/nortti5.jpg"
+        compact
+      />
 
-        <div className="mx-auto max-w-4xl space-y-12 px-4 py-12 sm:space-y-14 sm:px-6 sm:py-16 lg:px-8">
+      <main className="rn-container rn-page-pad flex-1 pb-12 pt-6 sm:pt-8">
+        <nav className="mb-6 text-sm text-text-muted" aria-label="Breadcrumb">
+          <ol className="flex flex-wrap items-center gap-2">
+            <li><Link to="/" className="hover:text-white">Home</Link></li>
+            <li aria-hidden>/</li>
+            <li className="text-white">Travel trade</li>
+          </ol>
+        </nav>
+
+        <div className="mx-auto max-w-3xl space-y-12">
           <section>
-            <h2 className="mb-5 font-luxury text-2xl font-bold">Why partner with us</h2>
-            <ul className="space-y-3">
+            <h2 className="font-display text-2xl font-semibold text-white">Why partner with us</h2>
+            <ul className="mt-4 space-y-3">
               {reasons.map((reason) => (
-                <li key={reason} className="flex items-start gap-3 font-clean text-sm text-gray-300 sm:text-base">
-                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
+                <li key={reason} className="flex items-start gap-3 text-sm text-text-muted sm:text-base">
+                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-aurora" aria-hidden />
                   <span>{reason}</span>
                 </li>
               ))}
@@ -130,62 +125,60 @@ const TravelTrade: React.FC = () => {
           </section>
 
           <section>
-            <h2 className="mb-4 font-luxury text-2xl font-bold">Company introduction</h2>
-            <div className="space-y-4 font-clean text-sm leading-relaxed text-gray-300 sm:text-base">
+            <h2 className="font-display text-2xl font-semibold text-white">Company introduction</h2>
+            <div className="mt-4 space-y-4 text-sm leading-relaxed text-text-muted sm:text-base">
               <p>
-                Royal Nordic is a Rovaniemi-based tour operator focused on premium Arctic
-                experiences. We specialise in small-group and private tours with local guides,
-                clear product pages, and direct online booking for travellers who prefer to confirm
-                immediately.
+                Royal Nordic is a Rovaniemi-based tour operator focused on premium Arctic experiences. We
+                specialise in small-group and private tours with local guides, clear product pages, and direct
+                online booking for travellers who prefer to confirm immediately.
               </p>
               <p>
-                For agencies and partners, we support FIT and group requests, customized programmes,
-                and clear communication around pickup, languages, and seasonal availability.
-                Commercial terms are shared privately after we understand your market and volume.
+                For agencies and partners, we support FIT and group requests, customized programmes, and clear
+                communication around pickup, languages, and seasonal availability. Commercial terms are shared
+                privately after we understand your market and volume.
               </p>
             </div>
           </section>
 
           <section>
-            <h2 className="mb-5 font-luxury text-2xl font-bold">Our experiences</h2>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <h2 className="font-display text-2xl font-semibold text-white">Our experiences</h2>
+            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {experiences.map((item) => (
                 <Link
                   key={item.to}
                   to={item.to}
-                  className="rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-colors hover:border-emerald-500/35"
+                  className="rounded-rn border border-white/10 bg-surface p-4 transition-colors hover:border-aurora/30"
                 >
-                  <h3 className="mb-1 text-base font-semibold text-white">{item.title}</h3>
-                  <p className="font-clean text-sm leading-relaxed text-gray-400">{item.detail}</p>
+                  <h3 className="text-base font-semibold text-white">{item.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-text-muted">{item.detail}</p>
                 </Link>
               ))}
             </div>
           </section>
 
-          <section className="grid grid-cols-1 gap-8 border-y border-white/10 py-8 md:grid-cols-2 md:gap-10">
+          <section className="grid gap-8 border-y border-white/10 py-8 md:grid-cols-2">
             <div>
-              <h2 className="mb-3 font-luxury text-xl font-bold">Accommodation</h2>
-              <p className="mb-3 font-clean text-sm leading-relaxed text-gray-300 sm:text-base">
-                We help partners advise guests on where to stay in the Rovaniemi area and how lodging
-                connects with hotel pickup. Detailed property contracts and rates are arranged case
-                by case.
+              <h2 className="font-display text-xl font-semibold text-white">Accommodation</h2>
+              <p className="mt-3 text-sm leading-relaxed text-text-muted sm:text-base">
+                We help partners advise guests on where to stay in the Rovaniemi area and how lodging connects
+                with hotel pickup. Detailed property contracts and rates are arranged case by case.
               </p>
               <Link
                 to="/blog/where-to-stay-lapland-accommodation-guide"
-                className="text-sm font-medium text-emerald-400 underline underline-offset-2 hover:text-emerald-300"
+                className="mt-3 inline-block text-sm font-medium text-aurora-soft hover:underline"
               >
                 Lapland accommodation guide
               </Link>
             </div>
             <div>
-              <h2 className="mb-3 font-luxury text-xl font-bold">Customized itineraries</h2>
-              <p className="mb-3 font-clean text-sm leading-relaxed text-gray-300 sm:text-base">
-                Multi-activity programmes combining aurora hunting, daytime adventures, and private
-                transfers. Share guest profile, dates, and pace — we reply with a workable outline.
+              <h2 className="font-display text-xl font-semibold text-white">Customized itineraries</h2>
+              <p className="mt-3 text-sm leading-relaxed text-text-muted sm:text-base">
+                Multi-activity programmes combining aurora hunting, daytime adventures, and private transfers.
+                Share guest profile, dates, and pace — we reply with a workable outline.
               </p>
               <Link
                 to="/customized-tour"
-                className="text-sm font-medium text-emerald-400 underline underline-offset-2 hover:text-emerald-300"
+                className="mt-3 inline-block text-sm font-medium text-aurora-soft hover:underline"
               >
                 Request a customized tour
               </Link>
@@ -193,33 +186,33 @@ const TravelTrade: React.FC = () => {
           </section>
 
           <section>
-            <h2 className="mb-4 font-luxury text-2xl font-bold">How partnerships work</h2>
-            <ol className="list-inside list-decimal space-y-3 font-clean text-sm leading-relaxed text-gray-300 sm:text-base">
+            <h2 className="font-display text-2xl font-semibold text-white">How partnerships work</h2>
+            <ol className="mt-4 list-inside list-decimal space-y-3 text-sm leading-relaxed text-text-muted sm:text-base">
               <li>Send an enquiry with your company details and the products or dates you need.</li>
               <li>We confirm suitability, seasonal availability, and operational notes.</li>
               <li>Commercial terms (including any agency arrangements) are shared privately.</li>
               <li>We align on booking flow, guest communication, and pickup details.</li>
             </ol>
-            <p className="mt-4 font-clean text-xs text-gray-500">
+            <p className="mt-4 text-xs text-text-dim">
               Commission rates and net rates are agreed directly with partners — not published here.
             </p>
           </section>
 
-          <section id="partnership-enquiry" className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-8">
-            <h2 className="mb-2 font-luxury text-2xl font-bold">Partnership enquiry</h2>
-            <p className="mb-6 font-clean text-sm text-gray-400">
+          <section id="partnership-enquiry" className="rn-panel p-5 shadow-rn sm:p-8">
+            <h2 className="font-display text-2xl font-semibold text-panel-ink">Partnership enquiry</h2>
+            <p className="mt-2 text-sm text-panel-muted">
               Prefer email? Write to{' '}
-              <a href="mailto:contact@royalnordic.fi" className="text-emerald-400 hover:underline">
+              <a href="mailto:contact@royalnordic.fi" className="font-medium text-aurora hover:underline">
                 contact@royalnordic.fi
               </a>{' '}
               or call{' '}
-              <a href="tel:+3584578345138" className="text-emerald-400 hover:underline">
+              <a href="tel:+3584578345138" className="font-medium text-aurora hover:underline">
                 +358 45 78345138
               </a>
               .
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <input
                   required
@@ -227,14 +220,14 @@ const TravelTrade: React.FC = () => {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Your name"
-                  className="min-h-[48px] w-full rounded-lg border border-white/15 bg-black/40 px-3 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className={inputClass}
                 />
                 <input
                   name="company"
                   value={formData.company}
                   onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                   placeholder="Company / agency"
-                  className="min-h-[48px] w-full rounded-lg border border-white/15 bg-black/40 px-3 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className={inputClass}
                 />
               </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -245,14 +238,14 @@ const TravelTrade: React.FC = () => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="Work email"
-                  className="min-h-[48px] w-full rounded-lg border border-white/15 bg-black/40 px-3 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className={inputClass}
                 />
                 <input
                   name="phone"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   placeholder="Phone (optional)"
-                  className="min-h-[48px] w-full rounded-lg border border-white/15 bg-black/40 px-3 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className={inputClass}
                 />
               </div>
               <textarea
@@ -262,17 +255,17 @@ const TravelTrade: React.FC = () => {
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 placeholder="Tell us about your agency, markets, and what you need (products, dates, group size)…"
-                className="w-full resize-y rounded-lg border border-white/15 bg-black/40 px-3 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className={`${inputClass} resize-y`}
               />
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="min-h-[48px] w-full rounded-lg bg-emerald-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-emerald-500 disabled:opacity-50 sm:w-auto"
+                className="rn-btn-primary min-h-[48px] w-full disabled:opacity-50 sm:w-auto sm:px-8"
               >
                 {isSubmitting ? 'Sending…' : 'Send partnership enquiry'}
               </button>
               {submitStatus === 'success' && (
-                <p className="text-sm text-emerald-400">
+                <p className="text-sm text-aurora-soft">
                   Thank you — check your email for confirmation. We will reply soon.
                 </p>
               )}
@@ -283,12 +276,12 @@ const TravelTrade: React.FC = () => {
               )}
             </form>
 
-            <div className="mt-8 flex flex-wrap gap-4 text-sm text-gray-400">
-              <a href="mailto:contact@royalnordic.fi" className="inline-flex items-center gap-2 hover:text-emerald-400">
-                <Mail size={16} /> contact@royalnordic.fi
+            <div className="mt-8 flex flex-wrap gap-4 text-sm text-panel-muted">
+              <a href="mailto:contact@royalnordic.fi" className="inline-flex items-center gap-2 hover:text-aurora">
+                <Mail size={16} aria-hidden /> contact@royalnordic.fi
               </a>
-              <a href="tel:+3584578345138" className="inline-flex items-center gap-2 hover:text-emerald-400">
-                <Phone size={16} /> +358 45 78345138
+              <a href="tel:+3584578345138" className="inline-flex items-center gap-2 hover:text-aurora">
+                <Phone size={16} aria-hidden /> +358 45 78345138
               </a>
             </div>
           </section>

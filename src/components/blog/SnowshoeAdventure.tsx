@@ -11,6 +11,19 @@ const SnowshoeAdventure: React.FC = () => {
     category: "Activities",
     excerpt: "Discover the magic of snowshoeing in Lapland's pristine wilderness. Learn about this traditional Arctic activity and how to experience the untouched beauty of Finnish Lapland.",
     heroImage: "/snowshoe1.jpg",
+    author: "Royal Nordic Team",
+    relatedExperiences: [
+      {
+        title: "Snowshoe rental",
+        href: "/snowshoe-rental",
+        description: "Explore Lapland forests at your own pace with rental snowshoes near Rovaniemi.",
+      },
+      {
+        title: "Daytime experiences",
+        href: "/daytime-experiences",
+        description: "Browse guided winter activities that pair well with a snowshoe day.",
+      },
+    ],
     content: `Snowshoeing is one of the most authentic ways to explore Lapland's pristine wilderness. This traditional Arctic activity allows you to walk on deep snow and access areas that would be impossible to reach on foot during winter. Experience the untouched beauty of Finnish Lapland while following ancient paths through snow-covered forests.
 
 ## What is Snowshoeing?

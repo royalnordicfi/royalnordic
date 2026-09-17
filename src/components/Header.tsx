@@ -3,10 +3,7 @@ import { createPortal } from 'react-dom'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 
-type NavItem = {
-  label: string
-  to: string
-}
+type NavItem = { label: string; to: string }
 
 const NAV: NavItem[] = [
   { label: 'Experiences', to: '/#experiences' },
@@ -16,6 +13,16 @@ const NAV: NavItem[] = [
   { label: 'Transfers', to: '/transportation' },
   { label: 'Guides', to: '/blog' },
 ]
+
+/** Routes where a full-bleed photographic hero sits under a transparent header. */
+const HERO_ROUTES = new Set([
+  '/',
+  '/northern-lights-tours',
+  '/daytime-experiences',
+  '/renting-equipment',
+  '/transportation',
+  '/blog',
+])
 
 function resolveNav(to: string, navigate: ReturnType<typeof useNavigate>, pathname: string) {
   if (to.startsWith('/#')) {
@@ -44,15 +51,15 @@ const Header = () => {
   const scrollLockY = useRef(0)
   const afterClose = useRef<(() => void) | null>(null)
 
-  const isHome = pathname === '/'
-  const overHero = isHome && !scrolled
+  const hasHero = HERO_ROUTES.has(pathname)
+  const transparent = hasHero && !scrolled
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
+    const onScroll = () => setScrolled(window.scrollY > 20)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [pathname])
 
   const lockScroll = useCallback(() => {
     scrollLockY.current = window.scrollY
@@ -118,45 +125,52 @@ const Header = () => {
   return (
     <>
       <header
-        className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
-          overHero
-            ? 'bg-transparent'
+        className={`fixed left-0 right-0 z-50 transition-colors duration-300 ${
+          transparent
+            ? 'bg-gradient-to-b from-black/70 to-transparent'
             : 'border-b border-white/10 bg-midnight/95 backdrop-blur-md'
         }`}
         style={{ top: 'var(--rn-promo-bar-height, 0px)' }}
       >
-        <div className="rn-container flex h-[4.25rem] items-center justify-between gap-4">
+        <div className="rn-container flex h-16 items-center justify-between gap-4">
           <Link to="/" className="flex shrink-0 items-center gap-2.5" aria-label="Royal Nordic home">
             <img src="/logo.png" alt="" className="h-8 w-auto" width={32} height={32} />
-            <span className="font-display text-lg font-semibold tracking-wide text-snow sm:text-xl">
+            <span className="font-display text-lg font-semibold tracking-wide text-white sm:text-xl">
               Royal Nordic
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-1 xl:flex" aria-label="Primary">
-            {NAV.map((item) => (
-              <button
-                key={item.label}
-                type="button"
-                onClick={() => resolveNav(item.to, navigate, pathname)}
-                className="rounded-full px-3 py-2 text-[13px] font-medium text-snow/85 transition hover:bg-white/10 hover:text-snow"
-              >
-                {item.label}
-              </button>
-            ))}
+          <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Primary">
+            {NAV.map((item) => {
+              const active =
+                item.to === pathname ||
+                (item.to !== '/' && pathname.startsWith(item.to.split('#')[0]) && item.to !== '/#experiences')
+              return (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => resolveNav(item.to, navigate, pathname)}
+                  className={`rounded-md px-3 py-2 text-[13px] font-medium transition ${
+                    active ? 'text-aurora-soft' : 'text-white/80 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              )
+            })}
           </nav>
 
           <div className="flex items-center gap-2">
             <Link
               to="/northern-lights-tour"
-              className="rn-btn-primary hidden px-5 py-2.5 text-xs sm:inline-flex"
+              className="rn-btn-primary hidden !min-h-0 !rounded-md px-4 py-2 text-xs sm:inline-flex"
             >
               Book a tour
             </Link>
             <button
               ref={openRef}
               type="button"
-              className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 text-snow xl:hidden"
+              className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-white/20 text-white xl:hidden"
               aria-label="Open menu"
               aria-expanded={menuOpen}
               onClick={() => (menuOpen || menuMounted ? closeMenu() : openMenu())}
@@ -172,51 +186,47 @@ const Header = () => {
           <div className="fixed inset-0 z-[70] xl:hidden" role="dialog" aria-modal="true">
             <button
               type="button"
-              className={`absolute inset-0 bg-midnight/70 transition-opacity ${menuOpen ? 'opacity-100' : 'opacity-0'}`}
+              className={`absolute inset-0 bg-black/70 transition-opacity ${menuOpen ? 'opacity-100' : 'opacity-0'}`}
               aria-label="Close menu"
               onClick={() => closeMenu()}
             />
             <div
-              className={`absolute inset-y-0 right-0 flex w-[min(100%,22rem)] flex-col bg-midnight-soft shadow-2xl transition-transform duration-300 ${
+              className={`absolute inset-y-0 right-0 flex w-[min(100%,22rem)] flex-col bg-surface transition-transform duration-300 ${
                 menuOpen ? 'translate-x-0' : 'translate-x-full'
               }`}
             >
               <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
-                <span className="font-display text-xl text-snow">Menu</span>
+                <span className="font-display text-xl text-white">Menu</span>
                 <button
                   ref={closeRef}
                   type="button"
-                  className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 text-snow"
+                  className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-white/20 text-white"
                   aria-label="Close menu"
                   onClick={() => closeMenu()}
                 >
                   <X size={20} />
                 </button>
               </div>
-              <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-4" aria-label="Mobile">
+              <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-4" aria-label="Mobile">
                 {NAV.map((item) => (
                   <button
                     key={item.label}
                     type="button"
                     onClick={() => go(item.to)}
-                    className="rounded-rn px-4 py-3.5 text-left text-base font-medium text-snow hover:bg-white/5"
+                    className="rounded-md px-4 py-3.5 text-left text-base font-medium text-white hover:bg-white/5"
                   >
                     {item.label}
                   </button>
                 ))}
               </nav>
               <div className="border-t border-white/10 p-4">
-                <Link
-                  to="/northern-lights-tour"
-                  onClick={() => closeMenu()}
-                  className="rn-btn-primary w-full"
-                >
+                <Link to="/northern-lights-tour" onClick={() => closeMenu()} className="rn-btn-primary w-full">
                   Book Guaranteed Northern Lights
                 </Link>
                 <Link
                   to="/travel-trade"
                   onClick={() => closeMenu()}
-                  className="mt-3 block text-center text-sm text-snow/60 hover:text-snow"
+                  className="mt-3 block text-center text-sm text-text-muted hover:text-white"
                 >
                   Travel trade / partners
                 </Link>

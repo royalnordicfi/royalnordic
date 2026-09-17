@@ -1,168 +1,77 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Car, Clock, Users, MapPin } from 'lucide-react';
-import Footer from './Footer';
+import React from 'react'
+import CategoryHero from './CategoryHero'
+import Footer from './Footer'
+import TourCard from './TourCard'
+
+const TRANSFERS = [
+  {
+    to: '/transportation-rovaniemi-levi',
+    image: '/transportation1.jpg',
+    imageAlt: 'Private transfer from Rovaniemi to Levi',
+    title: 'Rovaniemi – Levi / Kittilä',
+    duration: '2–3 hours',
+    groupSize: 'Up to 8',
+    pickup: true,
+    badge: 'Private transfer',
+    priceFrom: 399,
+  },
+  {
+    to: '/transportation-customized',
+    image: '/transportation2.jpg',
+    imageAlt: 'Custom Lapland transportation',
+    title: 'Customized Transportation',
+    duration: 'Flexible',
+    groupSize: 'Up to 8',
+    pickup: true,
+    badge: 'On request',
+    priceFrom: undefined as number | undefined,
+  },
+]
 
 const TransportationCategory = () => {
-  const transportations = [
-    {
-      id: 1,
-      title: "Private Transportation: Rovaniemi - Levi/Kittilä",
-      description: "Comfortable private transportation service between Rovaniemi and the popular ski resorts of Levi and Kittilä.",
-      price: "399€",
-      duration: "2-3 hours",
-      groupSize: "Up to 8 people",
-      location: "Rovaniemi to Levi/Kittilä",
-      features: ["Private vehicle", "Professional driver", "Comfortable seating", "Flexible timing"],
-      images: ["/transportation1.jpg", "/transportation3.jpg"],
-      route: "/transportation-rovaniemi-levi"
-    },
-    {
-      id: 2,
-      title: "Private Customized Transportation",
-      description: "Tailored transportation service for your specific needs. From airport transfers to custom routes throughout Lapland.",
-      price: "Custom pricing",
-      duration: "Flexible",
-      groupSize: "Up to 8 people",
-      location: "Lapland, Finland",
-      features: ["Custom routes", "Flexible scheduling", "Professional driver", "Personalized service"],
-      images: ["/transportation2.jpg"],
-      route: "/transportation-customized"
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-black">
-      {/* Hero Section */}
-      <section className="relative h-[60vh] sm:h-[70vh] lg:h-[80vh] overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <img
-            src="/transportation1.jpg"
-            alt="Transportation Services"
-            className="w-full h-full object-cover"
-          />
-          {/* Fade effect */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black"></div>
-        </div>
-        
-        {/* Hero Content */}
-        <div className="absolute inset-0 flex items-center justify-center z-10 pt-40 sm:pt-44 md:pt-48">
-          <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-            <Link 
-              to="/"
-              className="inline-flex items-center bg-emerald-500 text-white hover:bg-emerald-600 transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-8 sm:mb-12"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Link>
-            
-            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-luxury font-bold mb-4 sm:mb-6 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
-              Transportation Services
-            </h1>
-            
-            <p className="text-sm sm:text-lg md:text-xl text-gray-300 max-w-2xl sm:max-w-3xl mx-auto leading-relaxed font-clean px-2">
-              Travel comfortably and safely throughout Lapland with our professional transportation services.
+    <div className="rn-page">
+      <CategoryHero
+        title="Private Transportation in Lapland"
+        subtitle="Point-to-point transfers between Rovaniemi, Levi, Kittilä, and custom routes — professional driver and flexible timing."
+        image="/transportation3.jpg"
+      />
+
+      <section className="rn-section bg-midnight">
+        <div className="rn-container">
+          <div className="grid gap-5 sm:grid-cols-2">
+            {TRANSFERS.map((item) => (
+              <TourCard
+                key={item.to}
+                to={item.to}
+                image={item.image}
+                imageAlt={item.imageAlt}
+                title={item.title}
+                location="Lapland, Finland"
+                duration={item.duration}
+                groupSize={item.groupSize}
+                pickup={item.pickup}
+                badge={item.badge}
+                priceFrom={item.priceFrom}
+                ctaLabel={item.priceFrom != null ? 'View details' : 'Request quote'}
+              />
+            ))}
+          </div>
+
+          <div className="mt-12 max-w-2xl rounded-rn border border-white/10 bg-surface p-6">
+            <h2 className="font-display text-2xl font-semibold text-white">How it works</h2>
+            <p className="mt-3 text-sm text-text-muted">
+              Fixed-route Levi/Kittilä transfers are priced per vehicle. For airport pickups, ski
+              transfers, or multi-stop days, use the customized option and tell us your schedule — we
+              reply with a quote.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Transportation Cards Section */}
-      <section className="py-16 sm:py-20 lg:py-24 bg-black relative">
-        {/* Background fade effect */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black"></div>
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Transportation Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
-          {transportations.map((transportation) => (
-            <Link
-              key={transportation.id}
-              to={transportation.route}
-              className="bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/20 group block"
-            >
-                {/* Image */}
-                <div className="relative h-48 sm:h-56 overflow-hidden">
-                  <img
-                    src={transportation.images[0]}
-                    alt={transportation.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                  
-                  {/* Badge */}
-                  <div className="absolute top-4 left-4">
-                    <span className="bg-emerald-600/90 text-white text-xs font-semibold px-3 py-1 rounded-full backdrop-blur-sm">
-                      Transportation
-                    </span>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-4 sm:p-5">
-                  <h3 className="text-xl font-luxury font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">
-                    {transportation.title}
-                  </h3>
-                  
-                  <p className="text-gray-300 text-sm mb-4 font-clean leading-relaxed">
-                    {transportation.description}
-                  </p>
-
-                  {/* Features */}
-                  <div className="grid grid-cols-2 gap-3 mb-6">
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <Clock className="w-4 h-4 mr-2 text-emerald-400" />
-                      <span>{transportation.duration}</span>
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <Users className="w-4 h-4 mr-2 text-emerald-400" />
-                      <span>{transportation.groupSize}</span>
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <MapPin className="w-4 h-4 mr-2 text-emerald-400" />
-                      <span>{transportation.location}</span>
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <Car className="w-4 h-4 mr-2 text-emerald-400" />
-                      <span>Private Vehicle</span>
-                    </div>
-                  </div>
-
-                  {/* Features List */}
-                  <div className="mb-6">
-                    <h4 className="text-white font-semibold mb-2 text-sm">Included:</h4>
-                    <div className="grid grid-cols-1 gap-1">
-                      {transportation.features.map((feature, index) => (
-                        <div key={index} className="flex items-center text-gray-300 text-xs">
-                          <div className="w-1 h-1 bg-emerald-400 rounded-full mr-2"></div>
-                          <span>{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                {/* Price */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-emerald-400 font-bold text-lg">{transportation.price}</p>
-                  </div>
-                  <div className="text-emerald-400 group-hover:text-white transition-colors">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-        </div>
-      </section>
-      
-      {/* Footer */}
       <Footer />
     </div>
-  );
-};
+  )
+}
 
-export default TransportationCategory;
+export default TransportationCategory

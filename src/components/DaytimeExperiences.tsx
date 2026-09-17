@@ -1,61 +1,63 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Users, Clock, MapPin, Star } from 'lucide-react';
-import Footer from './Footer';
-import { fetchActiveTourIds } from '../lib/productVisibility';
+import React, { useEffect, useMemo, useState } from 'react'
+import CategoryHero from './CategoryHero'
+import Footer from './Footer'
+import TourCard from './TourCard'
+import { fetchActiveTourIds } from '../lib/productVisibility'
 
 const ALL_EXPERIENCES = [
   {
-    id: 1,
     tourId: 4 as number | null,
-    name: "Ice Fishing Experience",
-    description: "Experience traditional Lapland ice fishing on pristine frozen lakes with expert guidance. Perfect for all skill levels!",
-    image: "/icefishing2.jpg",
-    duration: "3-4 hours",
-    groupSize: "Max 8 people",
-    location: "Rovaniemi, Lapland",
-    features: ["Professional guide", "All equipment", "Hot drinks", "Traditional techniques"],
-    route: "/ice-fishing"
+    to: '/ice-fishing',
+    image: '/icefishing2.jpg',
+    imageAlt: 'Ice fishing on a frozen Lapland lake',
+    title: 'Ice Fishing Experience',
+    duration: '3–4 hours',
+    groupSize: 'Max 8',
+    pickup: true,
+    badge: 'Day trip',
+    priceFrom: 119,
+    featured: false,
   },
   {
-    id: 2,
     tourId: 5 as number | null,
-    name: "Nordic Animals of Ranua Zoo",
-    description: "Day trip from Rovaniemi to Ranua Wildlife Park — polar bears and 50+ Arctic species, transfers and tickets included.",
-    image: "/ranua1.jpg",
-    duration: "About 5 hours",
-    groupSize: "Max 16 people",
-    location: "Ranua, Lapland",
-    features: ["Hotel pickup", "Zoo tickets", "Polar bears & Arctic wildlife", "English & Finnish"],
-    route: "/ranua-zoo",
-    badge: "Family Favorite"
+    to: '/ranua-zoo',
+    image: '/ranua1.jpg',
+    imageAlt: 'Ranua Wildlife Park',
+    title: 'Nordic Animals of Ranua Zoo',
+    duration: 'About 5 hours',
+    groupSize: 'Max 16',
+    pickup: true,
+    badge: 'Family',
+    priceFrom: 99,
+    featured: false,
   },
   {
-    id: 3,
     tourId: 6 as number | null,
-    name: "Korouoma Canyon Winter Adventure",
-    description: "6-hour canyon hike to frozen waterfalls from Rovaniemi — hotel pickup, guided trails, and a campfire picnic with hot drinks.",
-    image: "/korouoma1.jpg",
-    duration: "6 hours",
-    groupSize: "Max 8 people per vehicle",
-    location: "Korouoma Canyon, Lapland",
-    features: ["Hotel pickup", "Professional guide", "Campfire picnic", "Hot drinks"],
-    route: "/korouoma-canyon",
-    badge: "Adventure"
+    to: '/korouoma-canyon',
+    image: '/korouoma1.jpg',
+    imageAlt: 'Korouoma Canyon frozen waterfalls',
+    title: 'Korouoma Canyon Winter Adventure',
+    duration: '6 hours',
+    groupSize: 'Max 8 / vehicle',
+    pickup: true,
+    badge: 'Adventure',
+    priceFrom: 129,
+    featured: false,
   },
   {
-    id: 4,
     tourId: null as number | null,
-    name: "Snowmobile Safari",
-    description: "Snowmobile through Lapland wilderness. Partner experience — request availability and a quote.",
-    image: "/snowmobiling.jpg",
-    duration: "0.5h, 1h, 2h, or 3h",
-    location: "Rovaniemi, Lapland",
-    features: ["Professional guide", "All equipment", "Safety briefing", "Scenic routes"],
-    route: "/snowmobile-safari",
-    badge: "Request availability"
-  }
-];
+    to: '/snowmobile-safari',
+    image: '/snowmobiling2.jpg',
+    imageAlt: 'Snowmobile safari in Lapland',
+    title: 'Snowmobile Safari',
+    duration: '0.5–3 hours',
+    groupSize: 'Flexible',
+    pickup: false,
+    badge: 'Partner',
+    priceFrom: undefined as number | undefined,
+    featured: false,
+  },
+]
 
 const DaytimeExperiences: React.FC = () => {
   const [activeIds, setActiveIds] = useState<Set<number> | null>(null)
@@ -70,141 +72,61 @@ const DaytimeExperiences: React.FC = () => {
   }, [activeIds])
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Hero Section */}
-      <div 
-        className="relative h-[40vh] sm:h-[50vh] bg-cover bg-center"
-        style={{ backgroundImage: 'url(/icefishing3.jpg)' }}
-      >
-        <div className="absolute inset-0 bg-black/60"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black"></div>
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 pt-40 sm:pt-44 md:pt-48">
-          <Link 
-            to="/"
-            className="inline-flex items-center bg-emerald-500 text-white hover:bg-emerald-600 transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-8 sm:mb-12"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
-          </Link>
-          
-          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-luxury font-bold mb-4 sm:mb-6 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
-            Daytime Experiences
-          </h1>
-          <p className="text-sm sm:text-lg md:text-xl text-gray-300 max-w-2xl sm:max-w-3xl mx-auto leading-relaxed font-clean px-2">
-            Discover authentic Arctic activities and wildlife during the day
-          </p>
-        </div>
-      </div>
+    <div className="rn-page">
+      <CategoryHero
+        title="Daytime Experiences in Lapland"
+        subtitle="Ice fishing, wildlife, canyon hikes, and partner snowmobile trips — small groups with local guides from Rovaniemi."
+        image="/icefishing3.jpg"
+      />
 
-      {/* Experiences Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
-          {experiences.map((experience) => (
-            <Link
-              key={experience.id}
-              to={experience.route}
-              className="group bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/20"
-            >
-              {/* Image */}
-              <div className="relative h-48 sm:h-56 overflow-hidden">
-                <img
-                  src={experience.image}
-                  alt={experience.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                
-                {/* Badge */}
-                {experience.badge && (
-                  <div className="absolute top-4 right-4 bg-emerald-500 text-black px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                    <Star className="w-3 h-3 fill-current" />
-                    {experience.badge}
-                  </div>
-                )}
-              </div>
+      <section className="rn-section bg-midnight">
+        <div className="rn-container">
+          <div className="grid gap-5 sm:grid-cols-2">
+            {experiences.map((exp) => (
+              <TourCard
+                key={exp.to}
+                to={exp.to}
+                image={exp.image}
+                imageAlt={exp.imageAlt}
+                title={exp.title}
+                duration={exp.duration}
+                groupSize={exp.groupSize}
+                pickup={exp.pickup}
+                badge={exp.badge}
+                priceFrom={exp.priceFrom}
+                featured={exp.featured}
+                ctaLabel={exp.priceFrom != null ? 'View details' : 'Request availability'}
+              />
+            ))}
+          </div>
 
-              {/* Content */}
-              <div className="p-4 sm:p-5">
-                <h3 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">
-                  {experience.name}
-                </h3>
-                
-                <p className="text-gray-300 mb-6 leading-relaxed font-clean">
-                  {experience.description}
-                </p>
-
-                {/* Experience Details */}
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-center text-gray-300">
-                    <Clock className="w-5 h-5 mr-3 text-emerald-400 flex-shrink-0" />
-                    <span className="font-clean">{experience.duration}</span>
-                  </div>
-                  {experience.groupSize && (
-                    <div className="flex items-center text-gray-300">
-                      <Users className="w-5 h-5 mr-3 text-emerald-400 flex-shrink-0" />
-                      <span className="font-clean">{experience.groupSize}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center text-gray-300">
-                    <MapPin className="w-5 h-5 mr-3 text-emerald-400 flex-shrink-0" />
-                    <span className="font-clean">{experience.location}</span>
-                  </div>
-                </div>
-
-                {/* Features */}
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {(experience.features ?? []).map((feature, index) => (
-                    <span
-                      key={index}
-                      className="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-medium border border-emerald-500/20"
-                    >
-                      {feature}
-                    </span>
-                  ))}
-                </div>
-
-                {/* CTA */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-800">
-                  <span className="text-emerald-400 font-semibold group-hover:translate-x-2 transition-transform">
-                    View Details →
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* Info Box */}
-        <div className="mt-12 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-6 sm:p-8">
-          <h3 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4">
-            Why Choose Our Daytime Experiences?
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-300 font-clean">
-            <div className="flex items-start">
-              <span className="text-emerald-400 mr-2">✓</span>
-              <span>Authentic Arctic activities and traditions</span>
-            </div>
-            <div className="flex items-start">
-              <span className="text-emerald-400 mr-2">✓</span>
-              <span>Expert local guides with deep knowledge</span>
-            </div>
-            <div className="flex items-start">
-              <span className="text-emerald-400 mr-2">✓</span>
-              <span>Small groups for personalized experience</span>
-            </div>
-            <div className="flex items-start">
-              <span className="text-emerald-400 mr-2">✓</span>
-              <span>Perfect for families and all ages</span>
-            </div>
+          <div className="mt-12 max-w-2xl rounded-rn border border-white/10 bg-surface p-6">
+            <h2 className="font-display text-2xl font-semibold text-white">Pick your day trip</h2>
+            <ul className="mt-4 space-y-3 text-sm text-text-muted">
+              <li>
+                <strong className="text-white">Ice fishing</strong> — relaxed morning or afternoon on
+                frozen lakes near Rovaniemi.
+              </li>
+              <li>
+                <strong className="text-white">Ranua Zoo</strong> — polar bears and Arctic species with
+                transfers and tickets included.
+              </li>
+              <li>
+                <strong className="text-white">Korouoma</strong> — guided hike to frozen waterfalls and
+                campfire lunch.
+              </li>
+              <li>
+                <strong className="text-white">Snowmobile</strong> — operated by a partner; send a request
+                for times and pricing.
+              </li>
+            </ul>
           </div>
         </div>
-      </div>
+      </section>
 
       <Footer />
     </div>
-  );
-};
+  )
+}
 
-export default DaytimeExperiences;
-
+export default DaytimeExperiences

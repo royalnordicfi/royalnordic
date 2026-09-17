@@ -1,6 +1,6 @@
-import { Car, Clock, Users, MapPin, CheckCircle, ArrowLeft, Mail, User, MessageSquare } from 'lucide-react';
+import { Car, Clock, Users, MapPin, CheckCircle, Mail, User, MessageSquare } from 'lucide-react';
 import { useState } from 'react';
-import ImageSlideshow from './ImageSlideshow';
+import CategoryHero from './CategoryHero';
 import Footer from './Footer';
 import { Link } from 'react-router-dom';
 
@@ -21,6 +21,8 @@ const TransportationRovaniemiLevi = () => {
     adult: 399,
     child: 299
   };
+  const inputClass =
+    'w-full rounded-lg border border-black/10 bg-white px-3 py-2.5 text-sm text-panel-ink placeholder:text-panel-muted focus:border-aurora focus:outline-none focus:ring-1 focus:ring-aurora/30';
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('');
 
@@ -115,47 +117,29 @@ const TransportationRovaniemiLevi = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Header */}
-      <div className="relative">
-        <ImageSlideshow 
-          images={["/transportation1.jpg"]}
-          className="h-[28rem] sm:h-[32rem] md:h-[36rem] lg:h-[40rem]"
-          alt="Transportation Rovaniemi to Levi"
-        />
-        
-        {/* Hero Content */}
-        <div className="absolute inset-0 flex items-center justify-center z-10 pt-20 sm:pt-0">
-          <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-            <Link 
-              to="/" 
-              className="inline-flex items-center bg-emerald-500 text-white hover:bg-emerald-600 transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-8 sm:mb-12"
-            >
-              <ArrowLeft size={16} className="mr-1 sm:mr-2" />
-              Back to Home
-            </Link>
-            
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-luxury font-bold mb-4 sm:mb-6 leading-tight drop-shadow-2xl">
-              <span className="bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent drop-shadow-2xl">
-                Private Transportation: Rovaniemi - Levi/Kittilä
-              </span>
-            </h1>
-            <p className="text-lg sm:text-xl md:text-2xl text-white font-clean max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-2xl">
-              Comfortable and reliable private transportation service between Rovaniemi and the popular ski resorts of Levi and Kittilä.
-            </p>
-          </div>
-        </div>
-        
-        {/* Bottom transition overlay */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 sm:h-24 md:h-28 bg-gradient-to-t from-black via-black/90 to-transparent z-10"></div>
-      </div>
+    <div className="rn-page">
+      <CategoryHero
+        title="Private Transportation: Rovaniemi – Levi/Kittilä"
+        subtitle="Comfortable private transfers between Rovaniemi and the ski resorts of Levi and Kittilä."
+        image="/transportation1.jpg"
+        compact
+      />
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8 lg:py-12">
+      <div className="rn-container rn-page-pad pb-12 pt-6 sm:pt-8">
+        <nav className="mb-6 text-sm text-text-muted" aria-label="Breadcrumb">
+          <ol className="flex flex-wrap items-center gap-2">
+            <li><Link to="/" className="hover:text-white">Home</Link></li>
+            <li aria-hidden>/</li>
+            <li><Link to="/transportation" className="hover:text-white">Transportation</Link></li>
+            <li aria-hidden>/</li>
+            <li className="text-white">Rovaniemi – Levi/Kittilä</li>
+          </ol>
+        </nav>
         {/* Quick Info */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-12">
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
-              <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
+              <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-aurora mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Duration</h3>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">2-3 hours</p>
@@ -163,7 +147,7 @@ const TransportationRovaniemiLevi = () => {
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
-              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
+              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-aurora mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Capacity</h3>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Up to 8 people</p>
@@ -171,25 +155,24 @@ const TransportationRovaniemiLevi = () => {
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
-              <Car className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
+              <Car className="w-5 h-5 sm:w-6 sm:h-6 text-aurora mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Price</h3>
             </div>
-            <p className="text-emerald-400 font-bold text-lg sm:text-xl">399€</p>
+            <p className="text-aurora font-bold text-lg sm:text-xl">399€</p>
           </div>
           
           <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
             <div className="flex items-center mb-2 sm:mb-3">
-              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
+              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-aurora mr-2 sm:mr-3" />
               <h3 className="text-white font-semibold text-sm sm:text-base">Route</h3>
             </div>
             <p className="text-gray-300 text-sm sm:text-base">Rovaniemi to Levi/Kittilä</p>
           </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8">
+        <div className="grid gap-8 lg:grid-cols-12 lg:gap-10">
           {/* Left Column - Service Details */}
-          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+          <div className="space-y-9 lg:col-span-7">
             {/* About Section */}
             <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">About This Service</h2>
@@ -207,7 +190,7 @@ const TransportationRovaniemiLevi = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 {features.map((feature, index) => (
                   <div key={index} className="flex items-start">
-                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-aurora mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
                     <span className="text-gray-300 text-sm sm:text-base">{feature}</span>
                   </div>
                 ))}
@@ -223,7 +206,7 @@ const TransportationRovaniemiLevi = () => {
                   <div key={index}>
                     <div className="flex">
                       {item.time && (
-                        <div className="flex-shrink-0 w-14 sm:w-16 text-emerald-400 font-semibold text-sm sm:text-base">
+                        <div className="flex-shrink-0 w-14 sm:w-16 text-aurora font-semibold text-sm sm:text-base">
                           {item.time}
                         </div>
                       )}
@@ -242,15 +225,16 @@ const TransportationRovaniemiLevi = () => {
           </div>
 
           {/* Right Column - Contact Form */}
-          <div className="lg:col-span-2">
-            <div className="sticky top-6">
-              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
-                <h2 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4 sm:mb-6 text-center">Request Transportation</h2>
+          <aside className="lg:col-span-5">
+            <div className="lg:sticky lg:top-24">
+              <div className="rn-panel p-5 shadow-rn sm:p-6">
+                <h2 className="font-display text-xl font-semibold text-panel-ink">Request transportation</h2>
+                <p className="mt-1 text-sm text-panel-muted">From €{pricing.adult} per adult — we reply with a quote within 24 hours.</p>
                 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="mt-5 space-y-4">
                   {/* Name Field */}
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-white mb-2">
+                    <label htmlFor="name" className="mb-2 block text-sm font-medium text-panel-ink">
                       <User className="w-4 h-4 inline mr-2" />
                       Your Name *
                     </label>
@@ -261,14 +245,14 @@ const TransportationRovaniemiLevi = () => {
                       value={formData.name}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      className={inputClass}
                       placeholder="Enter your full name"
                     />
                   </div>
 
                   {/* Email Field */}
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
+                    <label htmlFor="email" className="mb-2 block text-sm font-medium text-panel-ink">
                       <Mail className="w-4 h-4 inline mr-2" />
                       Email Address *
                     </label>
@@ -279,14 +263,14 @@ const TransportationRovaniemiLevi = () => {
                       value={formData.email}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      className={inputClass}
                       placeholder="your.email@example.com"
                     />
                   </div>
 
                   {/* Phone Field */}
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-white mb-2">
+                    <label htmlFor="phone" className="mb-2 block text-sm font-medium text-panel-ink">
                       Phone Number
                     </label>
                     <input
@@ -295,7 +279,7 @@ const TransportationRovaniemiLevi = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      className={inputClass}
                       placeholder="+358 40 123 4567"
                     />
                   </div>
@@ -303,7 +287,7 @@ const TransportationRovaniemiLevi = () => {
                   {/* Preferred Date & Time */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="preferredDate" className="block text-sm font-medium text-white mb-2">
+                      <label htmlFor="preferredDate" className="mb-2 block text-sm font-medium text-panel-ink">
                         Preferred Pickup Date
                       </label>
                       <input
@@ -312,11 +296,11 @@ const TransportationRovaniemiLevi = () => {
                         name="preferredDate"
                         value={formData.preferredDate}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className={inputClass}
                       />
                     </div>
                     <div>
-                      <label htmlFor="preferredTime" className="block text-sm font-medium text-white mb-2">
+                      <label htmlFor="preferredTime" className="mb-2 block text-sm font-medium text-panel-ink">
                         Preferred Pickup Time
                       </label>
                       <input
@@ -325,14 +309,14 @@ const TransportationRovaniemiLevi = () => {
                         name="preferredTime"
                         value={formData.preferredTime}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className={inputClass}
                       />
                     </div>
                   </div>
 
                   {/* Group Size */}
                   <div>
-                    <label htmlFor="groupSize" className="block text-sm font-medium text-white mb-2">
+                    <label htmlFor="groupSize" className="mb-2 block text-sm font-medium text-panel-ink">
                       Group Size & Luggage
                     </label>
                     <input
@@ -341,14 +325,14 @@ const TransportationRovaniemiLevi = () => {
                       name="groupSize"
                       value={formData.groupSize}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      className={inputClass}
                       placeholder="e.g., 4 adults, 6 bags"
                     />
                   </div>
 
                   {/* Destination Field */}
                   <div>
-                    <label htmlFor="destination" className="block text-sm font-medium text-white mb-2">
+                    <label htmlFor="destination" className="mb-2 block text-sm font-medium text-panel-ink">
                       <MapPin className="w-4 h-4 inline mr-2" />
                       Route Details (From → To) *
                     </label>
@@ -359,14 +343,14 @@ const TransportationRovaniemiLevi = () => {
                       value={formData.destination}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      className={inputClass}
                       placeholder="e.g., Hotel in Rovaniemi to Levi ski resort"
                     />
                   </div>
 
                   {/* Pickup Details */}
                   <div>
-                    <label htmlFor="pickupDetails" className="block text-sm font-medium text-white mb-2">
+                    <label htmlFor="pickupDetails" className="mb-2 block text-sm font-medium text-panel-ink">
                       Pickup Instructions
                     </label>
                     <input
@@ -375,14 +359,14 @@ const TransportationRovaniemiLevi = () => {
                       name="pickupDetails"
                       value={formData.pickupDetails}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      className={inputClass}
                       placeholder="Hotel name, flight number, special instructions"
                     />
                   </div>
 
                   {/* Additional Information */}
                   <div>
-                    <label htmlFor="additionalInfo" className="block text-sm font-medium text-white mb-2">
+                    <label htmlFor="additionalInfo" className="mb-2 block text-sm font-medium text-panel-ink">
                       <MessageSquare className="w-4 h-4 inline mr-2" />
                       Additional Information
                     </label>
@@ -392,7 +376,7 @@ const TransportationRovaniemiLevi = () => {
                       value={formData.additionalInfo}
                       onChange={handleInputChange}
                       rows={4}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
+                      className={`${inputClass} resize-none`}
                       placeholder="Tell us about your specific needs: dates, times, group size, child seats, special requirements, etc."
                     />
                   </div>
@@ -401,7 +385,7 @@ const TransportationRovaniemiLevi = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
+                    className="rn-btn-primary flex w-full items-center justify-center disabled:opacity-50"
                   >
                     {isSubmitting ? (
                       <>
@@ -429,14 +413,9 @@ const TransportationRovaniemiLevi = () => {
                   )}
                 </form>
 
-                <div className="mt-4 text-center">
-                  <p className="text-gray-400 text-sm">
-                    We'll respond within 24 hours with a personalized quote.
-                  </p>
-                </div>
               </div>
             </div>
-          </div>
+          </aside>
         </div>
       </div>
       

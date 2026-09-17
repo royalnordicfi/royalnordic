@@ -1,44 +1,59 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Clock, Users, MapPin, CheckCircle, XCircle } from 'lucide-react';
-import ImageSlideshow from './ImageSlideshow';
-import Footer from './Footer';
-import BookingForm from './BookingForm';
-import ProductFaq from './seo/ProductFaq';
-import { getAllTours } from '../lib/api';
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { CheckCircle, Clock, MapPin, Users, XCircle } from 'lucide-react'
+import BookingForm from './BookingForm'
+import ExperienceGallery from './ExperienceGallery'
+import Footer from './Footer'
+import MobileBookingBar from './MobileBookingBar'
+import ProductFaq from './seo/ProductFaq'
+import { getAllTours } from '../lib/api'
 
-const FamilyFriendlyNorthernLights: React.FC = () => {
+const GALLERY = [
+  { src: '/family1.jpg', alt: 'Family watching the Northern Lights in Lapland' },
+  { src: '/family2.jpg', alt: 'Family aurora evening near Rovaniemi' },
+  { src: '/family3.jpg', alt: 'Parents and children on a Northern Lights tour' },
+  { src: '/family4.jpg', alt: 'Winter night family experience in Finnish Lapland' },
+]
+
+const INCLUDED = [
+  'Hotel pickup and drop-off',
+  'Professional local guide (English & Finnish)',
+  'Hot drinks and snacks',
+  'Aurora photography tips',
+  'Warm vehicle for the journey',
+]
+
+const FamilyFriendlyNorthernLights = () => {
   const [tourData, setTourData] = useState({
     adult_price: 79,
     child_price: 59,
     max_capacity: 16,
-  });
+  })
 
   useEffect(() => {
     const loadTourData = async () => {
       try {
-        const tours = await getAllTours();
-        const familyTour = tours.find((tour) => tour.id === 8);
+        const tours = await getAllTours()
+        const familyTour = tours.find((tour) => tour.id === 8)
         if (familyTour) {
           setTourData({
             adult_price: Number(familyTour.adult_price) || 79,
             child_price: Number(familyTour.child_price) || 59,
             max_capacity: familyTour.max_capacity || 16,
-          });
+          })
         }
       } catch (error) {
-        console.error('Error loading tour data:', error);
+        console.error('Error loading tour data:', error)
       }
-    };
-    loadTourData();
-  }, []);
+    }
+    loadTourData()
+  }, [])
 
-  const tourImages = [
-    '/family1.jpg',
-    '/family2.jpg',
-    '/family3.jpg',
-    '/family4.jpg',
-  ];
+  const price = tourData.adult_price
+
+  const scrollToBook = () => {
+    document.getElementById('book')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   const knowBefore: Array<string | { text: string; link?: { to: string; label: string } }> = [
     {
@@ -48,7 +63,7 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
     'Designed for all ages — a shorter, comfortable evening for families.',
     'Dress warmly; we have a warm vehicle, but viewing stops are outdoors.',
     'Free cancellation up to 24 hours before departure.',
-  ];
+  ]
 
   const faqs = [
     {
@@ -70,233 +85,193 @@ const FamilyFriendlyNorthernLights: React.FC = () => {
       question: 'How long is the tour?',
       answer: 'About 2 hours including pickup, viewing stops with hot drinks, and return to Rovaniemi.',
     },
-  ];
+  ]
+
+  const itinerary = [
+    {
+      time: '~21:00',
+      title: 'Pickup',
+      text: 'Hotel pickup in the Rovaniemi area. Exact time is confirmed after booking.',
+    },
+    {
+      title: 'Guided aurora evening',
+      text: 'Drive to darker viewing spots, enjoy hot drinks and snacks, and listen to stories about the lights and Lapland while we watch the sky (~2 h).',
+    },
+    {
+      title: 'Return to Rovaniemi',
+      text: 'Drop-off at your accommodation.',
+    },
+  ]
 
   return (
-    <div className="min-h-screen bg-black">
-      <div className="relative">
-        <ImageSlideshow
-          images={tourImages}
-          className="h-[35rem] sm:h-[40rem] md:h-[45rem] lg:h-[50rem]"
-          alt="Family-Friendly Northern Lights Tour"
-        />
+    <div className="rn-page pb-24 lg:pb-0">
+      <div className="rn-container rn-page-pad pb-12 pt-6 sm:pt-8">
+        <nav className="mb-4 text-sm text-text-muted" aria-label="Breadcrumb">
+          <ol className="flex flex-wrap items-center gap-2">
+            <li><Link to="/" className="hover:text-white">Home</Link></li>
+            <li aria-hidden>/</li>
+            <li><Link to="/northern-lights-tours" className="hover:text-white">Northern Lights</Link></li>
+            <li aria-hidden>/</li>
+            <li className="text-white">Family-Friendly Northern Lights</li>
+          </ol>
+        </nav>
 
-        <div className="absolute inset-0 flex items-center justify-center z-10 pt-32 sm:pt-36 md:pt-32 lg:pt-28 xl:pt-24">
-          <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-            <Link
-              to="/northern-lights-tours"
-              className="inline-flex items-center bg-emerald-500 text-white hover:bg-emerald-600 transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-8 sm:mb-12"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Northern Lights Tours
+        <div className="max-w-3xl">
+          <p className="rn-eyebrow">Rovaniemi · Family aurora</p>
+          <h1 className="mt-2 font-display text-3xl font-semibold text-white sm:text-4xl lg:text-[2.75rem]">
+            Family-Friendly Northern Lights Tour
+          </h1>
+          <p className="mt-3 max-w-2xl text-base leading-relaxed text-text-muted sm:text-lg">
+            A shorter 2-hour aurora evening from Rovaniemi — hotel pickup, warm drinks, and a guide for the
+            whole family. Aurora sightings are never guaranteed; for our guaranteed hunt, see the{' '}
+            <Link to="/northern-lights-tour" className="font-medium text-aurora-soft hover:underline">
+              Guaranteed Northern Lights Tour
             </Link>
-
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-luxury font-bold mb-4 sm:mb-6 leading-tight drop-shadow-2xl">
-              <span className="bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent drop-shadow-2xl">
-                Family-Friendly Northern Lights Tour
-              </span>
-            </h1>
-            <p className="text-sm sm:text-lg md:text-xl lg:text-2xl text-white font-clean max-w-2xl sm:max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-2xl px-2">
-              A shorter 2-hour aurora evening from Rovaniemi — hotel pickup, warm drinks, and a guide for the whole family.
-            </p>
-          </div>
+            .
+          </p>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 h-20 sm:h-24 md:h-28 bg-gradient-to-t from-black via-black/90 to-transparent z-10"></div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8 lg:py-12">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-12">
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-            <div className="flex items-center mb-2 sm:mb-3">
-              <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <p className="text-white font-semibold text-sm sm:text-base">Duration</p>
-            </div>
-            <p className="text-gray-300 text-sm sm:text-base">2 hours</p>
-          </div>
-
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-            <div className="flex items-center mb-2 sm:mb-3">
-              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <p className="text-white font-semibold text-sm sm:text-base">Group Size</p>
-            </div>
-            <p className="text-gray-300 text-sm sm:text-base">Max 16 people</p>
-          </div>
-
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-            <div className="flex items-center mb-2 sm:mb-3">
-              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <p className="text-white font-semibold text-sm sm:text-base">Location</p>
-            </div>
-            <p className="text-gray-300 text-sm sm:text-base">Rovaniemi, Lapland</p>
-          </div>
-
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10 col-span-2 sm:col-span-1">
-            <div className="flex items-center mb-2 sm:mb-3">
-              <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <p className="text-white font-semibold text-sm sm:text-base">Languages</p>
-            </div>
-            <p className="text-gray-300 text-sm sm:text-base">English &amp; Finnish</p>
-          </div>
+        <div className="mt-6">
+          <ExperienceGallery images={GALLERY} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8">
-          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">About This Tour</h2>
-              <p className="text-gray-300 text-sm sm:text-base font-clean mb-3">
-                Begin with hotel pickup in Rovaniemi, then head away from city lights to viewing spots chosen for the evening’s weather and aurora activity.
-              </p>
-              <p className="text-gray-300 text-sm sm:text-base font-clean">
-                Your guide shares stories about the Northern Lights and Lapland while you stay warm with hot drinks and snacks. A shorter, comfortable format designed for families and all ages — aurora sightings are never 100% guaranteed.
-              </p>
-            </div>
+        <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:gap-10">
+          <div className="space-y-9 lg:col-span-7">
+            <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { icon: Clock, label: 'Duration', value: '2 hours' },
+                { icon: Users, label: 'Group', value: 'Max 16' },
+                { icon: MapPin, label: 'Location', value: 'Rovaniemi' },
+                { icon: CheckCircle, label: 'Languages', value: 'EN & FI' },
+              ].map(({ icon: Icon, label, value }) => (
+                <div key={label} className="rounded-rn border border-white/10 bg-surface p-3.5">
+                  <Icon size={16} className="text-aurora" aria-hidden />
+                  <p className="mt-2 text-[11px] uppercase tracking-wide text-text-dim">{label}</p>
+                  <p className="mt-0.5 text-sm font-semibold text-white">{value}</p>
+                </div>
+              ))}
+            </section>
 
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">What&apos;s Included</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                {[
-                  'Hotel pickup and drop-off',
-                  'Professional local guide (English & Finnish)',
-                  'Hot drinks and snacks',
-                  'Aurora photography tips',
-                  'Warm vehicle for the journey',
-                ].map((item) => (
-                  <div key={item} className="flex items-start">
-                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-300 text-sm sm:text-base">{item}</span>
+            <section>
+              <h2 className="font-display text-2xl font-semibold text-white">About this tour</h2>
+              <p className="mt-3 leading-relaxed text-text-muted">
+                Begin with hotel pickup in Rovaniemi, then head away from city lights to viewing spots chosen
+                for the evening’s weather and aurora activity.
+              </p>
+              <p className="mt-3 leading-relaxed text-text-muted">
+                Your guide shares stories about the Northern Lights and Lapland while you stay warm with hot
+                drinks and snacks. A shorter, comfortable format designed for families and all ages.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="font-display text-2xl font-semibold text-white">Itinerary</h2>
+              <div className="mt-4 space-y-4">
+                {itinerary.map((item) => (
+                  <div key={item.title} className="border-l-2 border-aurora/40 pl-4">
+                    {item.time && (
+                      <p className="text-xs font-semibold uppercase tracking-wide text-aurora-soft">{item.time}</p>
+                    )}
+                    <h3 className="font-semibold text-white">{item.title}</h3>
+                    <p className="mt-1 text-sm text-text-muted">{item.text}</p>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
 
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">What&apos;s Not Included</h2>
-              <div className="space-y-2">
-                <div className="flex items-start">
-                  <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-300 text-sm sm:text-base">Warm winter clothing (bring layered outdoor clothing)</span>
-                </div>
+            <section className="grid gap-6 sm:grid-cols-2">
+              <div>
+                <h2 className="font-display text-2xl font-semibold text-white">What&apos;s included</h2>
+                <ul className="mt-3 space-y-2 text-sm text-text-muted">
+                  {INCLUDED.map((h) => (
+                    <li key={h} className="flex gap-2">
+                      <CheckCircle size={16} className="mt-0.5 shrink-0 text-aurora" aria-hidden />
+                      {h}
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
+              <div>
+                <h2 className="font-display text-2xl font-semibold text-white">Not included</h2>
+                <ul className="mt-3 space-y-2 text-sm text-text-muted">
+                  <li className="flex gap-2">
+                    <XCircle size={16} className="mt-0.5 shrink-0 text-red-400" aria-hidden />
+                    Warm winter clothing (bring layered outdoor clothing)
+                  </li>
+                </ul>
+              </div>
+            </section>
 
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">Know Before You Go</h2>
-              <ul className="space-y-2">
+            <section>
+              <h2 className="font-display text-2xl font-semibold text-white">Good to know</h2>
+              <ul className="mt-3 space-y-2 text-sm text-text-muted">
                 {knowBefore.map((item, index) => (
-                  <li key={index} className="flex items-start text-gray-300 text-sm sm:text-base font-clean">
-                    <span className="text-emerald-400 mr-2 mt-0.5">•</span>
-                    <span>
-                      {typeof item === 'string' ? (
-                        item
-                      ) : (
-                        <>
-                          {item.text}
-                          {item.link && (
-                            <Link to={item.link.to} className="text-emerald-400 underline underline-offset-2">
-                              {item.link.label}
-                            </Link>
-                          )}
-                          .
-                        </>
-                      )}
-                    </span>
+                  <li key={index}>
+                    •{' '}
+                    {typeof item === 'string' ? (
+                      item
+                    ) : (
+                      <>
+                        {item.text}
+                        {item.link && (
+                          <Link to={item.link.to} className="font-medium text-aurora-soft hover:underline">
+                            {item.link.label}
+                          </Link>
+                        )}
+                        .
+                      </>
+                    )}
                   </li>
                 ))}
               </ul>
-            </div>
+            </section>
 
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">Tour Itinerary</h2>
-              <div className="space-y-4">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
-                    1
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold text-sm sm:text-base mb-1">~21:00 — Pickup</h3>
-                    <p className="text-gray-300 text-xs sm:text-sm">
-                      Hotel pickup in the Rovaniemi area. Exact time is confirmed after booking.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
-                    2
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold text-sm sm:text-base mb-1">Guided aurora evening (~2 h)</h3>
-                    <p className="text-gray-300 text-xs sm:text-sm">
-                      Drive to darker viewing spots, enjoy hot drinks and snacks, and listen to stories about the lights and Lapland while we watch the sky.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
-                    3
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold text-sm sm:text-base mb-1">Return to Rovaniemi</h3>
-                    <p className="text-gray-300 text-xs sm:text-sm">Drop-off at your accommodation.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <ProductFaq items={faqs} schemaId="family-nl-faq" />
+            <ProductFaq items={faqs} schemaId="family-nl-faq" tone="dark" />
           </div>
 
-          <div className="lg:col-span-2">
-            <div className="sticky top-28">
-              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
-                <h2 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4 sm:mb-6 text-center">Book Your Tour</h2>
-                <BookingForm
-                  tourId={8}
-                  tourName="Family-Friendly Northern Lights Tour"
-                  adultPrice={tourData.adult_price}
-                  childPrice={tourData.child_price}
-                  maxCapacity={tourData.max_capacity}
-                  seasonStart="09-15"
-                  seasonEnd="04-15"
-                />
+          <aside className="lg:col-span-5" id="book">
+            <div className="lg:sticky lg:top-24">
+              <div className="rn-panel overflow-hidden shadow-rn">
+                <div className="border-b border-black/10 px-5 py-5">
+                  <p className="text-xs uppercase tracking-wide text-panel-muted">From</p>
+                  <p className="mt-1 font-display text-3xl font-semibold text-panel-ink">
+                    €{price}
+                    <span className="ml-1 text-base font-sans font-normal text-panel-muted">/ person</span>
+                  </p>
+                  <ul className="mt-3 space-y-1.5 text-xs text-panel-muted">
+                    <li>✓ Free cancellation up to 24h before</li>
+                    <li>✓ Secure Stripe payment</li>
+                    <li>✓ Hotel pickup in Rovaniemi</li>
+                    <li>✓ Shorter format for families — aurora not guaranteed</li>
+                  </ul>
+                </div>
+                <div className="p-4 sm:p-5">
+                  <BookingForm
+                    tourId={8}
+                    tourName="Family-Friendly Northern Lights Tour"
+                    adultPrice={tourData.adult_price}
+                    childPrice={tourData.child_price}
+                    maxCapacity={tourData.max_capacity}
+                    seasonStart="09-15"
+                    seasonEnd="04-15"
+                    chrome="embedded"
+                  />
+                </div>
               </div>
+              <p className="mt-3 text-center text-sm text-text-muted">
+                <Link to="/northern-lights-tour" className="font-medium text-aurora-soft hover:underline">
+                  Want a guaranteed aurora hunt?
+                </Link>
+              </p>
             </div>
-          </div>
-        </div>
-
-        <div className="mt-12 sm:mt-16 lg:mt-20">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-luxury font-bold text-white mb-6 sm:mb-8 text-center bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
-            Family Aurora Gallery
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-            {[
-              { src: '/lights4.jpg', alt: 'Soft green Northern Lights above Lapland trees on a family aurora evening' },
-              { src: '/lights6.jpg', alt: 'Aurora Borealis over snow near Rovaniemi during a short family tour' },
-              { src: '/lights1.jpg', alt: 'Colourful Northern Lights display in Finnish Lapland winter sky' },
-              { src: '/lights5.jpg', alt: 'Aurora hunting night sky with snowy Arctic landscape near Rovaniemi' },
-            ].map(({ src, alt }) => (
-              <div
-                key={src}
-                className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105"
-              >
-                <img
-                  src={src}
-                  alt={alt}
-                  className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-            ))}
-          </div>
+          </aside>
         </div>
       </div>
 
       <Footer />
+      <MobileBookingBar priceFrom={price} onBook={scrollToBook} />
     </div>
-  );
-};
+  )
+}
 
-export default FamilyFriendlyNorthernLights;
+export default FamilyFriendlyNorthernLights

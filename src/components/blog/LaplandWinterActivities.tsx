@@ -11,6 +11,29 @@ const LaplandWinterActivities: React.FC = () => {
     category: "Travel Guide",
     excerpt: "Discover the best winter activities in Finnish Lapland. From Northern Lights hunting to snowshoeing, ice fishing, and more - your complete guide to Arctic adventures.",
     heroImage: "/lights4.jpg",
+    author: "Royal Nordic Team",
+    relatedExperiences: [
+      {
+        title: "Northern Lights tour",
+        href: "/northern-lights-tour",
+        description: "Signature aurora evening from Rovaniemi.",
+      },
+      {
+        title: "Ice fishing",
+        href: "/ice-fishing",
+        description: "Traditional winter fishing on frozen lakes.",
+      },
+      {
+        title: "Snowshoe rental",
+        href: "/snowshoe-rental",
+        description: "Self-guided forest routes with rental gear.",
+      },
+      {
+        title: "Ranua Zoo",
+        href: "/ranua-zoo",
+        description: "Day trip to Arctic wildlife at Ranua Wildlife Park.",
+      },
+    ],
     content: `Finnish Lapland transforms into a magical winter wonderland from November through March, offering visitors an incredible array of Arctic adventures. Whether you're seeking the thrill of outdoor activities or the tranquility of nature, Lapland has something for everyone.
 
 ## Northern Lights Hunting

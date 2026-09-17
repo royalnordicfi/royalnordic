@@ -11,6 +11,19 @@ const LaplandCabinsGuide: React.FC = () => {
     category: "Accommodation",
     excerpt: "Discover the charm of traditional Finnish log cabins in Lapland. Complete guide to cabin types, what's included, best locations, and booking tips for an authentic Arctic experience.",
     heroImage: "/slideshow3.jpg",
+    author: "Royal Nordic Team",
+    relatedExperiences: [
+      {
+        title: "Customized tour",
+        href: "/customized-tour",
+        description: "Combine a cabin stay with private activities and transport.",
+      },
+      {
+        title: "Northern Lights tour",
+        href: "/northern-lights-tour",
+        description: "Evening aurora trip while you are based in Lapland.",
+      },
+    ],
     content: `For an authentic Finnish experience, nothing beats staying in a traditional log cabin in Lapland. These cozy accommodations offer privacy, comfort, and a genuine taste of Arctic life - complete with private saunas and stunning wilderness views.
 
 ## Why Choose a Cabin?

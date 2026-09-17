@@ -1,50 +1,65 @@
-import React, { useState, useEffect } from 'react';
-import { CheckCircle, Users, Clock, MapPin, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import ImageSlideshow from './ImageSlideshow';
-import BookingForm from './BookingForm';
-import Footer from './Footer';
-import { getAllTours } from '../lib/api';
-import ProductFaq from './seo/ProductFaq';
-const SnowshoeRental: React.FC = () => {
-  // const navigate = useNavigate();
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { CheckCircle, Clock, MapPin, Users } from 'lucide-react'
+import BookingForm from './BookingForm'
+import ExperienceGallery from './ExperienceGallery'
+import Footer from './Footer'
+import MobileBookingBar from './MobileBookingBar'
+import ProductFaq from './seo/ProductFaq'
+import { getAllTours } from '../lib/api'
+
+const GALLERY = [
+  { src: '/snowshoe1.jpg', alt: 'Snowshoeing in Lapland winter forest' },
+  { src: '/snowshoe2.jpg', alt: 'Snowshoe rental adventure near Rovaniemi' },
+  { src: '/snowshoe3.jpg', alt: 'Winter landscape on snowshoes in Finnish Lapland' },
+  { src: '/snowshoe4.jpg', alt: 'Exploring Lapland on traditional snowshoes' },
+  { src: '/snowshoe5.jpg', alt: 'Snowshoe trek through pristine wilderness' },
+  { src: '/snowshoe6.jpg', alt: 'Snowshoe equipment delivery in Rovaniemi' },
+]
+
+const SnowshoeRental = () => {
   const [tourData, setTourData] = useState({
     adult_price: 79,
     child_price: 49,
-    max_capacity: 3
-  });
-  const [loading, setLoading] = useState(true);
+    max_capacity: 3,
+  })
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const loadTourData = async () => {
       try {
-        const tours = await getAllTours();
-        const snowshoeTour = tours.find(tour => tour.id === 2);
+        const tours = await getAllTours()
+        const snowshoeTour = tours.find((tour) => tour.id === 2)
         if (snowshoeTour) {
           setTourData({
             adult_price: snowshoeTour.adult_price,
             child_price: snowshoeTour.child_price,
-            max_capacity: snowshoeTour.max_capacity
-          });
+            max_capacity: snowshoeTour.max_capacity,
+          })
         }
       } catch (error) {
-        console.error('Error loading tour data:', error);
-        // Keep default values if loading fails
+        console.error('Error loading tour data:', error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    loadTourData();
-  }, []);
+    loadTourData()
+  }, [])
+
+  const price = loading ? 79 : tourData.adult_price
+
+  const scrollToBook = () => {
+    document.getElementById('book')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   const features = [
     'Professional snowshoe equipment for all sizes',
     'Detailed safety briefing and instructions',
     'Equipment delivery to your accommodation',
     'Equipment pickup when finished',
-    'Local area recommendations'
-  ];
+    'Local area recommendations',
+  ]
 
   const faqs = [
     {
@@ -72,238 +87,158 @@ const SnowshoeRental: React.FC = () => {
       answer:
         'Yes. Children are welcome with an adult. Child pricing applies for ages 0–17.',
     },
-  ];
+  ]
 
   const itinerary = [
     {
-      activity: 'Book your snowshoes',
-      description: 'Reserve your snowshoe equipment online or contact us directly'
+      title: 'Book your snowshoes',
+      text: 'Reserve your snowshoe equipment online or contact us directly',
     },
     {
-      activity: 'Equipment delivery',
-      description: 'We\'ll deliver the snowshoes and safety gear to your accommodation'
+      title: 'Equipment delivery',
+      text: "We'll deliver the snowshoes and safety gear to your accommodation",
     },
     {
-      activity: 'Safety briefing & instructions',
-      description: 'Receive detailed instructions on how to use the equipment safely'
+      title: 'Safety briefing & instructions',
+      text: 'Receive detailed instructions on how to use the equipment safely',
     },
     {
-      activity: 'Enjoy your adventure',
-      description: 'Explore Lapland\'s beautiful winter landscapes at your own pace'
+      title: 'Enjoy your adventure',
+      text: "Explore Lapland's beautiful winter landscapes at your own pace",
     },
     {
-      activity: 'Equipment return',
-      description: 'We\'ll collect the snowshoes when you\'re finished with your adventure'
-    }
-  ];
+      title: 'Equipment return',
+      text: "We'll collect the snowshoes when you're finished with your adventure",
+    },
+  ]
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="rn-page pb-24 lg:pb-0">
+      <div className="rn-container rn-page-pad pb-12 pt-6 sm:pt-8">
+        <nav className="mb-4 text-sm text-text-muted" aria-label="Breadcrumb">
+          <ol className="flex flex-wrap items-center gap-2">
+            <li><Link to="/" className="hover:text-white">Home</Link></li>
+            <li aria-hidden>/</li>
+            <li><Link to="/renting-equipment" className="hover:text-white">Renting equipment</Link></li>
+            <li aria-hidden>/</li>
+            <li className="text-white">Snowshoe Adventure</li>
+          </ol>
+        </nav>
 
-
-      {/* Header */}
-      <div className="relative">
-        <ImageSlideshow 
-          images={["/snowshoe1.jpg", "/snowshoe2.jpg"]}
-          className="h-[35rem] sm:h-[40rem] md:h-[45rem] lg:h-[50rem]"
-          alt="Snowshoe Adventure Images"
-        />
-        
-        {/* Reduced overlay effects */}
-        <div className="absolute inset-0 bg-black/30"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60"></div>
-        
-        {/* Hero Content */}
-        <div className="absolute inset-0 flex items-center justify-center z-10 pt-32 sm:pt-36 md:pt-32 lg:pt-28 xl:pt-24">
-          <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-            <Link 
-              to="/renting-equipment" 
-              className="inline-flex items-center bg-emerald-500 text-white hover:bg-emerald-600 transition-all duration-300 font-medium px-4 py-2 rounded-lg mb-8 sm:mb-12"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Renting Equipment
-            </Link>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-luxury font-bold mb-4 sm:mb-6 leading-tight drop-shadow-2xl">
-              <span className="bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent drop-shadow-2xl">
-                Snowshoe Adventure
-              </span>
-            </h1>
-            <p className="text-sm sm:text-lg md:text-xl lg:text-2xl text-white font-clean max-w-2xl sm:max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-2xl px-2">
-              Experience the magic of Lapland winter on traditional snowshoes through pristine wilderness.
-            </p>
-          </div>
-        </div>
-        
-        {/* Bottom transition overlay for smooth flow to content - positioned much lower to give more space for text */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 sm:h-24 md:h-28 bg-gradient-to-t from-black via-black/90 to-transparent z-10"></div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8 lg:py-12">
-        {/* Quick Info - More compact on mobile */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-12">
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-            <div className="flex items-center mb-2 sm:mb-3">
-              <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <p className="text-white font-semibold text-sm sm:text-base">Duration</p>
-            </div>
-            <p className="text-gray-300 text-sm sm:text-base">Flexible rental</p>
-          </div>
-          
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-            <div className="flex items-center mb-2 sm:mb-3">
-              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <p className="text-white font-semibold text-sm sm:text-base">Group Size</p>
-            </div>
-            <p className="text-gray-300 text-sm sm:text-base">Individual or groups</p>
-          </div>
-          
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-            <div className="flex items-center mb-2 sm:mb-3">
-              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <p className="text-white font-semibold text-sm sm:text-base">Location</p>
-            </div>
-            <p className="text-gray-300 text-sm sm:text-base">Rovaniemi, Lapland</p>
-          </div>
-
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10 col-span-2 sm:col-span-1">
-            <div className="flex items-center mb-2 sm:mb-3">
-              <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <p className="text-white font-semibold text-sm sm:text-base">Delivery</p>
-            </div>
-            <p className="text-gray-300 text-sm sm:text-base">To your lodging</p>
-          </div>
+        <div className="max-w-3xl">
+          <p className="rn-eyebrow">Rovaniemi · Self-guided rental</p>
+          <h1 className="mt-2 font-display text-3xl font-semibold text-white sm:text-4xl lg:text-[2.75rem]">
+            Snowshoe Adventure
+          </h1>
+          <p className="mt-3 max-w-2xl text-base leading-relaxed text-text-muted sm:text-lg">
+            Explore Finnish Lapland’s winter wonderland at your own pace — we deliver snowshoes to your
+            lodging, brief you on safety, and collect when you are done.
+          </p>
         </div>
 
+        <div className="mt-6">
+          <ExperienceGallery images={GALLERY} />
+        </div>
 
+        <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:gap-10">
+          <div className="space-y-9 lg:col-span-7">
+            <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { icon: Clock, label: 'Duration', value: 'Flexible rental' },
+                { icon: Users, label: 'Group', value: 'Any size' },
+                { icon: MapPin, label: 'Location', value: 'Rovaniemi' },
+                { icon: CheckCircle, label: 'Delivery', value: 'To your lodging' },
+              ].map(({ icon: Icon, label, value }) => (
+                <div key={label} className="rounded-rn border border-white/10 bg-surface p-3.5">
+                  <Icon size={16} className="text-aurora" aria-hidden />
+                  <p className="mt-2 text-[11px] uppercase tracking-wide text-text-dim">{label}</p>
+                  <p className="mt-0.5 text-sm font-semibold text-white">{value}</p>
+                </div>
+              ))}
+            </section>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8">
-          {/* Left Column - Tour Details (Smaller) */}
-          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-            {/* About Section */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">About This Adventure</h2>
-              <p className="text-gray-300 text-sm sm:text-base mb-3 sm:mb-4 font-clean">
-                Our Snowshoe Rental service gives you the freedom to explore Finnish Lapland's winter wonderland at your own pace. 
-                We provide professional snowshoe equipment along with comprehensive instructions on how to use 
-                them safely and effectively.
+            <section>
+              <h2 className="font-display text-2xl font-semibold text-white">About this rental</h2>
+              <p className="mt-3 leading-relaxed text-text-muted">
+                Our snowshoe rental gives you the freedom to explore Finnish Lapland&apos;s winter wonderland at
+                your own pace. We provide professional equipment along with instructions on how to use it
+                safely.
               </p>
-              <p className="text-gray-300 text-sm sm:text-base font-clean">
-                Perfect for families and groups who want to experience the authentic Lapland winter independently. 
-                We'll deliver the equipment to your accommodation, provide detailed safety instructions, and collect 
-                everything when you're finished with your adventure.
+              <p className="mt-3 leading-relaxed text-text-muted">
+                Perfect for families and groups who want an authentic Lapland winter independently. We deliver
+                to your accommodation, provide a safety briefing, and collect everything when you finish.
               </p>
-            </div>
+            </section>
 
-            {/* Features */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">What's Included</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                {features.map((feature, index) => (
-                  <div key={index} className="flex items-start">
-                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-300 text-sm sm:text-base">{feature}</span>
+            <section>
+              <h2 className="font-display text-2xl font-semibold text-white">What&apos;s included</h2>
+              <ul className="mt-4 space-y-2.5">
+                {features.map((h) => (
+                  <li key={h} className="flex items-start gap-2.5 text-text-muted">
+                    <CheckCircle className="mt-0.5 shrink-0 text-aurora" size={18} aria-hidden />
+                    <span>{h}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="font-display text-2xl font-semibold text-white">How it works</h2>
+              <div className="mt-4 space-y-4">
+                {itinerary.map((item) => (
+                  <div key={item.title} className="border-l-2 border-aurora/40 pl-4">
+                    <h3 className="font-semibold text-white">{item.title}</h3>
+                    <p className="mt-1 text-sm text-text-muted">{item.text}</p>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
 
-            {/* Itinerary */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">Adventure Itinerary</h2>
-              <div className="space-y-2 sm:space-y-3">
-                {itinerary.map((item, index) => (
-                  <div key={index}>
-                    <div className="flex">
-                      <div className="flex-1">
-                        <h4 className="text-white font-semibold text-sm sm:text-base">{item.activity}</h4>
-                        <p className="text-gray-300 text-xs sm:text-sm">{item.description}</p>
-                      </div>
-                    </div>
-                    {index < itinerary.length - 1 && (
-                      <div className="border-t border-white/20 my-2 sm:my-3"></div>
-                    )}
-                  </div>
-                ))}
+            <ProductFaq items={faqs} schemaId="snowshoe-faq" tone="dark" />
+          </div>
+
+          <aside className="lg:col-span-5" id="book">
+            <div className="lg:sticky lg:top-24">
+              <div className="rn-panel overflow-hidden shadow-rn">
+                <div className="border-b border-black/10 px-5 py-5">
+                  <p className="text-xs uppercase tracking-wide text-panel-muted">From</p>
+                  <p className="mt-1 font-display text-3xl font-semibold text-panel-ink">
+                    €{price}
+                    <span className="ml-1 text-base font-sans font-normal text-panel-muted">/ person</span>
+                  </p>
+                  <ul className="mt-3 space-y-1.5 text-xs text-panel-muted">
+                    <li>✓ Delivery to your lodging</li>
+                    <li>✓ Secure Stripe payment</li>
+                    <li>✓ Safety briefing included</li>
+                    <li>✓ Explore at your own pace</li>
+                  </ul>
+                </div>
+                <div className="p-4 sm:p-5">
+                  {loading ? (
+                    <p className="py-10 text-center text-panel-muted">Loading availability…</p>
+                  ) : (
+                    <BookingForm
+                      tourId={2}
+                      tourName="Snowshoe Adventure"
+                      adultPrice={tourData.adult_price}
+                      childPrice={tourData.child_price}
+                      maxCapacity={tourData.max_capacity}
+                      seasonStart="11-01"
+                      seasonEnd="04-01"
+                      chrome="embedded"
+                    />
+                  )}
+                </div>
               </div>
             </div>
-
-            <ProductFaq items={faqs} schemaId="snowshoe-faq" />
-          </div>
-
-          {/* Right Column - Booking Form (Wider) */}
-          <div className="lg:col-span-2">
-            <div className="sticky top-28">
-              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
-                <h2 className="text-xl sm:text-2xl font-luxury font-bold text-white mb-4 sm:mb-6 text-center">Book Your Adventure</h2>
-                {loading ? (
-                  <div className="text-center text-white">Loading tour data...</div>
-                ) : (
-                  <BookingForm
-                    tourId={2}
-                    tourName="Snowshoe Adventure"
-                    adultPrice={tourData.adult_price}
-                    childPrice={tourData.child_price}
-                    maxCapacity={tourData.max_capacity}
-                    seasonStart="11-01"
-                    seasonEnd="04-01"
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Photo Gallery Section */}
-        <div className="mt-12 sm:mt-16 lg:mt-20">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-luxury font-bold text-white mb-6 sm:mb-8 text-center bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">
-            Snowshoe Gallery
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-            <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <img 
-                src="/snowshoe3.jpg" 
-                alt="Snowshoe Adventure 1" 
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-            <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <img 
-                src="/snowshoe4.jpg" 
-                alt="Snowshoe Adventure 2" 
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-            <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <img 
-                src="/snowshoe5.jpg" 
-                alt="Snowshoe Adventure 3" 
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-            <div className="relative group overflow-hidden rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <img 
-                src="/snowshoe6.jpg" 
-                alt="Snowshoe Adventure 4" 
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-          </div>
+          </aside>
         </div>
       </div>
-      
-      {/* Footer */}
+
       <Footer />
+      <MobileBookingBar priceFrom={price} onBook={scrollToBook} />
     </div>
-  );
-};
+  )
+}
 
-export default SnowshoeRental;
+export default SnowshoeRental

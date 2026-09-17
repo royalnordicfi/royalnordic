@@ -115,7 +115,20 @@ const WhatToPackLapland: React.FC = () => {
     date: "2025-09-24",
     readTime: "4 min read",
     category: "Travel Tips",
-    author: "Royal Nordic Team"
+    author: "Royal Nordic Team",
+    heroImage: "/snowshoe2.jpg",
+    relatedExperiences: [
+      {
+        title: "Northern Lights tour",
+        href: "/northern-lights-tour",
+        description: "Evening outdoors in Lapland — dress warm and let guides handle the logistics.",
+      },
+      {
+        title: "Equipment rental",
+        href: "/renting-equipment",
+        description: "Snowshoes and winter gear available near Rovaniemi if you need extras on arrival.",
+      },
+    ],
   };
 
   return <BlogPost post={post} />;

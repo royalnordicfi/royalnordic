@@ -196,6 +196,14 @@ Ice fishing involves cutting holes through frozen lakes and rivers to catch fish
 Ice fishing in Lapland offers a unique opportunity to experience traditional Finnish culture while enjoying the peaceful beauty of the Arctic wilderness. Whether you catch fish or not, the experience of sitting on a frozen lake, surrounded by snow-covered forests, is unforgettable.
 
 This authentic activity connects you to centuries of Finnish tradition and provides a deeper understanding of how people have survived and thrived in the harsh Arctic environment. It's a perfect addition to any Lapland winter adventure.`,
+    author: "Royal Nordic Team",
+    relatedExperiences: [
+      {
+        title: "Ice fishing experience",
+        href: "/ice-fishing",
+        description: "Traditional ice fishing on a frozen Lapland lake with gear and guidance included.",
+      },
+    ],
     sections: []
   };
 

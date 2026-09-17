@@ -16,13 +16,14 @@ const MobileBookingBar = ({ priceFrom, onBook, label = 'Check availability' }: M
   }, [])
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-black/10 bg-snow/95 px-4 py-3 backdrop-blur-md lg:hidden"
+    <div
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-surface/95 px-4 py-3 backdrop-blur-md lg:hidden"
       style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
     >
       <div className="mx-auto flex max-w-rn items-center justify-between gap-3">
         <div>
-          <p className="text-xs text-ink-muted">From</p>
-          <p className="text-lg font-semibold text-ink">€{priceFrom}</p>
+          <p className="text-xs text-text-muted">From</p>
+          <p className="text-lg font-semibold text-white">€{priceFrom}</p>
         </div>
         <button type="button" onClick={onBook} className="rn-btn-primary px-6">
           {label}

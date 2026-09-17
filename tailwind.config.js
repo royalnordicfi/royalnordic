@@ -4,43 +4,56 @@ export default {
   theme: {
     extend: {
       colors: {
-        midnight: '#0b1220',
-        'midnight-soft': '#121a2b',
-        navy: '#162033',
-        snow: '#f4f1ec',
-        'snow-warm': '#ebe6de',
-        frost: '#e8eef2',
-        ink: '#141a24',
-        'ink-muted': '#5b6577',
+        black: '#000000',
+        midnight: '#070b12',
+        surface: {
+          DEFAULT: '#0e1420',
+          2: '#151c2b',
+          elevated: '#1a2336',
+        },
+        text: {
+          DEFAULT: '#f2f4f7',
+          muted: '#9aa3b5',
+          dim: '#6b7385',
+        },
         aurora: {
-          DEFAULT: '#1fa97a',
-          deep: '#178a63',
-          soft: '#b7f0d5',
+          DEFAULT: '#10b981',
+          hover: '#059669',
+          soft: '#6ee7b7',
         },
-        ice: '#7eb6c9',
-        amber: {
-          sand: '#c4a574',
+        ice: '#7dd3fc',
+        panel: {
+          DEFAULT: '#f8fafc',
+          ink: '#0f172a',
+          muted: '#64748b',
         },
+        // Back-compat aliases from Mission 1 / older pages
+        snow: '#f2f4f7',
+        'snow-warm': '#e8ecf1',
+        frost: '#151c2b',
+        ink: '#f2f4f7',
+        'ink-muted': '#9aa3b5',
+        navy: '#151c2b',
+        'midnight-soft': '#0e1420',
       },
       fontFamily: {
         display: ['Cormorant Garamond', 'Georgia', 'serif'],
-        body: ['Source Sans 3', 'Segoe UI', 'system-ui', 'sans-serif'],
-        // Legacy aliases used across older tour pages
+        body: ['Inter', 'system-ui', 'sans-serif'],
         luxury: ['Cormorant Garamond', 'Georgia', 'serif'],
         elegant: ['Cormorant', 'Georgia', 'serif'],
-        clean: ['Source Sans 3', 'Segoe UI', 'system-ui', 'sans-serif'],
-        modern: ['Source Sans 3', 'Segoe UI', 'system-ui', 'sans-serif'],
+        clean: ['Inter', 'system-ui', 'sans-serif'],
+        modern: ['Inter', 'system-ui', 'sans-serif'],
       },
       maxWidth: {
         rn: '72rem',
       },
       borderRadius: {
-        rn: '14px',
-        'rn-lg': '20px',
+        rn: '12px',
+        'rn-lg': '14px',
       },
       boxShadow: {
-        rn: '0 18px 50px rgba(11, 18, 32, 0.12)',
-        'rn-soft': '0 10px 30px rgba(11, 18, 32, 0.08)',
+        rn: '0 20px 50px rgba(0, 0, 0, 0.45)',
+        'rn-soft': '0 10px 30px rgba(0, 0, 0, 0.35)',
       },
     },
   },

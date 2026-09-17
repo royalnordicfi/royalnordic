@@ -179,7 +179,15 @@ const LaplandWildlife: React.FC = () => {
     date: "2025-09-22",
     readTime: "4 min read",
     category: "Wildlife",
-    author: "Royal Nordic Team"
+    author: "Royal Nordic Team",
+    heroImage: "/ranua1.jpg",
+    relatedExperiences: [
+      {
+        title: "Ranua Zoo day trip",
+        href: "/ranua-zoo",
+        description: "Guided visit to Ranua Wildlife Park with transport from Rovaniemi.",
+      },
+    ],
   };
 
   return <BlogPost post={post} />;

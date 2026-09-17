@@ -53,6 +53,7 @@ import RouteJsonLd from './components/seo/RouteJsonLd';
 import TravelTrade from './components/TravelTrade';
 import PromotionAnnouncementBar from './components/PromotionAnnouncementBar';
 import WinterPromoPopup from './components/WinterPromoPopup';
+import NotFound from './components/NotFound';
 
 function App() {
   return (
@@ -175,6 +176,7 @@ function App() {
           <Route path="/crypto-payment-success" element={<CryptoPaymentSuccess />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
         
         {/* WhatsApp Widget - appears on all pages */}

@@ -89,7 +89,20 @@ const BestTimeNorthernLights: React.FC = () => {
     date: "2025-09-25",
     readTime: "5 min read",
     category: "Northern Lights",
-    author: "Royal Nordic Team"
+    author: "Royal Nordic Team",
+    heroImage: "/lights5.jpg",
+    relatedExperiences: [
+      {
+        title: "Northern Lights tour",
+        href: "/northern-lights-tour",
+        description: "Guided aurora hunting from Rovaniemi with local experts and prime viewing spots.",
+      },
+      {
+        title: "All Northern Lights tours",
+        href: "/northern-lights-tours",
+        description: "Compare small-group and family-friendly aurora experiences.",
+      },
+    ],
   };
 
   return <BlogPost post={post} />;

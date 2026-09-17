@@ -11,6 +11,19 @@ const WhatToWearLapland: React.FC = () => {
     category: "Travel Guide",
     excerpt: "Complete guide to dressing for Lapland's Arctic winter. Learn the layering system, essential gear, and what to pack for temperatures down to -30°C.",
     heroImage: "/snowshoe3.jpg",
+    author: "Royal Nordic Team",
+    relatedExperiences: [
+      {
+        title: "Northern Lights tour",
+        href: "/northern-lights-tour",
+        description: "Long evenings outside — the layering advice in this guide applies directly.",
+      },
+      {
+        title: "Snowshoe rental",
+        href: "/snowshoe-rental",
+        description: "Active winter days in the forest with gear you can rent locally.",
+      },
+    ],
     content: `Planning a trip to Lapland but worried about the cold? Don't let the Arctic temperatures intimidate you! With the right clothing and layering system, you'll stay warm and comfortable even in -30°C weather. This comprehensive guide covers everything you need to know about dressing for Lapland's winter.
 
 ## Understanding Lapland's Winter Climate
