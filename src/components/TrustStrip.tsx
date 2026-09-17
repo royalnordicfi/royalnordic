@@ -24,11 +24,11 @@ const TrustStrip = () => {
       aria-label="Why travellers book Royal Nordic"
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(18,185,129,0.08),transparent_55%)]" aria-hidden />
-      <div className="rn-container relative grid gap-6 py-7 sm:grid-cols-2 sm:gap-8 sm:py-8 lg:grid-cols-4">
+      <div className="rn-container relative grid gap-5 py-6 sm:grid-cols-2 sm:gap-6 sm:py-7 lg:grid-cols-4">
         {items.map((item) => (
           <div key={item.title} className="rn-reveal">
-            <p className="text-sm font-semibold text-white">{item.title}</p>
-            <p className="mt-1.5 text-sm leading-relaxed text-text-muted">{item.text}</p>
+            <p className="text-[13px] font-semibold text-white/95">{item.title}</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-text-muted">{item.text}</p>
           </div>
         ))}
       </div>

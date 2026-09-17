@@ -78,24 +78,22 @@ const DaytimeExperiences: React.FC = () => {
     <div className="rn-page">
       <CategoryHero
         title="Daytime Experiences in Lapland"
-        subtitle="Ice fishing, wildlife, canyon hikes, and partner snowmobile trips — small groups with local guides from Rovaniemi."
+        subtitle="Ice fishing, wildlife, canyon hikes, and partner snowmobile trips — small groups from Rovaniemi."
         image="/korouoma1.jpg"
+        compact
       />
 
-      <section className="rn-section relative">
+      <section className="rn-section rn-hero-follow relative pt-0">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
         <div className="rn-container relative">
-          <div className="max-w-2xl">
+          <div className="max-w-xl">
             <p className="rn-eyebrow">Day tours</p>
-            <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-3xl">
-              Choose your Arctic day
-            </h2>
-            <p className="mt-2 text-sm text-text-muted sm:text-base">
-              Same small-group standard across every daytime experience — pick the one that fits your dates.
+            <p className="mt-2 text-sm leading-relaxed text-text-muted">
+              Uniform cards — hotel pickup and group size on each listing. Choose the day that fits your stay.
             </p>
           </div>
 
-          <div className="rn-card-grid mt-8">
+          <div className="rn-card-grid mt-6">
             {experiences.map((exp, i) => (
               <TourCard
                 key={exp.to}

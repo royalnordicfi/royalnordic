@@ -9,7 +9,7 @@ const FeaturedExperience = () => {
       <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
       <div className="rn-container relative">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10 xl:gap-14">
-          <div className="rn-reveal w-full max-w-[22rem] shrink-0 lg:max-w-[24rem]">
+          <div className="rn-reveal w-full max-w-[19rem] shrink-0 lg:max-w-[21rem]">
             <div className="rn-signature-card group">
               <div className="rn-signature-card__media">
                 <img
@@ -26,7 +26,7 @@ const FeaturedExperience = () => {
 
           <div className="rn-reveal min-w-0 flex-1 lg:pt-1">
             <p className="rn-eyebrow">From €149 · Rovaniemi</p>
-            <h2 className="mt-2 font-display text-[1.85rem] font-semibold leading-tight text-white sm:text-4xl">
+            <h2 className="mt-2 font-display text-[1.55rem] font-semibold leading-tight text-white sm:text-[1.85rem] lg:text-[2rem]">
               Guaranteed Northern Lights Tour
             </h2>
             <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-text-muted sm:text-base">

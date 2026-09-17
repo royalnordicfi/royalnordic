@@ -125,11 +125,12 @@ const FamilyFriendlyNorthernLights = () => {
           <>
             <BookingAside
               priceFrom={price}
+              offerLine="WINTER20 · Save 20% at checkout"
               trustLines={[
-                'Free cancellation up to 24h before',
+                'Free cancellation 24h before',
                 'Secure Stripe payment',
-                'Hotel pickup in Rovaniemi',
-                'Shorter format for families — aurora not guaranteed',
+                'Hotel pickup',
+                'Family format · aurora not guaranteed',
               ]}
             >
               <BookingForm

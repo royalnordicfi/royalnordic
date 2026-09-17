@@ -28,7 +28,7 @@ const GuidesTeaser = () => {
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="rn-eyebrow">Guides</p>
-            <h2 className="mt-2 font-display text-3xl font-semibold text-white">Plan with local context</h2>
+            <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-[1.65rem]">Plan with local context</h2>
           </div>
           <Link to="/blog" className="hidden text-sm font-semibold text-aurora-soft hover:underline sm:inline">
             All guides →

@@ -2,12 +2,14 @@ type Props = {
   priceFrom: number
   priceNote?: string
   trustLines?: string[]
+  offerLine?: string
   children: React.ReactNode
   className?: string
 }
 
 /**
  * Warm-white booking surface — signature commerce contrast on Arctic dark.
+ * Keep visual weight light; details live in the form progressive flow.
  */
 export default function BookingAside({
   priceFrom,
@@ -17,24 +19,31 @@ export default function BookingAside({
     'Secure Stripe payment',
     'Hotel pickup in Rovaniemi',
   ],
+  offerLine,
   children,
   className = '',
 }: Props) {
   return (
     <div className={`rn-book-panel-light rn-book-signature ${className}`}>
-      <div className="border-b border-black/[0.06] px-5 py-5 sm:px-6">
-        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-panel-muted">From</p>
+      <div className="border-b border-black/[0.06] px-5 py-4 sm:px-6 sm:py-5">
+        <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-panel-muted">From</p>
         <div className="mt-1 flex items-baseline gap-2">
-          <p className="font-display text-[2.15rem] font-semibold leading-none tracking-tight text-panel-ink sm:text-[2.35rem]">
+          <p className="font-display text-[2rem] font-semibold leading-none tracking-tight text-panel-ink sm:text-[2.2rem]">
             €{priceFrom}
           </p>
           <span className="text-sm text-panel-muted">{priceNote}</span>
         </div>
-        <ul className="mt-4 space-y-1.5 text-xs leading-snug text-panel-muted">
+        {offerLine ? (
+          <p className="mt-3 text-[12px] leading-snug text-panel-muted">
+            <span className="font-medium text-panel-ink">Direct booking · </span>
+            {offerLine}
+          </p>
+        ) : null}
+        <ul className="mt-3.5 flex flex-wrap gap-x-3 gap-y-1 text-[11px] leading-snug text-panel-muted">
           {trustLines.map((line) => (
-            <li key={line} className="flex gap-2">
+            <li key={line} className="inline-flex items-center gap-1.5">
               <span className="text-aurora" aria-hidden>
-                ✓
+                ·
               </span>
               <span>{line}</span>
             </li>

@@ -6,7 +6,6 @@ import Hero from './components/Hero';
 import TrustStrip from './components/TrustStrip';
 import FeaturedExperience from './components/FeaturedExperience';
 import ExploreCategories from './components/ExploreCategories';
-import FeaturedTours from './components/FeaturedTours';
 import ReviewsHome from './components/ReviewsHome';
 import PrivateCustomSection from './components/PrivateCustomSection';
 import GuidesTeaser from './components/GuidesTeaser';
@@ -76,7 +75,6 @@ function App() {
               <TrustStrip />
               <FeaturedExperience />
               <ExploreCategories />
-              <FeaturedTours />
               <ReviewsHome />
               <PrivateCustomSection />
               <GuidesTeaser />

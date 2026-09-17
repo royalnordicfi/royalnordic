@@ -9,7 +9,7 @@ const CategoryHero = ({ title, subtitle, image, compact = false }: CategoryHeroP
   return (
     <section
       className={`relative flex items-end overflow-hidden bg-[#030706] ${
-        compact ? 'min-h-[34vh] sm:min-h-[38vh]' : 'min-h-[42vh] sm:min-h-[48vh]'
+        compact ? 'min-h-[28vh] sm:min-h-[32vh]' : 'min-h-[36vh] sm:min-h-[40vh]'
       }`}
     >
       <img
@@ -23,12 +23,22 @@ const CategoryHero = ({ title, subtitle, image, compact = false }: CategoryHeroP
       />
       <div className="absolute inset-0 bg-gradient-to-t from-[#050a10] via-black/55 to-black/30" aria-hidden />
       <div className="rn-hero-chrome-veil pointer-events-none absolute inset-x-0 top-0 h-32 sm:h-40" aria-hidden />
-      <div className="rn-container relative z-10 w-full pb-9 pt-[calc(var(--rn-chrome-h)+1.25rem)] sm:pb-11 sm:pt-[calc(var(--rn-chrome-h)+1.75rem)]">
+      <div
+        className={`rn-container relative z-10 w-full pt-[calc(var(--rn-chrome-h)+1rem)] sm:pt-[calc(var(--rn-chrome-h)+1.35rem)] ${
+          compact ? 'pb-7 sm:pb-8' : 'pb-8 sm:pb-10'
+        }`}
+      >
         <p className="rn-eyebrow">Royal Nordic</p>
-        <h1 className="mt-2 max-w-3xl font-display text-3xl font-semibold text-white sm:text-4xl lg:text-[2.6rem]">
+        <h1
+          className={`mt-2 max-w-3xl font-display font-semibold text-white ${
+            compact
+              ? 'text-[1.65rem] sm:text-2xl lg:text-[2.05rem]'
+              : 'text-[1.85rem] sm:text-3xl lg:text-[2.35rem]'
+          }`}
+        >
           {title}
         </h1>
-        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-white/78 sm:text-base">{subtitle}</p>
+        <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-white/74 sm:text-[15px]">{subtitle}</p>
       </div>
     </section>
   )

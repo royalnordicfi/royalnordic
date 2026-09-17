@@ -36,11 +36,12 @@ const RentingEquipment: React.FC = () => {
     <div className="rn-page">
       <CategoryHero
         title="Equipment Rental in Rovaniemi"
-        subtitle="Premium snowshoes for independent winter walks — flexible duration and delivery to your lodging when booked."
+        subtitle="Premium snowshoes for independent winter walks — flexible duration and delivery when booked."
         image="/snowshoe2.jpg"
+        compact
       />
 
-      <section className="rn-section">
+      <section className="rn-section rn-hero-follow pt-0">
         <div className="rn-container">
           {rentals.length === 0 ? (
             <p className="text-center text-text-muted">No equipment rentals are available right now.</p>

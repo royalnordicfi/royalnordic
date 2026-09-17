@@ -35,13 +35,17 @@ const TransportationCategory = () => {
     <div className="rn-page">
       <CategoryHero
         title="Private Transportation in Lapland"
-        subtitle="Point-to-point transfers between Rovaniemi, Levi, Kittilä, and custom routes — professional driver and flexible timing."
+        subtitle="Rovaniemi, Levi, Kittilä, and custom routes — professional driver and flexible timing."
         image="/transportation3.jpg"
+        compact
       />
 
-      <section className="rn-section relative">
+      <section className="rn-section rn-hero-follow relative pt-0">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
-        <div className="rn-container relative space-y-10">
+        <div className="rn-container relative space-y-8">
+          <p className="max-w-xl text-sm text-text-muted">
+            Fixed-route and on-request transfers — same card format for quick comparison.
+          </p>
           <div className="mx-auto max-w-5xl">
           <div className="rn-card-grid lg:!grid-cols-2">
             {TRANSFERS.map((item) => (

@@ -70,28 +70,26 @@ const NorthernLightsTours: React.FC = () => {
     <div className="rn-page">
       <CategoryHero
         title="Northern Lights Tours in Rovaniemi"
-        subtitle="Small-group aurora hunts from a local operator — with a clear guarantee on our signature tour."
+        subtitle="Small-group aurora hunts — signature tour includes a free return trip if no lights appear (see Terms)."
         image="/nortti5.jpg"
+        compact
       />
 
-      <section className="rn-section relative">
+      <section className="rn-section rn-hero-follow relative pt-0">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
         <div className="rn-container relative">
-          <div className="max-w-2xl">
-            <p className="rn-eyebrow">Aurora season</p>
-            <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-3xl">
-              Northern Lights experiences
-            </h2>
-            <p className="mt-2 text-sm text-text-muted sm:text-base">
-              Compare formats side by side.{' '}
+          <div className="max-w-xl">
+            <p className="rn-eyebrow">Compare formats</p>
+            <p className="mt-2 text-sm leading-relaxed text-text-muted">
+              Same card layout for every tour —{' '}
               <Link to="/northern-lights-tour" className="text-aurora-soft hover:underline">
                 Guaranteed
               </Link>{' '}
-              includes a free return trip if no lights appear — see Terms.
+              is our signature evening hunt with hotel pickup.
             </p>
           </div>
 
-          <div className="rn-card-grid mt-8">
+          <div className="rn-card-grid mt-6">
             {tours.map((tour, i) => (
               <TourCard
                 key={tour.to}

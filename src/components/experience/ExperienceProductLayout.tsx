@@ -12,11 +12,12 @@ type Props = {
   booking: React.ReactNode
   children: React.ReactNode
   afterContent?: React.ReactNode
+  proof?: React.ReactNode
 }
 
 /**
- * Art-directed product composition:
- * title + gallery + facts + editorial column share one grid with sticky booking.
+ * Art-directed product composition.
+ * Shell clearance comes ONLY from .rn-shell-pad — never add Tailwind pt-*.
  */
 export default function ExperienceProductLayout({
   breadcrumbs,
@@ -28,26 +29,28 @@ export default function ExperienceProductLayout({
   booking,
   children,
   afterContent,
+  proof,
 }: Props) {
   return (
     <div className="rn-product">
       <div className="rn-product__glow" aria-hidden />
-      <div className="rn-container rn-shell-pad pb-16 pt-4 sm:pt-6">
+      <div className="rn-container rn-shell-pad rn-shell-pad--product pb-16 sm:pb-20">
         <ExperienceBreadcrumb items={breadcrumbs} />
 
-        <div className="mt-4 grid items-start gap-7 lg:mt-5 lg:grid-cols-12 lg:gap-x-9 xl:gap-x-11">
+        <div className="mt-6 grid items-start gap-8 lg:mt-7 lg:grid-cols-12 lg:gap-x-10 xl:gap-x-12">
           <div className="min-w-0 lg:col-span-7">
-            <header className="rn-product__intro max-w-2xl">
+            <header className="rn-product__intro rn-reveal max-w-2xl">
               <p className="rn-eyebrow">{eyebrow}</p>
-              <h1 className="rn-product__title mt-2 font-display font-semibold text-white">
+              <h1 className="rn-product__title mt-2.5 font-display font-semibold text-white">
                 {title}
               </h1>
-              <p className="rn-product__lede mt-2.5 text-[15px] leading-relaxed text-text-muted sm:text-[15.5px]">
+              <p className="rn-product__lede mt-3 text-[15px] leading-relaxed text-text-muted sm:text-[15.5px]">
                 {lede}
               </p>
+              {proof ? <div className="rn-product__proof mt-3.5">{proof}</div> : null}
             </header>
 
-            <div className="rn-product__gallery mt-5 sm:mt-6">
+            <div className="rn-product__gallery mt-6 sm:mt-7">
               <ExperienceGallery images={images} />
             </div>
 
@@ -55,12 +58,12 @@ export default function ExperienceProductLayout({
               <ExperienceFacts items={facts} />
             </div>
 
-            <div className="rn-product__editorial mt-9 space-y-10 sm:mt-11 sm:space-y-11">
+            <div className="rn-product__editorial mt-10 space-y-10 sm:mt-12 sm:space-y-12">
               {children}
             </div>
           </div>
 
-          <aside id="book" className="lg:col-span-5">
+          <aside id="book" className="lg:col-span-5 lg:pt-1">
             <div className="rn-sticky-book rn-product__book">{booking}</div>
           </aside>
         </div>

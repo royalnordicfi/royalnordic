@@ -1,15 +1,16 @@
 /**
  * Global page-shell contract.
- * Every public route resolves to one of these modes so header geometry
- * is structural — never patched per-page with ad-hoc padding.
+ * One geometry owns promo + header clearance for every public route.
+ * Never patch individual pages with ad-hoc padding-top.
  *
- * hero     — cinematic full-bleed hero; header overlays; hero pads itself
- * product  — experience / booking pages; content starts below chrome
- * standard — editorial / form / legal; content starts below chrome
+ * overlay — cinematic routes; header floats over imagery; hero pads itself
+ * product — experience / booking pages; content starts below chrome + breath
+ * standard — editorial / form / legal / utility; content starts below chrome
  */
-export type ShellMode = 'hero' | 'product' | 'standard'
+export type ShellMode = 'overlay' | 'product' | 'standard'
 
-const HERO_EXACT = new Set([
+/** Only intentional cinematic / category heroes may overlay photography. */
+const OVERLAY_EXACT = new Set([
   '/',
   '/northern-lights-tours',
   '/daytime-experiences',
@@ -17,8 +18,6 @@ const HERO_EXACT = new Set([
   '/transportation',
   '/blog',
   '/travel-trade',
-  '/privacy-policy',
-  '/terms-conditions',
 ])
 
 const PRODUCT_EXACT = new Set([
@@ -36,12 +35,18 @@ const PRODUCT_EXACT = new Set([
 ])
 
 export function resolveShellMode(pathname: string): ShellMode {
-  if (HERO_EXACT.has(pathname)) return 'hero'
+  if (OVERLAY_EXACT.has(pathname)) return 'overlay'
   if (PRODUCT_EXACT.has(pathname)) return 'product'
   if (pathname.startsWith('/blog/')) return 'standard'
   return 'standard'
 }
 
+/** @deprecated use resolveShellMode === 'overlay' */
 export function isHeroShell(pathname: string): boolean {
-  return resolveShellMode(pathname) === 'hero'
+  return resolveShellMode(pathname) === 'overlay'
+}
+
+/** Alias kept for Header / CSS mental model */
+export function isOverlayShell(pathname: string): boolean {
+  return resolveShellMode(pathname) === 'overlay'
 }

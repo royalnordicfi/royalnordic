@@ -34,7 +34,7 @@ const ExploreCategories = () => {
       <div className="rn-container relative">
         <div className="max-w-2xl">
           <p className="rn-eyebrow">Explore</p>
-          <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-3xl">
+          <h2 className="mt-2 font-display text-xl font-semibold text-white sm:text-2xl">
             Choose how you experience Lapland
           </h2>
         </div>
@@ -44,7 +44,7 @@ const ExploreCategories = () => {
             <Link
               key={cat.to}
               to={cat.to}
-              className="group rn-reveal rn-category-tile relative min-h-[168px] overflow-hidden rounded-rn border border-white/[0.06] sm:min-h-[200px]"
+              className="group rn-reveal rn-category-tile relative min-h-[152px] overflow-hidden rounded-rn border border-white/[0.06] sm:min-h-[176px]"
             >
               <img
                 src={cat.image}
@@ -57,8 +57,8 @@ const ExploreCategories = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
               <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-                <h3 className="font-display text-xl font-semibold text-white sm:text-2xl">{cat.title}</h3>
-                <p className="mt-1 max-w-sm text-sm text-white/75">{cat.text}</p>
+                <h3 className="font-display text-lg font-semibold text-white sm:text-xl">{cat.title}</h3>
+                <p className="mt-1 max-w-sm text-[13px] leading-snug text-white/72 sm:text-sm">{cat.text}</p>
               </div>
             </Link>
           ))}

@@ -79,7 +79,7 @@ const Contact = () => {
         <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
           <div className="lg:col-span-4">
             <p className="rn-eyebrow">Contact</p>
-            <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-3xl">
+            <h2 className="mt-2 font-display text-xl font-semibold text-white sm:text-2xl">
               Questions before you book?
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-text-muted">
@@ -106,7 +106,7 @@ const Contact = () => {
           <div className="rn-panel p-5 sm:p-6 lg:col-span-8">
             <h3 className="text-base font-semibold text-panel-ink">Send a message</h3>
 
-            <form onSubmit={handleSubmit} className="mt-4 space-y-3.5">
+            <form onSubmit={handleSubmit} className="mt-4 space-y-4">
               <div className="grid gap-3.5 md:grid-cols-2">
                 <div>
                   <label htmlFor="name" className="rn-form-label">

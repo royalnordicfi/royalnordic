@@ -671,6 +671,30 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
 
   const dark = tone === 'dark'
+  const embeddedLight = chrome === 'embedded' && tone === 'light'
+  const lightCalendar = tone === 'light'
+
+  type ProgressStepId = 'date' | 'guests' | 'details' | 'pay'
+  const progressSteps: { id: ProgressStepId; label: string }[] = [
+    { id: 'date', label: 'Date' },
+    { id: 'guests', label: 'Guests' },
+    { id: 'details', label: 'Details' },
+    { id: 'pay', label: 'Pay' },
+  ]
+  const progressOrder: ProgressStepId[] = ['date', 'guests', 'details', 'pay']
+  const activeProgressStep = ((): ProgressStepId => {
+    if (!formData.preferredDate) return 'date'
+    if (!formData.fullName.trim()) return 'guests'
+    const email = formData.email.trim()
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'details'
+    return 'pay'
+  })()
+  const activeProgressIndex = progressOrder.indexOf(activeProgressStep)
+
+  const showGuestsSection = !embeddedLight || Boolean(formData.preferredDate)
+  const showDetailsSection = !embeddedLight || Boolean(formData.preferredDate)
+  const showCheckoutSections = !embeddedLight || Boolean(formData.preferredDate)
+
   const ui = dark
     ? {
         wrap: chrome === 'embedded' ? 'rn-book-dark max-w-lg mx-auto lg:mx-0' : 'rn-book-dark bg-surface-elevated rounded-rn border border-white/10 p-6 max-w-lg mx-auto lg:mx-0',
@@ -700,12 +724,18 @@ const BookingForm: React.FC<BookingFormProps> = ({
         validText: 'text-aurora-soft text-sm font-semibold',
         discountOk: 'text-xs text-aurora-soft mt-1',
         discountBad: 'text-xs text-red-300 mt-1',
+        sectionGap: 'space-y-6',
       }
     : {
         wrap: chrome === 'embedded' ? 'max-w-lg mx-auto lg:mx-0' : 'bg-white rounded-xl shadow-xl p-6 max-w-lg mx-auto lg:mx-0',
         hint: chrome === 'embedded' ? 'text-panel-muted text-xs mb-4' : 'text-gray-600 text-sm text-center mb-6',
-        heading: 'text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2',
-        navBtn: 'w-11 h-11 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600',
+        heading: embeddedLight
+          ? 'text-[11px] font-medium uppercase tracking-[0.16em] text-panel-muted mb-3'
+          : 'text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2',
+        sectionGap: embeddedLight ? 'space-y-5' : 'space-y-6',
+        navBtn: embeddedLight
+          ? 'flex h-10 w-10 items-center justify-center rounded-md border border-black/[0.08] bg-black/[0.02] text-panel-ink transition hover:border-emerald-800/25 hover:bg-emerald-50/30'
+          : 'w-11 h-11 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600',
         month: 'text-lg font-semibold text-gray-900',
         weekday: 'text-center text-xs font-medium text-gray-500 py-1',
         priceNote: 'text-xs text-gray-500 mt-2',
@@ -731,15 +761,54 @@ const BookingForm: React.FC<BookingFormProps> = ({
         discountBad: 'text-xs text-red-600 mt-1',
       }
 
+  const renderProgress = () => (
+    <nav aria-label="Booking progress" className={embeddedLight ? 'mb-5' : 'mb-4'}>
+      <ol className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+        {progressSteps.map((step, index) => {
+          const isActive = step.id === activeProgressStep
+          const isComplete = index < activeProgressIndex
+          const stepClass = embeddedLight
+            ? isActive
+              ? 'text-[11px] font-medium tracking-wide text-panel-ink'
+              : isComplete
+              ? 'text-[11px] text-panel-muted'
+              : 'text-[11px] text-panel-muted/40'
+            : isActive
+            ? 'text-xs font-medium text-white'
+            : isComplete
+            ? 'text-xs text-text-muted'
+            : 'text-xs text-text-dim'
+          return (
+            <li key={step.id} className="flex items-center gap-2">
+              {index > 0 && (
+                <span
+                  className={
+                    embeddedLight
+                      ? `text-[10px] ${isComplete || isActive ? 'text-panel-muted/50' : 'text-panel-muted/25'}`
+                      : `text-[10px] ${isComplete || isActive ? 'text-text-dim' : 'text-white/15'}`
+                  }
+                  aria-hidden
+                >
+                  →
+                </span>
+              )}
+              <span className={stepClass}>{step.label}</span>
+            </li>
+          )
+        })}
+      </ol>
+    </nav>
+  )
+
   return (
     <div className={ui.wrap}>
-      <div className={dark ? 'mb-4' : (chrome === 'embedded' ? 'mb-4' : 'text-center mb-6')}>
-        <p className={ui.hint}>
-          {chrome === 'embedded' || dark ? 'Date → Guests → Details → Pay' : 'Select your preferred date and group size'}
-        </p>
+      <div className={dark ? 'mb-4' : chrome === 'embedded' ? 'mb-1' : 'text-center mb-6'}>
+        {embeddedLight || dark ? renderProgress() : (
+          <p className={ui.hint}>Select your preferred date and group size</p>
+        )}
       </div>
       
-      <form className="space-y-6">
+      <form className={embeddedLight ? ui.sectionGap : 'space-y-6'}>
         {/* Date Selection */}
         <div ref={dateSectionRef} className="scroll-mt-24">
           <h4 className={ui.heading}>Choose a date</h4>
@@ -790,16 +859,24 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 return <div key={`empty-${index}`} className="h-14 sm:h-16"></div>
               }
               
-              const { day: calendarDay, date, available, remainingSlots, isPastDate, isOutOfSeason, isFullBooked } = day
+              const { day: calendarDay, date, available, remainingSlots, isFullBooked } = day
               const isAvailable = available && remainingSlots >= (formData.adults + formData.children)
               const isSelected = formData.preferredDate === date
               const priceClass = isSelected
-                ? 'text-emerald-100'
-                : isAvailable
-                ? 'text-emerald-700'
-                : 'text-gray-400'
-              
-              
+                ? lightCalendar
+                  ? 'text-white/85'
+                  : 'text-emerald-100'
+                : lightCalendar
+                ? 'text-emerald-900/55'
+                : 'text-emerald-700'
+
+              const lightDayClass = (() => {
+                if (isSelected) return 'rn-bf-light-day rn-bf-light-day--selected'
+                if (!isAvailable) return 'rn-bf-light-day rn-bf-light-day--muted'
+                if (fieldErrors.preferredDate) return 'rn-bf-light-day rn-bf-light-day--error'
+                return 'rn-bf-light-day rn-bf-light-day--available'
+              })()
+
               return (
                 <button
                   key={date} 
@@ -820,41 +897,26 @@ const BookingForm: React.FC<BookingFormProps> = ({
                           ? 'rn-bf-day--available'
                           : 'rn-bf-day--disabled'
                       }`
-                    : `h-14 sm:h-16 rounded text-sm font-medium transition-colors flex flex-col items-center justify-center px-0.5 leading-none ${
-                    isSelected
-                      ? 'bg-emerald-600 text-white'
-                      : isPastDate
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : isOutOfSeason
-                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                      : isFullBooked
-                      ? 'bg-red-100 text-red-600 border border-red-200 cursor-not-allowed'
-                      : isAvailable
-                      ? fieldErrors.preferredDate
-                        ? 'bg-white border border-red-400 hover:bg-emerald-50 text-gray-900 cursor-pointer'
-                        : 'bg-white border border-gray-300 hover:bg-emerald-50 text-gray-900 cursor-pointer'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}
+                    : lightDayClass}
                   disabled={!isAvailable}
+                  aria-label={
+                    isAvailable
+                      ? `${calendarDay}, €${formatEuroAmount(liveAdultPrice)}`
+                      : `${calendarDay}, unavailable`
+                  }
                 >
-                  <div className="text-[11px] sm:text-sm font-semibold">{calendarDay}</div>
-                  {!isPastDate && (
-                    <div className={`text-[9px] sm:text-xs font-semibold mt-0.5 ${priceClass}`}>
+                  <div className="text-[11px] sm:text-sm font-semibold tabular-nums">{calendarDay}</div>
+                  {isAvailable && (
+                    <div className={`text-[9px] sm:text-[10px] font-medium mt-0.5 ${priceClass}`}>
                       €{formatEuroAmount(liveAdultPrice)}
                     </div>
                   )}
-                  {isAvailable && (
+                  {isAvailable && !embeddedLight && remainingSlots <= 4 && (
                     <div className={`text-[8px] sm:text-[10px] mt-0.5 ${
                       isSelected ? 'text-emerald-100' : 'text-gray-500'
                     }`}>
                       {remainingSlots} left
                     </div>
-                  )}
-                  {isFullBooked && (
-                    <div className="text-[8px] sm:text-[10px] text-red-600 font-semibold mt-0.5">FULL</div>
-                  )}
-                  {isOutOfSeason && (
-                    <div className="text-[8px] sm:text-[10px] text-gray-500 mt-0.5">Closed</div>
                   )}
                 </button>
               )
@@ -867,12 +929,23 @@ const BookingForm: React.FC<BookingFormProps> = ({
           </div>
 
           <p className={ui.priceNote}>Showing prices in EUR (Euro)</p>
+          {seasonStart && seasonEnd && (
+            <p
+              className={
+                embeddedLight
+                  ? 'mt-2 text-[11px] leading-snug text-panel-muted/90'
+                  : 'mt-1.5 text-[11px] leading-snug text-gray-500'
+              }
+            >
+              Grey dates are outside the season or unavailable.
+            </p>
+          )}
         </div>
 
-      {/* Participants Section */}
+      {showGuestsSection && (
         <div>
-          <h4 className={ui.heading}>Participants</h4>
-          {!formData.preferredDate && (
+          <h4 className={ui.heading}>{embeddedLight ? 'Guests' : 'Participants'}</h4>
+          {!embeddedLight && !formData.preferredDate && (
             <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded p-3 mb-4">
               <strong>Please select a date first</strong> to choose the number of participants
             </div>
@@ -928,8 +1001,15 @@ const BookingForm: React.FC<BookingFormProps> = ({
             
             {/* Available seats */}
             {formData.preferredDate && (
-              <div className="text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2.5 font-medium">
-                {selectedSeatsLeft} {selectedSeatsLeft === 1 ? 'seat' : 'seats'} available on {formatTourDateShort(formData.preferredDate)}
+              <div
+                className={
+                  embeddedLight
+                    ? 'text-xs text-panel-muted'
+                    : 'text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2.5 font-medium'
+                }
+              >
+                {selectedSeatsLeft} {selectedSeatsLeft === 1 ? 'seat' : 'seats'} available on{' '}
+                {formatTourDateShort(formData.preferredDate)}
               </div>
             )}
             
@@ -941,8 +1021,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
             )}
           </div>
         </div>
+      )}
 
-        {/* Contact Information */}
+        {showDetailsSection && (
         <div>
           <h4 className={ui.heading}>Your details</h4>
           <div className="space-y-3">
@@ -992,7 +1073,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
             />
           </div>
         </div>
+        )}
 
+        {showCheckoutSections && (
+        <>
         {/* Special Requests */}
         <div>
           <h4 className={ui.heading}>Special Requests</h4>
@@ -1168,6 +1252,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
             Prefer crypto? Request a crypto booking
           </button>
         </div>
+        </>
+        )}
 
       </form>
 
@@ -1260,7 +1346,7 @@ const CryptoPaymentModal: React.FC<{
             {/* Crypto Form */}
             <div className="space-y-4">
               <div>
-                <label className={ui.label}>Full Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                 <input
                   type="text"
                   value={cryptoFormData.fullName}
@@ -1271,7 +1357,7 @@ const CryptoPaymentModal: React.FC<{
               </div>
 
               <div>
-                <label className={ui.label}>Preferred Cryptocurrency</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Cryptocurrency</label>
                 <select
                   value={cryptoFormData.cryptoType}
                   onChange={(e) => setCryptoFormData({...cryptoFormData, cryptoType: e.target.value})}
@@ -1286,7 +1372,7 @@ const CryptoPaymentModal: React.FC<{
               </div>
 
               <div>
-                <label className={ui.label}>Additional Requests</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Additional Requests</label>
                 <textarea
                   value={cryptoFormData.specialRequests}
                   onChange={(e) => setCryptoFormData({...cryptoFormData, specialRequests: e.target.value})}

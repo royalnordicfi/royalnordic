@@ -134,6 +134,39 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Sync chrome geometry before React paints — prevents header overlap / CLS -->
+    <script>
+      (function () {
+        try {
+          var path = location.pathname.replace(/\/$/, '') || '/';
+          var overlay = {
+            '/': 1,
+            '/northern-lights-tours': 1,
+            '/daytime-experiences': 1,
+            '/renting-equipment': 1,
+            '/transportation': 1,
+            '/blog': 1,
+            '/travel-trade': 1
+          };
+          var product = {
+            '/northern-lights-tour': 1,
+            '/family-friendly-northern-lights': 1,
+            '/ice-fishing': 1,
+            '/ranua-zoo': 1,
+            '/korouoma-canyon': 1,
+            '/snowshoe-rental': 1,
+            '/snowmobile-safari': 1,
+            '/monster-truck-northern-lights': 1,
+            '/customized-tour': 1,
+            '/transportation-rovaniemi-levi': 1,
+            '/transportation-customized': 1
+          };
+          var mode = overlay[path] ? 'overlay' : product[path] ? 'product' : 'standard';
+          document.documentElement.setAttribute('data-rn-shell', mode);
+          document.documentElement.style.setProperty('--rn-promo-bar-height', '28px');
+        } catch (e) {}
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

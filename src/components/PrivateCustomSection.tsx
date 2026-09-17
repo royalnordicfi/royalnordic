@@ -17,7 +17,7 @@ const PrivateCustomSection = () => {
           </div>
           <div className="p-6 sm:p-8 lg:p-10">
             <p className="rn-eyebrow">Private & custom</p>
-            <h2 className="mt-2 font-display text-3xl font-semibold text-white sm:text-4xl">
+            <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-[1.75rem]">
               Plan a Lapland itinerary around your dates, group, and pace
             </h2>
             <p className="mt-4 text-text-muted">

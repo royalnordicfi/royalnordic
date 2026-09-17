@@ -182,15 +182,15 @@ const Header = () => {
         }`}
         style={{ top: 'var(--rn-promo-bar-height, 0px)' }}
       >
-        <div className="rn-header__inner rn-container flex items-center justify-between gap-6">
-          <Link to="/" className="rn-header__brand flex shrink-0 items-center gap-2" aria-label="Royal Nordic home">
-            <img src="/logo.png" alt="" className="h-[1.65rem] w-auto sm:h-7" width={28} height={28} />
-            <span className="font-display text-[1rem] font-semibold tracking-[0.04em] text-white sm:text-[1.125rem]">
+        <div className="rn-header__inner rn-container flex items-center justify-between gap-3 lg:gap-4">
+          <Link to="/" className="rn-header__brand flex shrink-0 items-center gap-1.5" aria-label="Royal Nordic home">
+            <img src="/logo.png" alt="" className="h-6 w-auto sm:h-[1.55rem]" width={24} height={24} />
+            <span className="font-display text-[0.95rem] font-semibold tracking-[0.05em] text-white/95 sm:text-[1.05rem]">
               Royal Nordic
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-0 xl:flex" aria-label="Primary">
+          <nav className="hidden items-center gap-0 lg:flex" aria-label="Primary">
             <div
               className="relative"
               ref={dropRef}
@@ -268,7 +268,7 @@ const Header = () => {
             <button
               ref={openRef}
               type="button"
-              className="inline-flex min-h-[42px] min-w-[42px] items-center justify-center rounded border border-white/15 text-white xl:hidden"
+              className="inline-flex min-h-[40px] min-w-[40px] items-center justify-center rounded border border-white/12 text-white/90 lg:hidden"
               aria-label="Open menu"
               aria-expanded={menuOpen}
               onClick={() => (menuOpen || menuMounted ? closeMenu() : openMenu())}
@@ -281,7 +281,7 @@ const Header = () => {
 
       {menuMounted &&
         createPortal(
-          <div className="fixed inset-0 z-[70] xl:hidden" role="dialog" aria-modal="true">
+          <div className="fixed inset-0 z-[70] lg:hidden" role="dialog" aria-modal="true">
             <button
               type="button"
               className={`absolute inset-0 bg-black/80 transition-opacity duration-300 ${
@@ -326,7 +326,7 @@ const Header = () => {
                 <button
                   type="button"
                   onClick={() => go('/travel-trade')}
-                  className={`rounded px-4 py-3.5 text-left text-base font-medium ${
+                  className={`rounded px-4 py-3 text-left text-base font-medium ${
                     isActive('/travel-trade') ? 'text-aurora-soft' : 'text-white'
                   }`}
                 >

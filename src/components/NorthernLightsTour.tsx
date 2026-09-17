@@ -112,6 +112,11 @@ const NorthernLightsTour = () => {
         eyebrow="Rovaniemi · Aurora season"
         title="Guaranteed Northern Lights Tour"
         lede="Small-group aurora hunt from Rovaniemi — we chase clearer skies. No lights? Free return trip per Terms."
+        proof={
+          <p>
+            <strong>★★★★★</strong> Verified guest reviews · Small groups · Photography guidance
+          </p>
+        }
         images={GALLERY}
         facts={[
           { label: 'Duration', value: '2–12 h (~6h)' },
@@ -123,17 +128,14 @@ const NorthernLightsTour = () => {
           <>
             <BookingAside
               priceFrom={price}
+              offerLine="WINTER20 · Save 20% at checkout"
               trustLines={[
-                'Free cancellation up to 24h before',
+                'Free cancellation 24h before',
                 'Secure Stripe payment',
-                'Hotel pickup in Rovaniemi',
-                'Northern Lights guarantee (see Terms)',
+                'Hotel pickup',
+                'Return-trip guarantee',
               ]}
             >
-              <p className="mb-4 rounded-md border border-black/5 bg-black/[0.03] px-3 py-2 text-xs text-panel-muted">
-                Optional: enter <span className="font-semibold text-panel-ink">WINTER20</span> at checkout for
-                20% off eligible direct bookings.
-              </p>
               {loading ? (
                 <p className="py-10 text-center text-sm text-panel-muted">Loading availability…</p>
               ) : (

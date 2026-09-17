@@ -6,6 +6,25 @@ import ExperienceAccordion from './experience/ExperienceAccordion'
 import ExperienceBreadcrumb from './experience/ExperienceBreadcrumb'
 import Footer from './Footer'
 
+const OPERATIONS = [
+  {
+    title: 'Product pages you can link to',
+    text: 'Each experience has a public page with duration, pickup, and inclusions — share URLs with clients or embed in proposals.',
+  },
+  {
+    title: 'Direct guest booking',
+    text: 'Travellers can confirm online on royalnordic.fi; partners can still route FIT and group requests through us for alignment.',
+  },
+  {
+    title: 'Pickup & timing',
+    text: 'We confirm hotel pickup zones in Rovaniemi and realistic start windows for aurora evenings and daytime departures.',
+  },
+  {
+    title: 'Languages & on-the-ground contact',
+    text: 'English-led tours with WhatsApp and email support for last-minute changes when operations allow.',
+  },
+]
+
 const AUDIENCES = [
   {
     title: 'Travel agencies & tour operators',
@@ -119,10 +138,10 @@ const TravelTrade: React.FC = () => {
         <div className="rn-container relative z-10 -mt-10 sm:-mt-12">
         <ExperienceBreadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Travel trade' }]} />
 
-        <div className="mx-auto mt-6 max-w-3xl space-y-14 sm:mt-8">
+        <div className="mx-auto mt-6 max-w-3xl space-y-12 sm:mt-8">
           <section className="rn-reveal">
             <p className="rn-eyebrow">Who we work with</p>
-            <h2 className="mt-2 font-display text-2xl font-semibold text-white">Built for B2B partners</h2>
+            <h2 className="mt-2 font-display text-xl font-semibold text-white sm:text-2xl">Built for B2B partners</h2>
             <div className="mt-6 grid gap-6 sm:grid-cols-2">
               {AUDIENCES.map((item) => (
                 <div key={item.title} className="border-t border-white/[0.08] pt-4">
@@ -135,13 +154,13 @@ const TravelTrade: React.FC = () => {
 
           <section className="rn-reveal">
             <p className="rn-eyebrow">Product catalogue</p>
-            <h2 className="mt-2 font-display text-2xl font-semibold text-white">What you can sell</h2>
-            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <h2 className="mt-2 font-display text-xl font-semibold text-white sm:text-2xl">What you can sell</h2>
+            <div className="mt-5 grid grid-cols-1 gap-3.5 sm:grid-cols-2">
               {sellable.map((item) => (
                 <Link
                   key={item.to}
                   to={item.to}
-                  className="rn-b2b-card group rounded-rn border border-white/[0.07] bg-surface/60 p-4 transition hover:border-aurora/25 hover:bg-surface/90"
+                  className="rn-b2b-card group rounded-rn border border-white/[0.07] bg-surface/60 p-4 hover:border-aurora/25 hover:bg-surface/90"
                 >
                   <h3 className="text-base font-semibold text-white transition group-hover:text-aurora-soft">
                     {item.title}
@@ -152,8 +171,35 @@ const TravelTrade: React.FC = () => {
             </div>
           </section>
 
-          <section>
-            <h2 className="font-display text-2xl font-semibold text-white">How cooperation works</h2>
+          <section className="rn-reveal">
+            <p className="rn-eyebrow">Operations</p>
+            <h2 className="mt-2 font-display text-xl font-semibold text-white sm:text-2xl">
+              What partners can count on
+            </h2>
+            <div className="mt-5 grid gap-5 sm:grid-cols-2">
+              {OPERATIONS.map((item) => (
+                <div key={item.title} className="rounded-rn border border-white/[0.06] bg-surface/40 p-4">
+                  <h3 className="text-sm font-semibold text-white">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-text-muted">{item.text}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+              <Link to="/terms-conditions" className="font-medium text-aurora-soft hover:underline">
+                Terms &amp; guarantee
+              </Link>
+              <Link to="/northern-lights-tours" className="font-medium text-aurora-soft hover:underline">
+                Northern Lights catalogue
+              </Link>
+              <Link to="/daytime-experiences" className="font-medium text-aurora-soft hover:underline">
+                Day experiences
+              </Link>
+            </div>
+          </section>
+
+          <section className="rn-reveal">
+            <p className="rn-eyebrow">Onboarding</p>
+            <h2 className="mt-2 font-display text-xl font-semibold text-white sm:text-2xl">How cooperation works</h2>
             <div className="mt-4">
               <ExperienceAccordion
                 items={[
@@ -182,8 +228,8 @@ const TravelTrade: React.FC = () => {
             </div>
           </section>
 
-          <section className="border-y border-white/[0.08] py-8">
-            <h2 className="font-display text-xl font-semibold text-white">Royal Nordic at a glance</h2>
+          <section className="rn-reveal border-y border-white/[0.08] py-7">
+            <h2 className="font-display text-lg font-semibold text-white sm:text-xl">Royal Nordic at a glance</h2>
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-text-muted sm:text-base">
               <p>
                 Royal Nordic is a Rovaniemi-based tour operator focused on premium Arctic experiences. We
@@ -220,49 +266,79 @@ const TravelTrade: React.FC = () => {
 
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <input
-                    required
-                    name="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Your name"
-                    className={inputClass}
-                  />
-                  <input
-                    name="company"
-                    value={formData.company}
-                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                    placeholder="Company / agency"
-                    className={inputClass}
-                  />
+                  <div>
+                    <label htmlFor="tt-name" className="rn-form-label">
+                      Your name *
+                    </label>
+                    <input
+                      required
+                      id="tt-name"
+                      name="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Full name"
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="tt-company" className="rn-form-label">
+                      Company
+                    </label>
+                    <input
+                      id="tt-company"
+                      name="company"
+                      value={formData.company}
+                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                      placeholder="Agency or DMC"
+                      className={inputClass}
+                    />
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <input
+                  <div>
+                    <label htmlFor="tt-email" className="rn-form-label">
+                      Work email *
+                    </label>
+                    <input
+                      required
+                      id="tt-email"
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      placeholder="you@agency.com"
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="tt-phone" className="rn-form-label">
+                      Phone
+                    </label>
+                    <input
+                      id="tt-phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      placeholder="+358 …"
+                      className={inputClass}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="tt-message" className="rn-form-label">
+                    Enquiry *
+                  </label>
+                  <textarea
                     required
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="Work email"
-                    className={inputClass}
-                  />
-                  <input
-                    name="phone"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="Phone (optional)"
-                    className={inputClass}
+                    id="tt-message"
+                    name="message"
+                    rows={5}
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    placeholder="Markets, products, dates, group size, and how you prefer to book…"
+                    className={`${inputClass} resize-y`}
                   />
                 </div>
-                <textarea
-                  required
-                  name="message"
-                  rows={5}
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  placeholder="Tell us about your agency, markets, and what you need (products, dates, group size)…"
-                  className={`${inputClass} resize-y`}
-                />
                 <button
                   type="submit"
                   disabled={isSubmitting}

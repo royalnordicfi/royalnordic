@@ -141,8 +141,9 @@ const SnowshoeRental = () => {
         booking={
           <BookingAside
             priceFrom={price}
+            offerLine="WINTER20 · Save 20% at checkout"
             trustLines={[
-              'Delivery to your lodging',
+              'Delivery to lodging',
               'Secure Stripe payment',
               'Safety briefing included',
               'Explore at your own pace',
