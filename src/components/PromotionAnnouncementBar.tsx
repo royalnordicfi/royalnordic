@@ -59,7 +59,7 @@ const PromotionAnnouncementBar = () => {
 
   return (
     <div
-      className="rn-promo-bar fixed inset-x-0 top-0 z-[60] border-b border-emerald-900/40 bg-emerald-950 text-emerald-50"
+      className="rn-promo-bar fixed inset-x-0 top-0 z-[60] border-b border-white/10 bg-navy text-snow"
       style={{
         height: PROMO_BAR_HEIGHT_PX,
         paddingTop: 'env(safe-area-inset-top, 0px)',
@@ -75,8 +75,8 @@ const PromotionAnnouncementBar = () => {
       >
         <span className="rn-promo-bar__static truncate px-2 text-center font-clean text-[11px] font-medium tracking-wide sm:text-xs">
           {config.announcementText}
-          <span className="ml-2 inline font-semibold text-emerald-300 underline-offset-2 group-hover:underline">
-            BOOK NOW
+          <span className="ml-2 inline font-semibold text-aurora-soft underline-offset-2 group-hover:underline">
+            Book
           </span>
         </span>
 
@@ -85,7 +85,7 @@ const PromotionAnnouncementBar = () => {
             {marqueeChunks.map((chunk, i) => (
               <span key={`${chunk}-${i}`} className="mx-8 inline-flex items-center gap-3">
                 {chunk}
-                <span className="font-semibold text-emerald-300">BOOK NOW</span>
+                <span className="font-semibold text-aurora-soft">Book</span>
               </span>
             ))}
           </span>

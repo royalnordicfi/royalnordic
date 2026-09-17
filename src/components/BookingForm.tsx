@@ -30,6 +30,8 @@ interface BookingFormProps {
   maxCapacity?: number
   seasonStart?: string
   seasonEnd?: string
+  /** embedded = no outer card chrome (parent provides commerce shell) */
+  chrome?: 'default' | 'embedded'
 }
 
 type FieldKey = 'preferredDate' | 'fullName' | 'email'
@@ -40,7 +42,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
   adultPrice, 
   childPrice, 
   seasonStart,
-  seasonEnd
+  seasonEnd,
+  chrome = 'default',
 }) => {
   const navigate = useNavigate()
   const dateSectionRef = useRef<HTMLDivElement>(null)
@@ -627,9 +630,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
 
   return (
-    <div className="bg-white rounded-xl shadow-xl p-6 max-w-lg mx-auto lg:mx-0">
-      <div className="text-center mb-6">
-        <p className="text-gray-600 text-sm">Select your preferred date and group size</p>
+    <div className={chrome === 'embedded' ? 'max-w-lg mx-auto lg:mx-0' : 'bg-white rounded-xl shadow-xl p-6 max-w-lg mx-auto lg:mx-0'}>
+      <div className={chrome === 'embedded' ? 'mb-4' : 'text-center mb-6'}>
+        <p className="text-gray-600 text-sm">
+          {chrome === 'embedded' ? '1. Choose a date · 2. Guests · 3. Your details · Book' : 'Select your preferred date and group size'}
+        </p>
       </div>
       
       <form className="space-y-6">
@@ -827,7 +832,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
         {/* Contact Information */}
         <div>
-          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Contact Information</h4>
+          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Your details</h4>
           <div className="space-y-3">
           <div>
             <input 

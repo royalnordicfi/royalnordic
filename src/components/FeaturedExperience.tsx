@@ -2,14 +2,15 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Check } from 'lucide-react'
 import { isTourPubliclyActive } from '../lib/productVisibility'
+import { GUARANTEED_NL_CATALOG_ADULT_PRICE } from '../seo/guaranteedNorthernLightsTour'
 
 const HIGHLIGHTS = [
-  'Northern Lights Guarantee',
-  'Professional Photos Included',
-  'Local Expert Guide',
-  'Hotel Pickup & Drop-off',
-  'Small Groups',
-  'Flexible Aurora Hunting Locations',
+  'Northern Lights guarantee (see Terms)',
+  'Small group — max 8 per vehicle',
+  'Hotel pickup in Rovaniemi',
+  'Flexible duration based on forecasts',
+  'English & Finnish guides',
+  'Photography guidance included',
 ]
 
 const FeaturedExperience = () => {
@@ -22,73 +23,73 @@ const FeaturedExperience = () => {
   if (!visible) return null
 
   return (
-    <section
-      id="featured-experience"
-      className="relative bg-black py-12 sm:py-16 lg:py-20"
-      aria-labelledby="featured-experience-heading"
-    >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-12 xl:gap-16">
+    <section id="featured-experience" className="rn-section-dark" aria-labelledby="featured-nl-heading">
+      <div className="rn-container">
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
           <Link
             to="/northern-lights-tour"
-            className="group relative block overflow-hidden rounded-2xl"
+            className="rn-card-photo aspect-[4/5] sm:aspect-[5/4] lg:aspect-[4/5]"
             aria-label="View Guaranteed Northern Lights Tour"
           >
-            <div className="aspect-[4/3] w-full overflow-hidden sm:aspect-[16/11] lg:aspect-[5/4]">
-              <img
-                src="/nortti1.jpg"
-                alt="Guests watching the Northern Lights on our Guaranteed Northern Lights Tour in Lapland"
-                width={1200}
-                height={960}
-                loading="eager"
-                decoding="async"
-                fetchPriority="high"
-                className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-              />
-            </div>
-            <div
-              className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-t from-black/35 via-transparent to-transparent"
-              aria-hidden
+            <img
+              src="/nortti1.jpg"
+              alt="Guests watching the Northern Lights on a Royal Nordic aurora tour"
+              width={1200}
+              height={1500}
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
+              className="h-full w-full object-cover"
             />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-midnight/50 via-transparent to-transparent" />
           </Link>
 
-          <div className="flex flex-col justify-center">
-            <p className="mb-3 font-clean text-xs font-medium uppercase tracking-[0.22em] text-emerald-400 sm:text-sm">
-              Our Signature Experience
-            </p>
-            <h2
-              id="featured-experience-heading"
-              className="mb-4 font-luxury text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-[2.75rem]"
-            >
+          <div>
+            <p className="rn-eyebrow">Signature experience</p>
+            <h2 id="featured-nl-heading" className="mt-3 font-display text-3xl font-semibold text-snow sm:text-4xl lg:text-5xl">
               Guaranteed Northern Lights Tour
             </h2>
-            <p className="mb-8 max-w-xl font-clean text-base leading-relaxed text-gray-300 sm:text-lg">
-              Experience the magic of Lapland with our signature Northern Lights tour. Our
-              experienced local guides continuously monitor weather and aurora forecasts to maximize
-              your chances of witnessing the Northern Lights. Professional photography, small groups,
-              hotel pickup, and our Northern Lights Guarantee make this our most requested experience.
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-snow/75 sm:text-lg">
+              Chase clearer skies from Rovaniemi with a small group, hotel pickup, and a Northern
+              Lights guarantee — free return trip if no lights appear (see Terms).
             </p>
 
-            <ul className="mb-9 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-3">
+            <dl className="mt-6 grid grid-cols-2 gap-4 text-sm sm:max-w-md">
+              <div>
+                <dt className="text-snow/45">From</dt>
+                <dd className="mt-0.5 text-xl font-semibold text-snow">€{GUARANTEED_NL_CATALOG_ADULT_PRICE}</dd>
+              </div>
+              <div>
+                <dt className="text-snow/45">Duration</dt>
+                <dd className="mt-0.5 text-snow">2–12 h (typically ~6h)</dd>
+              </div>
+              <div>
+                <dt className="text-snow/45">Group</dt>
+                <dd className="mt-0.5 text-snow">Max 8 / vehicle</dd>
+              </div>
+              <div>
+                <dt className="text-snow/45">Pickup</dt>
+                <dd className="mt-0.5 text-snow">Rovaniemi area</dd>
+              </div>
+            </dl>
+
+            <ul className="mt-8 grid gap-2.5 sm:grid-cols-2">
               {HIGHLIGHTS.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-start gap-2.5 font-clean text-sm text-gray-200 sm:text-base"
-                >
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400">
-                    <Check size={13} strokeWidth={2.5} aria-hidden />
+                <li key={item} className="flex items-start gap-2.5 text-sm text-snow/80">
+                  <span className="mt-0.5 text-aurora">
+                    <Check size={16} strokeWidth={2.5} aria-hidden />
                   </span>
                   <span>{item}</span>
                 </li>
               ))}
             </ul>
 
-            <div>
-              <Link
-                to="/northern-lights-tour"
-                className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 px-10 py-3.5 font-elegant text-base font-bold tracking-widest text-white shadow-xl transition-all duration-300 hover:from-emerald-500 hover:to-emerald-400 hover:shadow-emerald-500/30 sm:w-auto sm:text-lg"
-              >
-                BOOK NOW
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <Link to="/northern-lights-tour" className="rn-btn-primary px-8">
+                Book now
+              </Link>
+              <Link to="/northern-lights-tour#book" className="rn-btn-secondary px-8">
+                Check availability
               </Link>
             </div>
           </div>

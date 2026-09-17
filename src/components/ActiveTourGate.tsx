@@ -17,21 +17,32 @@ export default function ActiveTourGate({ tourId, children }: Props) {
   useEffect(() => {
     let cancelled = false
     setState('loading')
+
+    const timeout = window.setTimeout(() => {
+      if (!cancelled) setState('active')
+    }, 2500)
+
     isTourPubliclyActive(tourId)
       .then((active) => {
         if (!cancelled) setState(active ? 'active' : 'inactive')
       })
       .catch(() => {
-        if (!cancelled) setState('inactive')
+        // Fail open so a flaky network never blanks a money page
+        if (!cancelled) setState('active')
       })
+      .finally(() => {
+        window.clearTimeout(timeout)
+      })
+
     return () => {
       cancelled = true
+      window.clearTimeout(timeout)
     }
   }, [tourId])
 
   if (state === 'loading') {
     return (
-      <div className="min-h-[40vh] flex items-center justify-center bg-black text-gray-300 text-sm">
+      <div className="flex min-h-[40vh] items-center justify-center bg-snow text-sm text-ink-muted">
         Loading…
       </div>
     )

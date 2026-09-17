@@ -63,11 +63,21 @@ export async function fetchActiveTourIds(): Promise<Set<number>> {
 }
 
 export async function isTourPubliclyActive(tourId: number): Promise<boolean> {
-  const { data, error } = await supabase
-    .from('tours')
-    .select('is_active')
-    .eq('id', tourId)
-    .maybeSingle()
-  if (error || !data) return false
-  return data.is_active !== false
+  try {
+    const { data, error } = await supabase
+      .from('tours')
+      .select('is_active')
+      .eq('id', tourId)
+      .maybeSingle()
+    if (error) {
+      console.error('isTourPubliclyActive:', error)
+      // Fail open on transient/API errors so marketing pages do not hang blank
+      return true
+    }
+    if (!data) return true
+    return data.is_active !== false
+  } catch (err) {
+    console.error('isTourPubliclyActive:', err)
+    return true
+  }
 }

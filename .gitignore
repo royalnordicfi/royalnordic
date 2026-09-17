@@ -8,6 +8,9 @@ yarn-error.log*
 dist/
 build/
 
+# Generated each build from dist/index.html — never commit (stale hashes blank the money page)
+public/northern-lights-tour.html
+
 # Environment variables
 .env
 .env.local

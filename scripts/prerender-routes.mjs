@@ -2,8 +2,12 @@
  * Post-Vite build: emit route-specific HTML so crawlers see money-page meta/JSON-LD
  * instead of the homepage shell in dist/index.html.
  *
- * Vercel serves filesystem files before the SPA rewrite, so
- * dist/northern-lights-tour/index.html is returned for /northern-lights-tour.
+ * ALWAYS derived from the just-built dist/index.html so script/link hashes stay in sync.
+ * Never hand-edit or commit public/northern-lights-tour.html — it is regenerated here.
+ *
+ * Writes:
+ * - dist/northern-lights-tour.html (build artifact)
+ * - public/northern-lights-tour.html (so Vercel Vite packaging includes the HTML file)
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -229,11 +233,12 @@ function main() {
       '<div id="root"></div>',
       `<div id="root"></div>
     <noscript>
-      <div id="prerender-nl-landmark">
+      <article id="prerender-nl-landmark">
         <h1>Guaranteed Northern Lights Tour</h1>
         <p>${DESCRIPTION}</p>
-        <p><a href="${canonical}">Book the Guaranteed Northern Lights Tour in Rovaniemi</a></p>
-      </div>
+        <p>Small-group aurora hunt from Rovaniemi with hotel pickup, flexible duration, and a Northern Lights guarantee (free return trip if no lights appear — see Terms). From €${CATALOG_ADULT_PRICE} per adult.</p>
+        <p><a href="${canonical}#book">Book the Guaranteed Northern Lights Tour in Rovaniemi</a></p>
+      </article>
     </noscript>`
     )
   }

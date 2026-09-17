@@ -1,13 +1,17 @@
-// import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS } from './lib/productVisibility';
 import ActiveTourGate from './components/ActiveTourGate';
 import Header from './components/Header';
 import Hero from './components/Hero';
-import Tours from './components/Tours';
-import Transportations from './components/Transportations';
-import Reviews from './components/Reviews';
-import About from './components/About';
+import TrustStrip from './components/TrustStrip';
+import FeaturedExperience from './components/FeaturedExperience';
+import ExploreCategories from './components/ExploreCategories';
+import FeaturedTours from './components/FeaturedTours';
+import WhyRoyalNordic from './components/WhyRoyalNordic';
+import ReviewsHome from './components/ReviewsHome';
+import PrivateCustomSection from './components/PrivateCustomSection';
+import GuidesTeaser from './components/GuidesTeaser';
+import FinalCta from './components/FinalCta';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import NorthernLightsTour from './components/NorthernLightsTour';
@@ -43,7 +47,6 @@ import TermsConditions from './components/TermsConditions';
 import ScrollToTop from './components/ScrollToTop';
 import WhatsAppWidget from './components/WhatsAppWidget';
 import SnowmobileSafari from './components/SnowmobileSafari';
-import FeaturedExperience from './components/FeaturedExperience';
 import MonsterTruckNorthernLights from './components/MonsterTruckNorthernLights';
 import RoutePageMeta from './components/RoutePageMeta';
 import RouteJsonLd from './components/seo/RouteJsonLd';
@@ -67,18 +70,16 @@ function App() {
           <Route path="/" element={
             <>
               <Hero />
+              <TrustStrip />
               <FeaturedExperience />
-              <div id="tours">
-                <Tours />
-              </div>
-              <Transportations />
-              <Reviews />
-              <div id="about">
-                <About />
-              </div>
-              <div id="contact">
-                <Contact />
-              </div>
+              <ExploreCategories />
+              <FeaturedTours />
+              <WhyRoyalNordic />
+              <ReviewsHome />
+              <PrivateCustomSection />
+              <GuidesTeaser />
+              <FinalCta />
+              <Contact />
               <Footer />
             </>
           } />

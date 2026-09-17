@@ -77,7 +77,7 @@ const Contact = () => {
   return (
     <section 
       id="contact" 
-      className="py-12 pb-32 relative bg-black"
+      className="py-16 sm:py-20 relative bg-midnight"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
