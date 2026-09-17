@@ -1,13 +1,20 @@
 import { Mail } from 'lucide-react'
 import { useState } from 'react'
-import BookingAside from './experience/BookingAside'
-import CategoryHero from './CategoryHero'
-import ExperienceAccordion from './experience/ExperienceAccordion'
-import ExperienceBreadcrumb from './experience/ExperienceBreadcrumb'
-import ExperienceFacts from './experience/ExperienceFacts'
-import ExperienceInclusions from './experience/ExperienceInclusions'
-import ExperienceItinerary from './experience/ExperienceItinerary'
 import Footer from './Footer'
+import ExperienceProductLayout from './experience/ExperienceProductLayout'
+import ExperienceHighlights from './experience/ExperienceHighlights'
+import ExperienceItinerary from './experience/ExperienceItinerary'
+import ExperienceInclusions from './experience/ExperienceInclusions'
+import ExperienceAccordion from './experience/ExperienceAccordion'
+import BookingAside from './experience/BookingAside'
+
+const GALLERY = [{ src: '/transportation1.jpg', alt: 'Private transfer between Rovaniemi and Levi' }]
+
+const HIGHLIGHTS = [
+  'Private vehicle with driver — up to 8 passengers',
+  'Direct Rovaniemi ↔ Levi/Kittilä route, about 2–3 hours',
+  'Flexible pickup times; quote confirmed by email after request',
+]
 
 const TransportationRovaniemiLevi = () => {
   const [formData, setFormData] = useState({
@@ -123,213 +130,202 @@ const TransportationRovaniemiLevi = () => {
 
   return (
     <div className="rn-page">
-      <CategoryHero
+      <ExperienceProductLayout
+        breadcrumbs={[
+          { label: 'Home', to: '/' },
+          { label: 'Transportation', to: '/transportation' },
+          { label: 'Rovaniemi – Levi/Kittilä' },
+        ]}
+        eyebrow="Lapland · Ski resort transfer"
         title="Private Transportation: Rovaniemi – Levi/Kittilä"
-        subtitle="Comfortable private transfers between Rovaniemi and the ski resorts of Levi and Kittilä."
-        image="/transportation1.jpg"
-        compact
-      />
-
-      <div className="rn-container pb-12 pt-8">
-        <ExperienceBreadcrumb
-          items={[
-            { label: 'Home', to: '/' },
-            { label: 'Transportation', to: '/transportation' },
-            { label: 'Rovaniemi – Levi/Kittilä' },
-          ]}
-        />
-
-        <div className="mt-8 grid gap-10 lg:grid-cols-12">
-          <div className="space-y-10 lg:col-span-7">
-            <ExperienceFacts
-              items={[
-                { label: 'Duration', value: '2–3 hours' },
-                { label: 'Capacity', value: 'Up to 8' },
-                { label: 'Route', value: 'Rovaniemi → Levi/Kittilä' },
-                { label: 'From', value: `€${pricing.adult} adult` },
-              ]}
-            />
-
-            <section>
-              <h2 className="font-display text-2xl font-semibold text-white">Overview</h2>
-              <p className="mt-3 leading-relaxed text-text-muted">
-                Our private transportation service provides a comfortable and reliable way to travel between
-                Rovaniemi and the popular ski resorts of Levi and Kittilä. Whether you&apos;re heading to the slopes
-                for skiing or snowboarding, or simply want to explore these beautiful destinations, we ensure a
-                smooth and enjoyable journey.
-              </p>
-              <p className="mt-3 leading-relaxed text-text-muted">
-                Our professional drivers are familiar with the routes and weather conditions, ensuring your safety
-                and comfort throughout the journey. The scenic drive through Lapland&apos;s countryside offers
-                beautiful views of snow-covered forests and frozen lakes.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-display text-2xl font-semibold text-white">Itinerary</h2>
-              <div className="mt-4">
-                <ExperienceItinerary steps={itinerary} />
-              </div>
-            </section>
-
-            <ExperienceInclusions included={included} />
-
-            <section>
-              <h2 className="font-display text-2xl font-semibold text-white">Practical information</h2>
-              <div className="mt-4">
-                <ExperienceAccordion
-                  items={[
-                    {
-                      title: 'Pricing',
-                      content: (
-                        <>
-                          From €{pricing.adult} per adult and €{pricing.child} per child (0–17). Final quote
-                          confirmed after you send your request.
-                        </>
-                      ),
-                    },
-                    {
-                      title: 'Response time',
-                      content: 'We aim to reply with confirmation details within 24 hours of your request.',
-                    },
-                  ]}
+        lede="Private transfer between Rovaniemi and Levi/Kittilä — from €399/adult, up to 8 passengers."
+        images={GALLERY}
+        facts={[
+          { label: 'Duration', value: '2–3 hours' },
+          { label: 'Capacity', value: 'Up to 8' },
+          { label: 'Route', value: 'Rovaniemi → Levi/Kittilä' },
+          { label: 'From', value: `€${pricing.adult} adult` },
+        ]}
+        booking={
+          <BookingAside
+            priceFrom={pricing.adult}
+            priceNote="/ adult"
+            trustLines={[
+              `Child rate €${pricing.child} (0–17)`,
+              'Private vehicle up to 8 passengers',
+              'Flexible pickup times',
+              'Quote confirmed by email',
+            ]}
+          >
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                required
+                className={inputClass}
+                placeholder="Your full name"
+              />
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+                className={inputClass}
+                placeholder="your.email@example.com"
+              />
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className={inputClass}
+                placeholder="+358 40 123 4567"
+              />
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <input
+                  type="date"
+                  id="preferredDate"
+                  name="preferredDate"
+                  value={formData.preferredDate}
+                  onChange={handleInputChange}
+                  className={inputClass}
+                />
+                <input
+                  type="time"
+                  id="preferredTime"
+                  name="preferredTime"
+                  value={formData.preferredTime}
+                  onChange={handleInputChange}
+                  className={inputClass}
                 />
               </div>
-            </section>
-          </div>
+              <input
+                type="text"
+                id="groupSize"
+                name="groupSize"
+                value={formData.groupSize}
+                onChange={handleInputChange}
+                className={inputClass}
+                placeholder="Group size & luggage (e.g. 4 adults, 6 bags)"
+              />
+              <input
+                type="text"
+                id="destination"
+                name="destination"
+                value={formData.destination}
+                onChange={handleInputChange}
+                required
+                className={inputClass}
+                placeholder="Route details (from → to)"
+              />
+              <input
+                type="text"
+                id="pickupDetails"
+                name="pickupDetails"
+                value={formData.pickupDetails}
+                onChange={handleInputChange}
+                className={inputClass}
+                placeholder="Pickup instructions (hotel, flight, etc.)"
+              />
+              <textarea
+                id="additionalInfo"
+                name="additionalInfo"
+                value={formData.additionalInfo}
+                onChange={handleInputChange}
+                rows={4}
+                className={`${inputClass} resize-none`}
+                placeholder="Dates, child seats, special requirements…"
+              />
 
-          <aside id="book" className="lg:col-span-5">
-            <div className="rn-sticky-book">
-              <BookingAside
-                priceFrom={pricing.adult}
-                priceNote="/ adult"
-                trustLines={[
-                  `Child rate €${pricing.child} (0–17)`,
-                  'Private vehicle up to 8 passengers',
-                  'Flexible pickup times',
-                  'Quote confirmed by email',
-                ]}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="rn-btn-primary flex w-full items-center justify-center gap-2 disabled:opacity-50"
               >
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                    className={inputClass}
-                    placeholder="Your full name"
-                  />
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className={inputClass}
-                    placeholder="your.email@example.com"
-                  />
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    className={inputClass}
-                    placeholder="+358 40 123 4567"
-                  />
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <input
-                      type="date"
-                      id="preferredDate"
-                      name="preferredDate"
-                      value={formData.preferredDate}
-                      onChange={handleInputChange}
-                      className={inputClass}
-                    />
-                    <input
-                      type="time"
-                      id="preferredTime"
-                      name="preferredTime"
-                      value={formData.preferredTime}
-                      onChange={handleInputChange}
-                      className={inputClass}
-                    />
-                  </div>
-                  <input
-                    type="text"
-                    id="groupSize"
-                    name="groupSize"
-                    value={formData.groupSize}
-                    onChange={handleInputChange}
-                    className={inputClass}
-                    placeholder="Group size & luggage (e.g. 4 adults, 6 bags)"
-                  />
-                  <input
-                    type="text"
-                    id="destination"
-                    name="destination"
-                    value={formData.destination}
-                    onChange={handleInputChange}
-                    required
-                    className={inputClass}
-                    placeholder="Route details (from → to)"
-                  />
-                  <input
-                    type="text"
-                    id="pickupDetails"
-                    name="pickupDetails"
-                    value={formData.pickupDetails}
-                    onChange={handleInputChange}
-                    className={inputClass}
-                    placeholder="Pickup instructions (hotel, flight, etc.)"
-                  />
-                  <textarea
-                    id="additionalInfo"
-                    name="additionalInfo"
-                    value={formData.additionalInfo}
-                    onChange={handleInputChange}
-                    rows={4}
-                    className={`${inputClass} resize-none`}
-                    placeholder="Dates, child seats, special requirements…"
-                  />
+                {isSubmitting ? (
+                  <>
+                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    Sending request…
+                  </>
+                ) : (
+                  <>
+                    Send transportation request
+                    <Mail className="h-5 w-5" aria-hidden />
+                  </>
+                )}
+              </button>
 
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="rn-btn-primary flex w-full items-center justify-center gap-2 disabled:opacity-50"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                        Sending request…
-                      </>
-                    ) : (
-                      <>
-                        Send transportation request
-                        <Mail className="h-5 w-5" aria-hidden />
-                      </>
-                    )}
-                  </button>
+              {submitStatus === 'success' && (
+                <p className="text-center text-sm text-aurora-soft">Request sent — we&apos;ll contact you soon.</p>
+              )}
+              {submitStatus === 'error' && (
+                <p className="text-center text-sm text-red-400">
+                  Failed to send. Please try again or email contact@royalnordic.fi.
+                </p>
+              )}
+            </form>
+          </BookingAside>
+        }
+      >
+        <section className="rn-reveal">
+          <h2 className="font-display font-semibold text-white">Overview</h2>
+          <p className="mt-3 leading-relaxed text-text-muted">
+            Private door-to-door transfer between Rovaniemi and the Levi/Kittilä ski areas. One vehicle for your
+            group, luggage help, and drivers who know winter road conditions on the 2–3 hour route.
+          </p>
+          <p className="mt-3 leading-relaxed text-text-muted">
+            Published rates start at €{pricing.adult} per adult and €{pricing.child} per child (0–17). Send your
+            details for final confirmation.
+          </p>
+        </section>
 
-                  {submitStatus === 'success' && (
-                    <p className="text-center text-sm text-aurora-soft">
-                      Request sent — we&apos;ll contact you soon.
-                    </p>
-                  )}
-                  {submitStatus === 'error' && (
-                    <p className="text-center text-sm text-red-400">
-                      Failed to send. Please try again or email contact@royalnordic.fi.
-                    </p>
-                  )}
-                </form>
-              </BookingAside>
-            </div>
-          </aside>
-        </div>
-      </div>
+        <section className="rn-reveal">
+          <h2 className="font-display font-semibold text-white">Highlights</h2>
+          <div className="mt-5">
+            <ExperienceHighlights items={HIGHLIGHTS} />
+          </div>
+        </section>
+
+        <section className="rn-reveal">
+          <h2 className="font-display font-semibold text-white">Itinerary</h2>
+          <div className="mt-5">
+            <ExperienceItinerary steps={itinerary} />
+          </div>
+        </section>
+
+        <section className="rn-reveal">
+          <ExperienceInclusions included={included} />
+        </section>
+
+        <section className="rn-reveal">
+          <h2 className="font-display font-semibold text-white">Practical information</h2>
+          <div className="mt-4">
+            <ExperienceAccordion
+              items={[
+                {
+                  title: 'Pricing',
+                  content: (
+                    <>
+                      From €{pricing.adult} per adult and €{pricing.child} per child (0–17). Final quote
+                      confirmed after you send your request.
+                    </>
+                  ),
+                },
+                {
+                  title: 'Response time',
+                  content: 'We aim to reply with confirmation details within 24 hours of your request.',
+                },
+              ]}
+            />
+          </div>
+        </section>
+      </ExperienceProductLayout>
 
       <Footer />
     </div>

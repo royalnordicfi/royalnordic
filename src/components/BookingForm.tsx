@@ -38,6 +38,44 @@ interface BookingFormProps {
 
 type FieldKey = 'preferredDate' | 'fullName' | 'email'
 
+/** Open calendar on the soonest month that intersects the tour season (UI only). */
+function initialCalendarMonth(seasonStart?: string, seasonEnd?: string): Date {
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12)
+  if (!seasonStart || !seasonEnd) return new Date(today.getFullYear(), today.getMonth(), 1)
+
+  const [startMonth, startDay] = seasonStart.split('-').map(Number)
+  const [endMonth, endDay] = seasonEnd.split('-').map(Number)
+  const year = today.getFullYear()
+
+  const candidates: Date[] = []
+  if (endMonth < startMonth) {
+    // Season spans year boundary (e.g. 12-15 → 03-15)
+    candidates.push(new Date(year - 1, startMonth - 1, startDay, 12))
+    candidates.push(new Date(year, startMonth - 1, startDay, 12))
+    candidates.push(new Date(year + 1, startMonth - 1, startDay, 12))
+  } else {
+    candidates.push(new Date(year, startMonth - 1, startDay, 12))
+    candidates.push(new Date(year + 1, startMonth - 1, startDay, 12))
+  }
+
+  for (const start of candidates) {
+    const end = new Date(
+      endMonth < startMonth ? start.getFullYear() + 1 : start.getFullYear(),
+      endMonth - 1,
+      endDay,
+      12
+    )
+    if (today <= end) {
+      if (today >= start) return new Date(today.getFullYear(), today.getMonth(), 1)
+      return new Date(start.getFullYear(), start.getMonth(), 1)
+    }
+  }
+
+  const fallback = candidates[candidates.length - 1]
+  return new Date(fallback.getFullYear(), fallback.getMonth(), 1)
+}
+
 const BookingForm: React.FC<BookingFormProps> = ({
   tourId,
   tourName, 
@@ -69,7 +107,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldKey, string>>>({})
-  const [currentMonth, setCurrentMonth] = useState(new Date())
+  const [currentMonth, setCurrentMonth] = useState(() => initialCalendarMonth(seasonStart, seasonEnd))
   const [showCryptoModal, setShowCryptoModal] = useState(false)
   const [cryptoFormData, setCryptoFormData] = useState({
     fullName: '',

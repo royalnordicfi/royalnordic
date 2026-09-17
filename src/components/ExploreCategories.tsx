@@ -30,7 +30,7 @@ const CATEGORIES = [
 const ExploreCategories = () => {
   return (
     <section id="experiences" className="rn-section relative overflow-hidden bg-midnight">
-      <div className="pointer-events-none absolute inset-0 rn-ambient-aurora opacity-40" aria-hidden />
+      <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
       <div className="rn-container relative">
         <div className="max-w-2xl">
           <p className="rn-eyebrow">Explore</p>
@@ -44,7 +44,7 @@ const ExploreCategories = () => {
             <Link
               key={cat.to}
               to={cat.to}
-              className="group rn-reveal relative min-h-[168px] overflow-hidden rounded-rn border border-white/[0.06] sm:min-h-[200px]"
+              className="group rn-reveal rn-category-tile relative min-h-[168px] overflow-hidden rounded-rn border border-white/[0.06] sm:min-h-[200px]"
             >
               <img
                 src={cat.image}

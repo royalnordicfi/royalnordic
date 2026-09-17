@@ -71,8 +71,7 @@ const Contact = () => {
     }
   }
 
-  const inputClass =
-    'w-full rounded-md border border-black/10 bg-white px-3 py-2.5 text-sm text-panel-ink placeholder:text-panel-muted focus:border-aurora focus:outline-none focus:ring-1 focus:ring-aurora/30'
+  const inputClass = 'rn-form-input'
 
   return (
     <section id="contact" className="rn-section-tight border-t border-white/10 bg-midnight">
@@ -110,7 +109,7 @@ const Contact = () => {
             <form onSubmit={handleSubmit} className="mt-4 space-y-3.5">
               <div className="grid gap-3.5 md:grid-cols-2">
                 <div>
-                  <label htmlFor="name" className="mb-1 block text-sm font-medium text-panel-ink">
+                  <label htmlFor="name" className="rn-form-label">
                     Full name *
                   </label>
                   <input
@@ -125,7 +124,7 @@ const Contact = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="mb-1 block text-sm font-medium text-panel-ink">
+                  <label htmlFor="email" className="rn-form-label">
                     Email *
                   </label>
                   <input
@@ -142,7 +141,7 @@ const Contact = () => {
               </div>
 
               <div>
-                <label htmlFor="phone" className="mb-1 block text-sm font-medium text-panel-ink">
+                <label htmlFor="phone" className="rn-form-label">
                   Phone
                 </label>
                 <input
@@ -157,7 +156,7 @@ const Contact = () => {
               </div>
 
               <div>
-                <label htmlFor="message" className="mb-1 block text-sm font-medium text-panel-ink">
+                <label htmlFor="message" className="rn-form-label">
                   Message *
                 </label>
                 <textarea

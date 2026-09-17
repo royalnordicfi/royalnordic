@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 const Hero = () => {
   return (
-    <section className="relative overflow-hidden bg-black">
+    <section className="relative overflow-hidden bg-[#030706]">
       <video
         autoPlay
         loop
@@ -14,15 +14,12 @@ const Hero = () => {
         <source src="/northernlightsvideo_final.mp4" type="video/mp4" />
       </video>
       <div
-        className="absolute inset-0 bg-gradient-to-t from-[#050a10] via-black/50 to-black/30"
+        className="absolute inset-0 bg-gradient-to-t from-[#050a10] via-black/45 to-black/20"
         aria-hidden
       />
-      <div
-        className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_80%,rgba(18,185,129,0.18),transparent_55%)]"
-        aria-hidden
-      />
+      <div className="rn-hero-chrome-veil pointer-events-none absolute inset-x-0 top-0 h-36 sm:h-44" aria-hidden />
 
-      <div className="rn-container relative z-10 flex min-h-[78svh] flex-col justify-end pb-12 pt-[calc(var(--rn-chrome-h)+1.5rem)] sm:min-h-[88svh] sm:pb-16 sm:pt-[calc(var(--rn-chrome-h)+2rem)]">
+      <div className="rn-container relative z-10 flex min-h-[78svh] flex-col justify-end pb-12 pt-[calc(var(--rn-chrome-h)+1.5rem)] sm:min-h-[86svh] sm:pb-16 sm:pt-[calc(var(--rn-chrome-h)+2rem)]">
         <div className="rn-hero-copy max-w-xl">
           <p className="rn-eyebrow">Royal Nordic · Rovaniemi, Finnish Lapland</p>
           <h1 className="rn-display mt-3 text-[2.05rem] text-white sm:text-4xl lg:text-[2.65rem]">

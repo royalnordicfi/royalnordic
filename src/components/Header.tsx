@@ -182,15 +182,15 @@ const Header = () => {
         }`}
         style={{ top: 'var(--rn-promo-bar-height, 0px)' }}
       >
-        <div className="rn-container flex h-[3.75rem] items-center justify-between gap-4 sm:h-16">
-          <Link to="/" className="flex shrink-0 items-center gap-2.5" aria-label="Royal Nordic home">
-            <img src="/logo.png" alt="" className="h-7 w-auto sm:h-8" width={32} height={32} />
-            <span className="font-display text-[1.05rem] font-semibold tracking-wide text-white sm:text-xl">
+        <div className="rn-header__inner rn-container flex items-center justify-between gap-6">
+          <Link to="/" className="rn-header__brand flex shrink-0 items-center gap-2" aria-label="Royal Nordic home">
+            <img src="/logo.png" alt="" className="h-[1.65rem] w-auto sm:h-7" width={28} height={28} />
+            <span className="font-display text-[1rem] font-semibold tracking-[0.04em] text-white sm:text-[1.125rem]">
               Royal Nordic
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Primary">
+          <nav className="hidden items-center gap-0 xl:flex" aria-label="Primary">
             <div
               className="relative"
               ref={dropRef}
@@ -261,7 +261,7 @@ const Header = () => {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <Link to="/northern-lights-tour" className="rn-btn-primary rn-btn-nav hidden sm:inline-flex">
               Book a tour
             </Link>

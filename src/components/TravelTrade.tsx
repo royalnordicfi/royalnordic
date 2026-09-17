@@ -36,8 +36,7 @@ const TravelTrade: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
-  const inputClass =
-    'w-full rounded-md border border-black/10 bg-white px-3 py-2.5 text-sm text-panel-ink placeholder:text-panel-muted focus:border-aurora/50 focus:outline-none focus:ring-1 focus:ring-aurora/30'
+  const inputClass = 'rn-form-input'
 
   const sellable = [
     {
@@ -118,8 +117,8 @@ const TravelTrade: React.FC = () => {
       <main className="rn-container flex-1 pb-12 pt-8">
         <ExperienceBreadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Travel trade' }]} />
 
-        <div className="mx-auto mt-8 max-w-3xl space-y-12">
-          <section>
+        <div className="mx-auto mt-8 max-w-3xl space-y-14">
+          <section className="rn-reveal">
             <p className="rn-eyebrow">Who we work with</p>
             <h2 className="mt-2 font-display text-2xl font-semibold text-white">Built for B2B partners</h2>
             <div className="mt-6 grid gap-6 sm:grid-cols-2">
@@ -132,16 +131,19 @@ const TravelTrade: React.FC = () => {
             </div>
           </section>
 
-          <section>
-            <h2 className="font-display text-2xl font-semibold text-white">What you can sell</h2>
+          <section className="rn-reveal">
+            <p className="rn-eyebrow">Product catalogue</p>
+            <h2 className="mt-2 font-display text-2xl font-semibold text-white">What you can sell</h2>
             <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {sellable.map((item) => (
                 <Link
                   key={item.to}
                   to={item.to}
-                  className="rounded-rn border border-white/[0.07] bg-surface/80 p-4 transition hover:border-aurora/25"
+                  className="rn-b2b-card group rounded-rn border border-white/[0.07] bg-surface/60 p-4 transition hover:border-aurora/25 hover:bg-surface/90"
                 >
-                  <h3 className="text-base font-semibold text-white">{item.title}</h3>
+                  <h3 className="text-base font-semibold text-white transition group-hover:text-aurora-soft">
+                    {item.title}
+                  </h3>
                   <p className="mt-1 text-sm leading-relaxed text-text-muted">{item.detail}</p>
                 </Link>
               ))}

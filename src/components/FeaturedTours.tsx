@@ -40,7 +40,7 @@ const TOURS = [
 
 const FeaturedTours = () => {
   return (
-    <section className="rn-section bg-midnight">
+    <section className="rn-section border-t border-white/[0.06] bg-[#040807]">
       <div className="rn-container">
         <div className="flex items-end justify-between gap-4">
           <div>

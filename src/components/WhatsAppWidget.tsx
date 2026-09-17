@@ -23,10 +23,10 @@ const WhatsAppWidget = () => {
       <button
         type="button"
         onClick={handleWhatsAppClick}
-        className="flex items-center justify-center rounded-full border border-white/10 bg-[#0c1f18] text-aurora-soft shadow-[0_8px_24px_rgba(0,0,0,0.45)] transition duration-300 hover:border-aurora/35 hover:bg-[#10261d] hover:text-white"
+        className="whatsapp-widget__btn flex items-center justify-center rounded-full border border-white/[0.08] bg-[#0a1612]/92 text-aurora-soft/90 shadow-[0_6px_20px_rgba(0,0,0,0.4)] backdrop-blur-sm transition duration-300 hover:border-aurora/30 hover:bg-[#0d1c17] hover:text-aurora-soft"
         aria-label="Open WhatsApp chat"
       >
-        <MessageCircle className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={1.75} />
+        <MessageCircle className="h-[1.125rem] w-[1.125rem] sm:h-5 sm:w-5" strokeWidth={1.65} />
       </button>
     </div>
   )

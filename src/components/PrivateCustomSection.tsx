@@ -2,10 +2,11 @@ import { Link } from 'react-router-dom'
 
 const PrivateCustomSection = () => {
   return (
-    <section className="rn-section bg-surface">
-      <div className="rn-container">
-        <div className="grid items-center gap-8 overflow-hidden rounded-rn border border-white/10 lg:grid-cols-2">
-          <div className="relative min-h-[260px] lg:min-h-[340px]">
+    <section className="rn-section relative border-t border-white/[0.06] bg-surface">
+      <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-50" aria-hidden />
+      <div className="rn-container relative">
+        <div className="grid items-stretch gap-0 overflow-hidden rounded-rn border border-white/[0.08] lg:grid-cols-2">
+          <div className="relative min-h-[220px] sm:min-h-[260px] lg:min-h-[300px]">
             <img
               src="/nortti5.jpg"
               alt="Private Lapland experience under the aurora"

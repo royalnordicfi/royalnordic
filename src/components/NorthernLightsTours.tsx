@@ -75,7 +75,7 @@ const NorthernLightsTours: React.FC = () => {
       />
 
       <section className="rn-section relative">
-        <div className="pointer-events-none absolute inset-0 rn-ambient-aurora opacity-35" aria-hidden />
+        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
         <div className="rn-container relative">
           <div className="max-w-2xl">
             <p className="rn-eyebrow">Aurora season</p>

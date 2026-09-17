@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react'
 import BookingForm from './BookingForm'
-import BookingAside from './experience/BookingAside'
-import ExperienceAccordion from './experience/ExperienceAccordion'
-import ExperienceBreadcrumb from './experience/ExperienceBreadcrumb'
-import ExperienceFacts from './experience/ExperienceFacts'
-import ExperienceGallery from './ExperienceGallery'
-import ExperienceInclusions from './experience/ExperienceInclusions'
-import ExperienceItinerary from './experience/ExperienceItinerary'
 import Footer from './Footer'
 import MobileBookingBar from './MobileBookingBar'
 import ProductFaq from './seo/ProductFaq'
+import ExperienceProductLayout from './experience/ExperienceProductLayout'
+import ExperienceHighlights from './experience/ExperienceHighlights'
+import ExperienceItinerary from './experience/ExperienceItinerary'
+import ExperienceInclusions from './experience/ExperienceInclusions'
+import ExperienceAccordion from './experience/ExperienceAccordion'
+import BookingAside from './experience/BookingAside'
 import { getAllTours } from '../lib/api'
 
 const KORUOMA_MAX_CAPACITY = 16
@@ -17,6 +16,12 @@ const KORUOMA_MAX_CAPACITY = 16
 const GALLERY = [
   { src: '/korouoma1.jpg', alt: 'Frozen waterfall and snowy cliffs at Korouoma Canyon' },
   { src: '/korouoma2.jpg', alt: 'Winter hiking trail through Korouoma Canyon Nature Reserve' },
+]
+
+const HIGHLIGHTS = [
+  'Winter hike among frozen waterfalls and canyon cliffs',
+  'Campfire picnic with grilled snacks and hot drinks',
+  'Small groups — max 8 per vehicle from Rovaniemi',
 ]
 
 const KorouomaTour = () => {
@@ -119,123 +124,107 @@ const KorouomaTour = () => {
 
   return (
     <div className="rn-page pb-24 lg:pb-0">
-      <div className="rn-container rn-shell-pad pb-14 pt-6 sm:pt-8">
-        <ExperienceBreadcrumb
-          items={[
-            { label: 'Home', to: '/' },
-            { label: 'Daytime experiences', to: '/daytime-experiences' },
-            { label: 'Korouoma Canyon Winter Adventure' },
-          ]}
-        />
-
-        <header className="mt-5 max-w-3xl">
-          <p className="rn-eyebrow">Korouoma · Canyon hike</p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-white sm:text-4xl lg:text-[2.75rem]">
-            Korouoma Canyon Winter Adventure
-          </h1>
-          <p className="mt-3 max-w-2xl text-base leading-relaxed text-text-muted sm:text-lg">
-            Canyon hike among frozen waterfalls — small-group guided tour from Rovaniemi with transport and
-            campfire picnic.
+      <ExperienceProductLayout
+        breadcrumbs={[
+          { label: 'Home', to: '/' },
+          { label: 'Day Tours', to: '/daytime-experiences' },
+          { label: 'Korouoma Canyon Winter Adventure' },
+        ]}
+        eyebrow="Korouoma · Canyon hike"
+        title="Korouoma Canyon Winter Adventure"
+        lede="Guided winter hike to frozen waterfalls — transport from Rovaniemi and campfire picnic included."
+        images={GALLERY}
+        facts={[
+          { label: 'Duration', value: '6 hours' },
+          { label: 'Group', value: 'Max 8 / vehicle' },
+          { label: 'Pickup', value: 'Rovaniemi' },
+          { label: 'Languages', value: 'English · Finnish' },
+        ]}
+        booking={
+          <BookingAside
+            priceFrom={price}
+            trustLines={[
+              'Free cancellation up to 24h before',
+              'Secure Stripe payment',
+              'Hotel pickup in Rovaniemi',
+              'Campfire picnic included',
+            ]}
+          >
+            {loading ? (
+              <p className="py-10 text-center text-sm text-panel-muted">Loading availability…</p>
+            ) : (
+              <BookingForm
+                tourId={6}
+                tourName="Korouoma Canyon Winter Adventure"
+                adultPrice={tourData.adult_price}
+                childPrice={tourData.child_price}
+                maxCapacity={tourData.max_capacity}
+                chrome="embedded"
+                tone="light"
+              />
+            )}
+          </BookingAside>
+        }
+      >
+        <section className="rn-reveal">
+          <h2 className="font-display font-semibold text-white">Overview</h2>
+          <p className="mt-3 leading-relaxed text-text-muted">
+            Winter hike through Korouoma Canyon — about 100 km from Rovaniemi, then snow-covered trails among
+            towering cliffs and frozen waterfalls.
           </p>
-        </header>
+          <p className="mt-3 leading-relaxed text-text-muted">
+            Campfire break with grilled snacks and hot drinks. Transport, guiding, and picnic included; bring
+            your own warm winter clothing.
+          </p>
+        </section>
 
-        <div className="mt-6">
-          <ExperienceGallery images={GALLERY} />
-        </div>
+        <section className="rn-reveal">
+          <h2 className="font-display font-semibold text-white">Highlights</h2>
+          <div className="mt-5">
+            <ExperienceHighlights items={HIGHLIGHTS} />
+          </div>
+        </section>
 
-        <div className="mt-8 grid gap-10 lg:grid-cols-12">
-          <div className="space-y-10 lg:col-span-7">
-            <ExperienceFacts
+        <section className="rn-reveal">
+          <h2 className="font-display font-semibold text-white">Itinerary</h2>
+          <div className="mt-5">
+            <ExperienceItinerary steps={itinerary} />
+          </div>
+        </section>
+
+        <section className="rn-reveal">
+          <ExperienceInclusions
+            included={included}
+            notIncluded={['Warm winter clothing (bring layered Arctic clothing and sturdy footwear)']}
+          />
+        </section>
+
+        <section className="rn-reveal">
+          <h2 className="font-display font-semibold text-white">Practical information</h2>
+          <div className="mt-4">
+            <ExperienceAccordion
               items={[
-                { label: 'Duration', value: '6 hours' },
-                { label: 'Group', value: 'Max 8 / vehicle' },
-                { label: 'Location', value: 'Korouoma' },
-                { label: 'Languages', value: 'EN & FI' },
+                {
+                  title: 'Outdoor conditions',
+                  content:
+                    'The tour is outdoors in winter conditions — dress in warm layers and sturdy footwear.',
+                },
+                {
+                  title: 'Accessibility',
+                  content: 'Not suitable for wheelchair users.',
+                },
+                {
+                  title: 'Allergies & cancellation',
+                  content:
+                    'Tell us about snack allergies when you book. Free cancellation up to 24 hours before departure. Book and pay securely online via Stripe.',
+                },
               ]}
             />
-
-            <section>
-              <h2 className="font-display text-2xl font-semibold text-white">Overview</h2>
-              <p className="mt-3 leading-relaxed text-text-muted">
-                A winter hike through Korouoma Canyon — one of Lapland’s most striking natural landscapes.
-                We drive about 100 km from Rovaniemi, then walk snow-covered trails among towering cliffs
-                and frozen waterfalls.
-              </p>
-              <p className="mt-3 leading-relaxed text-text-muted">
-                Along the way, enjoy a cozy campfire break with grilled snacks and hot drinks. Transport,
-                guiding, and the picnic are included; bring your own warm winter clothing. Photo stops among
-                frozen cliffs and icy landscapes are part of the day.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-display text-2xl font-semibold text-white">Itinerary</h2>
-              <div className="mt-4">
-                <ExperienceItinerary steps={itinerary} />
-              </div>
-            </section>
-
-            <ExperienceInclusions
-              included={included}
-              notIncluded={['Warm winter clothing (bring layered Arctic clothing and sturdy footwear)']}
-            />
-
-            <section>
-              <h2 className="font-display text-2xl font-semibold text-white">Practical information</h2>
-              <div className="mt-4">
-                <ExperienceAccordion
-                  items={[
-                    {
-                      title: 'Outdoor conditions',
-                      content:
-                        'The tour is outdoors in winter conditions — dress in warm layers and sturdy footwear.',
-                    },
-                    {
-                      title: 'Accessibility',
-                      content: 'Not suitable for wheelchair users.',
-                    },
-                    {
-                      title: 'Allergies & cancellation',
-                      content:
-                        'Tell us about snack allergies when you book. Free cancellation up to 24 hours before departure. Book and pay securely online via Stripe.',
-                    },
-                  ]}
-                />
-              </div>
-            </section>
-
-            <ProductFaq items={faqs} schemaId="korouoma-faq" tone="dark" />
           </div>
+        </section>
 
-          <aside id="book" className="lg:col-span-5">
-            <div className="rn-sticky-book">
-              <BookingAside
-                priceFrom={price}
-                trustLines={[
-                  'Free cancellation up to 24h before',
-                  'Secure Stripe payment',
-                  'Hotel pickup in Rovaniemi',
-                  'Campfire picnic included',
-                ]}
-              >
-                {loading ? (
-                  <p className="py-10 text-center text-text-muted">Loading availability…</p>
-                ) : (
-                  <BookingForm
-                    tourId={6}
-                    tourName="Korouoma Canyon Winter Adventure"
-                    adultPrice={tourData.adult_price}
-                    childPrice={tourData.child_price}
-                    maxCapacity={tourData.max_capacity}
-                    chrome="embedded"
-                    tone="light"
-                  />
-                )}
-              </BookingAside>
-            </div>
-          </aside>
-        </div>
-      </div>
+        <ProductFaq items={faqs} schemaId="korouoma-faq" tone="dark" />
+      </ExperienceProductLayout>
 
       <Footer />
       <MobileBookingBar priceFrom={price} onBook={scrollToBook} />

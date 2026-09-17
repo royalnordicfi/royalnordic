@@ -127,11 +127,11 @@ const Blog: React.FC = () => {
       <section className="rn-section bg-midnight">
         <div className="rn-container">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {blogPosts.map((post) => (
+            {blogPosts.map((post, i) => (
               <Link
                 key={post.id}
                 to={`/blog/${post.slug}`}
-                className="group flex flex-col rounded-rn border border-white/10 bg-surface p-5 transition hover:border-aurora/35 hover:bg-surface-2 sm:p-6"
+                className={`group rn-reveal rn-blog-card flex flex-col rounded-rn border border-white/10 bg-surface p-5 transition sm:p-6 rn-stagger-${(i % 4) + 1}`}
               >
                 <span className="rn-badge-aurora w-fit">{post.category}</span>
                 <h2 className="mt-3 font-display text-lg font-semibold leading-snug text-white transition group-hover:text-aurora-soft sm:text-xl">

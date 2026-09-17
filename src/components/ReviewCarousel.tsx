@@ -18,6 +18,7 @@ export default function ReviewCarousel({
   autoPlayMs = 9000,
 }: Props) {
   const [index, setIndex] = useState(0)
+  const [fade, setFade] = useState(true)
   const paused = useRef(false)
   const touchX = useRef<number | null>(null)
   const count = reviews.length
@@ -25,10 +26,23 @@ export default function ReviewCarousel({
   const go = useCallback(
     (dir: -1 | 1) => {
       if (!count) return
-      setIndex((i) => (i + dir + count) % count)
+      setFade(false)
+      window.setTimeout(() => {
+        setIndex((i) => (i + dir + count) % count)
+        setFade(true)
+      }, 180)
     },
     [count]
   )
+
+  const goTo = (i: number) => {
+    if (i === index) return
+    setFade(false)
+    window.setTimeout(() => {
+      setIndex(i)
+      setFade(true)
+    }, 180)
+  }
 
   useEffect(() => {
     if (count < 2 || autoPlayMs <= 0) return
@@ -61,12 +75,13 @@ export default function ReviewCarousel({
         paused.current = false
       }}
     >
-      <div className="pointer-events-none absolute inset-0 rn-ambient-aurora opacity-60" aria-hidden />
+      <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-80" aria-hidden />
       <div className="rn-container relative">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="rn-eyebrow">{eyebrow}</p>
             <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-3xl">{title}</h2>
+            <p className="mt-2 text-sm text-text-dim">Verified Royal Nordic guest reviews</p>
           </div>
           {count > 1 && (
             <div className="flex items-center gap-2">
@@ -91,7 +106,9 @@ export default function ReviewCarousel({
         </div>
 
         <figure
-          className="rn-reveal mt-8 max-w-3xl"
+          className={`rn-reveal rn-review-editorial mt-8 max-w-3xl transition duration-300 ${
+            fade ? 'opacity-100' : 'opacity-0'
+          }`}
           onTouchStart={(e) => {
             touchX.current = e.changedTouches[0]?.clientX ?? null
           }}
@@ -103,17 +120,17 @@ export default function ReviewCarousel({
             go(dx < 0 ? 1 : -1)
           }}
         >
-          <blockquote className="font-display text-xl leading-snug text-white sm:text-2xl lg:text-[1.75rem] lg:leading-snug">
+          <blockquote className="font-display text-xl leading-snug text-white sm:text-2xl lg:text-[1.65rem] lg:leading-snug">
             “{review.quote}”
           </blockquote>
-          <figcaption className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-muted">
+          <figcaption className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
             <span className="font-medium text-white">{review.name}</span>
             {review.location && (
               <>
                 <span className="text-white/25" aria-hidden>
                   ·
                 </span>
-                <span>{review.location}</span>
+                <span className="text-text-muted">{review.location}</span>
               </>
             )}
             {review.date && (
@@ -121,13 +138,10 @@ export default function ReviewCarousel({
                 <span className="text-white/25" aria-hidden>
                   ·
                 </span>
-                <span>{review.date}</span>
+                <span className="text-text-dim">{review.date}</span>
               </>
             )}
-            <span className="text-white/25" aria-hidden>
-              ·
-            </span>
-            <span className="text-aurora-soft">{review.source}</span>
+            <span className="rn-review-verified">{review.source}</span>
           </figcaption>
         </figure>
 
@@ -140,10 +154,10 @@ export default function ReviewCarousel({
                 role="tab"
                 aria-selected={i === index}
                 aria-label={`Show review ${i + 1}`}
-                className={`h-1 rounded-full transition-all ${
-                  i === index ? 'w-8 bg-aurora' : 'w-3 bg-white/20 hover:bg-white/35'
+                className={`h-0.5 rounded-full transition-all duration-300 ${
+                  i === index ? 'w-10 bg-aurora-soft/90' : 'w-4 bg-white/15 hover:bg-white/30'
                 }`}
-                onClick={() => setIndex(i)}
+                onClick={() => goTo(i)}
               />
             ))}
           </div>

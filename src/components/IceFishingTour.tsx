@@ -1,21 +1,20 @@
 import { useEffect, useState } from 'react'
 import BookingForm from './BookingForm'
-import ExperienceGallery from './ExperienceGallery'
 import Footer from './Footer'
 import MobileBookingBar from './MobileBookingBar'
 import ProductFaq from './seo/ProductFaq'
-import ExperienceBreadcrumb from './experience/ExperienceBreadcrumb'
-import ExperienceFacts from './experience/ExperienceFacts'
+import ExperienceProductLayout from './experience/ExperienceProductLayout'
 import ExperienceItinerary from './experience/ExperienceItinerary'
 import ExperienceInclusions from './experience/ExperienceInclusions'
 import ExperienceAccordion from './experience/ExperienceAccordion'
+import ExperienceHighlights from './experience/ExperienceHighlights'
 import BookingAside from './experience/BookingAside'
 import { getAllTours } from '../lib/api'
 
 const GALLERY = [
-  { src: '/icefishing.jpeg', alt: 'Ice fishing on a frozen Lapland lake' },
-  { src: '/icefishing2.jpg', alt: 'Traditional ice fishing with a local guide' },
-  { src: '/icefishing3.jpg', alt: 'Winter ice fishing experience near Rovaniemi' },
+  { src: '/icefishing.jpeg', alt: 'Ice fishing on a frozen Lapland lake', position: 'center' },
+  { src: '/icefishing2.jpg', alt: 'Traditional ice fishing with a local guide', position: 'center' },
+  { src: '/icefishing3.jpg', alt: 'Winter ice fishing experience near Rovaniemi', position: 'center 40%' },
 ]
 
 const INCLUDED = [
@@ -23,9 +22,15 @@ const INCLUDED = [
   'Professional local guide',
   'Fishing equipment',
   'Hot drinks and snacks by the fire',
-  'Information about local culture of Lapland',
-  'Small group experience (max 8 people)',
+  'Local Lapland culture insights',
+  'Small group — max 8 guests',
   'Multiple fishing spots',
+]
+
+const HIGHLIGHTS = [
+  'Frozen lakes away from the city, chosen for ice and conditions that day',
+  'Equipment and technique guidance included — no prior experience needed',
+  'Warm drinks by the fire between fishing spots',
 ]
 
 const IceFishingTour = () => {
@@ -72,7 +77,8 @@ const IceFishingTour = () => {
     },
     {
       question: 'How long is the ice fishing experience?',
-      answer: 'About 3–4 hours, typically with pickup around 10:00 and return between 13:00 and 14:00 depending on distance.',
+      answer:
+        'About 3–4 hours, typically with pickup around 10:00 and return between 13:00 and 14:00 depending on distance.',
     },
     {
       question: 'Do I need my own clothing?',
@@ -94,150 +100,132 @@ const IceFishingTour = () => {
   const itinerary = [
     {
       time: '10:00',
-      title: 'Pick up from hotel',
-      text: "We'll collect you from your accommodation in Rovaniemi",
+      title: 'Pickup in Rovaniemi',
+      text: 'We collect you from your accommodation.',
     },
     {
-      title: 'Drive to fishing location',
-      text: 'Head to our secret ice fishing spots on frozen lakes',
+      title: 'Drive to the lake',
+      text: 'Head to fishing spots chosen for ice and weather that day.',
     },
     {
-      title: 'Safety briefing and setup',
-      text: 'Learn proper ice fishing techniques and safety procedures',
+      title: 'Briefing & setup',
+      text: 'Learn safe ice fishing technique with all equipment provided.',
     },
     {
-      title: 'Ice fishing experience',
-      text: 'Enjoy traditional ice fishing with professional equipment',
+      title: 'On the ice',
+      text: 'Fish with your guide — hot drinks by the fire between spots.',
     },
     {
       time: '13:00 – 14:00',
-      title: 'Return to accommodation',
-      text: 'Drop off between 13:00 and 14:00 depending on distance traveled',
+      title: 'Return',
+      text: 'Drop-off at your lodging depending on distance traveled.',
     },
   ]
 
   return (
     <div className="rn-page pb-24 lg:pb-0">
-      <div className="rn-container rn-shell-pad pb-14 pt-6 sm:pt-8">
-        <ExperienceBreadcrumb
-          items={[
-            { label: 'Home', to: '/' },
-            { label: 'Daytime experiences', to: '/daytime-experiences' },
-            { label: 'Ice Fishing Experience' },
-          ]}
-        />
-
-        <header className="mt-5 max-w-3xl">
-          <p className="rn-eyebrow">Rovaniemi · Winter day trip</p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-white sm:text-4xl lg:text-[2.6rem]">
-            Ice Fishing Experience
-          </h1>
-          <p className="mt-3 max-w-2xl text-base leading-relaxed text-text-muted sm:text-lg">
-            Traditional Lapland ice fishing on frozen lakes with expert guidance, equipment, and hot
-            drinks by the fire.
+      <ExperienceProductLayout
+        breadcrumbs={[
+          { label: 'Home', to: '/' },
+          { label: 'Day Tours', to: '/daytime-experiences' },
+          { label: 'Ice Fishing Experience' },
+        ]}
+        eyebrow="Rovaniemi · Winter day trip"
+        title="Ice Fishing Experience"
+        lede="Traditional Lapland ice fishing on frozen lakes — guide, equipment, and hot drinks by the fire."
+        images={GALLERY}
+        facts={[
+          { label: 'Duration', value: '3–4 hours' },
+          { label: 'Group', value: 'Max 8' },
+          { label: 'Pickup', value: 'Rovaniemi' },
+          { label: 'Languages', value: 'English · Finnish' },
+        ]}
+        booking={
+          <BookingAside
+            priceFrom={price}
+            trustLines={[
+              'Free cancellation up to 24h before',
+              'Secure Stripe payment',
+              'Hotel pickup in Rovaniemi',
+              'Equipment & guide included',
+            ]}
+          >
+            {loading ? (
+              <p className="py-10 text-center text-sm text-panel-muted">Loading availability…</p>
+            ) : (
+              <BookingForm
+                tourId={4}
+                tourName="Ice Fishing Experience"
+                adultPrice={tourData.adult_price}
+                childPrice={tourData.child_price}
+                maxCapacity={tourData.max_capacity}
+                seasonStart="12-15"
+                seasonEnd="03-15"
+                chrome="embedded"
+                tone="light"
+              />
+            )}
+          </BookingAside>
+        }
+      >
+        <section className="rn-reveal">
+          <h2 className="font-display font-semibold text-white">Overview</h2>
+          <p className="mt-3 leading-relaxed text-text-muted">
+            Join a local guide on frozen lakes near Rovaniemi. You learn traditional ice fishing
+            technique, move between spots as conditions allow, and warm up with hot drinks by the fire.
           </p>
-        </header>
+          <p className="mt-3 leading-relaxed text-text-muted">
+            Groups stay small — max 8 guests — so the day stays calm, practical, and personal.
+          </p>
+        </section>
 
-        <div className="mt-6">
-          <ExperienceGallery images={GALLERY} />
-        </div>
+        <section className="rn-reveal">
+          <h2 className="font-display font-semibold text-white">Highlights</h2>
+          <div className="mt-5">
+            <ExperienceHighlights items={HIGHLIGHTS} />
+          </div>
+        </section>
 
-        <div className="mt-8 grid gap-10 lg:grid-cols-12 lg:gap-12">
-          <div className="space-y-10 lg:col-span-7">
-            <ExperienceFacts
+        <section className="rn-reveal">
+          <h2 className="font-display font-semibold text-white">Itinerary</h2>
+          <div className="mt-5">
+            <ExperienceItinerary steps={itinerary} />
+          </div>
+        </section>
+
+        <section className="rn-reveal">
+          <ExperienceInclusions
+            included={INCLUDED}
+            notIncluded={['Warm winter clothing (bring layered outdoor clothing)']}
+          />
+        </section>
+
+        <section className="rn-reveal">
+          <h2 className="font-display font-semibold text-white">Practical information</h2>
+          <div className="mt-4">
+            <ExperienceAccordion
               items={[
-                { label: 'Duration', value: '3–4 hours' },
-                { label: 'Group', value: 'Max 8' },
-                { label: 'Pickup', value: 'Rovaniemi' },
-                { label: 'Languages', value: 'English · Finnish' },
+                {
+                  title: 'What to bring',
+                  content:
+                    'Thermal layers, waterproof outerwear, warm boots, gloves, and a hat for frozen lake conditions.',
+                },
+                {
+                  title: 'Good to know',
+                  content: (
+                    <ul className="space-y-2">
+                      <li>Free cancellation up to 24 hours before departure.</li>
+                      <li>Pickup time and fishing location depend on ice and weather that day.</li>
+                    </ul>
+                  ),
+                },
               ]}
             />
-
-            <section className="rn-reveal">
-              <h2 className="font-display text-2xl font-semibold text-white">Overview</h2>
-              <p className="mt-3 leading-relaxed text-text-muted">
-                Experience the traditional art of ice fishing in the pristine wilderness of Finnish Lapland. Our
-                expert guides take you to the best fishing spots on frozen lakes, where you learn techniques used
-                by locals for generations.
-              </p>
-              <p className="mt-3 leading-relaxed text-text-muted">
-                This authentic Lapland experience combines adventure with cultural immersion — a true taste of
-                Arctic life while enjoying the peaceful beauty of frozen landscapes.
-              </p>
-            </section>
-
-            <section className="rn-reveal">
-              <h2 className="font-display text-2xl font-semibold text-white">Itinerary</h2>
-              <div className="mt-5">
-                <ExperienceItinerary steps={itinerary} />
-              </div>
-            </section>
-
-            <section className="rn-reveal">
-              <ExperienceInclusions
-                included={INCLUDED}
-                notIncluded={['Warm winter clothing (bring layered outdoor clothing)']}
-              />
-            </section>
-
-            <section className="rn-reveal">
-              <h2 className="font-display text-2xl font-semibold text-white">Practical information</h2>
-              <div className="mt-4">
-                <ExperienceAccordion
-                  items={[
-                    {
-                      title: 'What to bring',
-                      content:
-                        'Dress warmly for Arctic conditions: thermal layers, waterproof outerwear, warm boots, gloves, and a hat.',
-                    },
-                    {
-                      title: 'Good to know',
-                      content: (
-                        <ul className="space-y-2">
-                          <li>Free cancellation up to 24 hours before departure.</li>
-                          <li>Pickup time and fishing location depend on ice and weather conditions that day.</li>
-                        </ul>
-                      ),
-                    },
-                  ]}
-                />
-              </div>
-            </section>
-
-            <ProductFaq items={faqs} schemaId="ice-faq" tone="dark" />
           </div>
+        </section>
 
-          <aside className="lg:col-span-5" id="book">
-            <div className="rn-sticky-book">
-              <BookingAside
-                priceFrom={price}
-                trustLines={[
-                  'Free cancellation up to 24h before',
-                  'Secure Stripe payment',
-                  'Hotel pickup in Rovaniemi',
-                  'Equipment & guide included',
-                ]}
-              >
-                {loading ? (
-                  <p className="py-10 text-center text-text-muted">Loading availability…</p>
-                ) : (
-                  <BookingForm
-                    tourId={4}
-                    tourName="Ice Fishing Experience"
-                    adultPrice={tourData.adult_price}
-                    childPrice={tourData.child_price}
-                    maxCapacity={tourData.max_capacity}
-                    seasonStart="12-15"
-                    seasonEnd="03-15"
-                    chrome="embedded"
-                    tone="light"
-                  />
-                )}
-              </BookingAside>
-            </div>
-          </aside>
-        </div>
-      </div>
+        <ProductFaq items={faqs} schemaId="ice-faq" tone="dark" />
+      </ExperienceProductLayout>
 
       <Footer />
       <MobileBookingBar priceFrom={price} onBook={scrollToBook} />

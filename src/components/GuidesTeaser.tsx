@@ -39,7 +39,7 @@ const GuidesTeaser = () => {
             <Link
               key={g.to}
               to={g.to}
-              className="group overflow-hidden rounded-rn border border-white/10 bg-surface transition hover:border-aurora/40"
+              className="group rn-blog-card overflow-hidden rounded-rn border border-white/10 bg-surface"
             >
               <div className="aspect-[16/10] overflow-hidden">
                 <img

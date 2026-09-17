@@ -39,8 +39,9 @@ const TransportationCategory = () => {
         image="/transportation3.jpg"
       />
 
-      <section className="rn-section">
-        <div className="rn-container space-y-10">
+      <section className="rn-section relative">
+        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
+        <div className="rn-container relative space-y-10">
           <div className="rn-card-grid lg:!grid-cols-2">
             {TRANSFERS.map((item) => (
               <TourCard
