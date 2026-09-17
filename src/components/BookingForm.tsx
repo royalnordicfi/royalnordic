@@ -32,6 +32,8 @@ interface BookingFormProps {
   seasonEnd?: string
   /** embedded = no outer card chrome (parent provides commerce shell) */
   chrome?: 'default' | 'embedded'
+  /** dark = graphite booking UI inside rn-book-panel */
+  tone?: 'light' | 'dark'
 }
 
 type FieldKey = 'preferredDate' | 'fullName' | 'email'
@@ -44,6 +46,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
   seasonStart,
   seasonEnd,
   chrome = 'default',
+  tone = 'light',
 }) => {
   const navigate = useNavigate()
   const dateSectionRef = useRef<HTMLDivElement>(null)
@@ -629,18 +632,79 @@ const BookingForm: React.FC<BookingFormProps> = ({
   }
 
 
+  const dark = tone === 'dark'
+  const ui = dark
+    ? {
+        wrap: chrome === 'embedded' ? 'rn-book-dark max-w-lg mx-auto lg:mx-0' : 'rn-book-dark bg-surface-elevated rounded-rn border border-white/10 p-6 max-w-lg mx-auto lg:mx-0',
+        hint: 'mb-4 text-xs text-text-dim',
+        heading: 'rn-bf-heading',
+        navBtn: 'rn-bf-chip',
+        month: 'text-base font-semibold text-white',
+        weekday: 'text-center text-[11px] font-medium text-text-dim py-1',
+        priceNote: 'text-xs text-text-dim mt-2',
+        label: 'block text-sm font-medium text-white/85 mb-1',
+        sublabel: 'text-xs text-text-dim mb-2',
+        count: 'text-lg font-semibold text-white min-w-[2rem] text-center',
+        priceSide: 'text-sm text-text-muted ml-auto',
+        input: 'rn-bf-input scroll-mt-28',
+        textarea: 'rn-bf-input resize-none',
+        summary: 'rn-bf-summary',
+        muted: 'text-text-muted',
+        strong: 'text-white font-medium',
+        totalLabel: 'text-base font-semibold text-white',
+        totalValue: 'text-2xl font-semibold text-aurora-soft',
+        payInfo: 'rounded-md border border-aurora/20 bg-aurora/10 px-3 py-2 text-xs text-text-muted space-y-1',
+        primaryBtn: 'rn-btn-primary w-full !py-3.5 text-base',
+        cryptoLink: 'w-full text-sm text-text-muted hover:text-aurora-soft underline underline-offset-2 py-2 disabled:opacity-50',
+        errorBox: 'rounded-md border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200',
+        warnBox: 'rounded-md border border-amber-400/30 bg-amber-500/10 p-3 text-sm text-amber-100',
+        validBox: 'flex items-center px-3 rounded-md border border-aurora/30 bg-aurora/10',
+        validText: 'text-aurora-soft text-sm font-semibold',
+        discountOk: 'text-xs text-aurora-soft mt-1',
+        discountBad: 'text-xs text-red-300 mt-1',
+      }
+    : {
+        wrap: chrome === 'embedded' ? 'max-w-lg mx-auto lg:mx-0' : 'bg-white rounded-xl shadow-xl p-6 max-w-lg mx-auto lg:mx-0',
+        hint: chrome === 'embedded' ? 'text-panel-muted text-xs mb-4' : 'text-gray-600 text-sm text-center mb-6',
+        heading: 'text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2',
+        navBtn: 'w-11 h-11 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600',
+        month: 'text-lg font-semibold text-gray-900',
+        weekday: 'text-center text-xs font-medium text-gray-500 py-1',
+        priceNote: 'text-xs text-gray-500 mt-2',
+        label: 'block text-sm font-medium text-gray-700 mb-1',
+        sublabel: 'text-xs text-gray-500 mb-2',
+        count: 'text-lg font-semibold text-gray-900 min-w-[2rem] text-center',
+        priceSide: 'text-sm text-gray-500 ml-auto',
+        input: 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm scroll-mt-28',
+        textarea: 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm resize-none',
+        summary: 'bg-gray-50 border border-gray-200 rounded-lg p-4',
+        muted: 'text-gray-600',
+        strong: 'text-gray-800 font-medium',
+        totalLabel: 'text-lg font-semibold text-gray-800',
+        totalValue: 'text-2xl font-bold text-emerald-600',
+        payInfo: 'rounded-lg border border-emerald-100 bg-emerald-50/60 px-3 py-2 text-xs text-emerald-900 space-y-1',
+        primaryBtn: 'w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center shadow-lg hover:shadow-xl',
+        cryptoLink: 'w-full text-sm text-gray-600 hover:text-emerald-700 underline underline-offset-2 py-2 disabled:opacity-50',
+        errorBox: 'bg-red-50 border border-red-200 rounded-lg p-3',
+        warnBox: 'bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3',
+        validBox: 'flex items-center px-3 bg-emerald-50 border border-emerald-200 rounded-lg',
+        validText: 'text-emerald-600 text-sm font-semibold',
+        discountOk: 'text-xs text-emerald-700 mt-1',
+        discountBad: 'text-xs text-red-600 mt-1',
+      }
+
   return (
-    <div className={chrome === 'embedded' ? 'max-w-lg mx-auto lg:mx-0' : 'bg-white rounded-xl shadow-xl p-6 max-w-lg mx-auto lg:mx-0'}>
-      <div className={chrome === 'embedded' ? 'mb-4' : 'text-center mb-6'}>
-        <p className={chrome === 'embedded' ? 'text-panel-muted text-xs' : 'text-gray-600 text-sm'}>
-          {chrome === 'embedded' ? 'Date → Guests → Details → Pay' : 'Select your preferred date and group size'}
+    <div className={ui.wrap}>
+      <div className={dark ? 'mb-4' : (chrome === 'embedded' ? 'mb-4' : 'text-center mb-6')}>
+        <p className={ui.hint}>
+          {chrome === 'embedded' || dark ? 'Date → Guests → Details → Pay' : 'Select your preferred date and group size'}
         </p>
       </div>
       
       <form className="space-y-6">
         {/* Date Selection */}
         <div ref={dateSectionRef} className="scroll-mt-24">
-          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Choose a date</h4>
+          <h4 className={ui.heading}>Choose a date</h4>
           {fieldErrors.preferredDate && (
             <p className="text-sm text-red-600 mb-2">{fieldErrors.preferredDate}</p>
           )}
@@ -650,14 +714,14 @@ const BookingForm: React.FC<BookingFormProps> = ({
             <button 
               type="button"
               onClick={goToPreviousMonth}
-              className="w-11 h-11 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600"
+              className={ui.navBtn}
               aria-label="Previous month"
             >
               ‹
             </button>
             
             <div className="text-center">
-              <span className="text-lg font-semibold text-gray-900">
+              <span className={ui.month}>
                 {getMonthYearString()}
               </span>
             </div>
@@ -665,7 +729,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
             <button 
               type="button"
               onClick={goToNextMonth}
-              className="w-11 h-11 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600"
+              className={ui.navBtn}
               aria-label="Next month"
             >
               ›
@@ -675,7 +739,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           {/* Simple Date Picker */}
           <div className="grid grid-cols-7 gap-1 mb-3">
             {WEEKDAY_HEADERS_MON_FIRST.map(day => (
-              <div key={day} className="text-center text-xs font-medium text-gray-500 py-1">
+              <div key={day} className={ui.weekday}>
                 {day}
               </div>
             ))}
@@ -708,7 +772,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
                     clearFieldError('preferredDate')
                     setError('')
                   }}
-                  className={`h-14 sm:h-16 rounded text-sm font-medium transition-colors flex flex-col items-center justify-center px-0.5 leading-none ${
+                  className={dark
+                    ? `rn-bf-day ${
+                        isSelected
+                          ? 'rn-bf-day--selected'
+                          : isFullBooked
+                          ? 'rn-bf-day--full'
+                          : isAvailable
+                          ? 'rn-bf-day--available'
+                          : 'rn-bf-day--disabled'
+                      }`
+                    : `h-14 sm:h-16 rounded text-sm font-medium transition-colors flex flex-col items-center justify-center px-0.5 leading-none ${
                     isSelected
                       ? 'bg-emerald-600 text-white'
                       : isPastDate
@@ -754,12 +828,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
             )}
           </div>
 
-          <p className="text-xs text-gray-500 mt-2">Showing prices in EUR (Euro)</p>
+          <p className={ui.priceNote}>Showing prices in EUR (Euro)</p>
         </div>
 
       {/* Participants Section */}
         <div>
-          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Participants</h4>
+          <h4 className={ui.heading}>Participants</h4>
           {!formData.preferredDate && (
             <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded p-3 mb-4">
               <strong>Please select a date first</strong> to choose the number of participants
@@ -767,50 +841,50 @@ const BookingForm: React.FC<BookingFormProps> = ({
           )}
         <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Adult</label>
-              <p className="text-xs text-gray-500 mb-2">Age 18+</p>
+              <label className={ui.label}>Adult</label>
+              <p className={ui.sublabel}>Age 18+</p>
             <div className="flex items-center space-x-3">
               <button 
                 type="button"
                   onClick={() => setFormData({...formData, adults: Math.max(1, formData.adults - 1)})}
-                  className="w-11 h-11 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold"
+                  className={`${ui.navBtn} font-bold`}
               >
                 -
               </button>
-                <span className="text-lg font-semibold text-gray-900 min-w-[2rem] text-center">{formData.adults}</span>
+                <span className={ui.count}>{formData.adults}</span>
               <button 
                 type="button"
                   onClick={() => setFormData({...formData, adults: Math.min(getAvailableSlots(formData.preferredDate), formData.adults + 1)})}
-                  className="w-11 h-11 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold"
+                  className={`${ui.navBtn} font-bold`}
                   disabled={!formData.preferredDate || formData.adults + formData.children >= getAvailableSlots(formData.preferredDate)}
               >
                 +
               </button>
-                <span className="text-sm text-gray-500 ml-auto">€{formatEuroAmount(liveAdultPrice)} (VAT incl.)</span>
+                <span className={ui.priceSide}>€{formatEuroAmount(liveAdultPrice)} (VAT incl.)</span>
               </div>
           </div>
           
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Child</label>
-              <p className="text-xs text-gray-500 mb-2">Age 0 - 17</p>
+              <label className={ui.label}>Child</label>
+              <p className={ui.sublabel}>Age 0 - 17</p>
             <div className="flex items-center space-x-3">
               <button 
                 type="button"
                   onClick={() => setFormData({...formData, children: Math.max(0, formData.children - 1)})}
-                  className="w-11 h-11 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold"
+                  className={`${ui.navBtn} font-bold`}
               >
                 -
               </button>
-                <span className="text-lg font-semibold text-gray-900 min-w-[2rem] text-center">{formData.children}</span>
+                <span className={ui.count}>{formData.children}</span>
               <button 
                 type="button"
                   onClick={() => setFormData({...formData, children: Math.min(getAvailableSlots(formData.preferredDate) - formData.adults, formData.children + 1)})}
-                  className="w-11 h-11 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold"
+                  className={`${ui.navBtn} font-bold`}
                   disabled={!formData.preferredDate || formData.adults + formData.children >= getAvailableSlots(formData.preferredDate)}
               >
                 +
               </button>
-                <span className="text-sm text-gray-500 ml-auto">€{formatEuroAmount(liveChildPrice)} (VAT incl.)</span>
+                <span className={ui.priceSide}>€{formatEuroAmount(liveChildPrice)} (VAT incl.)</span>
               </div>
             </div>
             
@@ -832,7 +906,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
         {/* Contact Information */}
         <div>
-          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Your details</h4>
+          <h4 className={ui.heading}>Your details</h4>
           <div className="space-y-3">
           <div>
             <input 
@@ -876,27 +950,27 @@ const BookingForm: React.FC<BookingFormProps> = ({
             value={formData.phone}
             onChange={handleChange}
               placeholder="Phone Number (optional)"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+              className={dark ? ui.input : 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm'}
             />
           </div>
         </div>
 
         {/* Special Requests */}
         <div>
-          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Special Requests</h4>
+          <h4 className={ui.heading}>Special Requests</h4>
           <textarea
             name="specialRequests"
             value={formData.specialRequests}
             onChange={handleChange}
             rows={3}
             placeholder="Any special requirements or requests..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm resize-none"
+            className={dark ? ui.textarea : 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm resize-none'}
           />
         </div>
 
         {/* Discount Code */}
         <div>
-          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Discount Code</h4>
+          <h4 className={ui.heading}>Discount Code</h4>
           <div className="flex gap-2">
             <input 
               type="text" 
@@ -904,28 +978,28 @@ const BookingForm: React.FC<BookingFormProps> = ({
               value={formData.discountCode}
               onChange={handleChange}
               placeholder={`Enter code (e.g. ${WINTER_PROMOTION.discountCode})`}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm uppercase"
+              className={dark ? `${ui.input} flex-1 uppercase` : 'flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm uppercase'}
               style={{ textTransform: 'uppercase' }}
               autoComplete="off"
             />
             {isDiscountValid() && (
-              <div className="flex items-center px-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-                <span className="text-emerald-600 text-sm font-semibold">✓ Valid</span>
+              <div className={ui.validBox}>
+                <span className={ui.validText}>✓ Valid</span>
               </div>
             )}
           </div>
           {formData.discountCode && !isDiscountValid() && (
-            <p className="text-xs text-red-600 mt-1">Invalid code or promotion is not active</p>
+            <p className={ui.discountBad}>Invalid code or promotion is not active</p>
           )}
           {isDiscountValid() && (
-            <p className="text-xs text-emerald-700 mt-1">
+            <p className={ui.discountOk}>
               {WINTER_PROMOTION.discountPercent}% off eligible direct booking
             </p>
           )}
         </div>
 
         {/* Total Price */}
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <div className={ui.summary}>
           <div className="space-y-2 mb-3">
             {/* Selected Date */}
             {formData.preferredDate && (
@@ -975,8 +1049,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
             })()}
             <div className="border-t border-gray-300 pt-2">
               <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold text-gray-800">Total:</span>
-                <span className="text-2xl font-bold text-emerald-600">€{calculateTotal().toFixed(2)}</span>
+                <span className={ui.totalLabel}>Total:</span>
+                <span className={ui.totalValue}>€{calculateTotal().toFixed(2)}</span>
               </div>
               <p className="text-xs text-gray-500 mt-1">Includes VAT</p>
             </div>
@@ -985,9 +1059,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
         {/* Payment Options */}
         <div className="space-y-3">
-          <h4 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2">Payment</h4>
+          <h4 className={ui.heading}>Payment</h4>
 
-          <div className="rounded-lg border border-emerald-100 bg-emerald-50/60 px-3 py-2 text-xs text-emerald-900 space-y-1">
+          <div className={ui.payInfo}>
             <p>Free cancellation up to 24 hours before departure.</p>
             {isNorthernLightsTour && (
               <p>Northern Lights guarantee: free return trip if no lights appear — see Terms for details.</p>
@@ -1019,7 +1093,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           <button 
             type="submit"
             disabled={loading || !isStripeConfigured}
-            className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center shadow-lg hover:shadow-xl"
+            className={`${ui.primaryBtn} disabled:opacity-50 disabled:cursor-not-allowed`}
             onClick={(e) => {
               e.preventDefault()
               if (!isStripeConfigured) {
@@ -1050,7 +1124,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           <button 
             type="button"
             disabled={loading}
-            className="w-full text-sm text-gray-600 hover:text-emerald-700 underline underline-offset-2 py-2 disabled:opacity-50"
+            className={ui.cryptoLink}
             onClick={handleCryptoPayment}
           >
             Prefer crypto? Request a crypto booking
@@ -1148,7 +1222,7 @@ const CryptoPaymentModal: React.FC<{
             {/* Crypto Form */}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <label className={ui.label}>Full Name</label>
                 <input
                   type="text"
                   value={cryptoFormData.fullName}
@@ -1159,7 +1233,7 @@ const CryptoPaymentModal: React.FC<{
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Cryptocurrency</label>
+                <label className={ui.label}>Preferred Cryptocurrency</label>
                 <select
                   value={cryptoFormData.cryptoType}
                   onChange={(e) => setCryptoFormData({...cryptoFormData, cryptoType: e.target.value})}
@@ -1174,7 +1248,7 @@ const CryptoPaymentModal: React.FC<{
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Additional Requests</label>
+                <label className={ui.label}>Additional Requests</label>
                 <textarea
                   value={cryptoFormData.specialRequests}
                   onChange={(e) => setCryptoFormData({...cryptoFormData, specialRequests: e.target.value})}

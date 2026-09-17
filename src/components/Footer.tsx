@@ -23,7 +23,7 @@ const Footer = () => {
               <li><Link className="hover:text-white" to="/daytime-experiences">Day Tours</Link></li>
               <li><Link className="hover:text-white" to="/customized-tour">Private &amp; Custom</Link></li>
               <li><Link className="hover:text-white" to="/transportation">Transfers</Link></li>
-              <li><Link className="hover:text-white" to="/blog">Guides</Link></li>
+              <li><Link className="hover:text-white" to="/blog">Travel guides</Link></li>
             </ul>
           </div>
 
@@ -31,7 +31,7 @@ const Footer = () => {
             <h3 className="mb-3 text-sm font-semibold text-white">Company</h3>
             <ul className="space-y-2 text-sm text-text-muted">
               <li><Link className="hover:text-white" to="/#contact">Contact</Link></li>
-              <li><Link className="hover:text-white" to="/travel-trade">Travel Trade</Link></li>
+              <li><Link className="hover:text-white" to="/travel-trade">Partner With Us</Link></li>
               <li><a className="hover:text-white" href="mailto:contact@royalnordic.fi">contact@royalnordic.fi</a></li>
               <li><a className="hover:text-white" href="tel:+3584578345138">+358 45 78345138</a></li>
               <li>Rovaniemi, Lapland</li>

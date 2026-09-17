@@ -19,12 +19,16 @@ const TrustStrip = () => {
   ]
 
   return (
-    <section className="border-y border-white/10 bg-surface" aria-label="Why travellers book Royal Nordic">
-      <div className="rn-container grid gap-5 py-6 sm:grid-cols-2 sm:gap-6 sm:py-7 lg:grid-cols-4">
+    <section
+      className="relative border-y border-white/[0.07] bg-[#070e0c]"
+      aria-label="Why travellers book Royal Nordic"
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(18,185,129,0.08),transparent_55%)]" aria-hidden />
+      <div className="rn-container relative grid gap-6 py-7 sm:grid-cols-2 sm:gap-8 sm:py-8 lg:grid-cols-4">
         {items.map((item) => (
-          <div key={item.title}>
+          <div key={item.title} className="rn-reveal">
             <p className="text-sm font-semibold text-white">{item.title}</p>
-            <p className="mt-1 text-sm leading-relaxed text-text-muted">{item.text}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-text-muted">{item.text}</p>
           </div>
         ))}
       </div>

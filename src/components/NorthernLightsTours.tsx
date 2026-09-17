@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import CategoryHero from './CategoryHero'
 import Footer from './Footer'
+import ReviewCarousel from './ReviewCarousel'
 import TourCard from './TourCard'
+import { reviewsFor } from '../data/reviews'
 import { fetchActiveTourIds, SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS } from '../lib/productVisibility'
 
 const ALL_TOURS = [
@@ -11,6 +14,8 @@ const ALL_TOURS = [
     image: '/nortti1.jpg',
     imageAlt: 'Guaranteed Northern Lights Tour',
     title: 'Guaranteed Northern Lights Tour',
+    description:
+      'Full evening aurora hunt with hotel pickup. Free return trip if no lights appear — see Terms.',
     duration: '2–12 hours',
     groupSize: 'Max 8 / vehicle',
     pickup: true,
@@ -62,6 +67,9 @@ const NorthernLightsTours: React.FC = () => {
     return ALL_TOURS.filter((t) => t.tourId == null || activeIds.has(t.tourId))
   }, [activeIds])
 
+  const signature = tours.find((t) => t.featured)
+  const secondary = tours.filter((t) => !t.featured)
+
   return (
     <div className="rn-page">
       <CategoryHero
@@ -70,33 +78,63 @@ const NorthernLightsTours: React.FC = () => {
         image="/nortti5.jpg"
       />
 
-      <section className="rn-section bg-midnight">
-        <div className="rn-container">
-          <div className="grid gap-5 sm:grid-cols-2">
-            {tours.map((tour) => (
-              <TourCard
-                key={tour.to}
-                to={tour.to}
-                image={tour.image}
-                imageAlt={tour.imageAlt}
-                title={tour.title}
-                duration={tour.duration}
-                groupSize={tour.groupSize}
-                pickup={tour.pickup}
-                badge={tour.badge}
-                priceFrom={tour.priceFrom}
-                featured={tour.featured}
-                ctaLabel={tour.priceFrom ? 'View details' : 'Request availability'}
-              />
-            ))}
-          </div>
+      <section className="bg-midnight pb-12 pt-8">
+        <div className="rn-container space-y-10">
+          {signature && (
+            <div>
+              <p className="rn-eyebrow">Signature experience</p>
+              <div className="mt-4 grid gap-5">
+                <TourCard
+                  to={signature.to}
+                  image={signature.image}
+                  imageAlt={signature.imageAlt}
+                  title={signature.title}
+                  description={signature.description}
+                  duration={signature.duration}
+                  groupSize={signature.groupSize}
+                  pickup={signature.pickup}
+                  badge={signature.badge}
+                  priceFrom={signature.priceFrom}
+                  featured
+                  ctaLabel="View guaranteed tour"
+                />
+              </div>
+            </div>
+          )}
 
-          <div className="mt-12 max-w-2xl rounded-rn border border-white/10 bg-surface p-6">
-            <h2 className="font-display text-2xl font-semibold text-white">Which tour is right?</h2>
+          {secondary.length > 0 && (
+            <div>
+              <h2 className="font-display text-2xl font-semibold text-white">More aurora evenings</h2>
+              <div className="mt-5 grid gap-5 sm:grid-cols-2">
+                {secondary.map((tour) => (
+                  <TourCard
+                    key={tour.to}
+                    to={tour.to}
+                    image={tour.image}
+                    imageAlt={tour.imageAlt}
+                    title={tour.title}
+                    duration={tour.duration}
+                    groupSize={tour.groupSize}
+                    pickup={tour.pickup}
+                    badge={tour.badge}
+                    priceFrom={tour.priceFrom}
+                    ctaLabel={tour.priceFrom ? 'View details' : 'Request availability'}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="max-w-2xl border-y border-white/[0.08] py-8">
+            <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">Which tour is right?</h2>
             <ul className="mt-4 space-y-3 text-sm text-text-muted">
               <li>
                 <strong className="text-white">Guaranteed</strong> — full evening hunt with flexible
-                duration and free return trip if no lights appear (see Terms).
+                duration and free return trip if no lights appear (see{' '}
+                <Link to="/terms-conditions" className="font-medium text-aurora-soft hover:underline">
+                  Terms
+                </Link>
+                ).
               </li>
               <li>
                 <strong className="text-white">Family</strong> — shorter 2-hour evening format. Northern
@@ -104,6 +142,8 @@ const NorthernLightsTours: React.FC = () => {
               </li>
             </ul>
           </div>
+
+          <ReviewCarousel reviews={reviewsFor('northern-lights', 6)} />
         </div>
       </section>
 

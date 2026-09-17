@@ -36,20 +36,20 @@ const ExperienceGallery = ({ images }: ExperienceGalleryProps) => {
 
   return (
     <>
-      {/* Mobile swipe strip */}
+      {/* Mobile swipe strip — controlled height */}
       <div className="lg:hidden">
-        <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1">
+        <div className="-mx-4 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 pb-1">
           {images.map((img, i) => (
             <button
               key={img.src}
               type="button"
-              className="relative w-[85%] shrink-0 snap-center overflow-hidden rounded-rn-lg"
+              className="relative w-[78%] shrink-0 snap-center overflow-hidden rounded-rn"
               onClick={() => setLightbox(i)}
             >
               <img
                 src={img.src}
                 alt={img.alt}
-                className="aspect-[4/3] w-full object-cover"
+                className="aspect-[16/10] w-full object-cover"
                 loading={i === 0 ? 'eager' : 'lazy'}
               />
             </button>
@@ -57,32 +57,42 @@ const ExperienceGallery = ({ images }: ExperienceGalleryProps) => {
         </div>
         <button
           type="button"
-          className="mt-3 text-sm font-semibold text-aurora-soft"
+          className="mt-3 text-sm font-medium text-aurora-soft"
           onClick={() => setLightbox(0)}
         >
           View all photos ({images.length})
         </button>
       </div>
 
-      {/* Desktop editorial grid */}
-      <div className="hidden gap-3 lg:grid lg:grid-cols-4 lg:grid-rows-2 lg:h-[28rem]">
+      {/* Desktop — controlled editorial grid, not oversized */}
+      <div className="hidden gap-2.5 lg:grid lg:grid-cols-4 lg:grid-rows-2 lg:h-[22rem] xl:h-[24rem]">
         <button
           type="button"
-          className="relative col-span-2 row-span-2 overflow-hidden rounded-rn-lg"
+          className="group relative col-span-2 row-span-2 overflow-hidden rounded-rn"
           onClick={() => setLightbox(0)}
         >
-          <img src={primary.src} alt={primary.alt} className="h-full w-full object-cover" loading="eager" />
+          <img
+            src={primary.src}
+            alt={primary.alt}
+            className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+            loading="eager"
+          />
         </button>
         {secondary.map((img, i) => (
           <button
             key={img.src}
             type="button"
-            className="relative overflow-hidden rounded-rn-lg"
+            className="group relative overflow-hidden rounded-rn"
             onClick={() => setLightbox(i + 1)}
           >
-            <img src={img.src} alt={img.alt} className="h-full w-full object-cover" loading="lazy" />
+            <img
+              src={img.src}
+              alt={img.alt}
+              className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+              loading="lazy"
+            />
             {i === secondary.length - 1 && images.length > 5 && (
-              <span className="absolute inset-0 flex items-center justify-center bg-midnight/55 text-sm font-semibold text-snow">
+              <span className="absolute inset-0 flex items-center justify-center bg-[#050a10]/55 text-sm font-medium text-snow">
                 View all photos
               </span>
             )}
@@ -92,7 +102,7 @@ const ExperienceGallery = ({ images }: ExperienceGalleryProps) => {
 
       {lightbox != null &&
         createPortal(
-          <div className="fixed inset-0 z-[80] flex items-center justify-center bg-midnight/92 p-4" role="dialog" aria-modal="true">
+          <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#050a10]/92 p-4" role="dialog" aria-modal="true">
             <button
               type="button"
               className="absolute inset-0 cursor-zoom-out"
@@ -101,7 +111,7 @@ const ExperienceGallery = ({ images }: ExperienceGalleryProps) => {
             />
             <button
               type="button"
-              className="absolute right-4 top-4 z-10 inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-white/10 text-snow"
+              className="absolute right-4 top-4 z-10 inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-white/15 bg-white/5 text-snow"
               aria-label="Close"
               onClick={() => setLightbox(null)}
             >

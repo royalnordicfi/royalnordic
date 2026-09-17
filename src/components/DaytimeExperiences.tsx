@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import CategoryHero from './CategoryHero'
 import Footer from './Footer'
+import ReviewCarousel from './ReviewCarousel'
 import TourCard from './TourCard'
+import { reviewsFor } from '../data/reviews'
 import { fetchActiveTourIds } from '../lib/productVisibility'
 
 const ALL_EXPERIENCES = [
@@ -11,12 +13,13 @@ const ALL_EXPERIENCES = [
     image: '/icefishing2.jpg',
     imageAlt: 'Ice fishing on a frozen Lapland lake',
     title: 'Ice Fishing Experience',
+    description: 'Traditional ice fishing on frozen lakes with guide, equipment, and hot drinks by the fire.',
     duration: '3–4 hours',
     groupSize: 'Max 8',
     pickup: true,
     badge: 'Day trip',
     priceFrom: 119,
-    featured: false,
+    featured: true,
   },
   {
     tourId: 5 as number | null,
@@ -71,6 +74,9 @@ const DaytimeExperiences: React.FC = () => {
     return ALL_EXPERIENCES.filter((e) => e.tourId == null || activeIds.has(e.tourId))
   }, [activeIds])
 
+  const featured = experiences.find((e) => e.featured)
+  const secondary = experiences.filter((e) => !e.featured)
+
   return (
     <div className="rn-page">
       <CategoryHero
@@ -79,29 +85,54 @@ const DaytimeExperiences: React.FC = () => {
         image="/icefishing3.jpg"
       />
 
-      <section className="rn-section bg-midnight">
-        <div className="rn-container">
-          <div className="grid gap-5 sm:grid-cols-2">
-            {experiences.map((exp) => (
-              <TourCard
-                key={exp.to}
-                to={exp.to}
-                image={exp.image}
-                imageAlt={exp.imageAlt}
-                title={exp.title}
-                duration={exp.duration}
-                groupSize={exp.groupSize}
-                pickup={exp.pickup}
-                badge={exp.badge}
-                priceFrom={exp.priceFrom}
-                featured={exp.featured}
-                ctaLabel={exp.priceFrom != null ? 'View details' : 'Request availability'}
-              />
-            ))}
-          </div>
+      <section className="bg-midnight pb-12 pt-8">
+        <div className="rn-container space-y-10">
+          {featured && (
+            <div>
+              <p className="rn-eyebrow">Featured day trip</p>
+              <div className="mt-4 grid gap-5">
+                <TourCard
+                  to={featured.to}
+                  image={featured.image}
+                  imageAlt={featured.imageAlt}
+                  title={featured.title}
+                  description={featured.description}
+                  duration={featured.duration}
+                  groupSize={featured.groupSize}
+                  pickup={featured.pickup}
+                  badge={featured.badge}
+                  priceFrom={featured.priceFrom}
+                  featured
+                />
+              </div>
+            </div>
+          )}
 
-          <div className="mt-12 max-w-2xl rounded-rn border border-white/10 bg-surface p-6">
-            <h2 className="font-display text-2xl font-semibold text-white">Pick your day trip</h2>
+          {secondary.length > 0 && (
+            <div>
+              <h2 className="font-display text-2xl font-semibold text-white">More daytime adventures</h2>
+              <div className="mt-5 grid gap-5 sm:grid-cols-2">
+                {secondary.map((exp) => (
+                  <TourCard
+                    key={exp.to}
+                    to={exp.to}
+                    image={exp.image}
+                    imageAlt={exp.imageAlt}
+                    title={exp.title}
+                    duration={exp.duration}
+                    groupSize={exp.groupSize}
+                    pickup={exp.pickup}
+                    badge={exp.badge}
+                    priceFrom={exp.priceFrom}
+                    ctaLabel={exp.priceFrom != null ? 'View details' : 'Request availability'}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="max-w-2xl border-y border-white/[0.08] py-8">
+            <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">Pick your day trip</h2>
             <ul className="mt-4 space-y-3 text-sm text-text-muted">
               <li>
                 <strong className="text-white">Ice fishing</strong> — relaxed morning or afternoon on
@@ -121,6 +152,8 @@ const DaytimeExperiences: React.FC = () => {
               </li>
             </ul>
           </div>
+
+          <ReviewCarousel reviews={reviewsFor('day-tours', 6)} />
         </div>
       </section>
 

@@ -52,12 +52,16 @@ import TravelTrade from './components/TravelTrade';
 import PromotionAnnouncementBar from './components/PromotionAnnouncementBar';
 import WinterPromoPopup from './components/WinterPromoPopup';
 import NotFound from './components/NotFound';
+import ShellProvider from './layout/ShellProvider';
+import RevealObserver from './components/RevealObserver';
 
 function App() {
   return (
     <Router>
+      <ShellProvider>
       <div className="App">
         <ScrollToTop />
+        <RevealObserver />
         <RoutePageMeta />
         <RouteJsonLd />
         <PromotionAnnouncementBar />
@@ -178,6 +182,7 @@ function App() {
         {/* WhatsApp Widget - appears on all pages */}
         <WhatsAppWidget />
       </div>
+      </ShellProvider>
     </Router>
   );
 }

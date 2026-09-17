@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 const Hero = () => {
   return (
-    <section className="relative flex min-h-[78svh] items-end overflow-hidden bg-black pb-12 pt-24 sm:min-h-[85svh] sm:items-center sm:pb-16 sm:pt-28">
+    <section className="relative overflow-hidden bg-black">
       <video
         autoPlay
         loop
@@ -14,24 +14,30 @@ const Hero = () => {
         <source src="/northernlightsvideo_final.mp4" type="video/mp4" />
       </video>
       <div
-        className="absolute inset-0 bg-gradient-to-t from-midnight via-black/45 to-black/20"
+        className="absolute inset-0 bg-gradient-to-t from-[#050a10] via-black/50 to-black/30"
         aria-hidden
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" aria-hidden />
+      <div
+        className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_80%,rgba(18,185,129,0.18),transparent_55%)]"
+        aria-hidden
+      />
 
-      <div className="rn-container relative z-10 w-full">
-        <div className="max-w-xl">
-          <p className="rn-eyebrow">Rovaniemi · Finnish Lapland</p>
-          <h1 className="mt-3 font-display text-[2rem] font-semibold leading-[1.1] text-white sm:text-4xl lg:text-[2.75rem]">
-            Guaranteed Northern Lights from Rovaniemi
+      <div className="rn-container relative z-10 flex min-h-[78svh] flex-col justify-end pb-12 pt-[calc(var(--rn-chrome-h)+1.5rem)] sm:min-h-[88svh] sm:pb-16 sm:pt-[calc(var(--rn-chrome-h)+2rem)]">
+        <div className="rn-hero-copy max-w-xl">
+          <p className="rn-eyebrow">Royal Nordic · Rovaniemi, Finnish Lapland</p>
+          <h1 className="rn-display mt-3 text-[2.05rem] text-white sm:text-4xl lg:text-[2.65rem]">
+            Guaranteed Northern Lights
           </h1>
-          <p className="mt-3 max-w-lg text-[15px] leading-relaxed text-white/80 sm:text-base">
-            Small-group aurora hunts with hotel pickup. If you don’t see the lights, you can join us
-            again — free return trip per our Terms.
+          <p className="mt-3 max-w-md text-[15px] leading-relaxed text-white/78 sm:text-base">
+            Small-group aurora hunts with hotel pickup and photography. If you don’t see the lights,
+            join us again — free return trip per our Terms.
           </p>
-          <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+          <p className="mt-4 text-xs tracking-wide text-white/55">
+            Small groups · Photography · Rovaniemi
+          </p>
+          <div className="mt-7 flex flex-col gap-2.5 sm:flex-row sm:items-center">
             <Link to="/northern-lights-tour" className="rn-btn-primary px-6">
-              Book Guaranteed Northern Lights
+              Explore the Northern Lights
             </Link>
             <a href="#experiences" className="rn-btn-secondary px-6">
               Explore experiences

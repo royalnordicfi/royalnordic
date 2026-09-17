@@ -43,7 +43,7 @@ export const WINTER_PROMOTION: WinterPromotionConfig = {
   campaignVersion: 'winter20-v1',
   title: 'Winter Booking Offer',
   announcementText:
-    'Direct booking offer · Save 20% with code WINTER20',
+    'Direct booking · Save 20% with WINTER20',
   popupHeading: 'Save 20% when you book direct',
   popupBody:
     'Use code WINTER20 on eligible tours at checkout. Value first — the discount is optional.',

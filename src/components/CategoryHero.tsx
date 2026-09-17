@@ -9,7 +9,7 @@ const CategoryHero = ({ title, subtitle, image, compact = false }: CategoryHeroP
   return (
     <section
       className={`relative flex items-end overflow-hidden bg-black ${
-        compact ? 'min-h-[32vh] sm:min-h-[36vh]' : 'min-h-[40vh] sm:min-h-[44vh]'
+        compact ? 'min-h-[34vh] sm:min-h-[38vh]' : 'min-h-[42vh] sm:min-h-[48vh]'
       }`}
     >
       <img
@@ -21,12 +21,17 @@ const CategoryHero = ({ title, subtitle, image, compact = false }: CategoryHeroP
           e.currentTarget.src = '/nortti1.jpg'
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-midnight via-black/50 to-black/30" aria-hidden />
-      <div className="rn-container relative z-10 w-full pb-8 pt-24 sm:pb-10 sm:pt-28">
-        <h1 className="max-w-3xl font-display text-3xl font-semibold text-white sm:text-4xl">
+      <div className="absolute inset-0 bg-gradient-to-t from-[#050a10] via-black/55 to-black/25" aria-hidden />
+      <div
+        className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_80%,rgba(18,185,129,0.14),transparent_50%)]"
+        aria-hidden
+      />
+      <div className="rn-container relative z-10 w-full pb-9 pt-[calc(var(--rn-chrome-h)+1.25rem)] sm:pb-11 sm:pt-[calc(var(--rn-chrome-h)+1.75rem)]">
+        <p className="rn-eyebrow">Royal Nordic</p>
+        <h1 className="mt-2 max-w-3xl font-display text-3xl font-semibold text-white sm:text-4xl lg:text-[2.6rem]">
           {title}
         </h1>
-        <p className="mt-2 max-w-2xl text-[15px] text-white/80 sm:text-base">{subtitle}</p>
+        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-white/78 sm:text-base">{subtitle}</p>
       </div>
     </section>
   )

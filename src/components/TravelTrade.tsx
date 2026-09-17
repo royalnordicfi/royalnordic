@@ -1,8 +1,29 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { CheckCircle, Mail, Phone } from 'lucide-react'
+import { Mail, Phone } from 'lucide-react'
 import CategoryHero from './CategoryHero'
+import ExperienceAccordion from './experience/ExperienceAccordion'
+import ExperienceBreadcrumb from './experience/ExperienceBreadcrumb'
 import Footer from './Footer'
+
+const AUDIENCES = [
+  {
+    title: 'Travel agencies & tour operators',
+    text: 'FIT and group products with clear pickup, languages, and seasonal availability for your clients visiting Rovaniemi.',
+  },
+  {
+    title: 'DMCs & inbound partners',
+    text: 'Combine aurora hunts, daytime adventures, and private transfers into multi-day programmes tailored to your brief.',
+  },
+  {
+    title: 'Hotels & accommodation',
+    text: 'Recommend bookable experiences with hotel pickup — we help you advise guests on timing and what fits their stay.',
+  },
+  {
+    title: 'Concierges & guest services',
+    text: 'Direct online booking for guests who want to confirm immediately, plus enquiry support for custom requests.',
+  },
+]
 
 const TravelTrade: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -16,17 +37,9 @@ const TravelTrade: React.FC = () => {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
   const inputClass =
-    'w-full rounded-lg border border-black/10 bg-white px-3 py-2.5 text-sm text-panel-ink placeholder:text-panel-muted focus:border-aurora focus:outline-none focus:ring-1 focus:ring-aurora/30'
+    'w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-white placeholder:text-text-dim focus:border-aurora/50 focus:outline-none focus:ring-1 focus:ring-aurora/30'
 
-  const reasons = [
-    'Local operator based in Rovaniemi, Finnish Lapland',
-    'Small groups and private experiences with clear service standards',
-    'Online booking for guests who prefer to confirm direct',
-    'Flexible customized itineraries for agencies and private groups',
-    'Hotel pickup with English & Finnish guiding',
-  ]
-
-  const experiences = [
+  const sellable = [
     {
       title: 'Guaranteed Northern Lights Tour',
       detail: 'Aurora hunt with hotel pickup and a free return trip if no lights appear (see Terms).',
@@ -43,8 +56,8 @@ const TravelTrade: React.FC = () => {
       to: '/daytime-experiences',
     },
     {
-      title: 'Private & customized tours',
-      detail: 'Tailored itineraries for agencies, incentives, and private travellers.',
+      title: 'Private transfers & custom tours',
+      detail: 'Levi/Kittilä routes, airport pickups, and tailored itineraries for agencies and private travellers.',
       to: '/customized-tour',
     },
   ]
@@ -97,57 +110,36 @@ const TravelTrade: React.FC = () => {
     <div className="rn-page flex min-h-screen flex-col">
       <CategoryHero
         title="Partner With Royal Nordic"
-        subtitle="For travel agencies, DMCs, and B2B partners looking for premium Lapland experiences from Rovaniemi."
+        subtitle="For travel agencies, DMCs, hotels, and concierges selling premium Lapland experiences from Rovaniemi."
         image="/nortti5.jpg"
         compact
       />
 
-      <main className="rn-container rn-page-pad flex-1 pb-12 pt-6 sm:pt-8">
-        <nav className="mb-6 text-sm text-text-muted" aria-label="Breadcrumb">
-          <ol className="flex flex-wrap items-center gap-2">
-            <li><Link to="/" className="hover:text-white">Home</Link></li>
-            <li aria-hidden>/</li>
-            <li className="text-white">Travel trade</li>
-          </ol>
-        </nav>
+      <main className="rn-container flex-1 pb-12 pt-8">
+        <ExperienceBreadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Travel trade' }]} />
 
-        <div className="mx-auto max-w-3xl space-y-12">
+        <div className="mx-auto mt-8 max-w-3xl space-y-12">
           <section>
-            <h2 className="font-display text-2xl font-semibold text-white">Why partner with us</h2>
-            <ul className="mt-4 space-y-3">
-              {reasons.map((reason) => (
-                <li key={reason} className="flex items-start gap-3 text-sm text-text-muted sm:text-base">
-                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-aurora" aria-hidden />
-                  <span>{reason}</span>
-                </li>
+            <p className="rn-eyebrow">Who we work with</p>
+            <h2 className="mt-2 font-display text-2xl font-semibold text-white">Built for B2B partners</h2>
+            <div className="mt-6 grid gap-6 sm:grid-cols-2">
+              {AUDIENCES.map((item) => (
+                <div key={item.title} className="border-t border-white/[0.08] pt-4">
+                  <h3 className="font-semibold text-white">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-text-muted">{item.text}</p>
+                </div>
               ))}
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="font-display text-2xl font-semibold text-white">Company introduction</h2>
-            <div className="mt-4 space-y-4 text-sm leading-relaxed text-text-muted sm:text-base">
-              <p>
-                Royal Nordic is a Rovaniemi-based tour operator focused on premium Arctic experiences. We
-                specialise in small-group and private tours with local guides, clear product pages, and direct
-                online booking for travellers who prefer to confirm immediately.
-              </p>
-              <p>
-                For agencies and partners, we support FIT and group requests, customized programmes, and clear
-                communication around pickup, languages, and seasonal availability. Commercial terms are shared
-                privately after we understand your market and volume.
-              </p>
             </div>
           </section>
 
           <section>
-            <h2 className="font-display text-2xl font-semibold text-white">Our experiences</h2>
+            <h2 className="font-display text-2xl font-semibold text-white">What you can sell</h2>
             <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {experiences.map((item) => (
+              {sellable.map((item) => (
                 <Link
                   key={item.to}
                   to={item.to}
-                  className="rounded-rn border border-white/10 bg-surface p-4 transition-colors hover:border-aurora/30"
+                  className="rounded-rn border border-white/[0.07] bg-surface/80 p-4 transition hover:border-aurora/25"
                 >
                   <h3 className="text-base font-semibold text-white">{item.title}</h3>
                   <p className="mt-1 text-sm leading-relaxed text-text-muted">{item.detail}</p>
@@ -156,133 +148,144 @@ const TravelTrade: React.FC = () => {
             </div>
           </section>
 
-          <section className="grid gap-8 border-y border-white/10 py-8 md:grid-cols-2">
-            <div>
-              <h2 className="font-display text-xl font-semibold text-white">Accommodation</h2>
-              <p className="mt-3 text-sm leading-relaxed text-text-muted sm:text-base">
-                We help partners advise guests on where to stay in the Rovaniemi area and how lodging connects
-                with hotel pickup. Detailed property contracts and rates are arranged case by case.
+          <section>
+            <h2 className="font-display text-2xl font-semibold text-white">How cooperation works</h2>
+            <div className="mt-4">
+              <ExperienceAccordion
+                items={[
+                  {
+                    title: '1. Tell us about your business',
+                    content:
+                      'Send an enquiry with your company details, markets, and the products or dates you need.',
+                  },
+                  {
+                    title: '2. We confirm fit & operations',
+                    content:
+                      'We confirm suitability, seasonal availability, pickup zones, and languages for your clients.',
+                  },
+                  {
+                    title: '3. Commercial terms in private',
+                    content:
+                      'Commission rates and net rates are agreed directly with partners — not published on this site.',
+                  },
+                  {
+                    title: '4. Align on booking flow',
+                    content:
+                      'We align on how guests book, what they receive before arrival, and who handles on-the-ground communication.',
+                  },
+                ]}
+              />
+            </div>
+          </section>
+
+          <section className="border-y border-white/[0.08] py-8">
+            <h2 className="font-display text-xl font-semibold text-white">Royal Nordic at a glance</h2>
+            <div className="mt-4 space-y-4 text-sm leading-relaxed text-text-muted sm:text-base">
+              <p>
+                Royal Nordic is a Rovaniemi-based tour operator focused on premium Arctic experiences. We
+                specialise in small-group and private tours with local guides, clear product pages, and direct
+                online booking for travellers who prefer to confirm immediately.
+              </p>
+              <p>
+                For partners, we support FIT and group requests, customized programmes, and clear communication
+                around pickup, languages, and seasonal availability.
               </p>
               <Link
                 to="/blog/where-to-stay-lapland-accommodation-guide"
-                className="mt-3 inline-block text-sm font-medium text-aurora-soft hover:underline"
+                className="inline-block text-sm font-medium text-aurora-soft hover:underline"
               >
-                Lapland accommodation guide
+                Lapland accommodation guide for guest advice
               </Link>
             </div>
-            <div>
-              <h2 className="font-display text-xl font-semibold text-white">Customized itineraries</h2>
-              <p className="mt-3 text-sm leading-relaxed text-text-muted sm:text-base">
-                Multi-activity programmes combining aurora hunting, daytime adventures, and private transfers.
-                Share guest profile, dates, and pace — we reply with a workable outline.
+          </section>
+
+          <section id="partnership-enquiry">
+            <div className="rn-book-panel rn-reveal p-5 sm:p-8">
+              <h2 className="font-display text-2xl font-semibold text-white">Partnership enquiry</h2>
+              <p className="mt-2 text-sm text-text-muted">
+                Prefer email? Write to{' '}
+                <a href="mailto:contact@royalnordic.fi" className="font-medium text-aurora-soft hover:underline">
+                  contact@royalnordic.fi
+                </a>{' '}
+                or call{' '}
+                <a href="tel:+3584578345138" className="font-medium text-aurora-soft hover:underline">
+                  +358 45 78345138
+                </a>
+                .
               </p>
-              <Link
-                to="/customized-tour"
-                className="mt-3 inline-block text-sm font-medium text-aurora-soft hover:underline"
-              >
-                Request a customized tour
-              </Link>
-            </div>
-          </section>
 
-          <section>
-            <h2 className="font-display text-2xl font-semibold text-white">How partnerships work</h2>
-            <ol className="mt-4 list-inside list-decimal space-y-3 text-sm leading-relaxed text-text-muted sm:text-base">
-              <li>Send an enquiry with your company details and the products or dates you need.</li>
-              <li>We confirm suitability, seasonal availability, and operational notes.</li>
-              <li>Commercial terms (including any agency arrangements) are shared privately.</li>
-              <li>We align on booking flow, guest communication, and pickup details.</li>
-            </ol>
-            <p className="mt-4 text-xs text-text-dim">
-              Commission rates and net rates are agreed directly with partners — not published here.
-            </p>
-          </section>
-
-          <section id="partnership-enquiry" className="rn-panel p-5 shadow-rn sm:p-8">
-            <h2 className="font-display text-2xl font-semibold text-panel-ink">Partnership enquiry</h2>
-            <p className="mt-2 text-sm text-panel-muted">
-              Prefer email? Write to{' '}
-              <a href="mailto:contact@royalnordic.fi" className="font-medium text-aurora hover:underline">
-                contact@royalnordic.fi
-              </a>{' '}
-              or call{' '}
-              <a href="tel:+3584578345138" className="font-medium text-aurora hover:underline">
-                +358 45 78345138
-              </a>
-              .
-            </p>
-
-            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <input
+              <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <input
+                    required
+                    name="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Your name"
+                    className={inputClass}
+                  />
+                  <input
+                    name="company"
+                    value={formData.company}
+                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                    placeholder="Company / agency"
+                    className={inputClass}
+                  />
+                </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <input
+                    required
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="Work email"
+                    className={inputClass}
+                  />
+                  <input
+                    name="phone"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="Phone (optional)"
+                    className={inputClass}
+                  />
+                </div>
+                <textarea
                   required
-                  name="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Your name"
-                  className={inputClass}
+                  name="message"
+                  rows={5}
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  placeholder="Tell us about your agency, markets, and what you need (products, dates, group size)…"
+                  className={`${inputClass} resize-y`}
                 />
-                <input
-                  name="company"
-                  value={formData.company}
-                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                  placeholder="Company / agency"
-                  className={inputClass}
-                />
-              </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <input
-                  required
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="Work email"
-                  className={inputClass}
-                />
-                <input
-                  name="phone"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="Phone (optional)"
-                  className={inputClass}
-                />
-              </div>
-              <textarea
-                required
-                name="message"
-                rows={5}
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                placeholder="Tell us about your agency, markets, and what you need (products, dates, group size)…"
-                className={`${inputClass} resize-y`}
-              />
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="rn-btn-primary min-h-[48px] w-full disabled:opacity-50 sm:w-auto sm:px-8"
-              >
-                {isSubmitting ? 'Sending…' : 'Send partnership enquiry'}
-              </button>
-              {submitStatus === 'success' && (
-                <p className="text-sm text-aurora-soft">
-                  Thank you — check your email for confirmation. We will reply soon.
-                </p>
-              )}
-              {submitStatus === 'error' && (
-                <p className="text-sm text-red-400">
-                  Something went wrong. Please email contact@royalnordic.fi directly.
-                </p>
-              )}
-            </form>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="rn-btn-primary min-h-[48px] w-full disabled:opacity-50 sm:w-auto sm:px-8"
+                >
+                  {isSubmitting ? 'Sending…' : 'Send partnership enquiry'}
+                </button>
+                {submitStatus === 'success' && (
+                  <p className="text-sm text-aurora-soft">
+                    Thank you — check your email for confirmation. We will reply soon.
+                  </p>
+                )}
+                {submitStatus === 'error' && (
+                  <p className="text-sm text-red-400">
+                    Something went wrong. Please email contact@royalnordic.fi directly.
+                  </p>
+                )}
+              </form>
 
-            <div className="mt-8 flex flex-wrap gap-4 text-sm text-panel-muted">
-              <a href="mailto:contact@royalnordic.fi" className="inline-flex items-center gap-2 hover:text-aurora">
-                <Mail size={16} aria-hidden /> contact@royalnordic.fi
-              </a>
-              <a href="tel:+3584578345138" className="inline-flex items-center gap-2 hover:text-aurora">
-                <Phone size={16} aria-hidden /> +358 45 78345138
-              </a>
+              <div className="mt-8 flex flex-wrap gap-4 text-sm text-text-muted">
+                <a href="mailto:contact@royalnordic.fi" className="inline-flex items-center gap-2 hover:text-aurora-soft">
+                  <Mail size={16} aria-hidden /> contact@royalnordic.fi
+                </a>
+                <a href="tel:+3584578345138" className="inline-flex items-center gap-2 hover:text-aurora-soft">
+                  <Phone size={16} aria-hidden /> +358 45 78345138
+                </a>
+              </div>
             </div>
           </section>
         </div>

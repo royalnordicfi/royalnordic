@@ -1,8 +1,13 @@
-import { Car, Clock, Users, MapPin, CheckCircle, Mail, User, MessageSquare } from 'lucide-react';
-import { useState } from 'react';
-import CategoryHero from './CategoryHero';
-import Footer from './Footer';
-import { Link } from 'react-router-dom';
+import { Mail } from 'lucide-react'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import CategoryHero from './CategoryHero'
+import ExperienceAccordion from './experience/ExperienceAccordion'
+import ExperienceBreadcrumb from './experience/ExperienceBreadcrumb'
+import ExperienceFacts from './experience/ExperienceFacts'
+import ExperienceInclusions from './experience/ExperienceInclusions'
+import ExperienceItinerary from './experience/ExperienceItinerary'
+import Footer from './Footer'
 
 const TransportationCustomized = () => {
   const [formData, setFormData] = useState({
@@ -14,32 +19,32 @@ const TransportationCustomized = () => {
     preferredDate: '',
     preferredTime: '',
     groupSize: '',
-    additionalInfo: ''
-  });
+    additionalInfo: '',
+  })
   const inputClass =
-    'w-full rounded-lg border border-black/10 bg-white px-3 py-2.5 text-sm text-panel-ink placeholder:text-panel-muted focus:border-aurora focus:outline-none focus:ring-1 focus:ring-aurora/30';
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState('');
+    'w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-white placeholder:text-text-dim focus:border-aurora/50 focus:outline-none focus:ring-1 focus:ring-aurora/30'
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState('')
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
+    const { name, value } = e.target
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
-    }));
-  };
+      [name]: value,
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus('');
+    e.preventDefault()
+    setIsSubmitting(true)
+    setSubmitStatus('')
 
     try {
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-transportation-request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
           name: formData.name,
@@ -53,12 +58,12 @@ const TransportationCustomized = () => {
           additionalInfo: formData.additionalInfo,
           serviceType: 'Private Customized Transportation',
           to: ['royalnordicfi@gmail.com', 'contact@royalnordic.fi'],
-          subject: 'Custom Transportation Request - ROYAL NORDIC'
+          subject: 'Custom Transportation Request - ROYAL NORDIC',
         }),
-      });
+      })
 
       if (response.ok) {
-        setSubmitStatus('success');
+        setSubmitStatus('success')
         setFormData({
           name: '',
           email: '',
@@ -68,23 +73,23 @@ const TransportationCustomized = () => {
           preferredDate: '',
           preferredTime: '',
           groupSize: '',
-          additionalInfo: ''
-        });
+          additionalInfo: '',
+        })
       } else {
-        console.error('Response not ok:', response.status, response.statusText);
-        const errorData = await response.text();
-        console.error('Error response:', errorData);
-        setSubmitStatus('error');
+        console.error('Response not ok:', response.status, response.statusText)
+        const errorData = await response.text()
+        console.error('Error response:', errorData)
+        setSubmitStatus('error')
       }
     } catch (error) {
-      console.error('Request failed:', error);
-      setSubmitStatus('error');
+      console.error('Request failed:', error)
+      setSubmitStatus('error')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
-  const features = [
+  const included = [
     'Custom routes throughout Lapland',
     'Flexible scheduling and timing',
     'Professional driver with local knowledge',
@@ -94,24 +99,43 @@ const TransportationCustomized = () => {
     'Luggage assistance included',
     'Child safety seats upon request',
     'Multi-stop itineraries possible',
-    'Scenic route options available'
-  ];
+    'Scenic route options available',
+  ]
 
   const itinerary = [
     {
       time: 'Flexible',
-      activity: 'Custom pickup location',
-      description: 'We\'ll collect you from your specified location in Lapland'
+      title: 'Custom pickup location',
+      text: "We'll collect you from your specified location in Lapland",
     },
     {
-      activity: 'Custom route and stops',
-      description: 'Travel to your chosen destinations with stops as requested'
+      title: 'Custom route and stops',
+      text: 'Travel to your chosen destinations with stops as requested',
     },
     {
-      activity: 'Flexible drop-off',
-      description: 'Drop-off at your final destination or return to starting point'
-    }
-  ];
+      title: 'Flexible drop-off',
+      text: 'Drop-off at your final destination or return to starting point',
+    },
+  ]
+
+  const popularRoutes = [
+    {
+      title: 'Airport transfers',
+      text: 'Rovaniemi Airport to city center or hotels',
+    },
+    {
+      title: 'Sightseeing tours',
+      text: 'Multi-stop tours to Santa Claus Village, Ranua Zoo, and other attractions',
+    },
+    {
+      title: 'Remote locations',
+      text: 'Transportation to wilderness areas, fishing spots, and remote accommodations',
+    },
+    {
+      title: 'Event transportation',
+      text: 'Wedding parties, corporate events, and special occasions',
+    },
+  ]
 
   return (
     <div className="rn-page">
@@ -122,119 +146,98 @@ const TransportationCustomized = () => {
         compact
       />
 
-      <div className="rn-container rn-page-pad pb-12 pt-6 sm:pt-8">
-        <nav className="mb-6 text-sm text-text-muted" aria-label="Breadcrumb">
-          <ol className="flex flex-wrap items-center gap-2">
-            <li><Link to="/" className="hover:text-white">Home</Link></li>
-            <li aria-hidden>/</li>
-            <li><Link to="/transportation" className="hover:text-white">Transportation</Link></li>
-            <li aria-hidden>/</li>
-            <li className="text-white">Custom transfers</li>
-          </ol>
-        </nav>
-        {/* Quick Info */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-12">
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-            <div className="flex items-center mb-2 sm:mb-3">
-              <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Duration</h3>
-            </div>
-            <p className="text-gray-300 text-sm sm:text-base">Flexible</p>
-          </div>
-          
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-            <div className="flex items-center mb-2 sm:mb-3">
-              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Capacity</h3>
-            </div>
-            <p className="text-gray-300 text-sm sm:text-base">Flexible</p>
-          </div>
-          
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-            <div className="flex items-center mb-2 sm:mb-3">
-              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mr-2 sm:mr-3" />
-              <h3 className="text-white font-semibold text-sm sm:text-base">Coverage</h3>
-            </div>
-            <p className="text-gray-300 text-sm sm:text-base">Finland</p>
-          </div>
-        </div>
+      <div className="rn-container pb-12 pt-8">
+        <ExperienceBreadcrumb
+          items={[
+            { label: 'Home', to: '/' },
+            { label: 'Transportation', to: '/transportation' },
+            { label: 'Custom transfers' },
+          ]}
+        />
 
-        <div className="grid gap-8 lg:grid-cols-12 lg:gap-10">
-          {/* Left Column - Service Details */}
-          <div className="space-y-9 lg:col-span-7">
-            {/* About Section */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">About This Service</h2>
-              <p className="text-gray-300 text-sm sm:text-base mb-3 sm:mb-4 font-clean">
-                Our customized transportation service is designed to meet your specific travel needs throughout Lapland. Whether you need airport transfers, multi-stop sightseeing tours, or transportation to remote locations, we provide flexible and personalized service.
-              </p>
-              <p className="text-gray-300 text-sm sm:text-base font-clean">
-                Our experienced drivers know Lapland's roads and destinations intimately, ensuring you reach your destinations safely and efficiently. We can accommodate various group sizes and provide vehicles suitable for different types of terrain and weather conditions.
-              </p>
-            </div>
+        <div className="mt-8 grid gap-10 lg:grid-cols-12">
+          <div className="space-y-10 lg:col-span-7">
+            <ExperienceFacts
+              items={[
+                { label: 'Duration', value: 'Flexible' },
+                { label: 'Capacity', value: 'Up to 8' },
+                { label: 'Coverage', value: 'Finland / Lapland' },
+                { label: 'Booking', value: 'Quote on request' },
+              ]}
+            />
 
-            {/* Features */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">What's Included</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                {features.map((feature, index) => (
-                  <div key={index} className="flex items-start">
-                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-300 text-sm sm:text-base">{feature}</span>
-                  </div>
+            <section>
+              <h2 className="font-display text-2xl font-semibold text-white">Overview</h2>
+              <p className="mt-3 leading-relaxed text-text-muted">
+                Our customized transportation service is designed to meet your specific travel needs throughout
+                Lapland. Whether you need airport transfers, multi-stop sightseeing tours, or transportation to
+                remote locations, we provide flexible and personalized service.
+              </p>
+              <p className="mt-3 leading-relaxed text-text-muted">
+                Our experienced drivers know Lapland&apos;s roads and destinations intimately, ensuring you reach
+                your destinations safely and efficiently. We can accommodate various group sizes and provide
+                vehicles suitable for different types of terrain and weather conditions.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="font-display text-2xl font-semibold text-white">Itinerary</h2>
+              <div className="mt-4">
+                <ExperienceItinerary steps={itinerary} />
+              </div>
+            </section>
+
+            <ExperienceInclusions included={included} />
+
+            <section>
+              <h2 className="font-display text-2xl font-semibold text-white">Popular custom routes</h2>
+              <ul className="mt-4 space-y-4">
+                {popularRoutes.map((route) => (
+                  <li key={route.title}>
+                    <h3 className="font-semibold text-white">{route.title}</h3>
+                    <p className="mt-1 text-sm text-text-muted">{route.text}</p>
+                  </li>
                 ))}
-              </div>
-            </div>
+              </ul>
+            </section>
 
-            {/* Popular Routes */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-white/10">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-luxury font-bold text-white mb-3 sm:mb-4">Popular Custom Routes</h2>
-              <div className="space-y-3">
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-emerald-400 rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                  <div>
-                    <h4 className="text-white font-semibold text-sm sm:text-base">Airport Transfers</h4>
-                    <p className="text-gray-300 text-xs sm:text-sm">Rovaniemi Airport to city center or hotels</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-emerald-400 rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                  <div>
-                    <h4 className="text-white font-semibold text-sm sm:text-base">Sightseeing Tours</h4>
-                    <p className="text-gray-300 text-xs sm:text-sm">Multi-stop tours to Santa Claus Village, Ranua Zoo, and other attractions</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-emerald-400 rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                  <div>
-                    <h4 className="text-white font-semibold text-sm sm:text-base">Remote Locations</h4>
-                    <p className="text-gray-300 text-xs sm:text-sm">Transportation to wilderness areas, fishing spots, and remote accommodations</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-emerald-400 rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                  <div>
-                    <h4 className="text-white font-semibold text-sm sm:text-base">Event Transportation</h4>
-                    <p className="text-gray-300 text-xs sm:text-sm">Wedding parties, corporate events, and special occasions</p>
-                  </div>
-                </div>
+            <section>
+              <h2 className="font-display text-2xl font-semibold text-white">Practical information</h2>
+              <div className="mt-4">
+                <ExperienceAccordion
+                  items={[
+                    {
+                      title: 'Quotes',
+                      content:
+                        'Pricing depends on route, timing, and vehicle needs. Send your details — we reply with a quote, typically within 24 hours.',
+                    },
+                    {
+                      title: 'Fixed Levi route',
+                      content: (
+                        <>
+                          For Rovaniemi–Levi/Kittilä transfers with published adult/child rates, see our{' '}
+                          <Link to="/transportation-rovaniemi-levi" className="font-medium text-aurora-soft hover:underline">
+                            Levi/Kittilä transfer page
+                          </Link>
+                          .
+                        </>
+                      ),
+                    },
+                  ]}
+                />
               </div>
-            </div>
+            </section>
           </div>
 
-          <aside className="lg:col-span-5">
-            <div className="lg:sticky lg:top-24">
-              <div className="rn-panel p-5 shadow-rn sm:p-6">
-                <h2 className="font-display text-xl font-semibold text-panel-ink">Request custom transportation</h2>
-                <p className="mt-1 text-sm text-panel-muted">Tell us your route — we reply with a quote within 24 hours.</p>
-
-                <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-                  {/* Name Field */}
-                  <div>
-                    <label htmlFor="name" className="mb-2 block text-sm font-medium text-panel-ink">
-                      <User className="w-4 h-4 inline mr-2" />
-                      Your Name *
-                    </label>
+          <aside id="book" className="lg:col-span-5">
+            <div className="rn-sticky-book">
+              <div className="rn-book-panel rn-reveal">
+                <div className="border-b border-white/[0.08] px-5 py-5 sm:px-6">
+                  <h2 className="font-display text-xl font-semibold text-white">Request custom transportation</h2>
+                  <p className="mt-1 text-sm text-text-muted">Tell us your route — we reply with a quote within 24 hours.</p>
+                </div>
+                <div className="p-4 sm:p-5">
+                  <form onSubmit={handleSubmit} className="space-y-4">
                     <input
                       type="text"
                       id="name"
@@ -243,16 +246,8 @@ const TransportationCustomized = () => {
                       onChange={handleInputChange}
                       required
                       className={inputClass}
-                      placeholder="Enter your full name"
+                      placeholder="Your full name"
                     />
-                  </div>
-
-                  {/* Email Field */}
-                  <div>
-                    <label htmlFor="email" className="mb-2 block text-sm font-medium text-panel-ink">
-                      <Mail className="w-4 h-4 inline mr-2" />
-                      Email Address *
-                    </label>
                     <input
                       type="email"
                       id="email"
@@ -263,13 +258,6 @@ const TransportationCustomized = () => {
                       className={inputClass}
                       placeholder="your.email@example.com"
                     />
-                  </div>
-
-                  {/* Phone Field */}
-                  <div>
-                    <label htmlFor="phone" className="mb-2 block text-sm font-medium text-panel-ink">
-                      Phone Number
-                    </label>
                     <input
                       type="tel"
                       id="phone"
@@ -279,14 +267,7 @@ const TransportationCustomized = () => {
                       className={inputClass}
                       placeholder="+358 40 123 4567"
                     />
-                  </div>
-
-                  {/* Preferred Date & Time */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="preferredDate" className="mb-2 block text-sm font-medium text-panel-ink">
-                        Preferred Date
-                      </label>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <input
                         type="date"
                         id="preferredDate"
@@ -295,11 +276,6 @@ const TransportationCustomized = () => {
                         onChange={handleInputChange}
                         className={inputClass}
                       />
-                    </div>
-                    <div>
-                      <label htmlFor="preferredTime" className="mb-2 block text-sm font-medium text-panel-ink">
-                        Preferred Time
-                      </label>
                       <input
                         type="time"
                         id="preferredTime"
@@ -309,13 +285,6 @@ const TransportationCustomized = () => {
                         className={inputClass}
                       />
                     </div>
-                  </div>
-
-                  {/* Group Size */}
-                  <div>
-                    <label htmlFor="groupSize" className="mb-2 block text-sm font-medium text-panel-ink">
-                      Group Size & Luggage Details
-                    </label>
                     <input
                       type="text"
                       id="groupSize"
@@ -323,16 +292,8 @@ const TransportationCustomized = () => {
                       value={formData.groupSize}
                       onChange={handleInputChange}
                       className={inputClass}
-                      placeholder="e.g., 6 adults, baby seats, ski equipment"
+                      placeholder="Group size & luggage"
                     />
-                  </div>
-
-                  {/* Destination Field */}
-                  <div>
-                    <label htmlFor="destination" className="mb-2 block text-sm font-medium text-panel-ink">
-                      <MapPin className="w-4 h-4 inline mr-2" />
-                      Route & Destination Details *
-                    </label>
                     <input
                       type="text"
                       id="destination"
@@ -341,15 +302,8 @@ const TransportationCustomized = () => {
                       onChange={handleInputChange}
                       required
                       className={inputClass}
-                      placeholder="e.g., Rovaniemi Airport to Levi, or custom route"
+                      placeholder="Route & destination details"
                     />
-                  </div>
-
-                  {/* Pickup Details */}
-                  <div>
-                    <label htmlFor="pickupDetails" className="mb-2 block text-sm font-medium text-panel-ink">
-                      Pickup Instructions
-                    </label>
                     <input
                       type="text"
                       id="pickupDetails"
@@ -357,16 +311,8 @@ const TransportationCustomized = () => {
                       value={formData.pickupDetails}
                       onChange={handleInputChange}
                       className={inputClass}
-                      placeholder="Exact pickup location, flight info, etc."
+                      placeholder="Pickup instructions"
                     />
-                  </div>
-
-                  {/* Additional Information */}
-                  <div>
-                    <label htmlFor="additionalInfo" className="mb-2 block text-sm font-medium text-panel-ink">
-                      <MessageSquare className="w-4 h-4 inline mr-2" />
-                      Additional Information
-                    </label>
                     <textarea
                       id="additionalInfo"
                       name="additionalInfo"
@@ -374,51 +320,48 @@ const TransportationCustomized = () => {
                       onChange={handleInputChange}
                       rows={4}
                       className={`${inputClass} resize-none`}
-                      placeholder="Tell us about your specific needs: dates, times, group size, child seats, special requirements, etc."
+                      placeholder="Child seats, multi-stop plans, special requirements…"
                     />
-                  </div>
 
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="rn-btn-primary flex w-full items-center justify-center disabled:opacity-50"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Sending Request...
-                      </>
-                    ) : (
-                      <>
-                        <Mail className="w-4 h-4 mr-2" />
-                        Send Transportation Request
-                      </>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="rn-btn-primary flex w-full items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                          Sending request…
+                        </>
+                      ) : (
+                        <>
+                          Send transportation request
+                          <Mail className="h-5 w-5" aria-hidden />
+                        </>
+                      )}
+                    </button>
+
+                    {submitStatus === 'success' && (
+                      <p className="text-center text-sm text-aurora-soft">
+                        Request sent — we&apos;ll contact you soon.
+                      </p>
                     )}
-                  </button>
-
-                  {/* Status Messages */}
-                  {submitStatus === 'success' && (
-                    <div className="text-green-400 text-sm text-center">
-                      ✓ Request sent successfully! We'll contact you soon.
-                    </div>
-                  )}
-                  {submitStatus === 'error' && (
-                    <div className="text-red-400 text-sm text-center">
-                      ✗ Failed to send request. Please try again or contact us directly.
-                    </div>
-                  )}
-                </form>
+                    {submitStatus === 'error' && (
+                      <p className="text-center text-sm text-red-400">
+                        Failed to send. Please try again or email contact@royalnordic.fi.
+                      </p>
+                    )}
+                  </form>
+                </div>
               </div>
             </div>
           </aside>
         </div>
       </div>
-      
-      {/* Footer */}
+
       <Footer />
     </div>
-  );
-};
+  )
+}
 
-export default TransportationCustomized;
+export default TransportationCustomized

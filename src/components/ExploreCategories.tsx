@@ -29,8 +29,9 @@ const CATEGORIES = [
 
 const ExploreCategories = () => {
   return (
-    <section id="experiences" className="rn-section bg-surface">
-      <div className="rn-container">
+    <section id="experiences" className="rn-section relative overflow-hidden bg-midnight">
+      <div className="pointer-events-none absolute inset-0 rn-ambient-aurora opacity-40" aria-hidden />
+      <div className="rn-container relative">
         <div className="max-w-2xl">
           <p className="rn-eyebrow">Explore</p>
           <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-3xl">
@@ -38,23 +39,23 @@ const ExploreCategories = () => {
           </h2>
         </div>
 
-        <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:gap-4">
+        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:gap-4">
           {CATEGORIES.map((cat) => (
             <Link
               key={cat.to}
               to={cat.to}
-              className="group relative min-h-[180px] overflow-hidden rounded-rn sm:min-h-[220px]"
+              className="group rn-reveal relative min-h-[168px] overflow-hidden rounded-rn border border-white/[0.06] sm:min-h-[200px]"
             >
               <img
                 src={cat.image}
                 alt=""
-                className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
                 loading="lazy"
                 onError={(e) => {
                   e.currentTarget.src = '/nortti1.jpg'
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/15" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
               <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
                 <h3 className="font-display text-xl font-semibold text-white sm:text-2xl">{cat.title}</h3>
                 <p className="mt-1 max-w-sm text-sm text-white/75">{cat.text}</p>

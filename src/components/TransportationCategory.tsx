@@ -37,8 +37,8 @@ const TransportationCategory = () => {
         image="/transportation3.jpg"
       />
 
-      <section className="rn-section bg-midnight">
-        <div className="rn-container">
+      <section className="bg-midnight pb-12 pt-8">
+        <div className="rn-container space-y-10">
           <div className="grid gap-5 sm:grid-cols-2">
             {TRANSFERS.map((item) => (
               <TourCard
@@ -58,9 +58,9 @@ const TransportationCategory = () => {
             ))}
           </div>
 
-          <div className="mt-12 max-w-2xl rounded-rn border border-white/10 bg-surface p-6">
-            <h2 className="font-display text-2xl font-semibold text-white">How it works</h2>
-            <p className="mt-3 text-sm text-text-muted">
+          <div className="max-w-2xl border-y border-white/[0.08] py-8">
+            <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">How it works</h2>
+            <p className="mt-3 text-sm leading-relaxed text-text-muted">
               Fixed-route Levi/Kittilä transfers are priced per vehicle. For airport pickups, ski
               transfers, or multi-stop days, use the customized option and tell us your schedule — we
               reply with a quote.

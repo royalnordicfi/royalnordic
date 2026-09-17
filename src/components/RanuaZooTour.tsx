@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { CheckCircle, Clock, MapPin, Users, XCircle } from 'lucide-react'
 import BookingForm from './BookingForm'
+import BookingAside from './experience/BookingAside'
+import ExperienceAccordion from './experience/ExperienceAccordion'
+import ExperienceBreadcrumb from './experience/ExperienceBreadcrumb'
+import ExperienceFacts from './experience/ExperienceFacts'
 import ExperienceGallery from './ExperienceGallery'
+import ExperienceInclusions from './experience/ExperienceInclusions'
+import ExperienceItinerary from './experience/ExperienceItinerary'
 import Footer from './Footer'
 import MobileBookingBar from './MobileBookingBar'
 import ProductFaq from './seo/ProductFaq'
@@ -54,7 +58,7 @@ const RanuaZooTour = () => {
     document.getElementById('book')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
-  const features = [
+  const included = [
     'Hotel pickup and drop-off from Rovaniemi',
     'Professional guide (English & Finnish)',
     'Comfortable transportation to Ranua',
@@ -88,14 +92,6 @@ const RanuaZooTour = () => {
     },
   ]
 
-  const knowBefore = [
-    'Please tell us in advance about any mobility or dietary requirements.',
-    'Wear warm clothing and comfortable shoes suitable for walking.',
-    'A camera or smartphone is recommended for photography.',
-    'Lunch and drinks are not included — cafés and restaurants are available at the park.',
-    'Free cancellation up to 24 hours before departure.',
-  ]
-
   const faqs = [
     {
       question: 'What is included in the Ranua tour?',
@@ -127,18 +123,16 @@ const RanuaZooTour = () => {
 
   return (
     <div className="rn-page pb-24 lg:pb-0">
-      <div className="rn-container rn-page-pad pb-12 pt-6 sm:pt-8">
-        <nav className="mb-4 text-sm text-text-muted" aria-label="Breadcrumb">
-          <ol className="flex flex-wrap items-center gap-2">
-            <li><Link to="/" className="hover:text-white">Home</Link></li>
-            <li aria-hidden>/</li>
-            <li><Link to="/daytime-experiences" className="hover:text-white">Daytime experiences</Link></li>
-            <li aria-hidden>/</li>
-            <li className="text-white">Nordic Animals of Ranua Zoo</li>
-          </ol>
-        </nav>
+      <div className="rn-container rn-shell-pad pb-14 pt-6 sm:pt-8">
+        <ExperienceBreadcrumb
+          items={[
+            { label: 'Home', to: '/' },
+            { label: 'Daytime experiences', to: '/daytime-experiences' },
+            { label: 'Nordic Animals of Ranua Zoo' },
+          ]}
+        />
 
-        <div className="max-w-3xl">
+        <header className="mt-5 max-w-3xl">
           <p className="rn-eyebrow">Ranua · Wildlife day trip</p>
           <h1 className="mt-2 font-display text-3xl font-semibold text-white sm:text-4xl lg:text-[2.75rem]">
             Nordic Animals of Ranua Zoo
@@ -147,31 +141,25 @@ const RanuaZooTour = () => {
             Day trip from Rovaniemi to Finland’s northernmost zoo — polar bears and 50+ Arctic species, with
             transfers and entrance included.
           </p>
-        </div>
+        </header>
 
         <div className="mt-6">
           <ExperienceGallery images={GALLERY} />
         </div>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:gap-10">
-          <div className="space-y-9 lg:col-span-7">
-            <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[
-                { icon: Clock, label: 'Duration', value: '~5 hours' },
-                { icon: Users, label: 'Group', value: `Max ${RANUA_MAX_CAPACITY}` },
-                { icon: MapPin, label: 'Location', value: 'Ranua' },
-                { icon: CheckCircle, label: 'Languages', value: 'EN & FI' },
-              ].map(({ icon: Icon, label, value }) => (
-                <div key={label} className="rounded-rn border border-white/10 bg-surface p-3.5">
-                  <Icon size={16} className="text-aurora" aria-hidden />
-                  <p className="mt-2 text-[11px] uppercase tracking-wide text-text-dim">{label}</p>
-                  <p className="mt-0.5 text-sm font-semibold text-white">{value}</p>
-                </div>
-              ))}
-            </section>
+        <div className="mt-8 grid gap-10 lg:grid-cols-12">
+          <div className="space-y-10 lg:col-span-7">
+            <ExperienceFacts
+              items={[
+                { label: 'Duration', value: '~5 hours' },
+                { label: 'Group', value: `Max ${RANUA_MAX_CAPACITY}` },
+                { label: 'Location', value: 'Ranua' },
+                { label: 'Languages', value: 'EN & FI' },
+              ]}
+            />
 
             <section>
-              <h2 className="font-display text-2xl font-semibold text-white">About this tour</h2>
+              <h2 className="font-display text-2xl font-semibold text-white">Overview</h2>
               <p className="mt-3 leading-relaxed text-text-muted">
                 Depart Rovaniemi for a guided day trip through Lappish landscapes to Ranua Wildlife Park — home
                 to over 50 Arctic and northern species, including polar bears, lynxes, wolves, moose, reindeer,
@@ -186,87 +174,69 @@ const RanuaZooTour = () => {
 
             <section>
               <h2 className="font-display text-2xl font-semibold text-white">Itinerary</h2>
-              <div className="mt-4 space-y-4">
-                {itinerary.map((item) => (
-                  <div key={item.title} className="border-l-2 border-aurora/40 pl-4">
-                    {item.time && (
-                      <p className="text-xs font-semibold uppercase tracking-wide text-aurora-soft">{item.time}</p>
-                    )}
-                    <h3 className="font-semibold text-white">{item.title}</h3>
-                    <p className="mt-1 text-sm text-text-muted">{item.text}</p>
-                  </div>
-                ))}
+              <div className="mt-4">
+                <ExperienceItinerary steps={itinerary} />
               </div>
             </section>
 
-            <section className="grid gap-6 sm:grid-cols-2">
-              <div>
-                <h2 className="font-display text-2xl font-semibold text-white">What&apos;s included</h2>
-                <ul className="mt-3 space-y-2 text-sm text-text-muted">
-                  {features.map((h) => (
-                    <li key={h} className="flex gap-2">
-                      <CheckCircle size={16} className="mt-0.5 shrink-0 text-aurora" aria-hidden />
-                      {h}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h2 className="font-display text-2xl font-semibold text-white">Not included</h2>
-                <ul className="mt-3 space-y-2 text-sm text-text-muted">
-                  {notIncluded.map((item) => (
-                    <li key={item} className="flex gap-2">
-                      <XCircle size={16} className="mt-0.5 shrink-0 text-red-400" aria-hidden />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </section>
+            <ExperienceInclusions included={included} notIncluded={notIncluded} />
 
             <section>
-              <h2 className="font-display text-2xl font-semibold text-white">Good to know</h2>
-              <ul className="mt-3 space-y-2 text-sm text-text-muted">
-                {knowBefore.map((item) => (
-                  <li key={item}>• {item}</li>
-                ))}
-              </ul>
+              <h2 className="font-display text-2xl font-semibold text-white">Practical information</h2>
+              <div className="mt-4">
+                <ExperienceAccordion
+                  items={[
+                    {
+                      title: 'Accessibility & needs',
+                      content: 'Please tell us in advance about any mobility or dietary requirements.',
+                    },
+                    {
+                      title: 'What to bring',
+                      content:
+                        'Wear warm clothing and comfortable shoes suitable for walking. A camera or smartphone is recommended for photography.',
+                    },
+                    {
+                      title: 'Meals',
+                      content:
+                        'Lunch and drinks are not included — cafés and restaurants are available at the park.',
+                    },
+                    {
+                      title: 'Cancellation',
+                      content: 'Free cancellation up to 24 hours before departure.',
+                    },
+                  ]}
+                />
+              </div>
             </section>
 
             <ProductFaq items={faqs} schemaId="ranua-faq" tone="dark" />
           </div>
 
-          <aside className="lg:col-span-5" id="book">
-            <div className="lg:sticky lg:top-24">
-              <div className="rn-panel overflow-hidden shadow-rn">
-                <div className="border-b border-black/10 px-5 py-5">
-                  <p className="text-xs uppercase tracking-wide text-panel-muted">From</p>
-                  <p className="mt-1 font-display text-3xl font-semibold text-panel-ink">
-                    €{price}
-                    <span className="ml-1 text-base font-sans font-normal text-panel-muted">/ person</span>
-                  </p>
-                  <ul className="mt-3 space-y-1.5 text-xs text-panel-muted">
-                    <li>✓ Free cancellation up to 24h before</li>
-                    <li>✓ Secure Stripe payment</li>
-                    <li>✓ Hotel pickup in Rovaniemi</li>
-                    <li>✓ Park entrance included</li>
-                  </ul>
-                </div>
-                <div className="p-4 sm:p-5">
-                  {loading ? (
-                    <p className="py-10 text-center text-panel-muted">Loading availability…</p>
-                  ) : (
-                    <BookingForm
-                      tourId={5}
-                      tourName="Nordic Animals of Ranua Zoo"
-                      adultPrice={tourData.adult_price}
-                      childPrice={tourData.child_price}
-                      maxCapacity={tourData.max_capacity}
-                      chrome="embedded"
-                    />
-                  )}
-                </div>
-              </div>
+          <aside id="book" className="lg:col-span-5">
+            <div className="rn-sticky-book">
+              <BookingAside
+                priceFrom={price}
+                trustLines={[
+                  'Free cancellation up to 24h before',
+                  'Secure Stripe payment',
+                  'Hotel pickup in Rovaniemi',
+                  'Park entrance included',
+                ]}
+              >
+                {loading ? (
+                  <p className="py-10 text-center text-text-muted">Loading availability…</p>
+                ) : (
+                  <BookingForm
+                    tourId={5}
+                    tourName="Nordic Animals of Ranua Zoo"
+                    adultPrice={tourData.adult_price}
+                    childPrice={tourData.child_price}
+                    maxCapacity={tourData.max_capacity}
+                    chrome="embedded"
+                    tone="dark"
+                  />
+                )}
+              </BookingAside>
             </div>
           </aside>
         </div>

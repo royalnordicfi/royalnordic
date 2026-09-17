@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
-import { CheckCircle, Clock, Mail, MapPin, Users } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import CategoryHero from './CategoryHero'
+import { Mail } from 'lucide-react'
+import ExperienceAccordion from './experience/ExperienceAccordion'
+import ExperienceBreadcrumb from './experience/ExperienceBreadcrumb'
+import ExperienceFacts from './experience/ExperienceFacts'
 import ExperienceGallery from './ExperienceGallery'
+import ExperienceInclusions from './experience/ExperienceInclusions'
 import Footer from './Footer'
 
 const GALLERY = [
@@ -25,7 +27,7 @@ const MonsterTruckNorthernLights: React.FC = () => {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
   const inputClass =
-    'w-full rounded-lg border border-black/10 bg-white px-3 py-2.5 text-sm text-panel-ink placeholder:text-panel-muted focus:border-aurora focus:outline-none focus:ring-1 focus:ring-aurora/30'
+    'w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-white placeholder:text-text-dim focus:border-aurora/50 focus:outline-none focus:ring-1 focus:ring-aurora/30'
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -92,7 +94,7 @@ ${formData.message ? `Additional Message:\n${formData.message}` : ''}`
     }
   }
 
-  const features = [
+  const included = [
     'Professional guide and driver',
     'Specially built monster truck vehicle',
     'Remote Northern Lights viewing locations',
@@ -103,47 +105,44 @@ ${formData.message ? `Additional Message:\n${formData.message}` : ''}`
   ]
 
   return (
-    <div className="rn-page">
-      <CategoryHero
-        title="Monster Truck Northern Lights Experience"
-        subtitle="Ride a giant monster truck deep into snowy wilderness, away from city lights, for aurora viewing with a local guide."
-        image="/monsteri1.jpg"
-        compact
-      />
+    <div className="rn-page pb-24 lg:pb-0">
+      <div className="rn-container rn-shell-pad pb-14 pt-6 sm:pt-8">
+        <ExperienceBreadcrumb
+          items={[
+            { label: 'Home', to: '/' },
+            { label: 'Northern Lights', to: '/northern-lights-tours' },
+            { label: 'Monster truck experience' },
+          ]}
+        />
 
-      <div className="rn-container rn-page-pad pb-12 pt-6 sm:pt-8">
-        <nav className="mb-6 text-sm text-text-muted" aria-label="Breadcrumb">
-          <ol className="flex flex-wrap items-center gap-2">
-            <li><Link to="/" className="hover:text-white">Home</Link></li>
-            <li aria-hidden>/</li>
-            <li><Link to="/northern-lights-tours" className="hover:text-white">Northern Lights</Link></li>
-            <li aria-hidden>/</li>
-            <li className="text-white">Monster truck experience</li>
-          </ol>
-        </nav>
+        <header className="mt-5 max-w-3xl">
+          <p className="rn-eyebrow">Rovaniemi · Partner aurora</p>
+          <h1 className="mt-2 font-display text-3xl font-semibold text-white sm:text-4xl lg:text-[2.75rem]">
+            Monster Truck Northern Lights Experience
+          </h1>
+          <p className="mt-3 max-w-2xl text-base leading-relaxed text-text-muted sm:text-lg">
+            Ride a giant monster truck deep into snowy wilderness, away from city lights, for aurora viewing with
+            a local guide.
+          </p>
+        </header>
 
-        <div className="mt-2">
+        <div className="mt-6">
           <ExperienceGallery images={GALLERY} />
         </div>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:gap-10">
-          <div className="space-y-9 lg:col-span-7">
-            <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              {[
-                { icon: Clock, label: 'Duration', value: '3 hours' },
-                { icon: Users, label: 'Group', value: 'Flexible' },
-                { icon: MapPin, label: 'Location', value: 'Rovaniemi' },
-              ].map(({ icon: Icon, label, value }) => (
-                <div key={label} className="rounded-rn border border-white/10 bg-surface p-3.5">
-                  <Icon size={16} className="text-aurora" aria-hidden />
-                  <p className="mt-2 text-[11px] uppercase tracking-wide text-text-dim">{label}</p>
-                  <p className="mt-0.5 text-sm font-semibold text-white">{value}</p>
-                </div>
-              ))}
-            </section>
+        <div className="mt-8 grid gap-10 lg:grid-cols-12">
+          <div className="space-y-10 lg:col-span-7">
+            <ExperienceFacts
+              items={[
+                { label: 'Duration', value: '3 hours' },
+                { label: 'Group', value: 'Flexible' },
+                { label: 'Location', value: 'Rovaniemi' },
+                { label: 'Format', value: 'Partner activity' },
+              ]}
+            />
 
             <section>
-              <h2 className="font-display text-2xl font-semibold text-white">About this experience</h2>
+              <h2 className="font-display text-2xl font-semibold text-white">Overview</h2>
               <p className="mt-3 leading-relaxed text-text-muted">
                 Experience the Arctic night on board a giant monster truck. This adventure takes you deep into
                 snowy wilderness, far from city lights, where you have a chance of spotting the Northern Lights.
@@ -155,157 +154,158 @@ ${formData.message ? `Additional Message:\n${formData.message}` : ''}`
               </p>
             </section>
 
-            <section>
-              <h2 className="font-display text-2xl font-semibold text-white">What&apos;s included</h2>
-              <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-                {features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2 text-sm text-text-muted">
-                    <CheckCircle className="mt-0.5 shrink-0 text-aurora" size={16} aria-hidden />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-4 text-sm text-text-muted">
-                <span className="font-semibold text-white">Not included:</span> food &amp; drinks.
-              </p>
-              <p className="mt-2 text-sm text-text-muted">
-                <span className="font-semibold text-white">Bring:</span> warm winter clothes for the Arctic night.
-              </p>
-            </section>
+            <ExperienceInclusions
+              included={included}
+              notIncluded={['Food & drinks', 'Warm winter clothing (bring Arctic layers for the night)']}
+            />
 
-            <section className="rounded-rn border border-white/10 bg-surface p-5">
-              <h3 className="font-display text-lg font-semibold text-white">Third-party activity</h3>
-              <p className="mt-2 text-sm leading-relaxed text-text-muted">
-                This Monster Truck Northern Lights Experience is provided by our trusted partner. After you
-                submit your request, we&apos;ll coordinate with the provider and get back to you with availability
-                and pricing details.
-              </p>
+            <section>
+              <h2 className="font-display text-2xl font-semibold text-white">Practical information</h2>
+              <div className="mt-4">
+                <ExperienceAccordion
+                  items={[
+                    {
+                      title: 'Northern Lights',
+                      content:
+                        'Aurora sightings are never guaranteed. This is a partner-led evening format — not our Guaranteed Northern Lights Tour with return-trip terms.',
+                    },
+                    {
+                      title: 'Third-party activity',
+                      content:
+                        'This experience is provided by our trusted partner. After you submit your request, we coordinate with the provider and get back to you with availability and pricing details.',
+                    },
+                  ]}
+                />
+              </div>
             </section>
           </div>
 
-          <aside className="lg:col-span-5">
-            <div className="lg:sticky lg:top-24">
-              <div className="rn-panel p-5 shadow-rn sm:p-6">
-                <h2 className="font-display text-xl font-semibold text-panel-ink">Request monster truck experience</h2>
-                <p className="mt-1 text-sm text-panel-muted">Partner activity — we confirm availability by email.</p>
+          <aside id="book" className="lg:col-span-5">
+            <div className="rn-sticky-book">
+              <div className="rn-book-panel rn-reveal">
+                <div className="border-b border-white/[0.08] px-5 py-5 sm:px-6">
+                  <h2 className="font-display text-xl font-semibold text-white">Request monster truck experience</h2>
+                  <p className="mt-1 text-sm text-text-muted">Partner activity — we confirm availability by email.</p>
+                </div>
+                <div className="p-4 sm:p-5">
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <input
+                      type="text"
+                      name="name"
+                      required
+                      value={formData.name}
+                      onChange={handleChange}
+                      className={inputClass}
+                      placeholder="Your full name"
+                    />
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      value={formData.email}
+                      onChange={handleChange}
+                      className={inputClass}
+                      placeholder="your.email@example.com"
+                    />
+                    <input
+                      type="tel"
+                      name="phone"
+                      required
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className={inputClass}
+                      placeholder="+358 45 1234567"
+                    />
+                    <input
+                      type="date"
+                      name="preferredDate"
+                      value={formData.preferredDate}
+                      onChange={handleChange}
+                      className={inputClass}
+                    />
 
-                <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-                  <input
-                    type="text"
-                    name="name"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                    className={inputClass}
-                    placeholder="Your full name"
-                  />
-                  <input
-                    type="email"
-                    name="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={inputClass}
-                    placeholder="your.email@example.com"
-                  />
-                  <input
-                    type="tel"
-                    name="phone"
-                    required
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className={inputClass}
-                    placeholder="+358 45 1234567"
-                  />
-                  <input
-                    type="date"
-                    name="preferredDate"
-                    value={formData.preferredDate}
-                    onChange={handleChange}
-                    className={inputClass}
-                  />
-
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-panel-ink">Adults</label>
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, adults: Math.max(1, formData.adults - 1) })}
-                        className="h-10 w-10 rounded-lg border border-black/10 bg-white text-panel-ink hover:bg-black/5"
-                      >
-                        -
-                      </button>
-                      <span className="min-w-[2rem] text-center font-semibold text-panel-ink">{formData.adults}</span>
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, adults: formData.adults + 1 })}
-                        className="h-10 w-10 rounded-lg border border-black/10 bg-white text-panel-ink hover:bg-black/5"
-                      >
-                        +
-                      </button>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-white">Adults</label>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, adults: Math.max(1, formData.adults - 1) })}
+                          className="h-10 w-10 rounded-lg border border-white/10 bg-white/5 text-white hover:bg-white/10"
+                        >
+                          -
+                        </button>
+                        <span className="min-w-[2rem] text-center font-semibold text-white">{formData.adults}</span>
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, adults: formData.adults + 1 })}
+                          className="h-10 w-10 rounded-lg border border-white/10 bg-white/5 text-white hover:bg-white/10"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-panel-ink">Children</label>
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, children: Math.max(0, formData.children - 1) })}
-                        className="h-10 w-10 rounded-lg border border-black/10 bg-white text-panel-ink hover:bg-black/5"
-                      >
-                        -
-                      </button>
-                      <span className="min-w-[2rem] text-center font-semibold text-panel-ink">{formData.children}</span>
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, children: formData.children + 1 })}
-                        className="h-10 w-10 rounded-lg border border-black/10 bg-white text-panel-ink hover:bg-black/5"
-                      >
-                        +
-                      </button>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-white">Children</label>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, children: Math.max(0, formData.children - 1) })}
+                          className="h-10 w-10 rounded-lg border border-white/10 bg-white/5 text-white hover:bg-white/10"
+                        >
+                          -
+                        </button>
+                        <span className="min-w-[2rem] text-center font-semibold text-white">{formData.children}</span>
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, children: formData.children + 1 })}
+                          className="h-10 w-10 rounded-lg border border-white/10 bg-white/5 text-white hover:bg-white/10"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
-                  </div>
 
-                  <textarea
-                    name="message"
-                    rows={4}
-                    value={formData.message}
-                    onChange={handleChange}
-                    className={`${inputClass} resize-none`}
-                    placeholder="Any additional requests or information..."
-                  />
+                    <textarea
+                      name="message"
+                      rows={4}
+                      value={formData.message}
+                      onChange={handleChange}
+                      className={`${inputClass} resize-none`}
+                      placeholder="Any additional requests or information..."
+                    />
 
-                  {submitStatus === 'success' && (
-                    <p className="rounded-lg bg-aurora/10 px-3 py-2 text-center text-sm text-aurora-soft">
-                      Thank you! We&apos;ll get back to you as soon as possible with availability and pricing details.
-                    </p>
-                  )}
-
-                  {submitStatus === 'error' && (
-                    <p className="rounded-lg bg-red-500/10 px-3 py-2 text-center text-sm text-red-400">
-                      Something went wrong. Please try again or contact us directly.
-                    </p>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="rn-btn-primary flex w-full items-center justify-center gap-2 disabled:opacity-50"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                        Sending request…
-                      </>
-                    ) : (
-                      <>
-                        Send request
-                        <Mail className="h-5 w-5" aria-hidden />
-                      </>
+                    {submitStatus === 'success' && (
+                      <p className="rounded-lg bg-aurora/10 px-3 py-2 text-center text-sm text-aurora-soft">
+                        Thank you! We&apos;ll get back to you as soon as possible with availability and pricing details.
+                      </p>
                     )}
-                  </button>
-                </form>
+
+                    {submitStatus === 'error' && (
+                      <p className="rounded-lg bg-red-500/10 px-3 py-2 text-center text-sm text-red-400">
+                        Something went wrong. Please try again or contact us directly.
+                      </p>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="rn-btn-primary flex w-full items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                          Sending request…
+                        </>
+                      ) : (
+                        <>
+                          Send request
+                          <Mail className="h-5 w-5" aria-hidden />
+                        </>
+                      )}
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
           </aside>
