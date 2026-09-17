@@ -25,26 +25,24 @@ export default function BookingAside({
 }: Props) {
   return (
     <div className={`rn-book-panel-light rn-book-signature ${className}`}>
-      <div className="border-b border-black/[0.06] px-5 py-4 sm:px-6 sm:py-5">
+      <div className="border-b border-black/[0.06] px-5 py-5 sm:px-6 sm:py-5">
         <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-panel-muted">From</p>
-        <div className="mt-1 flex items-baseline gap-2">
-          <p className="font-display text-[2rem] font-semibold leading-none tracking-tight text-panel-ink sm:text-[2.2rem]">
+        <div className="mt-1.5 flex items-baseline gap-2">
+          <p className="font-display text-[2rem] font-semibold leading-none tracking-tight text-panel-ink sm:text-[2.15rem]">
             €{priceFrom}
           </p>
           <span className="text-sm text-panel-muted">{priceNote}</span>
         </div>
         {offerLine ? (
-          <p className="mt-3 text-[12px] leading-snug text-panel-muted">
+          <p className="mt-3 text-[12.5px] leading-snug text-panel-muted">
             <span className="font-medium text-panel-ink">Direct booking · </span>
             {offerLine}
           </p>
         ) : null}
-        <ul className="mt-3.5 flex flex-wrap gap-x-3 gap-y-1 text-[11px] leading-snug text-panel-muted">
+        <ul className="mt-4 space-y-1.5 text-[12px] leading-snug text-panel-muted">
           {trustLines.map((line) => (
-            <li key={line} className="inline-flex items-center gap-1.5">
-              <span className="text-aurora" aria-hidden>
-                ·
-              </span>
+            <li key={line} className="flex items-start gap-2">
+              <span className="mt-[0.35em] h-1 w-1 shrink-0 rounded-full bg-aurora/80" aria-hidden />
               <span>{line}</span>
             </li>
           ))}

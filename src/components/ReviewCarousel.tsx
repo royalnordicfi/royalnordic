@@ -82,7 +82,6 @@ export default function ReviewCarousel({
           <div>
             <p className="rn-eyebrow">{eyebrow}</p>
             <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-3xl">{title}</h2>
-            <p className="mt-2 text-sm text-text-dim">Verified Royal Nordic guest reviews</p>
           </div>
           {count > 1 && (
             <div className="flex items-center gap-2">
@@ -121,7 +120,7 @@ export default function ReviewCarousel({
             go(dx < 0 ? 1 : -1)
           }}
         >
-          <blockquote className="font-display text-xl leading-snug text-white sm:text-2xl lg:text-[1.65rem] lg:leading-snug">
+          <blockquote className="font-display text-[1.2rem] leading-snug text-white sm:text-2xl lg:text-[1.55rem] lg:leading-snug">
             “{review.quote}”
           </blockquote>
           <figcaption className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">

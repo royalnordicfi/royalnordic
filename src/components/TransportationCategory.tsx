@@ -41,37 +41,34 @@ const TransportationCategory = () => {
         compact
       />
 
-      <section className="rn-section rn-hero-follow relative pt-0">
+      <section className="rn-section-tight rn-hero-follow relative pt-0 pb-10 sm:pb-12">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
-        <div className="rn-container relative space-y-8">
-          <p className="max-w-xl text-sm text-text-muted">
-            Fixed-route and on-request transfers — same card format for quick comparison.
-          </p>
+        <div className="rn-container relative space-y-10">
           <div className="mx-auto max-w-5xl">
-          <div className="rn-card-grid lg:!grid-cols-2">
-            {TRANSFERS.map((item) => (
-              <TourCard
-                key={item.to}
-                to={item.to}
-                image={item.image}
-                imageAlt={item.imageAlt}
-                title={item.title}
-                description={item.description}
-                location="Lapland, Finland"
-                duration={item.duration}
-                groupSize={item.groupSize}
-                pickup={item.pickup}
-                badge={item.badge}
-                priceFrom={item.priceFrom}
-                ctaLabel={item.priceFrom != null ? 'View details' : 'Request quote'}
-              />
-            ))}
-          </div>
+            <div className="rn-card-grid lg:!grid-cols-2">
+              {TRANSFERS.map((item) => (
+                <TourCard
+                  key={item.to}
+                  to={item.to}
+                  image={item.image}
+                  imageAlt={item.imageAlt}
+                  title={item.title}
+                  description={item.description}
+                  location="Lapland, Finland"
+                  duration={item.duration}
+                  groupSize={item.groupSize}
+                  pickup={item.pickup}
+                  badge={item.badge}
+                  priceFrom={item.priceFrom}
+                  ctaLabel={item.priceFrom != null ? 'View details' : 'Request quote'}
+                />
+              ))}
+            </div>
           </div>
 
-          <div className="mx-auto max-w-2xl border-y border-white/[0.08] py-8">
+          <div className="mx-auto max-w-2xl border-y border-white/[0.08] py-8 sm:py-9">
             <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">How it works</h2>
-            <p className="mt-3 text-sm leading-relaxed text-text-muted">
+            <p className="mt-3 text-sm leading-relaxed text-text-muted sm:text-[15px]">
               Fixed-route Levi/Kittilä transfers are priced per vehicle. For airport pickups, ski
               transfers, or multi-stop days, use the customized option and tell us your schedule — we
               reply with a quote.

@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import CategoryHero from './CategoryHero'
 import CategoryPageEnd from './CategoryPageEnd'
 import Footer from './Footer'
@@ -76,21 +75,10 @@ const NorthernLightsTours: React.FC = () => {
         compact
       />
 
-      <section className="rn-section rn-hero-follow relative pt-0">
+      <section className="rn-section-tight rn-hero-follow relative pt-0 pb-10 sm:pb-12">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
         <div className="rn-container relative">
-          <div className="max-w-xl">
-            <p className="rn-eyebrow">Compare formats</p>
-            <p className="mt-2 text-sm leading-relaxed text-text-muted">
-              Same card layout for every tour —{' '}
-              <Link to="/northern-lights-tour" className="text-aurora-soft hover:underline">
-                Guaranteed
-              </Link>{' '}
-              is our signature evening hunt with hotel pickup.
-            </p>
-          </div>
-
-          <div className="rn-card-grid mt-6">
+          <div className="rn-card-grid">
             {tours.map((tour, i) => (
               <TourCard
                 key={tour.to}

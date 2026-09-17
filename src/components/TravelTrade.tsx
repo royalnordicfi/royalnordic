@@ -133,9 +133,9 @@ const TravelTrade: React.FC = () => {
         compact
       />
 
-      <main className="relative flex-1 bg-midnight pb-12 pt-2">
+      <main className="rn-section rn-hero-follow relative flex-1 bg-midnight pt-0 pb-12">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-75" aria-hidden />
-        <div className="rn-container relative z-10 -mt-10 sm:-mt-12">
+        <div className="rn-container relative z-10">
         <ExperienceBreadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Travel trade' }]} />
 
         <div className="mx-auto mt-6 max-w-3xl space-y-12 sm:mt-8">

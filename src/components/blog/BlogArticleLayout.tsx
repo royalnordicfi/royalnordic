@@ -59,21 +59,25 @@ const BlogArticleLayout: React.FC<BlogArticleLayoutProps> = ({
   relatedExperiences,
 }) => {
   const html = markdownToHtml(content)
+  const backLink = (
+    <Link to="/blog" className="rn-article-back">
+      <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden />
+      Back to guides
+    </Link>
+  )
 
   return (
     <div className="rn-page flex min-h-screen flex-col">
       {heroImage ? (
-        <div className="relative">
-          <CategoryHero title={title} subtitle={excerpt} image={heroImage} compact />
-          <div className="rn-container absolute left-0 right-0 top-0 z-20 pt-[calc(var(--rn-header-h)+var(--rn-promo-bar-height,0px)+1rem)] sm:pt-[calc(var(--rn-header-h)+var(--rn-promo-bar-height,0px)+1.25rem)]">
-            <Link to="/blog" className="rn-article-back rn-reveal">
-              <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden />
-              Back to guides
-            </Link>
-          </div>
-        </div>
+        <CategoryHero
+          title={title}
+          subtitle={excerpt}
+          image={heroImage}
+          compact
+          lead={backLink}
+        />
       ) : (
-        <header className="rn-container rn-page-pad rn-article-mast rn-reveal max-w-[42rem] pb-4 pt-8 sm:pt-10">
+        <header className="rn-container rn-page-pad rn-article-mast max-w-[42rem] pb-4 pt-8 sm:pt-10">
           <Link to="/blog" className="rn-article-back rn-article-back--plain">
             <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden />
             Back to guides
@@ -89,10 +93,8 @@ const BlogArticleLayout: React.FC<BlogArticleLayoutProps> = ({
       <article className="rn-section-tight relative flex-1 bg-midnight">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-60" aria-hidden />
         <div className="rn-container relative mx-auto w-full max-w-[42rem]">
-          <div
-            className={`rn-article-meta rn-reveal flex flex-wrap items-center gap-x-4 gap-y-2 ${heroImage ? 'pt-2' : ''}`}
-          >
-            {heroImage ? <span className="rn-badge-aurora">{category}</span> : null}
+          <div className="rn-article-meta flex flex-wrap items-center gap-x-4 gap-y-2">
+            <span className="rn-badge-aurora">{category}</span>
             <span className="inline-flex items-center gap-1.5 text-sm text-text-dim">
               <Clock className="h-3.5 w-3.5" aria-hidden />
               {readTime}
@@ -106,12 +108,12 @@ const BlogArticleLayout: React.FC<BlogArticleLayoutProps> = ({
           </div>
 
           <div
-            className="rn-article-body rn-reveal pt-8 sm:pt-10"
+            className="rn-article-body pt-8 sm:pt-10"
             dangerouslySetInnerHTML={{ __html: html }}
           />
 
           {relatedExperiences && relatedExperiences.length > 0 ? (
-            <aside className="rn-article-related rn-reveal mt-14 sm:mt-16">
+            <aside className="rn-article-related mt-14 sm:mt-16">
               <div className="rn-article-related__head">
                 <p className="rn-eyebrow">Continue planning</p>
                 <h2 className="mt-2 font-display text-xl font-semibold text-white sm:text-2xl">

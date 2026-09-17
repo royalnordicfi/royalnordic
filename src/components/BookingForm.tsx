@@ -856,7 +856,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           <div className="grid grid-cols-7 gap-1">
             {availability.length > 0 ? getCalendarGrid().map((day, index) => {
               if (day === null) {
-                return <div key={`empty-${index}`} className="h-14 sm:h-16"></div>
+                return <div key={`empty-${index}`} className="h-12 sm:h-14"></div>
               }
               
               const { day: calendarDay, date, available, remainingSlots, isFullBooked } = day
@@ -923,7 +923,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
             }) : (
               // Show loading state when availability data is not loaded
               Array.from({ length: 35 }, (_, index) => (
-                <div key={`loading-${index}`} className="h-14 sm:h-16 bg-gray-100 rounded animate-pulse"></div>
+                <div key={`loading-${index}`} className="h-12 sm:h-14 bg-gray-100 rounded animate-pulse"></div>
               ))
             )}
           </div>

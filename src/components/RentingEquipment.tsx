@@ -42,12 +42,12 @@ const RentingEquipment: React.FC = () => {
         compact
       />
 
-      <section className="rn-section rn-hero-follow pt-0">
+      <section className="rn-section-tight rn-hero-follow pt-0 pb-10 sm:pb-12">
         <div className="rn-container">
           {rentals.length === 0 ? (
             <p className="text-center text-text-muted">No equipment rentals are available right now.</p>
           ) : (
-            <div className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
+            <div className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-14">
               <div className="lg:col-span-5 xl:col-span-4">
                 {rentals.map((rental) => (
                   <TourCard
@@ -66,21 +66,22 @@ const RentingEquipment: React.FC = () => {
                 ))}
               </div>
 
-              <div className="lg:col-span-7 xl:col-span-8">
-                <h2 className="font-display text-2xl font-semibold text-white sm:text-3xl">
+              <div className="lg:col-span-7 xl:col-span-8 lg:pt-1">
+                <p className="rn-eyebrow">Included</p>
+                <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-[1.75rem]">
                   Why rent from us
                 </h2>
-                <ul className="mt-5 space-y-3 text-sm leading-relaxed text-text-muted sm:text-base">
-                  <li className="border-t border-white/[0.08] pt-4">
+                <ul className="mt-6 space-y-0 text-sm leading-relaxed text-text-muted sm:text-[15px]">
+                  <li className="border-t border-white/[0.08] py-4">
                     Well-maintained snowshoes sized for your group
                   </li>
-                  <li className="border-t border-white/[0.08] pt-4">
+                  <li className="border-t border-white/[0.08] py-4">
                     Trail tips and local route suggestions included
                   </li>
-                  <li className="border-t border-white/[0.08] pt-4">
+                  <li className="border-t border-white/[0.08] py-4">
                     Optional delivery to hotels in Rovaniemi
                   </li>
-                  <li className="border-t border-white/[0.08] pt-4">
+                  <li className="border-t border-white/[0.08] border-b py-4">
                     Book online with secure payment
                   </li>
                 </ul>

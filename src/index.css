@@ -39,8 +39,8 @@
   --rn-header-h: 3rem;
   --rn-promo-bar-height: 28px;
   --rn-chrome-h: calc(var(--rn-header-h) + var(--rn-promo-bar-height, 0px));
-  --rn-product-breath: 2.15rem;
-  --rn-standard-breath: 1.35rem;
+  --rn-product-breath: 2.35rem;
+  --rn-standard-breath: 1.5rem;
   --mobile-book-bar: 0px;
 }
 
@@ -106,16 +106,19 @@
   }
 
   .rn-section {
-    @apply py-8 sm:py-14 lg:py-16;
+    @apply py-9 sm:py-14 lg:py-16;
   }
 
   .rn-section-tight {
-    @apply py-7 sm:py-12 lg:py-14;
+    @apply py-8 sm:py-12 lg:py-14;
   }
 
-  /** Pull content up after compact CategoryHero to avoid a dead band */
+  /**
+   * Content after CategoryHero — positive rhythm only.
+   * Never use negative margin here: it collides with hero subtitle/eyebrow copy.
+   */
   .rn-hero-follow {
-    @apply relative z-10 -mt-8 pt-0 sm:-mt-14 sm:pt-1;
+    @apply relative z-10 mt-0 pt-1 sm:pt-2;
   }
 
   /** Payment / confirmation / 404 — centered card with ambient fill */
@@ -349,9 +352,9 @@
       linear-gradient(180deg, rgba(4, 12, 10, 0.35), transparent 70%);
   }
   .rn-product__title {
-    font-size: clamp(1.55rem, 1.8vw + 0.7rem, 2.15rem);
-    line-height: 1.12;
-    letter-spacing: -0.028em;
+    font-size: clamp(1.6rem, 1.85vw + 0.72rem, 2.2rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
   }
   .rn-product__lede {
     max-width: 32rem;
@@ -489,12 +492,13 @@
 
   .rn-book-panel-light {
     border-radius: var(--rn-radius);
-    border: 1px solid rgba(12, 20, 28, 0.08);
-    background: linear-gradient(180deg, #fbfcfa 0%, #f4f7f5 100%);
+    border: 1px solid rgba(12, 20, 28, 0.07);
+    background: linear-gradient(180deg, #fcfdfb 0%, #f5f7f4 100%);
     color: var(--rn-panel-ink);
     box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.8) inset,
-      0 18px 50px rgba(0, 0, 0, 0.35);
+      0 1px 0 rgba(255, 255, 255, 0.85) inset,
+      0 20px 48px rgba(0, 0, 0, 0.32),
+      0 0 0 1px rgba(12, 20, 16, 0.02);
   }
 
   /* ——— Experience cards ——— */
@@ -576,13 +580,19 @@
   }
   .rn-tour-card__badge {
     position: absolute;
-    left: 0.75rem;
-    top: 0.75rem;
-    font-size: 10px;
+    left: 0.65rem;
+    top: 0.65rem;
+    z-index: 2;
+    border-radius: 3px;
+    border: 1px solid rgba(125, 236, 192, 0.28);
+    background: rgba(2, 6, 5, 0.72);
+    padding: 0.28rem 0.5rem;
+    font-size: 9px;
     font-weight: 600;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--rn-aurora-soft);
+    backdrop-filter: blur(8px);
   }
   .rn-tour-card__body {
     display: flex;
@@ -921,14 +931,15 @@
   .rn-article-back {
     display: inline-flex;
     align-items: center;
-    gap: 0.45rem;
+    gap: 0.4rem;
     border-radius: var(--rn-radius-sm);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: rgba(2, 5, 4, 0.55);
-    padding: 0.4rem 0.75rem;
-    font-size: 0.8125rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(2, 5, 4, 0.58);
+    padding: 0.38rem 0.7rem;
+    font-size: 0.78rem;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.92);
+    letter-spacing: 0.01em;
+    color: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
     transition:
       border-color 0.25s ease,
@@ -1243,24 +1254,24 @@
   .rn-mega {
     position: absolute;
     left: 0;
-    top: calc(100% + 0.4rem);
+    top: calc(100% + 0.55rem);
     z-index: 60;
-    width: 18rem;
-    padding: 0.85rem 0.35rem 0.45rem;
-    border-radius: 9px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    width: 19.5rem;
+    padding: 0.95rem 0.4rem 0.55rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
     background:
-      linear-gradient(165deg, rgba(8, 32, 24, 0.35), transparent 48%),
-      rgba(2, 6, 5, 0.96);
+      linear-gradient(165deg, rgba(8, 36, 26, 0.42), transparent 50%),
+      rgba(1, 5, 4, 0.98);
     box-shadow:
-      0 24px 56px rgba(0, 0, 0, 0.62),
-      0 0 0 1px rgba(18, 155, 108, 0.06);
-    backdrop-filter: blur(22px) saturate(1.1);
+      0 28px 64px rgba(0, 0, 0, 0.68),
+      0 0 0 1px rgba(18, 155, 108, 0.07);
+    backdrop-filter: blur(24px) saturate(1.15);
     opacity: 0;
-    transform: translateY(-6px) scale(0.982);
+    transform: translateY(-5px) scale(0.985);
     transition:
-      opacity 0.22s ease,
-      transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+      opacity 0.2s ease,
+      transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
     pointer-events: none;
   }
   .rn-mega--open {
@@ -1378,7 +1389,7 @@
 
   /* Light embedded booking calendar (BookingForm tone=light) */
   .rn-bf-light-day {
-    @apply flex h-14 flex-col items-center justify-center rounded-md px-0.5 text-sm leading-none transition sm:h-16;
+    @apply flex h-12 flex-col items-center justify-center rounded-md px-0.5 text-sm leading-none transition sm:h-14;
   }
   .rn-bf-light-day--available {
     @apply cursor-pointer border border-black/[0.08] bg-white text-panel-ink;
@@ -1388,9 +1399,10 @@
   }
   .rn-bf-light-day--selected {
     cursor: pointer;
-    border: 1px solid #14532d;
-    background: #14532d;
+    border: 1px solid var(--rn-aurora);
+    background: var(--rn-aurora);
     color: #fff;
+    box-shadow: 0 0 0 1px rgba(18, 155, 108, 0.15);
   }
   .rn-bf-light-day--muted {
     @apply cursor-not-allowed border border-transparent bg-black/[0.035] text-panel-muted;

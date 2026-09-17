@@ -84,17 +84,10 @@ const DaytimeExperiences: React.FC = () => {
         compact
       />
 
-      <section className="rn-section rn-hero-follow relative pt-0">
+      <section className="rn-section-tight rn-hero-follow relative pt-0 pb-10 sm:pb-12">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
         <div className="rn-container relative">
-          <div className="max-w-xl">
-            <p className="rn-eyebrow">Day tours</p>
-            <p className="mt-2 text-sm leading-relaxed text-text-muted">
-              Uniform cards — hotel pickup and group size on each listing. Choose the day that fits your stay.
-            </p>
-          </div>
-
-          <div className="rn-card-grid mt-6">
+          <div className="rn-card-grid">
             {experiences.map((exp, i) => (
               <TourCard
                 key={exp.to}
