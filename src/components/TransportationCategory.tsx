@@ -9,6 +9,7 @@ const TRANSFERS = [
     image: '/transportation1.jpg',
     imageAlt: 'Private transfer from Rovaniemi to Levi',
     title: 'Rovaniemi – Levi / Kittilä',
+    description: 'Private vehicle transfer with professional driver and flexible pickup timing.',
     duration: '2–3 hours',
     groupSize: 'Up to 8',
     pickup: true,
@@ -20,6 +21,7 @@ const TRANSFERS = [
     image: '/transportation2.jpg',
     imageAlt: 'Custom Lapland transportation',
     title: 'Customized Transportation',
+    description: 'Airport pickups, multi-stop days, and routes across Finnish Lapland on request.',
     duration: 'Flexible',
     groupSize: 'Up to 8',
     pickup: true,
@@ -37,9 +39,9 @@ const TransportationCategory = () => {
         image="/transportation3.jpg"
       />
 
-      <section className="bg-midnight pb-12 pt-8">
+      <section className="rn-section">
         <div className="rn-container space-y-10">
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="rn-card-grid lg:!grid-cols-2">
             {TRANSFERS.map((item) => (
               <TourCard
                 key={item.to}
@@ -47,6 +49,7 @@ const TransportationCategory = () => {
                 image={item.image}
                 imageAlt={item.imageAlt}
                 title={item.title}
+                description={item.description}
                 location="Lapland, Finland"
                 duration={item.duration}
                 groupSize={item.groupSize}

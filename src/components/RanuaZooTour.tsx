@@ -233,7 +233,7 @@ const RanuaZooTour = () => {
                     childPrice={tourData.child_price}
                     maxCapacity={tourData.max_capacity}
                     chrome="embedded"
-                    tone="dark"
+                    tone="light"
                   />
                 )}
               </BookingAside>

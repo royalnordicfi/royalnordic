@@ -17,9 +17,8 @@ const ALL_EXPERIENCES = [
     duration: '3–4 hours',
     groupSize: 'Max 8',
     pickup: true,
-    badge: 'Day trip',
-    priceFrom: 119,
-    featured: true,
+    priceFrom: 119 as number | undefined,
+    imagePosition: 'center',
   },
   {
     tourId: 5 as number | null,
@@ -27,12 +26,12 @@ const ALL_EXPERIENCES = [
     image: '/ranua1.jpg',
     imageAlt: 'Ranua Wildlife Park',
     title: 'Nordic Animals of Ranua Zoo',
+    description: 'Arctic wildlife day trip with transfers and park tickets included.',
     duration: 'About 5 hours',
     groupSize: 'Max 16',
     pickup: true,
-    badge: 'Family',
-    priceFrom: 99,
-    featured: false,
+    priceFrom: 99 as number | undefined,
+    imagePosition: 'center',
   },
   {
     tourId: 6 as number | null,
@@ -40,12 +39,12 @@ const ALL_EXPERIENCES = [
     image: '/korouoma1.jpg',
     imageAlt: 'Korouoma Canyon frozen waterfalls',
     title: 'Korouoma Canyon Winter Adventure',
+    description: 'Guided hike to frozen waterfalls with campfire lunch in the canyon.',
     duration: '6 hours',
     groupSize: 'Max 8 / vehicle',
     pickup: true,
-    badge: 'Adventure',
-    priceFrom: 129,
-    featured: false,
+    priceFrom: 129 as number | undefined,
+    imagePosition: 'center top',
   },
   {
     tourId: null as number | null,
@@ -53,12 +52,13 @@ const ALL_EXPERIENCES = [
     image: '/snowmobiling2.jpg',
     imageAlt: 'Snowmobile safari in Lapland',
     title: 'Snowmobile Safari',
+    description: 'Partner-operated snowmobile routes near Rovaniemi — request times and pricing.',
     duration: '0.5–3 hours',
     groupSize: 'Flexible',
     pickup: false,
     badge: 'Partner',
     priceFrom: undefined as number | undefined,
-    featured: false,
+    imagePosition: 'center',
   },
 ]
 
@@ -74,89 +74,51 @@ const DaytimeExperiences: React.FC = () => {
     return ALL_EXPERIENCES.filter((e) => e.tourId == null || activeIds.has(e.tourId))
   }, [activeIds])
 
-  const featured = experiences.find((e) => e.featured)
-  const secondary = experiences.filter((e) => !e.featured)
-
   return (
     <div className="rn-page">
       <CategoryHero
         title="Daytime Experiences in Lapland"
         subtitle="Ice fishing, wildlife, canyon hikes, and partner snowmobile trips — small groups with local guides from Rovaniemi."
-        image="/icefishing3.jpg"
+        image="/korouoma1.jpg"
       />
 
-      <section className="bg-midnight pb-12 pt-8">
-        <div className="rn-container space-y-10">
-          {featured && (
-            <div>
-              <p className="rn-eyebrow">Featured day trip</p>
-              <div className="mt-4 grid gap-5">
-                <TourCard
-                  to={featured.to}
-                  image={featured.image}
-                  imageAlt={featured.imageAlt}
-                  title={featured.title}
-                  description={featured.description}
-                  duration={featured.duration}
-                  groupSize={featured.groupSize}
-                  pickup={featured.pickup}
-                  badge={featured.badge}
-                  priceFrom={featured.priceFrom}
-                  featured
-                />
-              </div>
-            </div>
-          )}
-
-          {secondary.length > 0 && (
-            <div>
-              <h2 className="font-display text-2xl font-semibold text-white">More daytime adventures</h2>
-              <div className="mt-5 grid gap-5 sm:grid-cols-2">
-                {secondary.map((exp) => (
-                  <TourCard
-                    key={exp.to}
-                    to={exp.to}
-                    image={exp.image}
-                    imageAlt={exp.imageAlt}
-                    title={exp.title}
-                    duration={exp.duration}
-                    groupSize={exp.groupSize}
-                    pickup={exp.pickup}
-                    badge={exp.badge}
-                    priceFrom={exp.priceFrom}
-                    ctaLabel={exp.priceFrom != null ? 'View details' : 'Request availability'}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="max-w-2xl border-y border-white/[0.08] py-8">
-            <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">Pick your day trip</h2>
-            <ul className="mt-4 space-y-3 text-sm text-text-muted">
-              <li>
-                <strong className="text-white">Ice fishing</strong> — relaxed morning or afternoon on
-                frozen lakes near Rovaniemi.
-              </li>
-              <li>
-                <strong className="text-white">Ranua Zoo</strong> — polar bears and Arctic species with
-                transfers and tickets included.
-              </li>
-              <li>
-                <strong className="text-white">Korouoma</strong> — guided hike to frozen waterfalls and
-                campfire lunch.
-              </li>
-              <li>
-                <strong className="text-white">Snowmobile</strong> — operated by a partner; send a request
-                for times and pricing.
-              </li>
-            </ul>
+      <section className="rn-section relative">
+        <div className="pointer-events-none absolute inset-0 rn-ambient-aurora opacity-30" aria-hidden />
+        <div className="rn-container relative">
+          <div className="max-w-2xl">
+            <p className="rn-eyebrow">Day tours</p>
+            <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-3xl">
+              Choose your Arctic day
+            </h2>
+            <p className="mt-2 text-sm text-text-muted sm:text-base">
+              Same small-group standard across every daytime experience — pick the one that fits your dates.
+            </p>
           </div>
 
-          <ReviewCarousel reviews={reviewsFor('day-tours', 6)} />
+          <div className="rn-card-grid mt-8">
+            {experiences.map((exp, i) => (
+              <TourCard
+                key={exp.to}
+                to={exp.to}
+                image={exp.image}
+                imageAlt={exp.imageAlt}
+                title={exp.title}
+                description={exp.description}
+                duration={exp.duration}
+                groupSize={exp.groupSize}
+                pickup={exp.pickup}
+                badge={'badge' in exp ? exp.badge : undefined}
+                priceFrom={exp.priceFrom}
+                imagePosition={exp.imagePosition}
+                ctaLabel={exp.priceFrom != null ? 'Explore' : 'Request availability'}
+                className={`rn-stagger-${(i % 4) + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
+      <ReviewCarousel reviews={reviewsFor('day-tours', 6)} className="border-t border-white/[0.06]" />
       <Footer />
     </div>
   )

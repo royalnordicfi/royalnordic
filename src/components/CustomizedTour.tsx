@@ -28,7 +28,7 @@ const CustomizedTour: React.FC = () => {
   ]
 
   const inputClass =
-    'w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-white placeholder:text-text-dim focus:border-aurora/50 focus:outline-none focus:ring-1 focus:ring-aurora/30'
+    'w-full rounded-md border border-black/10 bg-white px-3 py-2.5 text-sm text-panel-ink placeholder:text-panel-muted focus:border-aurora/50 focus:outline-none focus:ring-1 focus:ring-aurora/30'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -153,10 +153,10 @@ const CustomizedTour: React.FC = () => {
 
           <aside id="request" className="lg:col-span-5">
             <div className="rn-sticky-book">
-              <div className="rn-book-panel rn-reveal">
-                <div className="border-b border-white/[0.08] px-5 py-5 sm:px-6">
-                  <h2 className="font-display text-xl font-semibold text-white">Request your custom tour</h2>
-                  <p className="mt-1 text-sm text-text-muted">We reply with ideas and next steps — no payment on this form.</p>
+              <div className="rn-book-panel-light rn-reveal">
+                <div className="border-b border-black/[0.06] px-5 py-5 sm:px-6">
+                  <h2 className="font-display text-xl font-semibold text-panel-ink">Request your custom tour</h2>
+                  <p className="mt-1 text-sm text-panel-muted">We reply with ideas and next steps — no payment on this form.</p>
                 </div>
                 <div className="p-4 sm:p-5">
                   <form onSubmit={handleSubmit} className="space-y-4">

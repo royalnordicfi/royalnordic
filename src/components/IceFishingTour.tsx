@@ -230,7 +230,7 @@ const IceFishingTour = () => {
                     seasonStart="12-15"
                     seasonEnd="03-15"
                     chrome="embedded"
-                    tone="dark"
+                    tone="light"
                   />
                 )}
               </BookingAside>

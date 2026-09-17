@@ -20,8 +20,7 @@ const ALL_TOURS = [
     groupSize: 'Max 8 / vehicle',
     pickup: true,
     badge: 'Guaranteed',
-    priceFrom: 149,
-    featured: true,
+    priceFrom: 149 as number | undefined,
   },
   {
     tourId: 8 as number | null,
@@ -29,12 +28,12 @@ const ALL_TOURS = [
     image: '/family1.jpg',
     imageAlt: 'Family-Friendly Northern Lights',
     title: 'Family-Friendly Northern Lights',
+    description: 'Shorter 2-hour evening format for families and mixed-age groups.',
     duration: '2 hours',
     groupSize: 'Family format',
     pickup: true,
     badge: 'Family',
-    priceFrom: 79,
-    featured: false,
+    priceFrom: 79 as number | undefined,
   },
   ...(SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS
     ? [
@@ -44,12 +43,12 @@ const ALL_TOURS = [
           image: '/monsteri1.jpg',
           imageAlt: 'Monster Truck Northern Lights',
           title: 'Monster Truck Northern Lights',
+          description: 'Partner-operated monster-truck aurora experience from Rovaniemi.',
           duration: '3 hours',
           groupSize: 'Flexible',
           pickup: false,
           badge: 'Partner',
           priceFrom: undefined as number | undefined,
-          featured: false,
         },
       ]
     : []),
@@ -67,9 +66,6 @@ const NorthernLightsTours: React.FC = () => {
     return ALL_TOURS.filter((t) => t.tourId == null || activeIds.has(t.tourId))
   }, [activeIds])
 
-  const signature = tours.find((t) => t.featured)
-  const secondary = tours.filter((t) => !t.featured)
-
   return (
     <div className="rn-page">
       <CategoryHero
@@ -78,75 +74,49 @@ const NorthernLightsTours: React.FC = () => {
         image="/nortti5.jpg"
       />
 
-      <section className="bg-midnight pb-12 pt-8">
-        <div className="rn-container space-y-10">
-          {signature && (
-            <div>
-              <p className="rn-eyebrow">Signature experience</p>
-              <div className="mt-4 grid gap-5">
-                <TourCard
-                  to={signature.to}
-                  image={signature.image}
-                  imageAlt={signature.imageAlt}
-                  title={signature.title}
-                  description={signature.description}
-                  duration={signature.duration}
-                  groupSize={signature.groupSize}
-                  pickup={signature.pickup}
-                  badge={signature.badge}
-                  priceFrom={signature.priceFrom}
-                  featured
-                  ctaLabel="View guaranteed tour"
-                />
-              </div>
-            </div>
-          )}
-
-          {secondary.length > 0 && (
-            <div>
-              <h2 className="font-display text-2xl font-semibold text-white">More aurora evenings</h2>
-              <div className="mt-5 grid gap-5 sm:grid-cols-2">
-                {secondary.map((tour) => (
-                  <TourCard
-                    key={tour.to}
-                    to={tour.to}
-                    image={tour.image}
-                    imageAlt={tour.imageAlt}
-                    title={tour.title}
-                    duration={tour.duration}
-                    groupSize={tour.groupSize}
-                    pickup={tour.pickup}
-                    badge={tour.badge}
-                    priceFrom={tour.priceFrom}
-                    ctaLabel={tour.priceFrom ? 'View details' : 'Request availability'}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="max-w-2xl border-y border-white/[0.08] py-8">
-            <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">Which tour is right?</h2>
-            <ul className="mt-4 space-y-3 text-sm text-text-muted">
-              <li>
-                <strong className="text-white">Guaranteed</strong> — full evening hunt with flexible
-                duration and free return trip if no lights appear (see{' '}
-                <Link to="/terms-conditions" className="font-medium text-aurora-soft hover:underline">
-                  Terms
-                </Link>
-                ).
-              </li>
-              <li>
-                <strong className="text-white">Family</strong> — shorter 2-hour evening format. Northern
-                Lights not guaranteed.
-              </li>
-            </ul>
+      <section className="rn-section relative">
+        <div className="pointer-events-none absolute inset-0 rn-ambient-aurora opacity-35" aria-hidden />
+        <div className="rn-container relative">
+          <div className="max-w-2xl">
+            <p className="rn-eyebrow">Aurora season</p>
+            <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-3xl">
+              Northern Lights experiences
+            </h2>
+            <p className="mt-2 text-sm text-text-muted sm:text-base">
+              Compare formats side by side.{' '}
+              <Link to="/northern-lights-tour" className="text-aurora-soft hover:underline">
+                Guaranteed
+              </Link>{' '}
+              includes a free return trip if no lights appear — see Terms.
+            </p>
           </div>
 
-          <ReviewCarousel reviews={reviewsFor('northern-lights', 6)} />
+          <div className="rn-card-grid mt-8">
+            {tours.map((tour, i) => (
+              <TourCard
+                key={tour.to}
+                to={tour.to}
+                image={tour.image}
+                imageAlt={tour.imageAlt}
+                title={tour.title}
+                description={tour.description}
+                duration={tour.duration}
+                groupSize={tour.groupSize}
+                pickup={tour.pickup}
+                badge={tour.badge}
+                priceFrom={tour.priceFrom}
+                ctaLabel={tour.priceFrom ? 'Explore' : 'Request availability'}
+                className={`rn-stagger-${(i % 4) + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
+      <ReviewCarousel
+        reviews={reviewsFor('northern-lights', 6)}
+        className="border-t border-white/[0.06]"
+      />
       <Footer />
     </div>
   )

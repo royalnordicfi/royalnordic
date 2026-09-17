@@ -7,7 +7,7 @@ type Props = {
 }
 
 /**
- * Dark elevated booking shell — integrates with Royal Nordic identity.
+ * Light premium booking shell — warm white commerce surface on the dark site.
  * BookingForm logic stays unchanged; this is presentation only.
  */
 export default function BookingAside({
@@ -22,14 +22,14 @@ export default function BookingAside({
   className = '',
 }: Props) {
   return (
-    <div className={`rn-book-panel rn-reveal ${className}`}>
-      <div className="border-b border-white/[0.08] px-5 py-5 sm:px-6">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-text-dim">From</p>
-        <p className="mt-1 font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+    <div className={`rn-book-panel-light rn-reveal ${className}`}>
+      <div className="border-b border-black/[0.06] px-5 py-5 sm:px-6">
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-panel-muted">From</p>
+        <p className="mt-1 font-display text-3xl font-semibold tracking-tight text-panel-ink sm:text-4xl">
           €{priceFrom}
-          <span className="ml-1.5 font-sans text-sm font-normal text-text-muted">{priceNote}</span>
+          <span className="ml-1.5 font-sans text-sm font-normal text-panel-muted">{priceNote}</span>
         </p>
-        <ul className="mt-4 space-y-1.5 text-xs text-text-muted">
+        <ul className="mt-4 space-y-1.5 text-xs text-panel-muted">
           {trustLines.map((line) => (
             <li key={line} className="flex gap-2">
               <span className="text-aurora" aria-hidden>

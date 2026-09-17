@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom'
 import TourCard from './TourCard'
 
-/** Supporting bookable tours — Guaranteed NL is featured above, not repeated here. */
 const TOURS = [
   {
     to: '/family-friendly-northern-lights',
     image: '/family1.jpg',
     imageAlt: 'Family Northern Lights evening',
     title: 'Family-Friendly Northern Lights',
+    description: 'Shorter evening format designed for families.',
     duration: '2 hours',
     groupSize: 'Family format',
     pickup: true,
@@ -19,6 +19,7 @@ const TOURS = [
     image: '/korouoma1.jpg',
     imageAlt: 'Korouoma Canyon in winter',
     title: 'Korouoma Canyon',
+    description: 'Frozen waterfalls and a guided canyon hike.',
     duration: 'About 6 hours',
     groupSize: 'Small group',
     pickup: true,
@@ -29,6 +30,7 @@ const TOURS = [
     image: '/icefishing2.jpg',
     imageAlt: 'Ice fishing on a frozen lake',
     title: 'Ice Fishing Experience',
+    description: 'Traditional ice fishing with equipment and hot drinks.',
     duration: '3–4 hours',
     groupSize: 'Max 8',
     pickup: true,
@@ -49,14 +51,14 @@ const FeaturedTours = () => {
           </div>
           <Link
             to="/daytime-experiences"
-            className="hidden text-sm font-semibold text-aurora-soft hover:underline sm:inline"
+            className="hidden text-sm font-medium text-aurora-soft transition hover:translate-x-0.5 sm:inline-flex"
           >
             All day tours →
           </Link>
         </div>
-        <div className="mt-7 grid gap-4 sm:grid-cols-3">
-          {TOURS.map((tour) => (
-            <TourCard key={tour.to} {...tour} />
+        <div className="rn-card-grid mt-8">
+          {TOURS.map((tour, i) => (
+            <TourCard key={tour.to} {...tour} className={`rn-stagger-${(i % 4) + 1}`} />
           ))}
         </div>
       </div>

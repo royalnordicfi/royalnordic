@@ -37,7 +37,7 @@ const TravelTrade: React.FC = () => {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
   const inputClass =
-    'w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-white placeholder:text-text-dim focus:border-aurora/50 focus:outline-none focus:ring-1 focus:ring-aurora/30'
+    'w-full rounded-md border border-black/10 bg-white px-3 py-2.5 text-sm text-panel-ink placeholder:text-panel-muted focus:border-aurora/50 focus:outline-none focus:ring-1 focus:ring-aurora/30'
 
   const sellable = [
     {
@@ -200,8 +200,8 @@ const TravelTrade: React.FC = () => {
           </section>
 
           <section id="partnership-enquiry">
-            <div className="rn-book-panel rn-reveal p-5 sm:p-8">
-              <h2 className="font-display text-2xl font-semibold text-white">Partnership enquiry</h2>
+            <div className="rn-book-panel-light rn-reveal p-5 sm:p-8">
+              <h2 className="font-display text-2xl font-semibold text-panel-ink">Partnership enquiry</h2>
               <p className="mt-2 text-sm text-text-muted">
                 Prefer email? Write to{' '}
                 <a href="mailto:contact@royalnordic.fi" className="font-medium text-aurora-soft hover:underline">

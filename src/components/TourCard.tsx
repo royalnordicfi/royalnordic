@@ -14,7 +14,9 @@ export type TourCardProps = {
   priceFrom?: number
   ctaLabel?: string
   className?: string
+  /** @deprecated Uniform cards only — ignored for sizing */
   featured?: boolean
+  imagePosition?: string
 }
 
 const TourCard = ({
@@ -31,26 +33,18 @@ const TourCard = ({
   priceFrom,
   ctaLabel = 'Explore',
   className = '',
-  featured = false,
+  imagePosition = 'center',
 }: TourCardProps) => {
   const meta = [duration, groupSize, pickup ? 'Hotel pickup' : null].filter(Boolean).join(' · ')
 
   return (
-    <Link
-      to={to}
-      className={`group rn-reveal flex h-full flex-col overflow-hidden rounded-rn border border-white/[0.07] bg-surface/80 transition duration-500 hover:border-aurora/25 hover:bg-surface-2 ${
-        featured ? 'sm:col-span-2' : ''
-      } ${className}`}
-    >
-      <div
-        className={`relative overflow-hidden bg-black ${
-          featured ? 'aspect-[16/9]' : 'aspect-[16/10]'
-        }`}
-      >
+    <Link to={to} className={`rn-tour-card group rn-reveal ${className}`}>
+      <div className="rn-tour-card__media">
         <img
           src={image}
           alt={imageAlt}
-          className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.025]"
+          className="rn-tour-card__img"
+          style={{ objectPosition: imagePosition }}
           loading="lazy"
           decoding="async"
           onError={(e) => {
@@ -60,33 +54,27 @@ const TourCard = ({
             el.src = '/nortti1.jpg'
           }}
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-        {badge && (
-          <span className="absolute left-3 top-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-aurora-soft">
-            {badge}
-          </span>
-        )}
+        <div className="rn-tour-card__shade" aria-hidden />
+        {badge && <span className="rn-tour-card__badge">{badge}</span>}
       </div>
-      <div className="flex flex-1 flex-col px-4 py-3.5 sm:px-4 sm:py-4">
-        <p className="text-[11px] uppercase tracking-[0.14em] text-text-dim">{location}</p>
-        <h3 className="mt-1 font-display text-lg font-semibold leading-snug text-white sm:text-xl">
-          {title}
-        </h3>
-        {description && (
-          <p className="mt-1.5 line-clamp-2 text-sm text-text-muted">{description}</p>
-        )}
-        {meta && !description && <p className="mt-1.5 text-sm text-text-muted">{meta}</p>}
-        {meta && description && <p className="mt-1.5 text-xs text-text-dim">{meta}</p>}
-        <div className="mt-auto flex items-baseline justify-between gap-3 pt-3">
+      <div className="rn-tour-card__body">
+        <p className="rn-tour-card__eyebrow">{location}</p>
+        <h3 className="rn-tour-card__title">{title}</h3>
+        {description && <p className="rn-tour-card__desc">{description}</p>}
+        {meta && <p className="rn-tour-card__meta">{meta}</p>}
+        <div className="rn-tour-card__foot">
           {typeof priceFrom === 'number' ? (
-            <p className="text-sm text-text-muted">
-              From <span className="font-semibold text-white">€{priceFrom}</span>
+            <p className="rn-tour-card__price">
+              From <span>€{priceFrom}</span>
             </p>
           ) : (
             <span />
           )}
-          <span className="text-sm font-medium text-aurora-soft transition group-hover:translate-x-0.5">
-            {ctaLabel} →
+          <span className="rn-tour-card__cta">
+            {ctaLabel}
+            <span className="rn-tour-card__arrow" aria-hidden>
+              →
+            </span>
           </span>
         </div>
       </div>

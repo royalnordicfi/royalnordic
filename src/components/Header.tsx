@@ -1,26 +1,19 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronDown, Menu, X } from 'lucide-react'
 import { isHeroShell } from '../layout/shell'
 
-type NavItem = {
-  label: string
-  to: string
-  children?: { label: string; to: string; hint?: string }[]
-}
+type NavChild = { label: string; to: string; hint: string }
 
-const NAV: NavItem[] = [
-  {
-    label: 'Experiences',
-    to: '/#experiences',
-    children: [
-      { label: 'Northern Lights', to: '/northern-lights-tours', hint: 'Aurora hunts' },
-      { label: 'Day Tours', to: '/daytime-experiences', hint: 'Day adventures' },
-      { label: 'Private & Custom', to: '/customized-tour', hint: 'Tailored' },
-      { label: 'Transfers', to: '/transportation', hint: 'Private transport' },
-    ],
-  },
+const EXPERIENCES: NavChild[] = [
+  { label: 'Northern Lights', to: '/northern-lights-tours', hint: 'Aurora hunts & photography' },
+  { label: 'Day Tours', to: '/daytime-experiences', hint: 'Arctic daytime experiences' },
+  { label: 'Private & Custom', to: '/customized-tour', hint: 'Tailored Lapland itineraries' },
+  { label: 'Transfers', to: '/transportation', hint: 'Private transportation' },
+]
+
+const NAV = [
   { label: 'Northern Lights', to: '/northern-lights-tours' },
   { label: 'Day Tours', to: '/daytime-experiences' },
   { label: 'Private & Custom', to: '/customized-tour' },
@@ -49,6 +42,7 @@ const Header = () => {
   const [menuMounted, setMenuMounted] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [experiencesOpen, setExperiencesOpen] = useState(false)
+  const [dropVisible, setDropVisible] = useState(false)
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const closeRef = useRef<HTMLButtonElement>(null)
@@ -56,12 +50,14 @@ const Header = () => {
   const scrollLockY = useRef(0)
   const afterClose = useRef<(() => void) | null>(null)
   const dropRef = useRef<HTMLDivElement>(null)
+  const closeTimer = useRef<number | null>(null)
+  const menuId = useId()
 
   const hasHero = isHeroShell(pathname)
   const transparent = hasHero && !scrolled
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16)
+    const onScroll = () => setScrolled(window.scrollY > 12)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -69,15 +65,50 @@ const Header = () => {
 
   useEffect(() => {
     setExperiencesOpen(false)
+    setDropVisible(false)
   }, [pathname])
+
+  const openExperiences = () => {
+    if (closeTimer.current) {
+      window.clearTimeout(closeTimer.current)
+      closeTimer.current = null
+    }
+    setExperiencesOpen(true)
+    requestAnimationFrame(() => setDropVisible(true))
+  }
+
+  const scheduleCloseExperiences = () => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current)
+    setDropVisible(false)
+    closeTimer.current = window.setTimeout(() => {
+      setExperiencesOpen(false)
+      closeTimer.current = null
+    }, 160)
+  }
+
+  const closeExperiencesNow = () => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current)
+    setDropVisible(false)
+    setExperiencesOpen(false)
+  }
 
   useEffect(() => {
     if (!experiencesOpen) return
     const onDoc = (e: MouseEvent) => {
-      if (!dropRef.current?.contains(e.target as Node)) setExperiencesOpen(false)
+      if (!dropRef.current?.contains(e.target as Node)) closeExperiencesNow()
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        closeExperiencesNow()
+      }
     }
     document.addEventListener('mousedown', onDoc)
-    return () => document.removeEventListener('mousedown', onDoc)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDoc)
+      window.removeEventListener('keydown', onKey)
+    }
   }, [experiencesOpen])
 
   const lockScroll = useCallback(() => {
@@ -120,7 +151,7 @@ const Header = () => {
       afterClose.current = null
       if (fn) requestAnimationFrame(fn)
       else openRef.current?.focus()
-    }, 280)
+    }, 260)
     return () => window.clearTimeout(t)
   }, [menuMounted, menuOpen, unlockScroll])
 
@@ -141,111 +172,108 @@ const Header = () => {
     closeMenu(() => resolveNav(to, navigate, pathname))
   }
 
-  const isActive = (to: string) => {
-    if (to === '/#experiences') return false
-    return pathname === to || (to !== '/' && pathname.startsWith(to))
-  }
+  const isActive = (to: string) => pathname === to || (to !== '/' && pathname.startsWith(to))
 
   return (
     <>
       <header
-        className={`fixed left-0 right-0 z-50 transition-[background,border,box-shadow,backdrop-filter] duration-300 ${
-          transparent
-            ? 'border-b border-transparent bg-gradient-to-b from-black/55 to-transparent'
-            : 'border-b border-white/[0.07] bg-[#050a10]/88 backdrop-blur-xl shadow-[0_1px_0_0_rgba(18,185,129,0.08)]'
+        className={`rn-header fixed left-0 right-0 z-50 ${
+          transparent ? 'rn-header--transparent' : 'rn-header--solid'
         }`}
         style={{ top: 'var(--rn-promo-bar-height, 0px)' }}
       >
-        <div className="rn-container flex h-16 items-center justify-between gap-4">
+        <div className="rn-container flex h-[3.75rem] items-center justify-between gap-4 sm:h-16">
           <Link to="/" className="flex shrink-0 items-center gap-2.5" aria-label="Royal Nordic home">
-            <img src="/logo.png" alt="" className="h-8 w-auto" width={32} height={32} />
-            <span className="font-display text-lg font-semibold tracking-wide text-white sm:text-xl">
+            <img src="/logo.png" alt="" className="h-7 w-auto sm:h-8" width={32} height={32} />
+            <span className="font-display text-[1.05rem] font-semibold tracking-wide text-white sm:text-xl">
               Royal Nordic
             </span>
           </Link>
 
           <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Primary">
-            {NAV.map((item) => {
-              if (item.children) {
-                return (
-                  <div key={item.label} className="relative" ref={dropRef}>
-                    <button
-                      type="button"
-                      aria-expanded={experiencesOpen}
-                      aria-haspopup="true"
-                      onClick={() => setExperiencesOpen((v) => !v)}
-                      className={`inline-flex items-center gap-1 rounded-md px-3 py-2 text-[13px] font-medium transition ${
-                        experiencesOpen || item.children.some((c) => isActive(c.to))
-                          ? 'text-aurora-soft'
-                          : 'text-white/78 hover:text-white'
-                      }`}
-                    >
-                      {item.label}
-                      <ChevronDown
-                        size={14}
-                        className={`transition ${experiencesOpen ? 'rotate-180' : ''}`}
-                        aria-hidden
-                      />
-                    </button>
-                    {experiencesOpen && (
-                      <div className="absolute left-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-md border border-white/10 bg-[#0b121a]/96 p-1.5 shadow-rn backdrop-blur-xl">
-                        {item.children.map((child) => (
-                          <button
-                            key={child.to}
-                            type="button"
-                            onClick={() => {
-                              setExperiencesOpen(false)
-                              resolveNav(child.to, navigate, pathname)
-                            }}
-                            className={`flex w-full flex-col rounded-md px-3 py-2.5 text-left transition hover:bg-white/5 ${
-                              isActive(child.to) ? 'bg-white/[0.04]' : ''
-                            }`}
-                          >
-                            <span className="text-sm font-medium text-white">{child.label}</span>
-                            {child.hint && (
-                              <span className="text-xs text-text-dim">{child.hint}</span>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )
-              }
+            <div
+              className="relative"
+              ref={dropRef}
+              onMouseEnter={openExperiences}
+              onMouseLeave={scheduleCloseExperiences}
+            >
+              <button
+                type="button"
+                aria-expanded={experiencesOpen}
+                aria-haspopup="menu"
+                aria-controls={menuId}
+                onClick={() => (experiencesOpen ? scheduleCloseExperiences() : openExperiences())}
+                className={`rn-nav-link inline-flex items-center gap-1 ${
+                  experiencesOpen || EXPERIENCES.some((c) => isActive(c.to)) ? 'rn-nav-link--active' : ''
+                }`}
+              >
+                Experiences
+                <ChevronDown
+                  size={13}
+                  className={`transition duration-200 ${experiencesOpen ? 'rotate-180' : ''}`}
+                  aria-hidden
+                />
+              </button>
 
-              return (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => resolveNav(item.to, navigate, pathname)}
-                  className={`rounded-md px-3 py-2 text-[13px] font-medium transition ${
-                    isActive(item.to)
-                      ? 'text-aurora-soft'
-                      : 'text-white/78 hover:text-white'
-                  }`}
+              {experiencesOpen && (
+                <div
+                  id={menuId}
+                  role="menu"
+                  className={`rn-mega ${dropVisible ? 'rn-mega--open' : ''}`}
                 >
-                  {item.label}
-                </button>
-              )
-            })}
+                  <p className="rn-mega__label">Experiences</p>
+                  <ul className="rn-mega__list">
+                    {EXPERIENCES.map((child) => (
+                      <li key={child.to}>
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={() => {
+                            closeExperiencesNow()
+                            resolveNav(child.to, navigate, pathname)
+                          }}
+                          className={`rn-mega__item ${isActive(child.to) ? 'rn-mega__item--active' : ''}`}
+                        >
+                          <span className="rn-mega__item-main">
+                            <span className="rn-mega__item-title">{child.label}</span>
+                            <span className="rn-mega__item-hint">{child.hint}</span>
+                          </span>
+                          <span className="rn-mega__item-arrow" aria-hidden>
+                            →
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {NAV.map((item) => (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => resolveNav(item.to, navigate, pathname)}
+                className={`rn-nav-link ${isActive(item.to) ? 'rn-nav-link--active' : ''}`}
+              >
+                {item.label}
+              </button>
+            ))}
           </nav>
 
           <div className="flex items-center gap-2">
-            <Link
-              to="/northern-lights-tour"
-              className="rn-btn-primary hidden !min-h-0 !px-4 !py-2 text-xs sm:inline-flex"
-            >
+            <Link to="/northern-lights-tour" className="rn-btn-primary rn-btn-nav hidden sm:inline-flex">
               Book a tour
             </Link>
             <button
               ref={openRef}
               type="button"
-              className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-white/15 text-white xl:hidden"
+              className="inline-flex min-h-[42px] min-w-[42px] items-center justify-center rounded border border-white/15 text-white xl:hidden"
               aria-label="Open menu"
               aria-expanded={menuOpen}
               onClick={() => (menuOpen || menuMounted ? closeMenu() : openMenu())}
             >
-              {menuOpen ? <X size={22} /> : <Menu size={22} />}
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
@@ -256,49 +284,56 @@ const Header = () => {
           <div className="fixed inset-0 z-[70] xl:hidden" role="dialog" aria-modal="true">
             <button
               type="button"
-              className={`absolute inset-0 bg-black/75 transition-opacity ${menuOpen ? 'opacity-100' : 'opacity-0'}`}
+              className={`absolute inset-0 bg-black/80 transition-opacity duration-300 ${
+                menuOpen ? 'opacity-100' : 'opacity-0'
+              }`}
               aria-label="Close menu"
               onClick={() => closeMenu()}
             />
             <div
-              className={`absolute inset-y-0 right-0 flex w-[min(100%,22rem)] flex-col border-l border-white/10 bg-[#050a10] transition-transform duration-300 ${
+              className={`absolute inset-y-0 right-0 flex w-[min(100%,20rem)] flex-col border-l border-white/[0.08] bg-[#030706] transition-transform duration-300 ${
                 menuOpen ? 'translate-x-0' : 'translate-x-full'
               }`}
             >
-              <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+              <div className="flex items-center justify-between border-b border-white/[0.08] px-5 py-4">
                 <span className="font-display text-xl text-white">Menu</span>
                 <button
                   ref={closeRef}
                   type="button"
-                  className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-white/15 text-white"
+                  className="inline-flex min-h-[42px] min-w-[42px] items-center justify-center rounded border border-white/15 text-white"
                   aria-label="Close menu"
                   onClick={() => closeMenu()}
                 >
-                  <X size={20} />
+                  <X size={18} />
                 </button>
               </div>
-              <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-5" aria-label="Mobile">
-                {NAV.filter((item) => !item.children).map((item) => (
+              <nav className="flex flex-1 flex-col overflow-y-auto px-2 py-4" aria-label="Mobile">
+                <p className="px-4 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-aurora-soft/80">
+                  Experiences
+                </p>
+                {EXPERIENCES.map((item) => (
                   <button
-                    key={item.label}
+                    key={item.to}
                     type="button"
                     onClick={() => go(item.to)}
-                    className={`rounded-md px-4 py-3.5 text-left text-lg font-medium transition ${
-                      isActive(item.to) ? 'text-aurora-soft' : 'text-white hover:bg-white/5'
-                    }`}
+                    className="rounded px-4 py-3 text-left"
                   >
-                    {item.label}
+                    <span className="block text-base font-medium text-white">{item.label}</span>
+                    <span className="mt-0.5 block text-xs text-text-dim">{item.hint}</span>
                   </button>
                 ))}
+                <div className="my-3 mx-4 border-t border-white/[0.08]" />
                 <button
                   type="button"
-                  onClick={() => go('/#experiences')}
-                  className="rounded-md px-4 py-3.5 text-left text-lg font-medium text-white hover:bg-white/5"
+                  onClick={() => go('/travel-trade')}
+                  className={`rounded px-4 py-3.5 text-left text-base font-medium ${
+                    isActive('/travel-trade') ? 'text-aurora-soft' : 'text-white'
+                  }`}
                 >
-                  All experiences
+                  Partner With Us
                 </button>
               </nav>
-              <div className="border-t border-white/10 p-4">
+              <div className="border-t border-white/[0.08] p-4">
                 <Link to="/northern-lights-tour" onClick={() => closeMenu()} className="rn-btn-primary w-full">
                   Book a tour
                 </Link>

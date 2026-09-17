@@ -27,7 +27,7 @@ const TransportationRovaniemiLevi = () => {
     child: 299,
   }
   const inputClass =
-    'w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-white placeholder:text-text-dim focus:border-aurora/50 focus:outline-none focus:ring-1 focus:ring-aurora/30'
+    'w-full rounded-md border border-black/10 bg-white px-3 py-2.5 text-sm text-panel-ink placeholder:text-panel-muted focus:border-aurora/50 focus:outline-none focus:ring-1 focus:ring-aurora/30'
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState('')
 

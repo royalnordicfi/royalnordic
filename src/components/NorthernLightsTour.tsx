@@ -239,8 +239,8 @@ const NorthernLightsTour = () => {
                   'Northern Lights guarantee (see Terms)',
                 ]}
               >
-                <p className="mb-4 rounded-md border border-aurora/20 bg-aurora/10 px-3 py-2 text-xs text-text-muted">
-                  Optional: enter <span className="font-semibold text-aurora-soft">WINTER20</span> at
+                <p className="mb-4 rounded-md border border-black/5 bg-black/[0.03] px-3 py-2 text-xs text-panel-muted">
+                  Optional: enter <span className="font-semibold text-panel-ink">WINTER20</span> at
                   checkout for 20% off eligible direct bookings.
                 </p>
                 {loading ? (
@@ -255,7 +255,7 @@ const NorthernLightsTour = () => {
                     seasonStart={GUARANTEED_NL_SEASON_START}
                     seasonEnd={GUARANTEED_NL_SEASON_END}
                     chrome="embedded"
-                    tone="dark"
+                    tone="light"
                   />
                 )}
               </BookingAside>

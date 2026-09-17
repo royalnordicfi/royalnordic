@@ -17,7 +17,7 @@ const ALL_RENTALS = [
     pickup: true,
     badge: 'Self-guided',
     priceFrom: 79,
-    featured: true,
+    
   },
 ]
 
@@ -41,13 +41,13 @@ const RentingEquipment: React.FC = () => {
         image="/snowshoe2.jpg"
       />
 
-      <section className="bg-midnight pb-12 pt-8">
+      <section className="rn-section">
         <div className="rn-container space-y-10">
           {rentals.length === 0 ? (
             <p className="text-center text-text-muted">No equipment rentals are available right now.</p>
           ) : (
             <>
-              <div className="grid gap-5">
+              <div className="rn-card-grid max-w-md">
                 {rentals.map((rental) => (
                   <TourCard
                     key={rental.to}
@@ -61,7 +61,6 @@ const RentingEquipment: React.FC = () => {
                     pickup={rental.pickup}
                     badge={rental.badge}
                     priceFrom={rental.priceFrom}
-                    featured={rental.featured}
                   />
                 ))}
               </div>

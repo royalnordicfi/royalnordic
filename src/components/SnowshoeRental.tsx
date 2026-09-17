@@ -221,7 +221,7 @@ const SnowshoeRental = () => {
                     seasonStart="11-01"
                     seasonEnd="04-01"
                     chrome="embedded"
-                    tone="dark"
+                    tone="light"
                   />
                 )}
               </BookingAside>

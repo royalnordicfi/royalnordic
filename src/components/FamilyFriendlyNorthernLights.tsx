@@ -218,7 +218,7 @@ const FamilyFriendlyNorthernLights = () => {
                   seasonStart="09-15"
                   seasonEnd="04-15"
                   chrome="embedded"
-                  tone="dark"
+                  tone="light"
                 />
               </BookingAside>
               <p className="mt-3 text-center text-sm text-text-muted">
