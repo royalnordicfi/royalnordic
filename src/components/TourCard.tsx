@@ -38,7 +38,7 @@ const TourCard = ({
   const meta = [duration, groupSize, pickup ? 'Hotel pickup' : null].filter(Boolean).join(' · ')
 
   return (
-    <Link to={to} className={`rn-tour-card group rn-reveal ${className}`}>
+    <Link to={to} className={`rn-tour-card group ${className}`}>
       <div className="rn-tour-card__media">
         <img
           src={image}

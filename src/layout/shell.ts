@@ -16,7 +16,6 @@ const OVERLAY_EXACT = new Set([
   '/daytime-experiences',
   '/renting-equipment',
   '/transportation',
-  '/blog',
   '/travel-trade',
 ])
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import CategoryHero from './CategoryHero'
+import CategoryPageEnd from './CategoryPageEnd'
 import Footer from './Footer'
 import ReviewCarousel from './ReviewCarousel'
 import TourCard from './TourCard'
@@ -113,7 +114,15 @@ const NorthernLightsTours: React.FC = () => {
 
       <ReviewCarousel
         reviews={reviewsFor('northern-lights', 6)}
-        className="border-t border-white/[0.06]"
+        className="border-t border-white/[0.06] !pb-6 sm:!pb-10"
+      />
+      <CategoryPageEnd
+        lede="Fill your days between aurora hunts with small-group Lapland experiences."
+        links={[
+          { to: '/northern-lights-tour', label: 'Book Guaranteed tour', primary: true },
+          { to: '/daytime-experiences', label: 'Day tours' },
+        ]}
+        className="border-t-0 pt-0"
       />
       <Footer />
     </div>

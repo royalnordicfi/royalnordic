@@ -9,7 +9,7 @@ type MobileBookingBarProps = {
 /** Persistent mobile CTA — sets --mobile-book-bar for WhatsApp clearance. */
 const MobileBookingBar = ({ priceFrom, onBook, label = 'Book now' }: MobileBookingBarProps) => {
   useEffect(() => {
-    document.documentElement.style.setProperty('--mobile-book-bar', '5.25rem')
+    document.documentElement.style.setProperty('--mobile-book-bar', '4.75rem')
     return () => {
       document.documentElement.style.setProperty('--mobile-book-bar', '0px')
     }

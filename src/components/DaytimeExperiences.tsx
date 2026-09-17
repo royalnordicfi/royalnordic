@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import CategoryHero from './CategoryHero'
+import CategoryPageEnd from './CategoryPageEnd'
 import Footer from './Footer'
 import ReviewCarousel from './ReviewCarousel'
 import TourCard from './TourCard'
@@ -116,7 +117,18 @@ const DaytimeExperiences: React.FC = () => {
         </div>
       </section>
 
-      <ReviewCarousel reviews={reviewsFor('day-tours', 6)} className="border-t border-white/[0.06]" />
+      <ReviewCarousel
+        reviews={reviewsFor('day-tours', 6)}
+        className="border-t border-white/[0.06] !pb-6 sm:!pb-10"
+      />
+      <CategoryPageEnd
+        lede="Evenings free? Pair a day tour with our signature aurora hunt."
+        links={[
+          { to: '/northern-lights-tour', label: 'Guaranteed Northern Lights', primary: true },
+          { to: '/#contact', label: 'Contact us' },
+        ]}
+        className="border-t-0 pt-0"
+      />
       <Footer />
     </div>
   )

@@ -56,6 +56,7 @@ export default function ReviewCarousel({
 
   if (!count) return null
   const review = reviews[index]
+  const useDotStrip = count <= 5
 
   return (
     <section
@@ -145,23 +146,32 @@ export default function ReviewCarousel({
           </figcaption>
         </figure>
 
-        {count > 1 && (
-          <div className="mt-8 flex gap-1.5" role="tablist" aria-label="Review slides">
-            {reviews.map((r, i) => (
-              <button
-                key={r.id}
-                type="button"
-                role="tab"
-                aria-selected={i === index}
-                aria-label={`Show review ${i + 1}`}
-                className={`h-0.5 rounded-full transition-all duration-300 ${
-                  i === index ? 'w-10 bg-aurora-soft/90' : 'w-4 bg-white/15 hover:bg-white/30'
-                }`}
-                onClick={() => goTo(i)}
-              />
-            ))}
-          </div>
-        )}
+        {count > 1 &&
+          (useDotStrip ? (
+            <div className="mt-8 flex gap-1.5" role="tablist" aria-label="Review slides">
+              {reviews.map((r, i) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === index}
+                  aria-label={`Show review ${i + 1}`}
+                  className={`h-0.5 rounded-full transition-all duration-300 ${
+                    i === index ? 'w-10 bg-aurora-soft/90' : 'w-4 bg-white/15 hover:bg-white/30'
+                  }`}
+                  onClick={() => goTo(i)}
+                />
+              ))}
+            </div>
+          ) : (
+            <p
+              className="mt-8 text-sm tabular-nums text-text-dim"
+              aria-live="polite"
+              aria-label={`Review ${index + 1} of ${count}`}
+            >
+              {index + 1} / {count}
+            </p>
+          ))}
       </div>
     </section>
   )

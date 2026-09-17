@@ -2,7 +2,10 @@ import { useEffect } from 'react'
 
 const REVEAL_SELECTORS = ['.rn-reveal', '.rn-reveal-img'] as const
 
-/** Subtle viewport entrance for premium motion. Respects reduced motion. */
+/**
+ * Viewport entrance motion. Marks near-viewport elements immediately so
+ * long grids never leave opaque "ghost" voids that look like broken pagination.
+ */
 export default function RevealObserver() {
   useEffect(() => {
     const markAllVisible = () => {
@@ -27,24 +30,35 @@ export default function RevealObserver() {
       },
       {
         root: null,
-        rootMargin: '0px 0px -4% 0px',
-        threshold: [0, 0.06, 0.14],
+        // Reveal early — avoids invisible card rows creating empty black bands
+        rootMargin: '12% 0px 35% 0px',
+        threshold: 0.01,
       }
     )
 
     const observeAll = () => {
       REVEAL_SELECTORS.forEach((sel) => {
-        document.querySelectorAll(`${sel}:not(.is-visible)`).forEach((el) => io.observe(el))
+        document.querySelectorAll(`${sel}:not(.is-visible)`).forEach((el) => {
+          const rect = el.getBoundingClientRect()
+          const vh = window.innerHeight || 0
+          // Already on screen or within one viewport below — show now
+          if (rect.top < vh * 1.35) {
+            el.classList.add('is-visible')
+            return
+          }
+          io.observe(el)
+        })
       })
     }
-    observeAll()
 
-    const mo = new MutationObserver(() => {
-      observeAll()
-    })
+    observeAll()
+    // Catch late paint / route transitions
+    const t = window.setTimeout(observeAll, 80)
+    const mo = new MutationObserver(() => observeAll())
     mo.observe(document.body, { childList: true, subtree: true })
 
     return () => {
+      window.clearTimeout(t)
       io.disconnect()
       mo.disconnect()
     }

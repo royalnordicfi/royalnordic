@@ -58,7 +58,7 @@ const ExperienceGallery = ({ images }: ExperienceGalleryProps) => {
               <img
                 src={img.src}
                 alt={img.alt}
-                className="aspect-[16/10] w-full object-cover"
+                className="aspect-[16/9] max-h-[12rem] w-full object-cover sm:max-h-none"
                 style={img.position ? { objectPosition: img.position } : undefined}
                 loading={i === 0 ? 'eager' : 'lazy'}
                 onError={onGalleryImageError}

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import CategoryHero from './CategoryHero'
+import CategoryPageEnd from './CategoryPageEnd'
 import Footer from './Footer'
 import TourCard from './TourCard'
 import { fetchActiveTourIds } from '../lib/productVisibility'
@@ -66,8 +67,7 @@ const RentingEquipment: React.FC = () => {
               </div>
 
               <div className="lg:col-span-7 xl:col-span-8">
-                <p className="rn-eyebrow">Self-guided</p>
-                <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-3xl">
+                <h2 className="font-display text-2xl font-semibold text-white sm:text-3xl">
                   Why rent from us
                 </h2>
                 <ul className="mt-5 space-y-3 text-sm leading-relaxed text-text-muted sm:text-base">
@@ -89,6 +89,14 @@ const RentingEquipment: React.FC = () => {
           )}
         </div>
       </section>
+
+      <CategoryPageEnd
+        lede="Want a guided day out instead of self-guided gear?"
+        links={[
+          { to: '/daytime-experiences', label: 'Day tours', primary: true },
+          { to: '/#contact', label: 'Contact us' },
+        ]}
+      />
 
       <Footer />
     </div>

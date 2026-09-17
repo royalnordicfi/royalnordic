@@ -3,9 +3,11 @@ type CategoryHeroProps = {
   subtitle: string
   image: string
   compact?: boolean
+  /** Omit for a cleaner hero; pass e.g. "Royal Nordic" when it adds context */
+  eyebrow?: string | null
 }
 
-const CategoryHero = ({ title, subtitle, image, compact = false }: CategoryHeroProps) => {
+const CategoryHero = ({ title, subtitle, image, compact = false, eyebrow = null }: CategoryHeroProps) => {
   return (
     <section
       className={`relative flex items-end overflow-hidden bg-[#030706] ${
@@ -28,9 +30,9 @@ const CategoryHero = ({ title, subtitle, image, compact = false }: CategoryHeroP
           compact ? 'pb-7 sm:pb-8' : 'pb-8 sm:pb-10'
         }`}
       >
-        <p className="rn-eyebrow">Royal Nordic</p>
+        {eyebrow ? <p className="rn-eyebrow">{eyebrow}</p> : null}
         <h1
-          className={`mt-2 max-w-3xl font-display font-semibold text-white ${
+          className={`${eyebrow ? 'mt-2' : 'mt-0'} max-w-3xl font-display font-semibold text-white ${
             compact
               ? 'text-[1.65rem] sm:text-2xl lg:text-[2.05rem]'
               : 'text-[1.85rem] sm:text-3xl lg:text-[2.35rem]'
