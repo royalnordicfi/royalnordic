@@ -118,7 +118,7 @@ const DaytimeExperiences: React.FC = () => {
         lede="Evenings free? Pair a day tour with our signature aurora hunt."
         links={[
           { to: '/northern-lights-tour', label: 'Guaranteed Northern Lights', primary: true },
-          { to: '/#contact', label: 'Contact us' },
+          { to: '/contact', label: 'Contact us' },
         ]}
         className="border-t-0 pt-0"
       />

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { CONTACT } from '../lib/contactInfo'
 
 const Footer = () => {
   return (
@@ -35,10 +36,18 @@ const Footer = () => {
               Company
             </h3>
             <ul className="space-y-1.5 text-[13px]">
-              <li><Link className="rn-footer-link" to="/#contact">Contact</Link></li>
+              <li><Link className="rn-footer-link" to="/contact">Contact</Link></li>
               <li><Link className="rn-footer-link" to="/travel-trade">Partner With Us</Link></li>
-              <li><a className="rn-footer-link" href="mailto:contact@royalnordic.fi">contact@royalnordic.fi</a></li>
-              <li><a className="rn-footer-link" href="tel:+3584578345138">+358 45 78345138</a></li>
+              <li>
+                <a className="rn-footer-link" href={CONTACT.emailHref}>
+                  {CONTACT.email}
+                </a>
+              </li>
+              <li>
+                <a className="rn-footer-link" href={CONTACT.phoneHref}>
+                  {CONTACT.phoneDisplay}
+                </a>
+              </li>
               <li className="text-text-dim">Rovaniemi, Lapland</li>
             </ul>
           </div>

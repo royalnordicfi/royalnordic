@@ -6,15 +6,13 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
- 
-  try {
-    const { name, email, phone, message } = await req.json()
 
-    // Validate required fields
+  try {
+    const { name, email, phone, message, topic, topicLabel } = await req.json()
+
     if (!name || !email || !message) {
       return new Response(
         JSON.stringify({ error: 'Name, email, and message are required' }),
@@ -22,44 +20,22 @@ serve(async (req) => {
       )
     }
 
-    console.log('=== CONTACT FORM DEBUG ===')
-    console.log('Name:', name)
-    console.log('Email:', email)
-    console.log('Phone:', phone)
-    console.log('Message:', message)
-    console.log('=== END DEBUG ===')
-
-    // Use Resend with your existing setup but send to Gmail
+    const topicLine = topicLabel || topic || 'General'
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
-    
-    console.log('=== RESEND API KEY CHECK ===')
-    console.log('RESEND_API_KEY exists:', !!resendApiKey)
-    console.log('RESEND_API_KEY length:', resendApiKey ? resendApiKey.length : 0)
-    console.log('RESEND_API_KEY starts with:', resendApiKey ? resendApiKey.substring(0, 10) + '...' : 'N/A')
-    console.log('=== END API KEY CHECK ===')
-    
+
     if (!resendApiKey) {
-      console.log('Resend API key not configured, logging email content')
-      console.log('=== CONTACT FORM EMAIL CONTENT ===')
-      console.log('TO: royalnordicfi@gmail.com')
-      console.log('FROM: ' + name + ' <' + email + '>')
-      console.log('MESSAGE: ' + message)
-      console.log('=== END EMAIL CONTENT ===')
-      
+      console.log('Resend API key not configured — contact form payload logged')
+      console.log({ name, email, phone, topicLine, message })
       return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'Message submitted successfully! We will contact you soon.' 
+        JSON.stringify({
+          success: true,
+          message: 'Message submitted successfully! We will contact you soon.',
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
     try {
-      console.log('Sending email via Resend to Gmail...')
-      console.log('From: Royal Nordic <contact@royalnordic.fi>')
-      console.log('To: royalnordicfi@gmail.com')
-      
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -70,66 +46,49 @@ serve(async (req) => {
           from: 'Royal Nordic <contact@royalnordic.fi>',
           to: ['royalnordicfi@gmail.com'],
           reply_to: email,
-          subject: 'New Contact Form Submission - ROYAL NORDIC',
+          subject: `Contact — ${topicLine} — ROYAL NORDIC`,
           html: `
             <h2>New Contact Form Submission</h2>
-            <p><strong>Customer Inquiry From:</strong> ${name} (${email})</p>
+            <p><strong>Topic:</strong> ${topicLine}</p>
+            <p><strong>From:</strong> ${name} (${email})</p>
             <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
             <p><strong>Message:</strong></p>
-            <p>${message}</p>
+            <p>${String(message).replace(/\n/g, '<br>')}</p>
             <hr>
-            <p><em>This inquiry was submitted through your website's contact form.</em></p>
-            <p><em>To reply to the customer, simply reply to this email - it will go to ${email}</em></p>
+            <p><em>Reply to this email to reach ${email}</em></p>
           `,
           text: `
 New Contact Form Submission
 
-Customer Details:
-- Name: ${name}
-- Email: ${email}
-- Phone: ${phone || 'Not provided'}
+Topic: ${topicLine}
+Name: ${name}
+Email: ${email}
+Phone: ${phone || 'Not provided'}
 
 Message:
 ${message}
-
-This message was submitted through your website's contact form.
           `,
         }),
       })
 
-      console.log('Resend response status:', response.status)
-      console.log('Resend response headers:', Object.fromEntries(response.headers.entries()))
-
       if (response.ok) {
         const result = await response.json()
-        console.log('Email sent successfully via Resend:', result)
-        console.log('Email ID:', result.id)
         return new Response(
           JSON.stringify({ success: true, message: 'Message sent successfully!', emailId: result.id }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
-      } else {
-        const errorText = await response.text()
-        console.error('Resend API error:', response.status, errorText)
-        console.error('Full response:', response)
-        throw new Error(`Resend API error: ${response.status} - ${errorText}`)
       }
+
+      const errorText = await response.text()
+      console.error('Resend API error:', response.status, errorText)
+      throw new Error(`Resend API error: ${response.status}`)
     } catch (emailError) {
       console.error('Resend email failed:', emailError)
-      
-      // Fallback: Log the email content
-      console.log('=== CONTACT FORM EMAIL (FALLBACK) ===')
-      console.log('TO: royalnordicfi@gmail.com')
-      console.log('FROM: ' + name + ' <' + email + '>')
-      console.log('MESSAGE: ' + message)
-      console.log('=== END EMAIL ===')
-      
       return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'Message submitted successfully! We will contact you soon.' 
+        JSON.stringify({
+          error: 'Could not send message right now. Please email contact@royalnordic.fi directly.',
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 502 }
       )
     }
   } catch (error) {

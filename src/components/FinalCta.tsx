@@ -17,9 +17,9 @@ const FinalCta = () => {
           <Link to="/northern-lights-tour" className="rn-btn-primary">
             Book Guaranteed Northern Lights
           </Link>
-          <a href="#contact" className="rn-btn-secondary">
+          <Link to="/contact" className="rn-btn-secondary">
             Contact us
-          </a>
+          </Link>
         </div>
       </div>
     </section>

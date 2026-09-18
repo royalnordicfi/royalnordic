@@ -81,7 +81,7 @@ const TransportationCategory = () => {
         lede="Need a custom route or airport timing?"
         links={[
           { to: '/transportation-customized', label: 'Request a quote', primary: true },
-          { to: '/#contact', label: 'Contact us' },
+          { to: '/contact', label: 'Contact us' },
         ]}
       />
 

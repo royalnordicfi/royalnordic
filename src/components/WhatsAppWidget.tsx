@@ -1,8 +1,9 @@
 import React, { useRef } from 'react'
 import { MessageCircle } from 'lucide-react'
+import { CONTACT } from '../lib/contactInfo'
 
 const WhatsAppWidget = () => {
-  const whatsappUrl = 'https://wa.me/message/32DREESZC5QUB1'
+  const whatsappUrl = CONTACT.whatsappUrl
   const lockedUntil = useRef(0)
 
   const handleWhatsAppClick = (e: React.MouseEvent<HTMLButtonElement>) => {

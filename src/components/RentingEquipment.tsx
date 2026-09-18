@@ -95,7 +95,7 @@ const RentingEquipment: React.FC = () => {
         lede="Want a guided day out instead of self-guided gear?"
         links={[
           { to: '/daytime-experiences', label: 'Day tours', primary: true },
-          { to: '/#contact', label: 'Contact us' },
+          { to: '/contact', label: 'Contact us' },
         ]}
       />
 

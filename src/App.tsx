@@ -10,6 +10,7 @@ import ReviewsHome from './components/ReviewsHome';
 import PrivateCustomSection from './components/PrivateCustomSection';
 import GuidesTeaser from './components/GuidesTeaser';
 import Contact from './components/Contact';
+import ContactPage from './components/ContactPage';
 import Footer from './components/Footer';
 import NorthernLightsTour from './components/NorthernLightsTour';
 import SnowshoeRental from './components/SnowshoeRental';
@@ -139,6 +140,7 @@ function App() {
           />
           <Route path="/customized-tour" element={<CustomizedTour />} />
           <Route path="/travel-trade" element={<TravelTrade />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="/snowmobile-safari" element={<SnowmobileSafari />} />
           <Route
             path="/monster-truck-northern-lights"

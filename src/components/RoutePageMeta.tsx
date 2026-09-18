@@ -72,6 +72,11 @@ const META: Record<
     description:
       'Travel agency and B2B partnerships for premium Rovaniemi tours — Northern Lights, daytime experiences, private itineraries, and transfers.',
   },
+  '/contact': {
+    title: 'Contact Royal Nordic | Rovaniemi Lapland',
+    description:
+      'Contact Royal Nordic in Rovaniemi — phone, email, or enquiry form for tours, bookings, private itineraries, and travel-trade partnerships.',
+  },
   '/snowmobile-safari': {
     title: 'Snowmobile Safari Rovaniemi | Request Availability | Royal Nordic',
     description: 'Partner snowmobile safari near Rovaniemi. Request availability and a personalized quote.',

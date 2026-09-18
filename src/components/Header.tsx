@@ -19,6 +19,12 @@ const NAV = [
   { label: 'Private & Custom', to: '/customized-tour' },
   { label: 'Transfers', to: '/transportation' },
   { label: 'Partner With Us', to: '/travel-trade' },
+  { label: 'Contact', to: '/contact' },
+]
+
+const MOBILE_EXTRA = [
+  { label: 'Partner With Us', to: '/travel-trade', hint: 'Travel trade & partnerships' },
+  { label: 'Contact', to: '/contact', hint: 'Phone, email & enquiry form' },
 ]
 
 function resolveNav(to: string, navigate: ReturnType<typeof useNavigate>, pathname: string) {
@@ -182,7 +188,7 @@ const Header = () => {
         }`}
         style={{ top: 'var(--rn-promo-bar-height, 0px)' }}
       >
-        <div className="rn-header__inner rn-container flex items-center justify-between gap-3 lg:gap-4">
+        <div className="rn-header__inner rn-container flex items-center justify-between gap-4 xl:gap-6">
           <Link to="/" className="rn-header__brand flex shrink-0 items-center gap-1.5" aria-label="Royal Nordic home">
             <img src="/logo.png" alt="" className="h-6 w-auto sm:h-[1.55rem]" width={24} height={24} />
             <span className="font-display text-[0.95rem] font-semibold tracking-[0.05em] text-white/95 sm:text-[1.05rem]">
@@ -190,85 +196,86 @@ const Header = () => {
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-0 lg:flex" aria-label="Primary">
-            <div
-              className="relative"
-              ref={dropRef}
-              onMouseEnter={openExperiences}
-              onMouseLeave={scheduleCloseExperiences}
-            >
-              <button
-                type="button"
-                aria-expanded={experiencesOpen}
-                aria-haspopup="menu"
-                aria-controls={menuId}
-                onClick={() => (experiencesOpen ? scheduleCloseExperiences() : openExperiences())}
-                className={`rn-nav-link inline-flex items-center gap-1 ${
-                  experiencesOpen || EXPERIENCES.some((c) => isActive(c.to)) ? 'rn-nav-link--active' : ''
-                }`}
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            {/* Full nav from xl — tablet keeps drawer to avoid crowding */}
+            <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Primary">
+              <div
+                className="relative"
+                ref={dropRef}
+                onMouseEnter={openExperiences}
+                onMouseLeave={scheduleCloseExperiences}
               >
-                Experiences
-                <ChevronDown
-                  size={13}
-                  className={`transition duration-200 ${experiencesOpen ? 'rotate-180' : ''}`}
-                  aria-hidden
-                />
-              </button>
-
-              {experiencesOpen && (
-                <div
-                  id={menuId}
-                  role="menu"
-                  className={`rn-mega ${dropVisible ? 'rn-mega--open' : ''}`}
+                <button
+                  type="button"
+                  aria-expanded={experiencesOpen}
+                  aria-haspopup="menu"
+                  aria-controls={menuId}
+                  onClick={() => (experiencesOpen ? scheduleCloseExperiences() : openExperiences())}
+                  className={`rn-nav-link inline-flex items-center gap-1 ${
+                    experiencesOpen || EXPERIENCES.some((c) => isActive(c.to)) ? 'rn-nav-link--active' : ''
+                  }`}
                 >
-                  <p className="rn-mega__label">Experiences</p>
-                  <ul className="rn-mega__list">
-                    {EXPERIENCES.map((child) => (
-                      <li key={child.to}>
-                        <button
-                          type="button"
-                          role="menuitem"
-                          onClick={() => {
-                            closeExperiencesNow()
-                            resolveNav(child.to, navigate, pathname)
-                          }}
-                          className={`rn-mega__item ${isActive(child.to) ? 'rn-mega__item--active' : ''}`}
-                        >
-                          <span className="rn-mega__item-main">
-                            <span className="rn-mega__item-title">{child.label}</span>
-                            <span className="rn-mega__item-hint">{child.hint}</span>
-                          </span>
-                          <span className="rn-mega__item-arrow" aria-hidden>
-                            →
-                          </span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+                  Experiences
+                  <ChevronDown
+                    size={14}
+                    className={`transition duration-200 ${experiencesOpen ? 'rotate-180' : ''}`}
+                    aria-hidden
+                  />
+                </button>
 
-            {NAV.map((item) => (
-              <button
-                key={item.label}
-                type="button"
-                onClick={() => resolveNav(item.to, navigate, pathname)}
-                className={`rn-nav-link ${isActive(item.to) ? 'rn-nav-link--active' : ''}`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
+                {experiencesOpen && (
+                  <div
+                    id={menuId}
+                    role="menu"
+                    className={`rn-mega ${dropVisible ? 'rn-mega--open' : ''}`}
+                  >
+                    <p className="rn-mega__label">Experiences</p>
+                    <ul className="rn-mega__list">
+                      {EXPERIENCES.map((child) => (
+                        <li key={child.to}>
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => {
+                              closeExperiencesNow()
+                              resolveNav(child.to, navigate, pathname)
+                            }}
+                            className={`rn-mega__item ${isActive(child.to) ? 'rn-mega__item--active' : ''}`}
+                          >
+                            <span className="rn-mega__item-main">
+                              <span className="rn-mega__item-title">{child.label}</span>
+                              <span className="rn-mega__item-hint">{child.hint}</span>
+                            </span>
+                            <span className="rn-mega__item-arrow" aria-hidden>
+                              →
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
 
-          <div className="flex items-center gap-2.5">
+              {NAV.map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => resolveNav(item.to, navigate, pathname)}
+                  className={`rn-nav-link ${isActive(item.to) ? 'rn-nav-link--active' : ''}`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+
             <Link to="/northern-lights-tour" className="rn-btn-primary rn-btn-nav hidden sm:inline-flex">
               Book a tour
             </Link>
             <button
               ref={openRef}
               type="button"
-              className="inline-flex min-h-[40px] min-w-[40px] items-center justify-center rounded border border-white/12 text-white/90 lg:hidden"
+              className="inline-flex min-h-[40px] min-w-[40px] items-center justify-center rounded border border-white/12 text-white/90 xl:hidden"
               aria-label="Open menu"
               aria-expanded={menuOpen}
               onClick={() => (menuOpen || menuMounted ? closeMenu() : openMenu())}
@@ -282,7 +289,7 @@ const Header = () => {
       {menuMounted &&
         createPortal(
           <div
-            className={`rn-mobile-drawer fixed inset-0 z-[70] lg:hidden ${menuOpen ? 'rn-mobile-drawer--open' : ''}`}
+            className={`rn-mobile-drawer fixed inset-0 z-[70] xl:hidden ${menuOpen ? 'rn-mobile-drawer--open' : ''}`}
             role="dialog"
             aria-modal="true"
           >
@@ -320,17 +327,20 @@ const Header = () => {
                   </button>
                 ))}
                 <div className="rn-mobile-drawer__rule" aria-hidden />
-                <button
-                  type="button"
-                  onClick={() => go('/travel-trade')}
-                  className={`rn-mobile-drawer__link rn-mobile-drawer__link--solo ${
-                    isActive('/travel-trade') ? 'rn-mobile-drawer__link--active' : ''
-                  }`}
-                  style={{ '--rn-drawer-i': EXPERIENCES.length } as React.CSSProperties}
-                >
-                  <span className="rn-mobile-drawer__link-title">Partner With Us</span>
-                  <span className="rn-mobile-drawer__link-hint">Travel trade &amp; partnerships</span>
-                </button>
+                {MOBILE_EXTRA.map((item, i) => (
+                  <button
+                    key={item.to}
+                    type="button"
+                    onClick={() => go(item.to)}
+                    className={`rn-mobile-drawer__link rn-mobile-drawer__link--solo ${
+                      isActive(item.to) ? 'rn-mobile-drawer__link--active' : ''
+                    }`}
+                    style={{ '--rn-drawer-i': EXPERIENCES.length + i } as React.CSSProperties}
+                  >
+                    <span className="rn-mobile-drawer__link-title">{item.label}</span>
+                    <span className="rn-mobile-drawer__link-hint">{item.hint}</span>
+                  </button>
+                ))}
               </nav>
               <div className="rn-mobile-drawer__foot">
                 <Link to="/northern-lights-tour" onClick={() => closeMenu()} className="rn-btn-primary w-full">
