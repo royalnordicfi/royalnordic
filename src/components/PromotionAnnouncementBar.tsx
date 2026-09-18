@@ -59,7 +59,7 @@ const PromotionAnnouncementBar = () => {
 
   return (
     <div
-      className="rn-promo-bar fixed inset-x-0 top-0 z-[60] border-b border-white/[0.06] bg-[#07110e] text-snow"
+      className="rn-promo-bar fixed inset-x-0 top-0 z-[60] text-snow"
       style={{
         height: PROMO_BAR_HEIGHT_PX,
         paddingTop: 'env(safe-area-inset-top, 0px)',
@@ -70,23 +70,21 @@ const PromotionAnnouncementBar = () => {
       <button
         type="button"
         onClick={goToDestination}
-        className="group flex h-full w-full items-center justify-center gap-2 px-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-emerald-300"
+        className="rn-promo-bar__btn focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-emerald-300"
         aria-label={`${config.announcementText}. Book now.`}
       >
-        <span className="rn-promo-bar__static truncate text-center font-clean text-[11px] font-medium tracking-wide text-white/85 sm:text-xs">
+        <span className="rn-promo-bar__static">
           Direct booking · Save 20% with{' '}
-          <span className="font-semibold text-aurora-soft">{config.discountCode}</span>
-          <span className="ml-2 inline font-semibold text-white/90 transition group-hover:text-aurora-soft">
-            Book →
-          </span>
+          <span className="rn-promo-bar__code">{config.discountCode}</span>
+          <span className="rn-promo-bar__cta">Book →</span>
         </span>
 
-        <span className="rn-promo-bar__marquee hidden w-full overflow-hidden" aria-hidden>
-          <span className="rn-promo-bar__track inline-flex whitespace-nowrap font-clean text-[11px] font-medium tracking-wide sm:text-xs">
+        <span className="rn-promo-bar__marquee" aria-hidden>
+          <span className="rn-promo-bar__track inline-flex whitespace-nowrap">
             {marqueeChunks.map((chunk, i) => (
               <span key={`${chunk}-${i}`} className="mx-8 inline-flex items-center gap-3">
                 {chunk}
-                <span className="font-semibold text-aurora-soft">Book →</span>
+                <span className="rn-promo-bar__cta">Book →</span>
               </span>
             ))}
           </span>

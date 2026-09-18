@@ -65,4 +65,4 @@ export const WINTER_PROMOTION: WinterPromotionConfig = {
 /** CSS custom property used to offset the fixed header under the bar */
 export const PROMO_BAR_HEIGHT_VAR = '--rn-promo-bar-height'
 /** Slim announcement strip — not a second nav bar */
-export const PROMO_BAR_HEIGHT_PX = 28
+export const PROMO_BAR_HEIGHT_PX = 30

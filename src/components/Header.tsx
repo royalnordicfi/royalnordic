@@ -89,7 +89,7 @@ const Header = () => {
     closeTimer.current = window.setTimeout(() => {
       setExperiencesOpen(false)
       closeTimer.current = null
-    }, 160)
+    }, 220)
   }
 
   const closeExperiencesNow = () => {
@@ -188,19 +188,16 @@ const Header = () => {
         }`}
         style={{ top: 'var(--rn-promo-bar-height, 0px)' }}
       >
-        <div className="rn-header__inner rn-container flex items-center justify-between gap-4 xl:gap-6">
-          <Link to="/" className="rn-header__brand flex shrink-0 items-center gap-1.5" aria-label="Royal Nordic home">
-            <img src="/logo.png" alt="" className="h-6 w-auto sm:h-[1.55rem]" width={24} height={24} />
-            <span className="font-display text-[0.95rem] font-semibold tracking-[0.05em] text-white/95 sm:text-[1.05rem]">
-              Royal Nordic
-            </span>
+        <div className="rn-header__inner rn-container flex items-center justify-between gap-4">
+          <Link to="/" className="rn-header__brand flex shrink-0 items-center" aria-label="Royal Nordic home">
+            <img src="/logo.png" alt="" className="rn-header__brand-mark" width={26} height={26} />
+            <span className="rn-header__brand-name">Royal Nordic</span>
           </Link>
 
-          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-            {/* Full nav from xl — tablet keeps drawer to avoid crowding */}
-            <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Primary">
+          <div className="rn-header__cluster">
+            <nav className="rn-header__nav" aria-label="Primary">
               <div
-                className="relative"
+                className="rn-mega-wrap"
                 ref={dropRef}
                 onMouseEnter={openExperiences}
                 onMouseLeave={scheduleCloseExperiences}
@@ -211,16 +208,12 @@ const Header = () => {
                   aria-haspopup="menu"
                   aria-controls={menuId}
                   onClick={() => (experiencesOpen ? scheduleCloseExperiences() : openExperiences())}
-                  className={`rn-nav-link inline-flex items-center gap-1 ${
+                  className={`rn-nav-link inline-flex items-center ${
                     experiencesOpen || EXPERIENCES.some((c) => isActive(c.to)) ? 'rn-nav-link--active' : ''
                   }`}
                 >
                   Experiences
-                  <ChevronDown
-                    size={14}
-                    className={`transition duration-200 ${experiencesOpen ? 'rotate-180' : ''}`}
-                    aria-hidden
-                  />
+                  <ChevronDown size={14} className="rn-nav-link__chevron" aria-hidden strokeWidth={1.75} />
                 </button>
 
                 {experiencesOpen && (
@@ -269,18 +262,18 @@ const Header = () => {
               ))}
             </nav>
 
-            <Link to="/northern-lights-tour" className="rn-btn-primary rn-btn-nav hidden sm:inline-flex">
+            <Link to="/northern-lights-tour" className="rn-header-cta hidden sm:inline-flex">
               Book a tour
             </Link>
             <button
               ref={openRef}
               type="button"
-              className="inline-flex min-h-[40px] min-w-[40px] items-center justify-center rounded border border-white/12 text-white/90 xl:hidden"
+              className="rn-header-menu"
               aria-label="Open menu"
               aria-expanded={menuOpen}
               onClick={() => (menuOpen || menuMounted ? closeMenu() : openMenu())}
             >
-              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+              {menuOpen ? <X size={20} strokeWidth={1.75} /> : <Menu size={20} strokeWidth={1.75} />}
             </button>
           </div>
         </div>
@@ -309,7 +302,7 @@ const Header = () => {
                   aria-label="Close menu"
                   onClick={() => closeMenu()}
                 >
-                  <X size={18} />
+                  <X size={18} strokeWidth={1.75} />
                 </button>
               </div>
               <nav className="rn-mobile-drawer__nav" aria-label="Mobile">
@@ -343,7 +336,11 @@ const Header = () => {
                 ))}
               </nav>
               <div className="rn-mobile-drawer__foot">
-                <Link to="/northern-lights-tour" onClick={() => closeMenu()} className="rn-btn-primary w-full">
+                <Link
+                  to="/northern-lights-tour"
+                  onClick={() => closeMenu()}
+                  className="rn-header-cta rn-header-cta--drawer"
+                >
                   Book a tour
                 </Link>
               </div>
