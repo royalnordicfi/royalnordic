@@ -21,7 +21,7 @@ const Hero = () => {
 
       <div className="rn-container relative z-10 flex min-h-[72svh] flex-col justify-end pb-11 pt-[calc(var(--rn-chrome-h)+1.25rem)] sm:min-h-[80svh] sm:pb-14 sm:pt-[calc(var(--rn-chrome-h)+1.75rem)]">
         <div className="rn-hero-copy max-w-lg">
-          <p className="rn-eyebrow">Royal Nordic · Rovaniemi, Finnish Lapland</p>
+          <p className="rn-eyebrow">Royal Nordic · Rovaniemi, Finnish&nbsp;Lapland</p>
           <h1 className="rn-display mt-3 text-[1.95rem] text-white sm:text-[2.15rem] lg:text-[2.45rem]">
             Guaranteed Northern Lights
           </h1>

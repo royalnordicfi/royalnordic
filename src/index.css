@@ -445,7 +445,7 @@
   }
   .rn-gallery__tile {
     border-radius: 7px;
-    background: #050908;
+    background: linear-gradient(155deg, var(--rn-surface-2), var(--rn-elevated));
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.045);
   }
   .rn-gallery__veil {
@@ -536,7 +536,7 @@
     position: relative;
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    background: #000;
+    background: linear-gradient(155deg, var(--rn-surface-2), var(--rn-elevated));
     border-radius: var(--rn-radius);
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
     transition: box-shadow 0.4s ease;
@@ -854,7 +854,7 @@
     position: relative;
     aspect-ratio: 16 / 10;
     overflow: hidden;
-    background: #000;
+    background: linear-gradient(155deg, var(--rn-surface-2), var(--rn-elevated));
     border-radius: var(--rn-radius-sm);
   }
   @media (max-width: 639px) {

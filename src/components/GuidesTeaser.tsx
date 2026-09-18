@@ -11,7 +11,7 @@ const GUIDES = [
     to: '/blog/what-to-wear-lapland-winter-clothing-guide',
     title: 'What to wear in Lapland winter',
     text: 'Layers, boots, and how to stay warm on outdoor tours.',
-    image: '/nortti5.jpg',
+    image: '/snowshoe1.jpg',
   },
   {
     to: '/blog/northern-lights-photography-tips-beginners',
