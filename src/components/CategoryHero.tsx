@@ -46,8 +46,8 @@ const CategoryHero = ({
         <h1
           className={`${eyebrow || lead ? 'mt-2' : 'mt-0'} max-w-3xl font-display font-semibold text-white ${
             compact
-              ? 'text-[1.65rem] leading-[1.15] sm:text-2xl lg:text-[2.05rem]'
-              : 'text-[1.85rem] leading-[1.12] sm:text-3xl lg:text-[2.35rem]'
+              ? 'text-[1.75rem] leading-[1.13] sm:text-[2.15rem] lg:text-[2.55rem]'
+              : 'text-[2rem] leading-[1.08] sm:text-[2.65rem] lg:text-[3.25rem]'
           }`}
         >
           {title}
