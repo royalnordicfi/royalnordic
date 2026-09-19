@@ -11,7 +11,7 @@ const Contact = () => {
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-12 lg:items-start">
           <div className="lg:col-span-4">
             <p className="rn-eyebrow rn-reveal">Get in touch</p>
-            <h2 className="rn-h2 rn-reveal mt-3 text-white">
+            <h2 className="rn-h2-tight rn-reveal mt-3 text-white">
               Questions before you book?
             </h2>
             <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-text-muted">

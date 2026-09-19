@@ -28,7 +28,7 @@ const GuidesTeaser = () => {
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="rn-eyebrow">Guides</p>
-            <h2 className="rn-h2 mt-2.5 text-white">Plan with local context</h2>
+            <h2 className="rn-h2-tight mt-2.5 text-white">Plan with local context</h2>
           </div>
           <Link to="/blog" className="hidden text-sm font-semibold text-aurora-soft hover:underline sm:inline">
             All guides →
@@ -39,7 +39,7 @@ const GuidesTeaser = () => {
             <Link
               key={g.to}
               to={g.to}
-              className="group rn-blog-card overflow-hidden rounded-rn border border-white/10 bg-surface"
+              className="group rn-blog-card overflow-hidden rounded-rn border border-white/[0.08] bg-surface shadow-rn-soft transition-shadow duration-300 hover:shadow-rn"
             >
               <div className="aspect-[16/10] overflow-hidden">
                 <img

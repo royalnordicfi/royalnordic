@@ -242,13 +242,14 @@
     color: var(--rn-panel-ink);
     border-radius: var(--rn-radius);
   }
-  .rn-panel h1,
-  .rn-panel h2,
-  .rn-panel h3,
-  .rn-panel h4,
-  .rn-panel h5,
-  .rn-panel h6 {
+  /* Scoped ink utilities for light sections — never a blanket h1..h6 rule,
+     which would also repaint white text sitting on a dark photo card
+     nested inside a light section. */
+  .rn-ink {
     color: var(--rn-panel-ink);
+  }
+  .rn-ink-muted {
+    color: var(--rn-panel-muted);
   }
 
   .rn-surface {
@@ -377,6 +378,17 @@
     line-height: 1.12;
     letter-spacing: -0.022em;
     font-size: clamp(1.7rem, 1.05rem + 1.7vw, 2.5rem);
+  }
+
+  /* Module-level heading — for routine sections (reviews, guides, contact,
+     the experience catalogue). Reserve the full .rn-h2 scale for genuine
+     brand moments: the hero and the flagship product only. */
+  .rn-h2-tight {
+    font-family: var(--rn-font-display);
+    font-weight: 600;
+    line-height: 1.16;
+    letter-spacing: -0.015em;
+    font-size: clamp(1.4rem, 1.2rem + 0.85vw, 1.7rem);
   }
 
   /* ——— Product page composition ——— */
