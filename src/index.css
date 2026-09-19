@@ -383,6 +383,47 @@
   /* Module-level heading — for routine sections (reviews, guides, contact,
      the experience catalogue). Reserve the full .rn-h2 scale for genuine
      brand moments: the hero and the flagship product only. */
+  /* Floating trust bar: overlaps the hero's bottom edge instead of sitting
+     as its own hard-edged section, and picks up a faint aurora-tinted
+     ambient glow along its top edge so the photography above feels like
+     it is casting light onto the surface below. */
+  .rn-trust-float {
+    position: relative;
+    background: linear-gradient(180deg, rgba(16, 28, 24, 0.97), rgba(9, 16, 13, 0.97));
+  }
+  .rn-trust-float::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      180deg,
+      rgba(125, 236, 192, 0.22),
+      rgba(125, 236, 192, 0.02) 40%,
+      transparent 70%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .rn-explore-tile {
+    transition:
+      transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.32s ease;
+  }
+  .rn-explore-tile:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--tw-shadow, 0 24px 60px rgba(0, 0, 0, 0.5));
+  }
+  .rn-explore-tile--lead:hover {
+    transform: translateY(-4px);
+  }
+
   .rn-h2-tight {
     font-family: var(--rn-font-display);
     font-weight: 600;
@@ -780,6 +821,62 @@
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--rn-aurora-soft);
+  }
+
+  /* Ambient light derived from the photo itself — a soft aurora-tinted
+     glow bleeding out from behind the flagship image into the dark
+     surface around it, rather than a decorative gradient placed
+     arbitrarily on the section. */
+  .rn-signature-glow {
+    position: absolute;
+    inset: -6% -10%;
+    background:
+      radial-gradient(60% 55% at 30% 20%, rgba(18, 155, 108, 0.16), transparent 70%),
+      radial-gradient(45% 40% at 80% 85%, rgba(18, 155, 108, 0.1), transparent 70%);
+    filter: blur(28px);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Price chip: breaks out of the image's rounded rectangle and overlaps
+     the surrounding surface — a deliberately layered element rather than
+     everything living inside its own container. */
+  .rn-price-chip {
+    position: absolute;
+    right: -0.85rem;
+    bottom: -1rem;
+    z-index: 2;
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    border-radius: var(--rn-radius-sm);
+    border: 1px solid rgba(125, 236, 192, 0.18);
+    background: linear-gradient(155deg, var(--rn-surface-2), var(--rn-elevated));
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45);
+    padding: 0.55rem 0.9rem;
+  }
+  .rn-price-chip__label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--rn-text-dim);
+  }
+  .rn-price-chip__value {
+    font-family: var(--rn-font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--rn-snow);
+  }
+  @media (min-width: 640px) {
+    .rn-price-chip {
+      right: -1.1rem;
+      bottom: -1.15rem;
+      padding: 0.65rem 1.05rem;
+    }
+    .rn-price-chip__value {
+      font-size: 1.3rem;
+    }
   }
 
   .rn-review-editorial {

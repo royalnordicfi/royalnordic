@@ -19,20 +19,18 @@ const TrustStrip = () => {
   ]
 
   return (
-    <section
-      className="relative border-y border-white/[0.07] bg-[#070e0c]"
-      aria-label="Why travellers book Royal Nordic"
-    >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(18,185,129,0.08),transparent_55%)]" aria-hidden />
-      <div className="rn-container relative grid gap-5 py-6 sm:grid-cols-2 sm:gap-6 sm:py-7 lg:grid-cols-4">
-        {items.map((item) => (
-          <div key={item.title} className="rn-reveal">
-            <p className="text-[13px] font-semibold text-white/95">{item.title}</p>
-            <p className="mt-1 text-[13px] leading-relaxed text-text-muted">{item.text}</p>
-          </div>
-        ))}
+    <div className="relative z-10 -mt-7 px-4 sm:-mt-9 sm:px-6 lg:-mt-11 lg:px-8" aria-label="Why travellers book Royal Nordic">
+      <div className="rn-container !px-0">
+        <div className="rn-trust-float rn-reveal grid gap-4 gap-y-5 rounded-rn-lg border border-white/[0.08] bg-elevated/95 px-5 py-5 shadow-rn backdrop-blur sm:grid-cols-2 sm:gap-6 sm:px-7 sm:py-6 lg:grid-cols-4">
+          {items.map((item) => (
+            <div key={item.title}>
+              <p className="text-[12.5px] font-semibold text-white/95">{item.title}</p>
+              <p className="mt-1 text-[12.5px] leading-relaxed text-text-muted">{item.text}</p>
+            </div>
+          ))}
+        </div>
       </div>
-    </section>
+    </div>
   )
 }
 
