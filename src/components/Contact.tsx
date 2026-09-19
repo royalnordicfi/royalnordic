@@ -10,8 +10,8 @@ const Contact = () => {
       <div className="rn-container relative">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-12 lg:items-start">
           <div className="lg:col-span-4">
-            <p className="rn-eyebrow">Get in touch</p>
-            <h2 className="mt-2.5 font-display text-2xl font-semibold text-white sm:text-[1.75rem]">
+            <p className="rn-eyebrow rn-reveal">Get in touch</p>
+            <h2 className="rn-h2 rn-reveal mt-3 text-white">
               Questions before you book?
             </h2>
             <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-text-muted">

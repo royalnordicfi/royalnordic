@@ -26,7 +26,7 @@ const FeaturedExperience = () => {
 
           <div className="rn-reveal min-w-0 flex-1 lg:pt-1">
             <p className="rn-eyebrow">From €149 · Rovaniemi</p>
-            <h2 className="mt-2 font-display text-[1.55rem] font-semibold leading-tight text-white sm:text-[1.85rem] lg:text-[2rem]">
+            <h2 className="rn-h2 mt-2.5 text-white">
               Guaranteed Northern Lights Tour
             </h2>
             <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-text-muted sm:text-base">

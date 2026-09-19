@@ -34,7 +34,7 @@ const ExploreCategories = () => {
       <div className="rn-container relative">
         <div className="max-w-2xl">
           <p className="rn-eyebrow">Explore</p>
-          <h2 className="mt-2 font-display text-xl font-semibold text-white sm:text-2xl">
+          <h2 className="rn-h2 mt-2.5 text-white">
             Choose how you experience Lapland
           </h2>
         </div>

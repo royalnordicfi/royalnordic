@@ -343,6 +343,14 @@
     filter: saturate(1.16) contrast(1.05) brightness(1.03);
   }
 
+  .rn-h2 {
+    font-family: var(--rn-font-display);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.022em;
+    font-size: clamp(1.7rem, 1.05rem + 1.7vw, 2.5rem);
+  }
+
   /* ——— Product page composition ——— */
   .rn-product {
     position: relative;
@@ -362,8 +370,8 @@
       linear-gradient(180deg, rgba(4, 12, 10, 0.35), transparent 70%);
   }
   .rn-product__title {
-    font-size: clamp(1.6rem, 1.85vw + 0.72rem, 2.2rem);
-    line-height: 1.1;
+    font-size: clamp(1.9rem, 1.3rem + 1.9vw, 2.7rem);
+    line-height: 1.08;
     letter-spacing: -0.03em;
   }
   .rn-product__lede {
@@ -652,17 +660,25 @@
   .rn-tour-card__foot {
     margin-top: auto;
     display: flex;
-    align-items: baseline;
+    align-items: flex-end;
     justify-content: space-between;
     gap: 0.75rem;
-    padding-top: 0.6rem;
+    padding-top: 0.7rem;
   }
   .rn-tour-card__price {
-    font-size: 0.875rem;
-    color: var(--rn-text-muted);
+    font-size: 0.6875rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--rn-text-dim);
   }
   .rn-tour-card__price span {
+    display: block;
+    margin-top: 0.15rem;
+    font-family: var(--rn-font-display);
+    font-size: 1.2rem;
     font-weight: 600;
+    letter-spacing: -0.01em;
+    text-transform: none;
     color: #fff;
   }
   .rn-tour-card__cta {
