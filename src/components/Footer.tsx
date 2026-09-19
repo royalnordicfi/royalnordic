@@ -8,9 +8,9 @@ const Footer = () => {
       <div className="rn-container py-8 sm:py-10">
         <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           <div>
-            <div className="mb-2.5 flex items-center gap-2">
-              <img src="/logo.png" alt="" className="h-6 w-auto opacity-90" width={24} height={24} />
-              <span className="font-display text-base font-semibold tracking-wide text-white/95">Royal Nordic</span>
+            <div className="mb-3 flex items-center gap-2.5">
+              <img src="/logo.png" alt="" className="h-7 w-auto opacity-95" width={28} height={28} />
+              <span className="font-display text-lg font-semibold tracking-[0.03em] text-white/96">Royal Nordic</span>
             </div>
             <p className="max-w-xs text-[13px] leading-relaxed text-text-muted">
               Small-group Lapland experiences from Rovaniemi — aurora hunts, day tours, and private itineraries.
