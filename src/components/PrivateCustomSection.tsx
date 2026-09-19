@@ -8,8 +8,8 @@ const PrivateCustomSection = () => {
         <div className="grid items-stretch gap-0 overflow-hidden rounded-rn border border-white/[0.08] lg:grid-cols-2">
           <div className="relative min-h-[220px] sm:min-h-[260px] lg:min-h-[300px]">
             <img
-              src="/nortti5.jpg"
-              alt="Private Lapland experience under the aurora"
+              src="/nordicci7.jpg"
+              alt="A couple walks a snowy Lapland road beneath a swirling green aurora"
               className="absolute inset-0 h-full w-full object-cover"
               loading="lazy"
             />

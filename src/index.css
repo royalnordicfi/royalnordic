@@ -349,10 +349,10 @@
 
   .rn-hero-video {
     transform: scale(1.03);
-    animation: rn-hero-photo-in 24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: rn-hero-video-in 24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     filter: brightness(1.16) saturate(1.14) contrast(1.05);
   }
-  @keyframes rn-hero-photo-in {
+  @keyframes rn-hero-video-in {
     to {
       transform: scale(1);
     }
