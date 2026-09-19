@@ -242,6 +242,14 @@
     color: var(--rn-panel-ink);
     border-radius: var(--rn-radius);
   }
+  .rn-panel h1,
+  .rn-panel h2,
+  .rn-panel h3,
+  .rn-panel h4,
+  .rn-panel h5,
+  .rn-panel h6 {
+    color: var(--rn-panel-ink);
+  }
 
   .rn-surface {
     background: var(--rn-surface);
@@ -733,6 +741,15 @@
       0 0 0 1px rgba(125, 236, 192, 0.22),
       0 0 36px rgba(18, 155, 108, 0.1);
   }
+  .rn-signature-card__media--tall {
+    aspect-ratio: 4 / 5;
+  }
+  @media (min-width: 1024px) {
+    .rn-signature-card__media--tall {
+      aspect-ratio: 3 / 4;
+    }
+  }
+
   .rn-signature-card__img {
     height: 100%;
     width: 100%;

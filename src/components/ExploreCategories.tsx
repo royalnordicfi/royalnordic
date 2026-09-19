@@ -29,12 +29,11 @@ const CATEGORIES = [
 
 const ExploreCategories = () => {
   return (
-    <section id="experiences" className="rn-section relative overflow-hidden bg-midnight">
-      <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
+    <section id="experiences" className="rn-section rn-panel relative overflow-hidden">
       <div className="rn-container relative">
         <div className="max-w-2xl">
           <p className="rn-eyebrow">Explore</p>
-          <h2 className="rn-h2 mt-2.5 text-white">
+          <h2 className="rn-h2 mt-2.5">
             Choose how you experience Lapland
           </h2>
         </div>

@@ -3,6 +3,7 @@ import { SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS } from './lib/productVisibility';
 import ActiveTourGate from './components/ActiveTourGate';
 import Header from './components/Header';
 import Hero from './components/Hero';
+import EditorialMoment from './components/EditorialMoment';
 import TrustStrip from './components/TrustStrip';
 import FeaturedExperience from './components/FeaturedExperience';
 import ExploreCategories from './components/ExploreCategories';
@@ -75,6 +76,7 @@ function App() {
               <Hero />
               <TrustStrip />
               <FeaturedExperience />
+              <EditorialMoment />
               <ExploreCategories />
               <ReviewsHome />
               <PrivateCustomSection />
