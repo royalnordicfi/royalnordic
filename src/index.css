@@ -339,8 +339,15 @@
     letter-spacing: -0.03em;
   }
 
-  .rn-hero-video {
-    filter: saturate(1.16) contrast(1.05) brightness(1.03);
+  .rn-hero-photo {
+    transform: scale(1.055);
+    animation: rn-hero-photo-in 20s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    filter: saturate(1.05) contrast(1.02);
+  }
+  @keyframes rn-hero-photo-in {
+    to {
+      transform: scale(1);
+    }
   }
 
   .rn-h2 {
@@ -1747,8 +1754,12 @@
 
 @media (prefers-reduced-motion: reduce) {
   .rn-marquee-track,
-  .rn-hero-copy {
+  .rn-hero-copy,
+  .rn-hero-photo {
     animation: none;
+  }
+  .rn-hero-photo {
+    transform: none;
   }
   .rn-reveal,
   .rn-reveal-img .rn-blog-card__img,

@@ -3,18 +3,14 @@ import { Link } from 'react-router-dom'
 const Hero = () => {
   return (
     <section className="relative overflow-hidden bg-[#030706]">
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        poster="/nortti1.jpg"
-        className="rn-hero-video absolute inset-0 h-full w-full object-cover"
-      >
-        <source src="/northernlightsvideo_final.mp4" type="video/mp4" />
-      </video>
+      <img
+        src="/lights2.jpg"
+        alt="Vivid green Northern Lights arcing over a snow-covered forest near Rovaniemi"
+        className="rn-hero-photo absolute inset-0 h-full w-full object-cover"
+        fetchPriority="high"
+      />
       <div
-        className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/15"
+        className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/30 to-black/10"
         aria-hidden
       />
       <div className="rn-hero-chrome-veil pointer-events-none absolute inset-x-0 top-0 h-36 sm:h-44" aria-hidden />
