@@ -339,15 +339,28 @@
     letter-spacing: -0.03em;
   }
 
-  .rn-hero-photo {
-    transform: scale(1.055);
-    animation: rn-hero-photo-in 20s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    filter: saturate(1.05) contrast(1.02);
+  .rn-hero-video {
+    transform: scale(1.03);
+    animation: rn-hero-photo-in 24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    filter: brightness(1.16) saturate(1.14) contrast(1.05);
   }
   @keyframes rn-hero-photo-in {
     to {
       transform: scale(1);
     }
+  }
+
+  /* Bottom-weighted scrim: lets the aurora read clearly through most of the
+     frame, darkening only where the copy block needs contrast. */
+  .rn-hero-scrim {
+    background: linear-gradient(
+      to top,
+      rgba(1, 4, 3, 0.86) 0%,
+      rgba(1, 4, 3, 0.52) 20%,
+      rgba(1, 4, 3, 0.16) 42%,
+      rgba(1, 4, 3, 0.02) 60%,
+      transparent 72%
+    );
   }
 
   .rn-h2 {
@@ -1755,10 +1768,10 @@
 @media (prefers-reduced-motion: reduce) {
   .rn-marquee-track,
   .rn-hero-copy,
-  .rn-hero-photo {
+  .rn-hero-video {
     animation: none;
   }
-  .rn-hero-photo {
+  .rn-hero-video {
     transform: none;
   }
   .rn-reveal,
