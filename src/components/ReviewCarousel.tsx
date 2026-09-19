@@ -81,7 +81,7 @@ export default function ReviewCarousel({
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="rn-eyebrow">{eyebrow}</p>
-            <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-3xl">{title}</h2>
+            <h2 className="rn-h2 mt-2.5 text-white">{title}</h2>
           </div>
           {count > 1 && (
             <div className="flex items-center gap-2">
