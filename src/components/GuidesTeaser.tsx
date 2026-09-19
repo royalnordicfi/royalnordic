@@ -6,18 +6,21 @@ const GUIDES = [
     title: 'Best time for Northern Lights in Lapland',
     text: 'Seasons, weather, and practical timing tips from Rovaniemi.',
     image: '/nortti11.jpg',
+    offset: '',
   },
   {
     to: '/blog/what-to-wear-lapland-winter-clothing-guide',
     title: 'What to wear in Lapland winter',
     text: 'Layers, boots, and how to stay warm on outdoor tours.',
     image: '/snowshoe1.jpg',
+    offset: 'lg:mt-9',
   },
   {
     to: '/blog/northern-lights-photography-tips-beginners',
     title: 'Northern Lights photography tips',
     text: 'Simple aurora photography advice for first-time visitors.',
     image: '/lights7.jpg',
+    offset: 'lg:mt-3',
   },
 ]
 
@@ -34,12 +37,12 @@ const GuidesTeaser = () => {
             All guides →
           </Link>
         </div>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="mt-6 grid gap-4 md:grid-cols-3 lg:items-start">
           {GUIDES.map((g) => (
             <Link
               key={g.to}
               to={g.to}
-              className="group rn-blog-card overflow-hidden rounded-rn border border-white/[0.08] bg-surface shadow-rn-soft transition-shadow duration-300 hover:shadow-rn"
+              className={`group rn-blog-card overflow-hidden rounded-rn border border-white/[0.08] bg-surface shadow-rn-soft transition-shadow duration-300 hover:shadow-rn ${g.offset}`}
             >
               <div className="aspect-[16/10] overflow-hidden">
                 <img

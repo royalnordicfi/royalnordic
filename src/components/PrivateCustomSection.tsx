@@ -2,22 +2,28 @@ import { Link } from 'react-router-dom'
 
 const PrivateCustomSection = () => {
   return (
-    <section className="rn-section relative border-t border-white/[0.06] bg-surface">
-      <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-50" aria-hidden />
-      <div className="rn-container relative">
-        <div className="grid items-stretch gap-0 overflow-hidden rounded-rn border border-white/[0.08] lg:grid-cols-2">
-          <div className="relative min-h-[220px] sm:min-h-[260px] lg:min-h-[300px]">
+    <section
+      className="relative overflow-hidden border-t border-white/[0.06] bg-surface py-14 sm:py-16 lg:py-0"
+      aria-label="Private and custom tours"
+    >
+      <div className="grid lg:grid-cols-12 lg:items-stretch">
+        <div className="rn-reveal-img relative lg:col-span-7">
+          <div className="relative h-[280px] overflow-hidden sm:h-[360px] lg:h-[480px]">
             <img
               src="/nordicci7.jpg"
               alt="A couple walks a snowy Lapland road beneath a swirling green aurora"
-              className="absolute inset-0 h-full w-full object-cover"
+              className="h-full w-full object-cover"
               loading="lazy"
             />
-            <div className="absolute inset-0 bg-black/35" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-black/25" />
+            <span className="rn-float-badge absolute left-4 top-4 sm:left-6 sm:top-6">Private &amp; custom</span>
           </div>
-          <div className="p-6 sm:p-8 lg:p-10">
-            <p className="rn-eyebrow rn-reveal">Private & custom</p>
-            <h2 className="rn-h2-tight rn-reveal mt-2.5 text-white">
+        </div>
+
+        <div className="relative lg:col-span-5">
+          <div className="pointer-events-none absolute inset-0 -z-10 rn-ambient-subtle opacity-60 lg:-left-16" aria-hidden />
+          <div className="rn-reveal rn-private-panel relative mx-4 -mt-10 rounded-rn-lg border border-white/[0.08] bg-elevated p-6 shadow-rn sm:mx-6 sm:-mt-14 sm:p-8 lg:mx-0 lg:-ml-16 lg:mt-0 lg:flex lg:min-h-[480px] lg:flex-col lg:justify-center lg:self-stretch lg:rounded-l-[28px] lg:rounded-r-none lg:border-l-0 lg:p-12 lg:pl-20">
+            <h2 className="rn-h2-tight text-white">
               Plan a Lapland itinerary around your dates, group, and pace
             </h2>
             <p className="mt-4 text-text-muted">
