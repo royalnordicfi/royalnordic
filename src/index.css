@@ -333,6 +333,16 @@
     );
   }
 
+  .rn-hero-title {
+    font-size: clamp(2.35rem, 1.05rem + 4.6vw, 5.25rem);
+    line-height: 1.03;
+    letter-spacing: -0.03em;
+  }
+
+  .rn-hero-video {
+    filter: saturate(1.16) contrast(1.05) brightness(1.03);
+  }
+
   /* ——— Product page composition ——— */
   .rn-product {
     position: relative;

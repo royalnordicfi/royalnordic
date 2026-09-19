@@ -5,7 +5,7 @@ const CATEGORIES = [
     title: 'Northern Lights',
     text: 'Guaranteed aurora hunts and family evenings from Rovaniemi.',
     to: '/northern-lights-tours',
-    image: '/nortti1.jpg',
+    image: '/lights3.jpg',
   },
   {
     title: 'Day adventures',
