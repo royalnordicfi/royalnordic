@@ -6,6 +6,7 @@ import ReviewCarousel from './ReviewCarousel'
 import TourCard from './TourCard'
 import { reviewsFor } from '../data/reviews'
 import { fetchActiveTourIds, SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS } from '../lib/productVisibility'
+import { GUARANTEED_NL_CATALOG_ADULT_PRICE } from '../seo/guaranteedNorthernLightsTour'
 
 const ALL_TOURS = [
   {
@@ -20,7 +21,7 @@ const ALL_TOURS = [
     groupSize: 'Max 8 / vehicle',
     pickup: true,
     badge: 'Guaranteed',
-    priceFrom: 149 as number | undefined,
+    priceFrom: GUARANTEED_NL_CATALOG_ADULT_PRICE as number | undefined,
   },
   {
     tourId: 8 as number | null,

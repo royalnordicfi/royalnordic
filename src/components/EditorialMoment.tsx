@@ -13,7 +13,7 @@ const EditorialMoment = () => {
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 to-transparent"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#050a08] from-0% via-black/45 via-40% to-transparent"
           aria-hidden
         />
         <div className="rn-container absolute inset-x-0 top-[calc(var(--rn-chrome-h)+1.5rem)] sm:top-[calc(var(--rn-chrome-h)+2rem)]">

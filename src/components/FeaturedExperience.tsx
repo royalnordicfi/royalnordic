@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { GUARANTEED_NL_CATALOG_ADULT_PRICE } from '../seo/guaranteedNorthernLightsTour'
 
 const FeaturedExperience = () => {
   return (
@@ -25,7 +26,7 @@ const FeaturedExperience = () => {
             </div>
             <div className="rn-price-chip">
               <span className="rn-price-chip__label">From</span>
-              <span className="rn-price-chip__value">€149</span>
+              <span className="rn-price-chip__value">€{GUARANTEED_NL_CATALOG_ADULT_PRICE}</span>
             </div>
           </div>
 

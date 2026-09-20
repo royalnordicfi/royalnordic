@@ -8,7 +8,7 @@ export const SITE = 'https://royalnordic.fi'
 export const GUARANTEED_NL_PATH = '/northern-lights-tour'
 
 /** Catalog adult list price (EUR). Promo codes like WINTER20 apply at checkout — not in Offer.price. */
-export const GUARANTEED_NL_CATALOG_ADULT_PRICE = 149
+export const GUARANTEED_NL_CATALOG_ADULT_PRICE = 129
 
 /** Matches product copy: max 8 people per vehicle */
 export const GUARANTEED_NL_MAX_PER_VEHICLE = 8

@@ -23,7 +23,7 @@ const TITLE = 'Guaranteed Northern Lights Tour Rovaniemi | Royal Nordic'
 const DESCRIPTION =
   'Book a guaranteed Northern Lights / aurora tour from Rovaniemi: small-group hunt, hotel pickup, English & Finnish guides, flexible duration. Free cancellation 24h. Pay securely online.'
 const OG_IMAGE = `${SITE}/nortti1.jpg`
-const CATALOG_ADULT_PRICE = 149
+const CATALOG_ADULT_PRICE = 129 // mirrors GUARANTEED_NL_CATALOG_ADULT_PRICE in src/seo/guaranteedNorthernLightsTour.ts
 
 function isInSeason(date = new Date()) {
   const md = `${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`
