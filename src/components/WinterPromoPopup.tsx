@@ -124,7 +124,7 @@ const WinterPromoPopup = () => {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[110] flex items-end justify-center bg-black/75 p-4 sm:items-center"
+        className="fixed inset-0 z-[110] flex items-end justify-center bg-black/75 p-3 sm:items-center sm:p-4"
       role="presentation"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) close()
@@ -136,7 +136,8 @@ const WinterPromoPopup = () => {
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className="relative max-h-[min(92vh,640px)] w-full max-w-md overflow-y-auto rounded-2xl border border-emerald-400/30 bg-gradient-to-b from-gray-950 via-black to-gray-950 p-6 shadow-2xl sm:p-8"
+        className="relative max-h-[min(92dvh,640px)] w-full max-w-md overflow-y-auto rounded-2xl border border-emerald-400/30 bg-gradient-to-b from-gray-950 via-black to-gray-950 p-5 shadow-2xl sm:p-8"
+        style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
         <button
           ref={closeRef}

@@ -38,6 +38,7 @@ const navGroups: { title: string; items: NavItem[] }[] = [
     items: [
       { to: '/revenue', label: 'Revenue' },
       { to: '/import', label: 'Import' },
+      { to: '/integrations', label: 'Integrations' },
     ],
   },
 ]
@@ -90,8 +91,8 @@ export default function AdminShell() {
 
   if (!ready) {
     return (
-      <div className="min-h-screen bg-zinc-100 flex items-center justify-center">
-        <RefreshCw className="w-5 h-5 animate-spin text-emerald-700" />
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50">
+        <RefreshCw className="h-5 w-5 animate-spin text-emerald-700" />
       </div>
     )
   }
@@ -101,24 +102,24 @@ export default function AdminShell() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-100 text-zinc-900 overflow-x-clip">
-      <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950 text-white px-4 py-2.5 flex items-center justify-between">
+    <div className="min-h-screen overflow-x-clip bg-zinc-50 text-zinc-900">
+      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-zinc-800/90 bg-zinc-950 px-4 py-2.5 text-white sm:px-5">
         <div className="min-w-0">
-          <Link to="/" className="text-sm font-semibold tracking-tight">
+          <Link to="/" className="text-[13px] font-semibold tracking-tight">
             Royal Nordic Ops
           </Link>
-          <p className="text-[11px] text-zinc-400 truncate">{auth.user?.email}</p>
+          <p className="truncate text-[11px] text-zinc-400">{auth.user?.email}</p>
         </div>
         <div className="flex items-center gap-2">
           <Link
             to="/manual"
-            className="hidden sm:inline-flex text-xs font-medium px-2.5 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500"
+            className="hidden rounded-md bg-emerald-600 px-2.5 py-1.5 text-xs font-medium hover:bg-emerald-500 sm:inline-flex"
           >
             + Booking
           </Link>
           <button
             type="button"
-            className="text-xs px-2.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-md"
+            className="rounded-md bg-zinc-800 px-2.5 py-1.5 text-xs hover:bg-zinc-700"
             onClick={async () => {
               await signOutAdmin()
               navigate('/')
@@ -128,7 +129,7 @@ export default function AdminShell() {
           </button>
           <button
             type="button"
-            className="p-1.5 md:hidden"
+            className="rounded-md p-1.5 hover:bg-zinc-800 md:hidden"
             aria-label="Menu"
             onClick={() => setOpen((v) => !v)}
           >
@@ -141,12 +142,12 @@ export default function AdminShell() {
         <nav
           className={`${
             open ? 'block' : 'hidden'
-          } md:block md:w-52 md:shrink-0 md:sticky md:top-[49px] md:self-start md:max-h-[calc(100vh-49px)] md:overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-zinc-200`}
+          } border-b border-zinc-200 bg-white md:block md:w-56 md:shrink-0 md:sticky md:top-[49px] md:max-h-[calc(100vh-49px)] md:self-start md:overflow-y-auto md:border-b-0 md:border-r`}
         >
-          <div className="p-2 space-y-3">
+          <div className="space-y-4 p-3">
             {navGroups.map((group) => (
               <div key={group.title}>
-                <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                <p className="px-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
                   {group.title}
                 </p>
                 <ul className="space-y-0.5">
@@ -157,10 +158,10 @@ export default function AdminShell() {
                         end={item.end}
                         onClick={() => setOpen(false)}
                         className={({ isActive }) =>
-                          `flex items-center justify-between gap-2 px-3 py-2 rounded-md text-sm font-medium ${
+                          `flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-[13px] font-medium transition-colors ${
                             isActive
                               ? 'bg-emerald-50 text-emerald-900'
-                              : 'text-zinc-700 hover:bg-zinc-50'
+                              : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
                           }`
                         }
                       >
@@ -179,7 +180,7 @@ export default function AdminShell() {
           </div>
         </nav>
 
-        <main className="flex-1 min-w-0 p-3 sm:p-4 md:p-5 max-w-6xl w-full mx-auto pb-10">
+        <main className="mx-auto w-full min-w-0 max-w-6xl flex-1 px-3 pb-12 pt-4 sm:px-5 sm:pt-5 md:px-6 md:pt-6">
           <Outlet />
         </main>
       </div>

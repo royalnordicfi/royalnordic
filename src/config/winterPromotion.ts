@@ -40,7 +40,7 @@ export type WinterPromotionConfig = {
 
 export const WINTER_PROMOTION: WinterPromotionConfig = {
   enabled: true,
-  campaignVersion: 'winter20-v1',
+  campaignVersion: 'winter20-v2',
   title: 'Winter Booking Offer',
   announcementText:
     'Direct booking · Save 20% with WINTER20',
@@ -51,9 +51,9 @@ export const WINTER_PROMOTION: WinterPromotionConfig = {
   discountCode: 'WINTER20',
   destinationPath: '/northern-lights-tour',
   destinationHash: 'book',
-  popupEnabled: false,
+  popupEnabled: true,
   announcementBarEnabled: true,
-  popupDelayMs: 14000,
+  popupDelayMs: 4000,
   popupDismissalDays: 7,
   startDate: null,
   endDate: null,

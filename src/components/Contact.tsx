@@ -5,7 +5,7 @@ import ContactForm from './ContactForm'
 /** Homepage contact / get-in-touch — final substantive section before footer. */
 const Contact = () => {
   return (
-    <section id="contact" className="rn-section relative border-t border-white/[0.07] bg-midnight">
+    <section id="contact" className="rn-section relative bg-midnight">
       <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-50" aria-hidden />
       <div className="rn-container relative">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-12 lg:items-start">

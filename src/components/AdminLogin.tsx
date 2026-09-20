@@ -26,21 +26,17 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess }) => {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4">
-      <div className="w-full max-w-md border border-emerald-500/30 bg-gray-950 p-8">
-        <p className="text-emerald-500/80 text-xs tracking-[0.2em] uppercase mb-3 font-clean">
+    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+      <div className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white p-7 shadow-sm">
+        <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
           Operator console
         </p>
-        <h1 className="text-2xl font-luxury font-bold text-emerald-400 tracking-wide mb-2">
-          Royal Nordic Admin
-        </h1>
-        <p className="text-gray-400 text-sm mb-8 font-clean">
-          Sign in to manage bookings and availability.
-        </p>
+        <h1 className="text-xl font-semibold tracking-tight text-zinc-900">Royal Nordic Ops</h1>
+        <p className="mt-1.5 text-sm text-zinc-500">Sign in to manage bookings and availability.</p>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label htmlFor="admin-email" className="block text-sm text-gray-300 mb-2 font-clean">
+            <label htmlFor="admin-email" className="mb-1.5 block text-xs font-medium text-zinc-600">
               Email
             </label>
             <input
@@ -50,12 +46,12 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess }) => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-black border border-gray-700 text-white px-3 py-2 focus:outline-none focus:border-emerald-500"
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/15"
             />
           </div>
 
           <div>
-            <label htmlFor="admin-password" className="block text-sm text-gray-300 mb-2 font-clean">
+            <label htmlFor="admin-password" className="mb-1.5 block text-xs font-medium text-zinc-600">
               Password
             </label>
             <input
@@ -65,13 +61,13 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess }) => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-black border border-gray-700 text-white px-3 py-2 focus:outline-none focus:border-emerald-500"
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/15"
             />
           </div>
 
           {error && (
             <div
-              className="border border-red-500/40 bg-red-950/40 text-red-200 text-sm px-3 py-2"
+              className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
               role="alert"
             >
               {error}
@@ -81,7 +77,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-elegant font-semibold py-3 transition-colors"
+            className="w-full rounded-lg bg-emerald-700 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-600 disabled:opacity-50"
           >
             {loading ? 'Signing in…' : 'Sign in'}
           </button>

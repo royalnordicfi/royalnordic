@@ -2,33 +2,43 @@ import { Link } from 'react-router-dom'
 
 const Hero = () => {
   return (
-    <section className="relative overflow-hidden bg-[#030706]">
-      <video
-        className="rn-hero-video absolute inset-0 h-full w-full object-cover"
-        autoPlay
-        loop
-        muted
-        playsInline
-        poster="/nortti1.jpg"
-        aria-hidden
-      >
-        <source src="/northernlightsvideo_final.mp4" type="video/mp4" />
-      </video>
-      <div className="rn-hero-scrim pointer-events-none absolute inset-0" aria-hidden />
-      <div className="rn-hero-chrome-veil pointer-events-none absolute inset-x-0 top-0 h-36 sm:h-44" aria-hidden />
+    <section className="rn-hero relative overflow-hidden bg-[#030706]">
+      <div className="rn-hero-media absolute inset-0" aria-hidden>
+        <video
+          className="rn-hero-video absolute inset-0 h-full w-full object-cover"
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="/nortti1.jpg"
+        >
+          <source src="/northernlightsvideo_final.mp4" type="video/mp4" />
+        </video>
+        <div className="rn-hero-grade" />
+      </div>
 
-      <div className="rn-container relative z-10 flex min-h-[76svh] flex-col justify-end pb-12 pt-[calc(var(--rn-chrome-h)+1.25rem)] sm:min-h-[86svh] sm:pb-16 sm:pt-[calc(var(--rn-chrome-h)+1.75rem)]">
-        <div className="rn-hero-copy max-w-[38rem]">
-          <p className="rn-eyebrow">Royal Nordic · Rovaniemi, Finnish&nbsp;Lapland</p>
-          <h1 className="rn-display rn-hero-title mt-4 text-white">
+      <div className="rn-hero-vignette pointer-events-none absolute inset-0 z-[1]" aria-hidden />
+      <div className="rn-hero-scrim pointer-events-none absolute inset-0 z-[1]" aria-hidden />
+      <div className="rn-hero-bottom-fade pointer-events-none absolute inset-x-0 bottom-0 z-[1]" aria-hidden />
+      <div className="rn-hero-chrome-veil pointer-events-none absolute inset-x-0 top-0 z-[1] h-36 sm:h-48" aria-hidden />
+
+      <div className="rn-container relative z-10 flex min-h-[74svh] flex-col justify-end pb-16 pt-[calc(var(--rn-chrome-h)+1.25rem)] sm:min-h-[90svh] sm:pb-28 sm:pt-[calc(var(--rn-chrome-h)+2.25rem)] lg:pb-32">
+        <div className="rn-hero-copy max-w-[42rem]">
+          <p className="rn-eyebrow rn-hero-eyebrow">
+            Royal Nordic · Rovaniemi, Finnish&nbsp;Lapland
+          </p>
+          <h1 className="rn-display rn-hero-title mt-4 text-white sm:mt-5">
             Guaranteed Northern&nbsp;Lights
           </h1>
-          <p className="mt-5 max-w-md text-[15px] leading-relaxed text-white/78 sm:text-base">
+          <p className="rn-hero-lede mt-4 max-w-[30rem] text-[15px] leading-relaxed text-white/78 sm:mt-6 sm:text-[17px] sm:leading-[1.65]">
             Small-group aurora hunts across Finnish Lapland, led by local guides who know the sky.
           </p>
-          <div className="mt-8">
-            <Link to="/northern-lights-tour" className="rn-btn-primary px-7">
+          <div className="rn-hero-cta mt-8 flex flex-wrap items-center gap-2.5 sm:mt-10 sm:gap-4">
+            <Link to="/northern-lights-tour" className="rn-btn-primary px-7 sm:px-8">
               Explore the Northern Lights
+            </Link>
+            <Link to={{ pathname: '/', hash: 'experiences' }} className="rn-hero-ghost">
+              Browse experiences
             </Link>
           </div>
         </div>

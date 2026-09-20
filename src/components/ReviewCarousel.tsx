@@ -120,10 +120,10 @@ export default function ReviewCarousel({
             go(dx < 0 ? 1 : -1)
           }}
         >
-          <blockquote className="font-display text-[1.2rem] leading-snug text-white sm:text-2xl lg:text-[1.55rem] lg:leading-snug">
+          <blockquote className="font-display text-[1.35rem] leading-[1.35] text-white sm:text-[1.75rem] lg:text-[1.9rem] lg:leading-[1.3]">
             “{review.quote}”
           </blockquote>
-          <figcaption className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+          <figcaption className="mt-7 flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] sm:text-sm">
             <span className="font-medium text-white">{review.name}</span>
             {review.location && (
               <>

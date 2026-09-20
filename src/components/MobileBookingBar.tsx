@@ -20,12 +20,12 @@ const MobileBookingBar = ({ priceFrom, onBook, label = 'Book now' }: MobileBooki
       className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-[#040807]/96 px-4 py-3 backdrop-blur-md lg:hidden"
       style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
     >
-      <div className="mx-auto flex max-w-rn items-center justify-between gap-3">
-        <div>
+        <div className="mx-auto flex max-w-rn items-center justify-between gap-3">
+        <div className="min-w-0">
           <p className="text-[10px] uppercase tracking-[0.14em] text-text-dim">From</p>
           <p className="font-display text-xl font-semibold leading-none text-white">€{priceFrom}</p>
         </div>
-        <button type="button" onClick={onBook} className="rn-btn-primary min-w-[8.5rem] px-6">
+        <button type="button" onClick={onBook} className="rn-btn-primary min-h-[44px] min-w-[8.5rem] shrink-0 px-6">
           {label}
         </button>
       </div>

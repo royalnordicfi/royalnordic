@@ -74,9 +74,9 @@ export default function BookingsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <input
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          className="min-h-[44px] rounded-lg border border-gray-300 px-3 py-2.5 text-base sm:text-sm"
           placeholder="Search name, email, ref, tour…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -93,7 +93,7 @@ export default function BookingsPage() {
           }}
         />
         <select
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          className="min-h-[44px] rounded-lg border border-gray-300 px-3 py-2.5 text-base sm:text-sm"
           value={status}
           onChange={(e) =>
             setParams((p) => {
@@ -111,7 +111,7 @@ export default function BookingsPage() {
           ))}
         </select>
         <select
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          className="min-h-[44px] rounded-lg border border-gray-300 px-3 py-2.5 text-base sm:text-sm"
           value={source}
           onChange={(e) =>
             setParams((p) => {

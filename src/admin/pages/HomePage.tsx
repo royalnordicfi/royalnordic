@@ -178,11 +178,11 @@ export default function HomePage() {
   if (loading) return <p className="text-zinc-500 text-sm">Loading operations…</p>
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Ops today</h1>
-          <p className="text-sm text-zinc-500">
+          <p className="mt-0.5 text-sm text-zinc-500">
             {weekdayForTourDate(today)} {today} · what needs action
           </p>
         </div>
@@ -190,13 +190,13 @@ export default function HomePage() {
           type="button"
           onClick={() => load('refresh')}
           disabled={refreshing}
-          className="rounded-md border border-zinc-300 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 disabled:opacity-50"
+          className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 shadow-sm hover:bg-zinc-50 disabled:opacity-50"
         >
           {refreshing ? 'Refreshing…' : 'Refresh'}
         </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <StatCard label="Today guests" value={String(stats.guestsToday)} />
         <StatCard label="Today tours" value={String(stats.todayBookings.length)} />
         <StatCard label="7-day bookings" value={String(stats.weekBookings)} />
@@ -216,12 +216,12 @@ export default function HomePage() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 text-sm p-3 rounded-lg">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
           {error}
           {schemaHint && (
             <p className="mt-2">
-              Apply <code className="bg-red-100 px-1 rounded">016_admin_os_v1.sql</code> and{' '}
-              <code className="bg-red-100 px-1 rounded">018_ops_hub_winter.sql</code> in Supabase.
+              Apply <code className="rounded bg-red-100 px-1">016_admin_os_v1.sql</code> and{' '}
+              <code className="rounded bg-red-100 px-1">018_ops_hub_winter.sql</code> in Supabase.
             </p>
           )}
         </div>
@@ -230,15 +230,15 @@ export default function HomePage() {
       {stats.nextAction && (
         <Link
           to={stats.nextAction.to}
-          className="block bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl p-4 font-medium transition-colors"
+          className="block rounded-xl bg-emerald-700 p-4 font-medium text-white transition-colors hover:bg-emerald-800"
         >
           Next: {stats.nextAction.label}
         </Link>
       )}
 
       <section className="space-y-2">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Attention</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-400">Attention</h2>
+        <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
           <AttentionRow label="Payment problems" count={stats.paymentIssues.length} to="/bookings?attention=payment" />
           <AttentionRow label="Missing guide" count={stats.missingGuide.length} to="/bookings?attention=guide" />
           <AttentionRow label="Missing vehicle" count={stats.missingVehicle.length} to="/bookings?attention=vehicle" />
@@ -265,21 +265,21 @@ export default function HomePage() {
 
       {(stats.urgentNotes.length > 0 || stats.dueNotes.length > 0) && (
         <section className="space-y-2">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Notes</h2>
-            <Link to="/notes" className="text-xs text-emerald-800 font-medium">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-400">Notes</h2>
+            <Link to="/notes" className="text-xs font-medium text-emerald-800">
               All notes
             </Link>
           </div>
-          <ul className="space-y-2">
+          <ul className="overflow-hidden rounded-xl border border-zinc-200 bg-white divide-y divide-zinc-100">
             {[...stats.dueNotes, ...stats.urgentNotes]
               .filter((n, i, arr) => arr.findIndex((x) => x.id === n.id) === i)
               .slice(0, 5)
               .map((n) => (
-                <li key={n.id} className="bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
-                  <span className="font-medium">{n.title}</span>
-                  {n.due_date && <span className="text-xs text-amber-700 ml-2">Due {n.due_date}</span>}
-                  <span className="text-xs text-gray-400 ml-2">{n.priority}</span>
+                <li key={n.id} className="px-3.5 py-2.5 text-sm">
+                  <span className="font-medium text-zinc-900">{n.title}</span>
+                  {n.due_date && <span className="ml-2 text-xs text-amber-700">Due {n.due_date}</span>}
+                  <span className="ml-2 text-xs text-zinc-400">{n.priority}</span>
                 </li>
               ))}
           </ul>
@@ -304,27 +304,27 @@ function DaySection({
 }) {
   return (
     <section className="space-y-2">
-      <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{title}</h2>
+      <h2 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-400">{title}</h2>
       {bookings.length === 0 ? (
-        <p className="text-sm text-gray-500">{empty}</p>
+        <p className="text-sm text-zinc-500">{empty}</p>
       ) : (
-        <ul className="space-y-2">
+        <ul className="overflow-hidden rounded-xl border border-zinc-200 bg-white divide-y divide-zinc-100">
           {bookings.map((b) => (
             <li key={b.id}>
               <Link
                 to={`/bookings/${b.id}`}
-                className="block bg-white border border-gray-200 rounded-xl p-3 hover:border-emerald-300 transition-colors"
+                className="block px-3.5 py-3 transition-colors hover:bg-zinc-50"
               >
-                <div className="flex justify-between gap-2 items-start">
+                <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <div className="font-medium text-sm truncate">
+                    <div className="truncate text-sm font-medium text-zinc-900">
                       {b.tour_time || 'Time TBD'} · {b.tours?.public_name || b.tours?.name}
                     </div>
-                    <p className="text-xs text-gray-600 mt-1 truncate">
+                    <p className="mt-1 truncate text-xs text-zinc-600">
                       {b.customer_name} · {b.adults + b.children} pax ·{' '}
                       {b.guides?.name || 'No guide'} · {b.vehicles?.name || 'No vehicle'}
                     </p>
-                    <p className="text-xs text-gray-400 mt-0.5 truncate">
+                    <p className="mt-0.5 truncate text-xs text-zinc-400">
                       {b.pickup_location || 'Pickup TBD'}
                     </p>
                   </div>
@@ -350,14 +350,14 @@ function AttentionRow({
 }) {
   const body = (
     <div
-      className={`flex justify-between items-center rounded-lg px-3 py-2 text-sm border ${
+      className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm ${
         count > 0
-          ? 'bg-amber-50 border-amber-200 text-amber-950'
-          : 'bg-white border-zinc-200 text-zinc-600'
+          ? 'border border-amber-200 bg-amber-50 text-amber-950'
+          : 'border border-zinc-200 bg-white text-zinc-600'
       }`}
     >
       <span className="font-medium">{label}</span>
-      <span className={`font-semibold tabular-nums ${count > 0 ? 'text-amber-800' : 'text-zinc-400'}`}>
+      <span className={`tabular-nums font-semibold ${count > 0 ? 'text-amber-800' : 'text-zinc-400'}`}>
         {count}
       </span>
     </div>
@@ -367,9 +367,9 @@ function AttentionRow({
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2">
-      <div className="text-[10px] uppercase tracking-wide text-zinc-400 font-semibold">{label}</div>
-      <div className="text-lg font-semibold tabular-nums text-zinc-900 mt-0.5">{value}</div>
+    <div className="rounded-xl border border-zinc-200 bg-white px-3 py-2.5 shadow-sm">
+      <div className="text-[10px] font-semibold uppercase tracking-wide text-zinc-400">{label}</div>
+      <div className="mt-0.5 text-lg font-semibold tabular-nums text-zinc-900">{value}</div>
     </div>
   )
 }
@@ -386,10 +386,10 @@ function QuickLink({
   return (
     <Link
       to={to}
-      className={`rounded-md px-2.5 py-1.5 text-xs font-medium ${
+      className={`rounded-lg px-2.5 py-1.5 text-xs font-medium ${
         primary
           ? 'bg-emerald-700 text-white hover:bg-emerald-600'
-          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50'
+          : 'border border-zinc-200 bg-white text-zinc-700 shadow-sm hover:bg-zinc-50'
       }`}
     >
       {label}
