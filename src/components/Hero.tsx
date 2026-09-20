@@ -21,7 +21,7 @@ const Hero = () => {
         <div className="rn-hero-copy max-w-[38rem]">
           <p className="rn-eyebrow">Royal Nordic · Rovaniemi, Finnish&nbsp;Lapland</p>
           <h1 className="rn-display rn-hero-title mt-4 text-white">
-            Guaranteed Northern Lights
+            Guaranteed Northern&nbsp;Lights
           </h1>
           <p className="mt-5 max-w-md text-[15px] leading-relaxed text-white/78 sm:text-base">
             Small-group aurora hunts across Finnish Lapland, led by local guides who know the sky.

@@ -22,7 +22,7 @@ const PrivateCustomSection = () => {
 
         <div className="relative lg:col-span-5">
           <div className="pointer-events-none absolute inset-0 -z-10 rn-ambient-subtle opacity-60 lg:-left-16" aria-hidden />
-          <div className="rn-reveal rn-private-panel relative mx-4 -mt-10 rounded-rn-lg border border-white/[0.08] bg-elevated p-6 shadow-rn sm:mx-6 sm:-mt-14 sm:p-8 lg:mx-0 lg:-ml-16 lg:mt-0 lg:flex lg:min-h-[480px] lg:flex-col lg:justify-center lg:self-stretch lg:rounded-l-[28px] lg:rounded-r-none lg:border-l-0 lg:p-12 lg:pl-20">
+          <div className="rn-reveal rn-private-panel relative mx-4 -mt-10 rounded-rn-lg border border-white/[0.08] bg-elevated p-6 shadow-rn sm:mx-6 sm:-mt-14 sm:p-8 lg:mx-0 lg:-ml-16 lg:mt-0 lg:flex lg:min-h-[480px] lg:flex-col lg:justify-center lg:self-stretch lg:rounded-l-rn-lg lg:rounded-r-none lg:border-l-0 lg:p-12 lg:pl-20">
             <h2 className="rn-h2-tight text-white">
               Plan a Lapland itinerary around your dates, group, and pace
             </h2>

@@ -214,9 +214,18 @@
   .rn-btn-panel {
     @apply rn-btn text-white;
     background: var(--rn-aurora);
+    transition:
+      background 0.28s ease,
+      box-shadow 0.28s ease,
+      transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .rn-btn-panel:hover {
     background: var(--rn-aurora-hover);
+    box-shadow: 0 10px 24px rgba(18, 155, 108, 0.22);
+    transform: translateY(-1px);
+  }
+  .rn-btn-panel:active {
+    transform: translateY(0);
   }
 
   .rn-icon-btn {
@@ -352,6 +361,11 @@
     transform: scale(1.03);
     animation: rn-hero-video-in 24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     filter: brightness(1.16) saturate(1.14) contrast(1.05);
+    /* The source clip is a tight, near-square aurora shot; a centered cover
+       crop shows only mid-sky ribbons and reads as an abstract blur. Biasing
+       toward the bottom of the frame brings the forest tree line into view,
+       grounding the shot as a real Lapland scene rather than a color wash. */
+    object-position: 50% 82%;
   }
   @keyframes rn-hero-video-in {
     to {
@@ -925,8 +939,8 @@
   }
 
   .rn-form-label {
-    @apply mb-1 block text-sm font-medium;
-    color: var(--rn-panel-ink);
+    @apply mb-1.5 block text-[10.5px] font-semibold uppercase tracking-[0.13em];
+    color: var(--rn-panel-muted);
   }
   .rn-form-input {
     @apply w-full rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:ring-1;
