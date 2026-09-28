@@ -525,8 +525,8 @@ app.post('/api/admin/setup', (req, res) => {
                       <li>Expert local guides with years of experience</li>
                       <li>All necessary equipment provided</li>
                       <li>Hot drinks and snacks included</li>
-                      <li>Professional photography assistance</li>
-                      <li>Guaranteed Northern Lights or free return trip</li>
+                      <li>Professional photos of you with the Northern Lights</li>
+                      <li>If no lights: 100% refund or reschedule to another available date</li>
                     </ul>
                   </div>
                   
@@ -585,8 +585,8 @@ What to Expect:
 - Expert local guides with years of experience
 - All necessary equipment provided
 - Hot drinks and snacks included
-- Professional photography assistance
-- Guaranteed Northern Lights or free return trip
+- Professional photos of you with the Northern Lights
+- If no lights: 100% refund or reschedule to another available date
 
 We'll send you detailed meeting instructions and what to bring 24 hours before your tour. If you have any questions, don't hesitate to contact us!
 
@@ -710,8 +710,8 @@ app.post('/api/send-stripe-confirmation', async (req, res) => {
                   <li>Expert local guides with years of experience</li>
                   <li>All necessary equipment provided</li>
                   <li>Hot drinks and snacks included</li>
-                  <li>Professional photography assistance</li>
-                  <li>Guaranteed Northern Lights or free return trip</li>
+                  <li>Professional photos of you with the Northern Lights</li>
+                  <li>If no lights: 100% refund or reschedule to another available date</li>
                 </ul>
               </div>
               

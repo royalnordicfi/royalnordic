@@ -2,7 +2,7 @@ const TrustStrip = () => {
   const items = [
     {
       title: 'Northern Lights guarantee',
-      text: 'Free return trip if no lights appear — see Terms.',
+      text: '100% refund or reschedule if no lights appear — see Terms.',
     },
     {
       title: 'Small groups',

@@ -21,19 +21,24 @@ export const guaranteedNlMeta = {
   path: GUARANTEED_NL_PATH,
   title: 'Guaranteed Northern Lights Tour Rovaniemi | Royal Nordic',
   description:
-    'Book a guaranteed Northern Lights / aurora tour from Rovaniemi: small-group hunt, hotel pickup, English & Finnish guides, flexible duration. Free cancellation 24h. Pay securely online.',
+    'Book a guaranteed Northern Lights / aurora tour from Rovaniemi: small-group hunt, hotel pickup, English & Finnish guides, professional photos of you with the aurora. If lights are not seen: 100% refund or reschedule. Free cancellation 24h.',
   ogImage: `${SITE}/nortti1.jpg`,
   h1: 'Guaranteed Northern Lights Tour',
   productName: 'Guaranteed Northern Lights Tour',
   productDescription:
-    'Guaranteed Northern Lights (aurora) tour from Rovaniemi, Finnish Lapland: small-group hunt with hotel pickup, English and Finnish guides, flexible duration, and a free return trip if no lights appear (see Terms).',
+    'Guaranteed Northern Lights (aurora) tour from Rovaniemi, Finnish Lapland: small-group hunt with hotel pickup, English and Finnish guides, flexible duration, and professional photos of you with the aurora. If the Northern Lights are not seen, choose a 100% refund or reschedule to another available date (see Terms).',
 }
 
 export const guaranteedNlFaqs = [
   {
     question: 'What does the Northern Lights guarantee mean?',
     answer:
-      'If no Northern Lights are visible during your tour, we offer a free return trip on the next available date. See our Terms & Conditions for the full promise.',
+      'If the Northern Lights are not seen during your tour, you can choose either a 100% refund or reschedule your tour for another available date. See our Terms & Conditions for the full promise.',
+  },
+  {
+    question: 'Are professional photos included?',
+    answer:
+      'Yes. Your guide takes professional photos of you with the Northern Lights during the tour.',
   },
   {
     question: 'Where do you pick us up?',

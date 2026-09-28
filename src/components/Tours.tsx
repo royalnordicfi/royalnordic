@@ -7,7 +7,7 @@ const Tours = () => {
     {
       id: 1,
       title: "Guaranteed Northern Lights Tour",
-      description: "Our signature aurora hunt from Rovaniemi — hotel pickup, small groups, and a Northern Lights guarantee (free return trip if the lights don’t appear — see Terms).",
+      description: "Our signature aurora hunt from Rovaniemi — hotel pickup, small groups, and a Northern Lights guarantee (100% refund or reschedule if the lights don’t appear — see Terms).",
       icon: Sparkles,
       image: "/nortti5.jpg",
       route: "/northern-lights-tour",

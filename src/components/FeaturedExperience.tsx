@@ -4,8 +4,8 @@ import { GUARANTEED_NL_CATALOG_ADULT_PRICE } from '../seo/guaranteedNorthernLigh
 const META = [
   'Max 8 guests',
   'Hotel pickup in Rovaniemi',
-  'Photography guidance',
-  'Free return trip if no lights — see Terms',
+  'Professional photos of you with the aurora',
+  '100% refund or reschedule if no lights — see Terms',
 ]
 
 const FeaturedExperience = () => {

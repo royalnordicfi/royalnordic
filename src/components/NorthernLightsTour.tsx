@@ -31,18 +31,18 @@ const GALLERY = [
 ]
 
 const INCLUDED = [
-  'Northern Lights guarantee — free return trip if no lights appear (see Terms)',
+  'Northern Lights guarantee — 100% refund or reschedule if no lights appear (see Terms)',
   'Small group — max 8 people per vehicle',
   'Hotel pickup and drop-off in the Rovaniemi area',
   'Flexible duration based on live aurora forecasts',
   'English & Finnish speaking local guides',
-  'Warm drinks, snacks, and photography guidance',
+  'Warm drinks, snacks, and professional photos of you with the Northern Lights',
 ]
 
 const HIGHLIGHTS = [
   'Live aurora and weather data — we drive as far as needed for clearer skies',
-  'Small groups with hotel pickup, warm drinks, and photo tips at each stop',
-  'No aurora on your night? Free return trip per our Terms — not a cash refund',
+  'Small groups with hotel pickup, warm drinks, and professional photos of you beneath the aurora',
+  'No aurora on your night? Choose a 100% refund or reschedule to another available date',
 ]
 
 const NorthernLightsTour = () => {
@@ -92,7 +92,7 @@ const NorthernLightsTour = () => {
     },
     {
       title: 'Photo stops',
-      text: 'Warm drinks, snacks, and time outdoors under the Arctic night at each location.',
+      text: 'Warm drinks, snacks, and time outdoors while your guide takes professional photos of you with the Northern Lights.',
     },
     {
       time: 'Return',
@@ -111,10 +111,10 @@ const NorthernLightsTour = () => {
         ]}
         eyebrow="Rovaniemi · Aurora season"
         title="Guaranteed Northern Lights Tour"
-        lede="Small-group aurora hunt from Rovaniemi — we chase clearer skies. No lights? Free return trip per Terms."
+        lede="Small-group aurora hunt from Rovaniemi — we chase clearer skies. No lights? Choose a 100% refund or reschedule."
         proof={
           <p>
-            <strong>★★★★★</strong> Verified guest reviews · Small groups · Photography guidance
+            <strong>★★★★★</strong> Verified guest reviews · Small groups · Professional aurora photos
           </p>
         }
         images={GALLERY}
@@ -122,7 +122,7 @@ const NorthernLightsTour = () => {
           { label: 'Duration', value: '2–12 h (~6h)' },
           { label: 'Group', value: 'Max 8 / vehicle' },
           { label: 'Pickup', value: 'Rovaniemi' },
-          { label: 'Guarantee', value: 'Return trip' },
+          { label: 'Guarantee', value: 'Refund or reschedule' },
         ]}
         booking={
           <>
@@ -133,7 +133,7 @@ const NorthernLightsTour = () => {
                 'Free cancellation 24h before',
                 'Secure Stripe payment',
                 'Hotel pickup',
-                'Return-trip guarantee',
+                '100% refund or reschedule if no lights',
               ]}
             >
               {loading ? (
@@ -173,7 +173,7 @@ const NorthernLightsTour = () => {
           <p className="mt-3 leading-relaxed text-text-muted">
             Hunt the Aurora Borealis from Rovaniemi with local guides who read live solar and weather data, then
             drive as far as needed for clearer skies — including across borders when conditions call for it. Hotel
-            pickup, a warm vehicle, hot drinks, and photography guidance are included.
+            pickup, a warm vehicle, hot drinks, and professional photos of you with the Northern Lights are included.
           </p>
         </section>
 
@@ -222,8 +222,8 @@ const NorthernLightsTour = () => {
                   title: 'Guarantee & cancellation',
                   content: (
                     <p>
-                      If no Northern Lights are visible during your tour, we offer a free return trip on the next
-                      available date. See our{' '}
+                      If the Northern Lights are not seen during your tour, you can choose either a 100% refund or
+                      reschedule your tour for another available date. See our{' '}
                       <Link
                         to="/terms-conditions"
                         className="font-semibold text-aurora-soft underline-offset-2 hover:underline"

@@ -155,7 +155,7 @@ const NorthernLightsPhotography: React.FC = () => {
       {
         title: "Northern Lights tour",
         href: "/northern-lights-tour",
-        description: "Photograph the aurora with guides who know dark-sky locations around Rovaniemi.",
+        description: "Your guide takes professional photos of you with the Northern Lights at dark-sky locations around Rovaniemi.",
       },
       {
         title: "Family-friendly Northern Lights",

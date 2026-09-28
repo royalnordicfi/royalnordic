@@ -56,9 +56,9 @@ const TermsConditions: React.FC = () => {
                   or reschedule.
                 </p>
                 <p className="mt-2">
-                  <strong>Northern Lights guarantee:</strong> On the eligible guaranteed tour, if no
-                  Northern Lights are visible, we offer a free return trip on the next available date
-                  (see tour page and these terms).
+                  <strong>Northern Lights guarantee:</strong> On the Guaranteed Northern Lights Tour, if
+                  the Northern Lights are not seen during your tour, you may choose either a 100% refund
+                  or reschedule your tour for another available date (see the tour page and these terms).
                 </p>
               </section>
 
@@ -82,8 +82,10 @@ const TermsConditions: React.FC = () => {
               <section>
                 <h2>6. Photography and media</h2>
                 <p>
-                  Guides may take photos for promotional use; by joining a tour you consent to reasonable
-                  use of those images. Personal photos are welcome; respect other guests’ privacy.
+                  On the Guaranteed Northern Lights Tour, your guide takes professional photos of you with
+                  the Northern Lights as part of the experience. Guides may also take photos for
+                  promotional use; by joining a tour you consent to reasonable use of those images.
+                  Personal photos are welcome; respect other guests’ privacy.
                 </p>
               </section>
 

@@ -280,7 +280,7 @@ ${formData.message ? `Additional Message:\n${formData.message}` : ''}`
           </p>
           <p className="mt-3 leading-relaxed text-text-muted">
             No previous experience required — dress in warm Arctic layers. This is not our Guaranteed Northern
-            Lights Tour with return-trip Terms.
+            Lights Tour with refund-or-reschedule Terms.
           </p>
         </section>
 
@@ -313,7 +313,7 @@ ${formData.message ? `Additional Message:\n${formData.message}` : ''}`
                 {
                   title: 'Northern Lights',
                   content:
-                    'Aurora sightings are never guaranteed. This is a partner-led evening format — not our Guaranteed Northern Lights Tour with return-trip terms.',
+                    'Aurora sightings are never guaranteed. This is a partner-led evening format — not our Guaranteed Northern Lights Tour with refund-or-reschedule terms.',
                 },
                 {
                   title: 'Third-party activity',

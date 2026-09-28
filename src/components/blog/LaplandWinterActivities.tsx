@@ -44,7 +44,7 @@ The Aurora Borealis is undoubtedly Lapland's most iconic winter experience. From
 
 **What to Expect**: Professional guides take you away from light pollution to prime viewing locations. Tours typically last 1-10 hours depending on Aurora activity.
 
-**Pro Tip**: Book a tour with a guarantee - some operators offer free rebooking if the lights don't appear.
+**Pro Tip**: Book a tour with a clear guarantee — at Royal Nordic, if the lights are not seen you choose a 100% refund or reschedule.
 
 ## Snowshoeing Adventures
 
@@ -156,7 +156,7 @@ At Royal Nordic, we specialize in authentic Lapland experiences with:
 - **Expert Guides**: Local knowledge and years of experience
 - **Quality Equipment**: Professional-grade gear provided
 - **Flexible Scheduling**: Tours available throughout the winter season
-- **Northern Lights Guarantee**: Free rebooking if Aurora doesn't appear
+- **Northern Lights Guarantee**: If the lights are not seen, choose a 100% refund or reschedule to another available date
 
 ## Conclusion
 

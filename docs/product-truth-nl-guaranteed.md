@@ -1,42 +1,28 @@
-# Product truth — Guaranteed Northern Lights
+# Product truth — Guaranteed Northern Lights Tour
 
-Sources compared 2026-07-28:
+Canonical customer-facing rules (site + Terms):
 
-- Website: `/northern-lights-tour` (direct Stripe)
-- GYG: https://www.getyourguide.com/en-gb/rovaniemi-l2653/rovaniemi-revontulit-ja-valokuvausretki-t629222/ (activity t629222, supplier Royal Nordic)
-- Terms: `/terms-conditions`
+## Guarantee
 
-## Comparison
+If the Northern Lights are not seen during the Guaranteed Northern Lights Tour, the customer chooses:
 
-| Field | Website (after polish) | GetYourGuide | Match | Notes |
-|---|---|---|---|---|
-| Title | Guaranteed Northern Lights Tour | Rovaniemi: Guaranteed Northern Lights & Photography Tour | Partial | Direct keeps short title; subtitle mentions photography guidance |
-| Rating | Not shown live (variable) | 4.8 · 110 reviews | N/A | Do not hardcode live GYG ratings on website |
-| Adult price | €149 | From ~€106 (dynamic) | Channel OK | Direct set 2026-07-28 |
-| Child price | €129 | Confirm supplier panel | Open | Direct set 2026-07-28 |
-| Duration | 2–10h, typically ~6h | Headline 6h; details 2–10h | Aligned | |
-| Pickup | From **18:30**; exact time confirmed after booking | Pickup available; ready 10–30 min before | Aligned | |
-| Languages | English & Finnish | English, Finnish | Aligned | |
-| Capacity | Max 16 | Small / private options | Soft | |
-| Photography | Guidance from guide (not claiming delivered gallery) | Professional photos included | **Open** | Confirm if direct bookings still receive edited photos |
-| Guarantee | Soft: “see Terms”; booking strip neutral | Money back / full refund if no aurora | **Critical** | Marketing/GYG say refund; Terms say free return trip |
-| Cancellation | Free cancel 24h | Free cancel 24h | Aligned | |
-| Payment | Book & pay now (Stripe) | Reserve now & pay later (platform) | Channel OK | |
-| Drop-off | Accommodation | Also lists Rovakatu 19 5 | Open | Confirm if public HQ/meeting point |
+1. **100% refund**, or
+2. **Reschedule** the tour for another available date.
 
-## Founder decisions required
+Do not market “free return trip only,” vouchers in place of refund, or “not a cash refund.”
 
-1. Guarantee: money-back (GYG + old marketing) vs free return trip (Terms) vs hybrid.
-2. Photography: do direct customers receive professional photos like GYG?
-3. GYG from-price / commission % for later pricing proposal.
-4. Is Rovakatu 19 a public meeting/drop-off address?
+## Photography
 
-## Recommended GYG supplier edits (paste manually)
+Royal Nordic / the guide **takes professional photos of the customers with the Northern Lights**.
 
-- Align duration headline with “2–10 hours (typically 6)” if GYG allows.
-- Keep clothing as “bring your own” under Not included — avoid listing clothing under Includes as advice-only.
-- After website Terms decision, sync guarantee wording on GYG so channels match.
+Do not market this as photography tips, guidance, assistance with the guest’s own camera, or “learn how to photograph the aurora” on product pages. Blog DIY tips are separate editorial content.
 
-## Channel rule
+## Catalog facts (unchanged by wording work)
 
-Website → GYG → Viator should share the same product facts; only payment UX and marketplace “from” pricing differ.
+- Path: `/northern-lights-tour`
+- Tour id: `1`
+- Catalog adult price: €129 (see `GUARANTEED_NL_CATALOG_ADULT_PRICE`)
+- Max per vehicle: 8
+- Season: mid-September through mid-April (`09-15`–`04-15`)
+
+SEO source of truth: `src/seo/guaranteedNorthernLightsTour.ts`

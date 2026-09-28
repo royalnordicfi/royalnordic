@@ -16,7 +16,7 @@ const ALL_TOURS = [
     imageAlt: 'Guaranteed Northern Lights Tour',
     title: 'Guaranteed Northern Lights Tour',
     description:
-      'Full evening aurora hunt with hotel pickup. Free return trip if no lights appear — see Terms.',
+      'Full evening aurora hunt with hotel pickup. If lights are not seen: 100% refund or reschedule — see Terms.',
     duration: '2–12 hours',
     groupSize: 'Max 8 / vehicle',
     pickup: true,
@@ -71,7 +71,7 @@ const NorthernLightsTours: React.FC = () => {
     <div className="rn-page">
       <CategoryHero
         title="Northern Lights Tours in Rovaniemi"
-        subtitle="Small-group aurora hunts — signature tour includes a free return trip if no lights appear (see Terms)."
+        subtitle="Small-group aurora hunts — signature tour includes a 100% refund or reschedule if no lights appear (see Terms)."
         image="/nortti5.jpg"
         compact
       />

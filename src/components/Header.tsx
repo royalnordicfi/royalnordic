@@ -7,7 +7,7 @@ import { isHeroShell } from '../layout/shell'
 type NavChild = { label: string; to: string; hint: string }
 
 const EXPERIENCES: NavChild[] = [
-  { label: 'Northern Lights', to: '/northern-lights-tours', hint: 'Aurora hunts & photography' },
+  { label: 'Northern Lights', to: '/northern-lights-tours', hint: 'Aurora hunts & pro photos' },
   { label: 'Day Tours', to: '/daytime-experiences', hint: 'Arctic daytime experiences' },
   { label: 'Private & Custom', to: '/customized-tour', hint: 'Tailored Lapland itineraries' },
   { label: 'Transfers', to: '/transportation', hint: 'Private transportation' },

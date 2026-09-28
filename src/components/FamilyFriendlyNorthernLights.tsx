@@ -23,7 +23,7 @@ const INCLUDED = [
   'Hotel pickup and drop-off',
   'Professional local guide (English & Finnish)',
   'Hot drinks and snacks',
-  'Aurora photography tips',
+  'Professional photos of you with the Northern Lights',
   'Warm vehicle for the journey',
 ]
 
@@ -161,7 +161,7 @@ const FamilyFriendlyNorthernLights = () => {
             drinks and snacks.
           </p>
           <p className="mt-3 leading-relaxed text-text-muted">
-            A shorter format designed for families and all ages. For our return-trip guarantee, see the{' '}
+            A shorter format designed for families and all ages. For our refund-or-reschedule guarantee, see the{' '}
             <Link to="/northern-lights-tour" className="font-medium text-aurora-soft hover:underline">
               Guaranteed Northern Lights Tour
             </Link>

@@ -60,7 +60,7 @@ const TravelTrade: React.FC = () => {
   const sellable = [
     {
       title: 'Guaranteed Northern Lights Tour',
-      detail: 'Aurora hunt with hotel pickup and a free return trip if no lights appear (see Terms).',
+      detail: 'Aurora hunt with hotel pickup. If lights are not seen: 100% refund or reschedule (see Terms).',
       to: '/northern-lights-tour',
     },
     {

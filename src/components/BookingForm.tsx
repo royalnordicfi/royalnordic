@@ -1186,7 +1186,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           <div className={ui.payInfo}>
             <p>Free cancellation up to 24 hours before departure.</p>
             {isNorthernLightsTour && (
-              <p>Northern Lights guarantee: free return trip if no lights appear — see Terms for details.</p>
+              <p>Northern Lights guarantee: if lights are not seen, choose a 100% refund or reschedule — see Terms.</p>
             )}
             <p>After payment you receive a confirmation email with pickup details.</p>
           </div>
