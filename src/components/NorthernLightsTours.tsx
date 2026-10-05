@@ -139,7 +139,7 @@ const NorthernLightsTours: React.FC = () => {
       </section>
 
       <ReviewCarousel
-        reviews={reviewsFor('northern-lights', 6)}
+        reviews={reviewsFor('northern-lights', 8)}
         className="border-t border-white/[0.06] !pb-6 sm:!pb-10"
       />
       <CategoryPageEnd

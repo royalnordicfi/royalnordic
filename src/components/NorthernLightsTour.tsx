@@ -229,7 +229,7 @@ const NorthernLightsTour = () => {
               </div>
             </section>
             <ReviewCarousel
-              reviews={reviewsFor('northern-lights', 7)}
+              reviews={reviewsFor('northern-lights', 10)}
               eyebrow="From real guests"
               title="Guests on this experience"
               className="border-t border-white/[0.06]"

@@ -1697,21 +1697,41 @@
   }
 
   .rn-review-editorial {
-    padding-left: 1.15rem;
-    border-left: 1px solid rgba(141, 206, 178, 0.35);
+    padding-left: 0.85rem;
+    border-left: 1px solid rgba(141, 206, 178, 0.28);
+  }
+  .rn-review-stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.12rem;
+    color: #e8b84a;
+  }
+  .rn-review-star {
+    display: block;
+    flex-shrink: 0;
+  }
+  .rn-review-quote {
+    font-family: var(--rn-font-display);
+    font-size: clamp(1.05rem, 0.95rem + 0.45vw, 1.28rem);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    color: var(--rn-text);
   }
   .rn-review-verified {
     display: inline-flex;
     align-items: center;
-    padding: 0.2rem 0.55rem;
-    font-size: 10px;
+    padding: 0.15rem 0.45rem;
+    font-size: 9.5px;
     font-weight: 600;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--rn-aurora-soft);
     border-radius: var(--rn-radius-sm);
-    border: 1px solid rgba(125, 236, 192, 0.22);
-    background: rgba(18, 155, 108, 0.08);
+    border: 1px solid rgba(125, 236, 192, 0.2);
+    background: rgba(18, 155, 108, 0.07);
+  }
+  .rn-section--reviews.rn-section {
+    padding-block: clamp(2.25rem, 4vw, 3.25rem);
   }
 
   .rn-form-label {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Star } from 'lucide-react'
 import type { RnReview } from '../data/reviews'
 
 type Props = {
@@ -8,6 +8,16 @@ type Props = {
   title?: string
   className?: string
   autoPlayMs?: number
+}
+
+function FiveYellowStars() {
+  return (
+    <div className="rn-review-stars" aria-label="5 out of 5 stars">
+      {Array.from({ length: 5 }, (_, i) => (
+        <Star key={i} className="rn-review-star" size={13} fill="currentColor" strokeWidth={0} aria-hidden />
+      ))}
+    </div>
+  )
 }
 
 export default function ReviewCarousel({
@@ -56,11 +66,11 @@ export default function ReviewCarousel({
 
   if (!count) return null
   const review = reviews[index]
-  const useDotStrip = count <= 5
+  const useDotStrip = count <= 8
 
   return (
     <section
-      className={`rn-section relative overflow-hidden ${className}`}
+      className={`rn-section rn-section--reviews relative overflow-hidden ${className}`}
       aria-roledescription="carousel"
       aria-label={title}
       onMouseEnter={() => {
@@ -78,20 +88,20 @@ export default function ReviewCarousel({
     >
       <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-80" aria-hidden />
       <div className="rn-container relative">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="rn-eyebrow">{eyebrow}</p>
-            <h2 className="rn-h2-tight mt-2.5 text-white">{title}</h2>
+            <h2 className="rn-h2-tight mt-1.5 text-white">{title}</h2>
           </div>
           {count > 1 && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <button
                 type="button"
                 className="rn-icon-btn"
                 aria-label="Previous review"
                 onClick={() => go(-1)}
               >
-                <ChevronLeft size={18} />
+                <ChevronLeft size={16} />
               </button>
               <button
                 type="button"
@@ -99,14 +109,14 @@ export default function ReviewCarousel({
                 aria-label="Next review"
                 onClick={() => go(1)}
               >
-                <ChevronRight size={18} />
+                <ChevronRight size={16} />
               </button>
             </div>
           )}
         </div>
 
         <figure
-          className={`rn-reveal rn-review-editorial mt-8 max-w-3xl transition duration-300 ${
+          className={`rn-reveal rn-review-editorial mt-5 max-w-2xl transition duration-300 ${
             fade ? 'opacity-100' : 'opacity-0'
           }`}
           onTouchStart={(e) => {
@@ -120,14 +130,13 @@ export default function ReviewCarousel({
             go(dx < 0 ? 1 : -1)
           }}
         >
-          <blockquote className="font-display text-[1.35rem] leading-[1.35] text-white sm:text-[1.75rem] lg:text-[1.9rem] lg:leading-[1.3]">
-            “{review.quote}”
-          </blockquote>
-          <figcaption className="mt-7 flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] sm:text-sm">
+          <FiveYellowStars />
+          <blockquote className="rn-review-quote mt-2.5">“{review.quote}”</blockquote>
+          <figcaption className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[12px] sm:text-[12.5px]">
             <span className="font-medium text-white">{review.name}</span>
             {review.location && (
               <>
-                <span className="text-white/25" aria-hidden>
+                <span className="text-white/20" aria-hidden>
                   ·
                 </span>
                 <span className="text-text-muted">{review.location}</span>
@@ -135,7 +144,7 @@ export default function ReviewCarousel({
             )}
             {review.date && (
               <>
-                <span className="text-white/25" aria-hidden>
+                <span className="text-white/20" aria-hidden>
                   ·
                 </span>
                 <span className="text-text-dim">{review.date}</span>
@@ -147,7 +156,7 @@ export default function ReviewCarousel({
 
         {count > 1 &&
           (useDotStrip ? (
-            <div className="mt-8 flex gap-1.5" role="tablist" aria-label="Review slides">
+            <div className="mt-5 flex gap-1.5" role="tablist" aria-label="Review slides">
               {reviews.map((r, i) => (
                 <button
                   key={r.id}
@@ -156,7 +165,7 @@ export default function ReviewCarousel({
                   aria-selected={i === index}
                   aria-label={`Show review ${i + 1}`}
                   className={`h-0.5 rounded-full transition-all duration-300 ${
-                    i === index ? 'w-10 bg-aurora-soft/90' : 'w-4 bg-white/15 hover:bg-white/30'
+                    i === index ? 'w-8 bg-aurora-soft/90' : 'w-3.5 bg-white/15 hover:bg-white/30'
                   }`}
                   onClick={() => goTo(i)}
                 />
@@ -164,7 +173,7 @@ export default function ReviewCarousel({
             </div>
           ) : (
             <p
-              className="mt-8 text-sm tabular-nums text-text-dim"
+              className="mt-5 text-[12px] tabular-nums text-text-dim"
               aria-live="polite"
               aria-label={`Review ${index + 1} of ${count}`}
             >
