@@ -130,10 +130,10 @@ const IceFishingTour = () => {
             referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}
             offerLine={cms.pricing.saleActive ? undefined : 'WINTER20 · Save 20% at checkout'}
             trustLines={[
-              'Free cancellation 24h before',
-              'Secure Stripe payment',
+              'Free cancellation',
+              'Secure payment',
               'Hotel pickup',
-              'Equipment & guide included',
+              'Equipment included',
             ]}
           >
             {cms.loading && !cms.tour ? (

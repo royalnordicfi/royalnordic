@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { createCheckoutSession, redirectToCheckout } from '../lib/stripe'
 import { createCryptoCheckout, redirectToCryptoCheckout } from '../lib/crypto'
 import { supabase } from '../lib/supabase'
@@ -22,6 +22,7 @@ import {
   trackWinterPromoEvent,
 } from '../lib/winterPromotion'
 import { formatEuroAmount } from '../lib/tourPricing'
+import { CHECKOUT_RETURN_PATH_KEY } from './PaymentCancelled'
 
 export type BookingPricingModel = 'per_person' | 'per_vehicle'
 
@@ -97,6 +98,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
 }) => {
   const perVehicle = pricingModel === 'per_vehicle'
   const navigate = useNavigate()
+  const location = useLocation()
+  const returnPath = `${location.pathname}${location.search || ''}#book`
   const dateSectionRef = useRef<HTMLDivElement>(null)
   const fullNameRef = useRef<HTMLInputElement>(null)
   const emailRef = useRef<HTMLInputElement>(null)
@@ -516,12 +519,14 @@ const BookingForm: React.FC<BookingFormProps> = ({
       const tourDate = formatTourDateLong(formData.preferredDate)
       const tourDateIso = formData.preferredDate
 
-      // Create Stripe Checkout Session
+      // Create Stripe Checkout Session — cancel returns to this tour (#book)
+      sessionStorage.setItem(CHECKOUT_RETURN_PATH_KEY, returnPath)
       const checkoutData = {
         amount: totalPrice,
         currency: 'eur',
         tour_name: tourName,
         tour_date: tourDate,
+        cancel_path: returnPath,
         metadata: {
           tour_id: tourId.toString(),
           tour_date_id: tourDateId.toString(),
@@ -773,14 +778,16 @@ const BookingForm: React.FC<BookingFormProps> = ({
         wrap: chrome === 'embedded' ? 'rn-booking-width mx-auto lg:mx-0' : 'bg-white rounded-xl shadow-xl p-6 rn-booking-width mx-auto lg:mx-0',
         hint: chrome === 'embedded' ? 'text-panel-muted text-xs mb-4' : 'text-gray-600 text-sm text-center mb-6',
         heading: embeddedLight
-          ? 'text-[11px] font-medium uppercase tracking-[0.16em] text-panel-muted mb-3'
+          ? 'rn-bf-date-heading text-[10.5px] font-medium uppercase tracking-[0.14em] text-panel-muted'
           : 'text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-2',
-        sectionGap: embeddedLight ? 'space-y-5' : 'space-y-6',
+        sectionGap: embeddedLight ? 'space-y-3.5' : 'space-y-6',
         navBtn: embeddedLight
-          ? 'flex h-10 w-10 items-center justify-center rounded-md border border-black/[0.08] bg-black/[0.02] text-panel-ink transition hover:border-emerald-800/25 hover:bg-emerald-50/30'
+          ? 'rn-bf-nav-btn flex items-center justify-center rounded-md border border-black/[0.08] bg-black/[0.02] text-panel-ink transition hover:border-emerald-800/25 hover:bg-emerald-50/30'
           : 'w-11 h-11 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600',
-        month: 'text-lg font-semibold text-gray-900',
-        weekday: 'text-center text-xs font-medium text-gray-500 py-1',
+        month: embeddedLight ? 'rn-bf-month-label text-panel-ink' : 'text-lg font-semibold text-gray-900',
+        weekday: embeddedLight
+          ? 'rn-bf-weekday text-center font-medium text-panel-muted'
+          : 'text-center text-xs font-medium text-gray-500 py-1',
         priceNote: 'text-xs text-gray-500 mt-2',
         label: 'block text-sm font-medium text-gray-700 mb-1',
         sublabel: 'text-xs text-gray-500 mb-2',
@@ -805,17 +812,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
       }
 
   const renderProgress = () => (
-    <nav aria-label="Booking progress" className={embeddedLight ? 'mb-5' : 'mb-4'}>
+    <nav aria-label="Booking progress" className={embeddedLight ? 'rn-bf-progress' : 'mb-4'}>
       <ol className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
         {progressSteps.map((step, index) => {
           const isActive = step.id === activeProgressStep
           const isComplete = index < activeProgressIndex
           const stepClass = embeddedLight
             ? isActive
-              ? 'text-[11px] font-medium tracking-wide text-panel-ink'
+              ? 'text-[10.5px] font-medium tracking-wide text-panel-ink'
               : isComplete
-              ? 'text-[11px] text-panel-muted'
-              : 'text-[11px] text-panel-muted/40'
+              ? 'text-[10.5px] text-panel-muted'
+              : 'text-[10.5px] text-panel-muted/40'
             : isActive
             ? 'text-xs font-medium text-white'
             : isComplete
@@ -860,7 +867,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           )}
           
           {/* Month/Year Navigation */}
-          <div className="flex items-center justify-between mb-4">
+          <div className={`flex items-center justify-between ${embeddedLight ? 'rn-bf-month-nav' : 'mb-4'}`}>
             <button 
               type="button"
               onClick={goToPreviousMonth}
@@ -887,7 +894,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           </div>
           
           {/* Simple Date Picker */}
-          <div className="grid grid-cols-7 gap-1 mb-3">
+          <div className={`grid grid-cols-7 gap-1 ${embeddedLight ? 'rn-bf-weekdays' : 'mb-3'}`}>
             {WEEKDAY_HEADERS_MON_FIRST.map(day => (
               <div key={day} className={ui.weekday}>
                 {day}
@@ -896,10 +903,15 @@ const BookingForm: React.FC<BookingFormProps> = ({
           </div>
           
           {/* Available Dates Grid */}
-          <div className="grid grid-cols-7 gap-1">
+          <div className={`grid grid-cols-7 ${embeddedLight ? 'gap-0.5' : 'gap-1'}`}>
             {availability.length > 0 ? getCalendarGrid().map((day, index) => {
               if (day === null) {
-                return <div key={`empty-${index}`} className="h-12 sm:h-14"></div>
+                return (
+                  <div
+                    key={`empty-${index}`}
+                    className={embeddedLight ? 'h-[2.35rem] sm:h-[2.45rem]' : 'h-12 sm:h-14'}
+                  />
+                )
               }
               
               const { day: calendarDay, date, available, remainingSlots, isFullBooked } = day
@@ -948,9 +960,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
                       : `${calendarDay}, unavailable`
                   }
                 >
-                  <div className="text-[11px] sm:text-sm font-semibold tabular-nums">{calendarDay}</div>
+                  <div className={lightCalendar ? 'rn-bf-day-num' : 'text-[11px] sm:text-sm font-semibold tabular-nums'}>
+                    {calendarDay}
+                  </div>
                   {isAvailable && (
-                    <div className={`text-[9px] sm:text-[10px] font-medium mt-0.5 ${priceClass}`}>
+                    <div
+                      className={
+                        lightCalendar
+                          ? `rn-bf-day-price ${priceClass}`
+                          : `text-[9px] sm:text-[10px] font-medium mt-0.5 ${priceClass}`
+                      }
+                    >
                       €{formatEuroAmount(liveAdultPrice)}
                     </div>
                   )}
@@ -966,17 +986,26 @@ const BookingForm: React.FC<BookingFormProps> = ({
             }) : (
               // Show loading state when availability data is not loaded
               Array.from({ length: 35 }, (_, index) => (
-                <div key={`loading-${index}`} className="h-12 sm:h-14 bg-gray-100 rounded animate-pulse"></div>
+                <div
+                  key={`loading-${index}`}
+                  className={
+                    embeddedLight
+                      ? 'h-[2.35rem] sm:h-[2.45rem] animate-pulse rounded bg-black/[0.04]'
+                      : 'h-12 sm:h-14 bg-gray-100 rounded animate-pulse'
+                  }
+                />
               ))
             )}
           </div>
 
-          <p className={ui.priceNote}>Showing prices in EUR (Euro)</p>
+          <p className={`${ui.priceNote}${embeddedLight ? ' rn-bf-price-note' : ''}`}>
+            Showing prices in EUR (Euro)
+          </p>
           {seasonStart && seasonEnd && (
             <p
               className={
                 embeddedLight
-                  ? 'mt-2 text-[11px] leading-snug text-panel-muted/90'
+                  ? 'rn-bf-price-note mt-2 text-[11px] leading-snug text-panel-muted/90'
                   : 'mt-1.5 text-[11px] leading-snug text-gray-500'
               }
             >

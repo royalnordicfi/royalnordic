@@ -97,10 +97,10 @@ const TransportationSaariselka = () => {
             priceFrom={cms.pricing.current}
             priceNote="/ vehicle · one way"
             trustLines={[
-              '€649 flat — not per passenger',
-              'Secure Stripe payment',
-              'Airport or hotel pickup',
-              'Free cancellation 24h before',
+              '€649 flat / vehicle',
+              'Secure payment',
+              'Airport or hotel',
+              'Free cancellation',
             ]}
           >
             {cms.loading && !cms.tour ? (

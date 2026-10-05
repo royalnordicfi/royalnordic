@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { CheckCircle, Mail, Calendar, Users } from 'lucide-react'
 import { formatTourDateForDisplay } from '../lib/tourDate'
 import Footer from './Footer'
 
+const REDIRECT_SECONDS = 10
+
 const PaymentSuccess: React.FC = () => {
+  const navigate = useNavigate()
   const [emailSent, setEmailSent] = useState(false)
   const [bookingData, setBookingData] = useState<any>(null)
+  const [secondsLeft, setSecondsLeft] = useState(REDIRECT_SECONDS)
 
   useEffect(() => {
     const stored = sessionStorage.getItem('pendingBooking')
     if (stored) {
       const data = JSON.parse(stored)
       setBookingData(data)
-      // Keep a copy so refresh still shows confirmation details
       sessionStorage.setItem('confirmedBooking', stored)
       sessionStorage.removeItem('pendingBooking')
       setEmailSent(true)
@@ -26,6 +29,22 @@ const PaymentSuccess: React.FC = () => {
       setEmailSent(true)
     }
   }, [])
+
+  useEffect(() => {
+    if (!bookingData) return
+    setSecondsLeft(REDIRECT_SECONDS)
+    const tick = window.setInterval(() => {
+      setSecondsLeft((s) => {
+        if (s <= 1) {
+          window.clearInterval(tick)
+          navigate('/', { replace: true })
+          return 0
+        }
+        return s - 1
+      })
+    }, 1000)
+    return () => window.clearInterval(tick)
+  }, [bookingData, navigate])
 
   const emptyState = (
     <div className="rn-prose-panel p-8 text-center">
@@ -49,14 +68,16 @@ const PaymentSuccess: React.FC = () => {
           {!bookingData ? (
             emptyState
           ) : (
-            <div className="rn-prose-panel p-6 sm:p-8">
+            <div className="rn-prose-panel rn-success-card p-6 sm:p-8">
               <div className="text-center">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-aurora/20">
-                  <CheckCircle className="h-7 w-7 text-aurora-soft" aria-hidden />
+                <div className="rn-success-check mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-aurora/20">
+                  <CheckCircle className="h-9 w-9 text-aurora-soft" aria-hidden />
                 </div>
-                <h1 className="font-display text-2xl font-semibold text-white">Payment successful</h1>
+                <h1 className="font-display text-2xl font-semibold text-white sm:text-[1.75rem]">
+                  Payment successful
+                </h1>
                 <p className="mt-2 text-sm text-text-muted">
-                  Your {bookingData.tour_name || 'tour'} is confirmed.
+                  Your {bookingData.tour_name || 'experience'} is confirmed.
                 </p>
               </div>
 
@@ -89,17 +110,21 @@ const PaymentSuccess: React.FC = () => {
                 )}
               </div>
 
-              <div className="mt-4 rounded-rn border border-white/10 bg-surface-2 p-4">
-                <h3 className="text-sm font-semibold text-white">What happens next</h3>
-                <ul className="mt-2 space-y-1 text-xs text-text-muted">
-                  <li>Check your email for instructions</li>
-                  <li>Meeting details before your tour date</li>
-                  <li>Contact us if anything looks wrong</li>
-                </ul>
+              <div className="mt-5">
+                <div className="mb-2 flex items-center justify-between text-[11px] text-text-dim">
+                  <span>Returning home</span>
+                  <span className="tabular-nums text-aurora-soft">{secondsLeft}s</span>
+                </div>
+                <div className="rn-success-progress" aria-hidden>
+                  <div
+                    className="rn-success-progress__bar"
+                    style={{ animationDuration: `${REDIRECT_SECONDS}s` }}
+                  />
+                </div>
               </div>
 
-              <Link to="/" className="rn-btn-secondary mt-6 flex w-full">
-                Back to home
+              <Link to="/" className="rn-btn-primary mt-5 flex w-full justify-center">
+                Go to homepage now
               </Link>
             </div>
           )}

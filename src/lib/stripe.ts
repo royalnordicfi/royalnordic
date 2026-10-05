@@ -12,6 +12,8 @@ export interface CheckoutSessionData {
   currency: string
   tour_name: string
   tour_date: string
+  /** Site path to return to if the guest cancels Stripe Checkout (e.g. /northern-lights-tour#book) */
+  cancel_path?: string
   metadata: {
     tour_id: string
     tour_date_id: string
@@ -20,6 +22,7 @@ export interface CheckoutSessionData {
     adults: string
     children: string
     total_price: string
+    [key: string]: string
   }
 }
 

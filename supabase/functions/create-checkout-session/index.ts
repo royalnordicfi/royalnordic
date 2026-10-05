@@ -6,6 +6,17 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+const SITE_ORIGIN = (Deno.env.get('SITE_URL') || 'https://royalnordic.fi').replace(/\/$/, '')
+
+/** Only allow same-site relative paths (blocks open redirects). */
+function safeReturnPath(raw: unknown, fallback: string): string {
+  const path = String(raw ?? '').trim()
+  if (!path.startsWith('/') || path.startsWith('//')) return fallback
+  if (path.includes('://') || /[\s<>"']/.test(path)) return fallback
+  if (path.length > 240) return fallback
+  return path
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -20,7 +31,7 @@ serve(async (req) => {
     }
 
     // Parse request body
-    const { amount, currency, tour_name, tour_date, metadata } = await req.json()
+    const { amount, currency, tour_name, tour_date, metadata, cancel_path } = await req.json()
 
     // Validate required fields
     if (!amount || !currency || !tour_name || !tour_date) {
@@ -94,6 +105,9 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
+    const cancelPath = safeReturnPath(cancel_path, '/')
+    const cancelUrl = `${SITE_ORIGIN}${cancelPath}`
+
     const session = await stripe.createCheckoutSession({
       // Methods active on the current Stripe account (acct_1Sx7hXCFu64j1T1g).
       payment_method_types: [
@@ -116,8 +130,8 @@ serve(async (req) => {
         },
       ],
       mode: 'payment',
-      success_url: `https://royalnordic.fi/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `https://royalnordic.fi/payment-cancelled`,
+      success_url: `${SITE_ORIGIN}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl,
       metadata: metadata,
       customer_email: metadata.customer_email,
       billing_address_collection: 'required',
@@ -128,17 +142,16 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ sessionId: session.id }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       },
     )
-
   } catch (error) {
     console.error('Error creating checkout session:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
       },

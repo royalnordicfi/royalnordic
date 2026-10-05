@@ -129,10 +129,10 @@ const SnowshoeRental = () => {
             referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}
             offerLine={cms.pricing.saleActive ? undefined : 'WINTER20 · Save 20% at checkout'}
             trustLines={[
-              'Delivery to lodging',
-              'Secure Stripe payment',
-              'Safety briefing included',
-              'Explore at your own pace',
+              'Lodging delivery',
+              'Secure payment',
+              'Safety briefing',
+              'Go at your pace',
             ]}
           >
             {cms.loading && !cms.tour ? (

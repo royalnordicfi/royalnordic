@@ -115,10 +115,10 @@ const FamilyFriendlyNorthernLights = () => {
               referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}
               offerLine={cms.pricing.saleActive ? undefined : 'WINTER20 · Save 20% at checkout'}
               trustLines={[
-                'Free cancellation 24h before',
-                'Secure Stripe payment',
+                'Free cancellation',
+                'Secure payment',
                 'Hotel pickup',
-                'Family format · aurora not guaranteed',
+                'Family format',
               ]}
             >
               {cms.loading && !cms.tour ? (

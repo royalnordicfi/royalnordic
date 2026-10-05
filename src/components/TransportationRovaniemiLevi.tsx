@@ -154,10 +154,10 @@ const TransportationRovaniemiLevi = () => {
             priceFrom={pricing.vehicle}
             priceNote="/ vehicle (indicative)"
             trustLines={[
-              'Priced per vehicle, not per passenger',
-              'Private vehicle up to 8 passengers',
-              'Flexible pickup times',
-              'Quote confirmed by email',
+              'Per vehicle pricing',
+              'Up to 8 passengers',
+              'Flexible pickup',
+              'Confirmed by email',
             ]}
           >
             <form onSubmit={handleSubmit} className="space-y-4">

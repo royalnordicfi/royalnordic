@@ -168,6 +168,11 @@ const META: Record<
     description: 'Your Royal Nordic booking payment was successful.',
     noIndex: true,
   },
+  '/payment-cancelled': {
+    title: 'Returning to your tour | Royal Nordic',
+    description: 'Returning to your Royal Nordic booking.',
+    noIndex: true,
+  },
   '/crypto-payment-success': {
     title: 'Crypto Booking Received | Royal Nordic',
     description: 'Your Royal Nordic crypto booking request was received.',

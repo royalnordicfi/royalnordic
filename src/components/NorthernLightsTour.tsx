@@ -169,40 +169,40 @@ const NorthernLightsTour = () => {
           { label: 'Guarantee', value: '100% refund*' },
         ]}
         booking={
-          <>
-            <BookingAside
-              priceFrom={pricing.current}
-              referencePrice={pricing.saleActive ? pricing.reference ?? undefined : undefined}
-              priceNote="/ adult"
-              trustLines={[
-                'Free cancellation up to 24h',
-                'Secure payment',
-                'Professional photos included',
-                '100% Aurora Guarantee',
-              ]}
-            >
-              {loading && !tour ? (
-                <p className="py-10 text-center text-sm text-panel-muted">Loading availability…</p>
-              ) : (
-                <BookingForm
-                  tourId={1}
-                  tourName="Guaranteed Northern Lights Tour"
-                  adultPrice={adultPrice}
-                  childPrice={childPrice}
-                  maxCapacity={maxCapacity}
-                  seasonStart={GUARANTEED_NL_SEASON_START}
-                  seasonEnd={GUARANTEED_NL_SEASON_END}
-                  chrome="embedded"
-                  tone="light"
-                />
-              )}
-            </BookingAside>
-            <p className="mt-3 text-center text-sm text-text-muted">
-              <Link to="/northern-lights-tours" className="font-medium text-aurora-soft hover:underline">
-                Compare Northern Lights tours
-              </Link>
-            </p>
-          </>
+          <BookingAside
+            priceFrom={pricing.current}
+            referencePrice={pricing.saleActive ? pricing.reference ?? undefined : undefined}
+            priceNote="/ adult"
+            trustLines={[
+              'Free cancellation',
+              'Secure payment',
+              'Free photos',
+              'Aurora Guarantee',
+            ]}
+          >
+            {loading && !tour ? (
+              <p className="py-8 text-center text-sm text-panel-muted">Loading availability…</p>
+            ) : (
+              <BookingForm
+                tourId={1}
+                tourName="Guaranteed Northern Lights Tour"
+                adultPrice={adultPrice}
+                childPrice={childPrice}
+                maxCapacity={maxCapacity}
+                seasonStart={GUARANTEED_NL_SEASON_START}
+                seasonEnd={GUARANTEED_NL_SEASON_END}
+                chrome="embedded"
+                tone="light"
+              />
+            )}
+          </BookingAside>
+        }
+        bookingBelow={
+          <p className="text-center text-[12px] text-text-muted">
+            <Link to="/northern-lights-tours" className="font-medium text-aurora-soft hover:underline">
+              Compare Northern Lights tours
+            </Link>
+          </p>
         }
         afterContent={
           <>
