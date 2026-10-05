@@ -13,6 +13,10 @@ type Props = {
   children: React.ReactNode
   afterContent?: React.ReactNode
   proof?: React.ReactNode
+  /** Compact benefit list under the lede (conversion pages) */
+  benefits?: readonly string[]
+  /** Primary above-the-fold CTA (e.g. scroll to book) */
+  heroAction?: React.ReactNode
 }
 
 /**
@@ -30,6 +34,8 @@ export default function ExperienceProductLayout({
   children,
   afterContent,
   proof,
+  benefits,
+  heroAction,
 }: Props) {
   return (
     <div className="rn-product">
@@ -44,10 +50,23 @@ export default function ExperienceProductLayout({
               <h1 className="rn-product__title mt-2.5 font-display font-semibold text-white">
                 {title}
               </h1>
-              <p className="rn-product__lede mt-3.5 text-[15px] leading-relaxed text-text-muted sm:text-[15.5px]">
+              <p className="rn-product__lede mt-3.5 text-[15px] leading-relaxed text-text-muted sm:text-[16px] sm:leading-relaxed">
                 {lede}
               </p>
               {proof ? <div className="rn-product__proof mt-4">{proof}</div> : null}
+              {benefits && benefits.length > 0 ? (
+                <ul className="rn-benefit-rail mt-6" aria-label="Key benefits">
+                  {benefits.map((item) => (
+                    <li key={item}>
+                      <span className="rn-benefit-rail__mark" aria-hidden>
+                        ★
+                      </span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              {heroAction ? <div className="mt-7 flex flex-wrap items-center gap-3">{heroAction}</div> : null}
             </header>
 
             <div className="rn-product__gallery mt-7 sm:mt-8">

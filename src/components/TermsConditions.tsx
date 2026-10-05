@@ -57,8 +57,10 @@ const TermsConditions: React.FC = () => {
                 </p>
                 <p className="mt-2">
                   <strong>Northern Lights guarantee:</strong> On the Guaranteed Northern Lights Tour, if
-                  the Northern Lights are not seen during your tour, you may choose either a 100% refund
-                  or reschedule your tour for another available date (see the tour page and these terms).
+                  the Northern Lights cannot be captured by our professional DSLR cameras during the tour,
+                  you receive a 100% refund. If the Aurora is captured in our photographs, the tour is
+                  considered successful even if it appears faint to the naked eye (see the tour page and
+                  these terms).
                 </p>
               </section>
 

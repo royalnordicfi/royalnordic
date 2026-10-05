@@ -28,7 +28,7 @@ const navGroups: { title: string; items: NavItem[] }[] = [
   {
     title: 'Catalog',
     items: [
-      { to: '/products', label: 'Products' },
+      { to: '/products', label: 'Tours' },
       { to: '/fleet', label: 'Guides & vehicles' },
       { to: '/customers', label: 'Customers' },
     ],

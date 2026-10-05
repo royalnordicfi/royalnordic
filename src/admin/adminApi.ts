@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabase'
 import { todayTourDateISO } from '../lib/tourDate'
 import { sendCustomerConfirmationStrict } from '../lib/email'
 import { validateTourPrices } from '../lib/tourPricing'
+import { normalizeTourCms } from '../lib/tourCms'
 import type {
   AssignmentConflict,
   BookingEmail,
@@ -851,17 +852,42 @@ async function upsertCustomerFromBooking(c: {
 export async function fetchProducts(): Promise<Product[]> {
   await requireAdmin()
   const { data, error } = await supabase.from('tours').select('*').order('id')
-  if (error) throw new Error(error.message)
-  return (data || []) as Product[]
+  if (error) throw new Error(friendlyDbError(error.message))
+  return (data || []).map((row) => normalizeProduct(row as Record<string, unknown>))
+}
+
+export async function fetchProduct(id: number): Promise<Product> {
+  await requireAdmin()
+  const { data, error } = await supabase.from('tours').select('*').eq('id', id).maybeSingle()
+  if (error) throw new Error(friendlyDbError(error.message))
+  if (!data) throw new Error('Tour not found')
+  return normalizeProduct(data as Record<string, unknown>)
+}
+
+function friendlyDbError(message: string): string {
+  const m = String(message || '')
+  if (/column .* does not exist/i.test(m) || /Could not find the/i.test(m)) {
+    return 'Tour CMS fields are missing in the database. Apply migration 025_tour_cms.sql, then try again.'
+  }
+  if (/JWT|auth|permission|policy|RLS/i.test(m)) {
+    return 'You do not have permission to edit tours. Sign in again as an admin.'
+  }
+  return 'Could not save tour changes. Please try again.'
+}
+
+function normalizeProduct(row: Record<string, unknown>): Product {
+  return normalizeTourCms(row) as unknown as Product
 }
 
 export async function updateProduct(id: number, patch: Partial<Product>): Promise<void> {
   await requireAdmin()
 
-  const next: Partial<Product> = { ...patch }
+  const next: Record<string, unknown> = { ...patch }
+  delete next.id
+
   if (next.adult_price != null || next.child_price != null) {
     const current = await supabase.from('tours').select('adult_price, child_price').eq('id', id).single()
-    if (current.error) throw new Error(current.error.message)
+    if (current.error) throw new Error(friendlyDbError(current.error.message))
     const prices = validateTourPrices(
       Number(next.adult_price ?? current.data?.adult_price),
       Number(next.child_price ?? current.data?.child_price),
@@ -869,6 +895,17 @@ export async function updateProduct(id: number, patch: Partial<Product>): Promis
     next.adult_price = prices.adult_price
     next.child_price = prices.child_price
   }
+
+  if (next.reference_price != null && next.reference_price !== '') {
+    const ref = Number(next.reference_price)
+    if (!Number.isFinite(ref) || ref < 0 || ref > 10000) {
+      throw new Error('Original/reference price must be between €0 and €10,000')
+    }
+    next.reference_price = Math.round(ref * 100) / 100
+  } else if (next.reference_price === '') {
+    next.reference_price = null
+  }
+
   if (next.max_capacity != null) {
     const cap = Number(next.max_capacity)
     if (!Number.isInteger(cap) || cap < 1 || cap > 100) {
@@ -877,15 +914,78 @@ export async function updateProduct(id: number, patch: Partial<Product>): Promis
     next.max_capacity = cap
   }
 
+  if (next.sale_enabled && next.reference_price != null && next.adult_price != null) {
+    if (Number(next.reference_price) <= Number(next.adult_price)) {
+      throw new Error('When sale is enabled, original price must be higher than the current adult price')
+    }
+  }
+
+  next.cms_updated_at = new Date().toISOString()
+
   const { error } = await supabase.from('tours').update(next).eq('id', id)
-  if (error) throw new Error(error.message)
+  if (error) throw new Error(friendlyDbError(error.message))
+}
+
+/** Compress and upload a tour gallery image to Supabase Storage (tour-media). */
+export async function uploadTourMedia(tourId: number, file: File): Promise<{ url: string; path: string }> {
+  await requireAdmin()
+  if (!file.type.startsWith('image/')) {
+    throw new Error('Please upload an image file (JPEG, PNG, or WebP).')
+  }
+  if (file.size > 12 * 1024 * 1024) {
+    throw new Error('Image is too large. Please use a file under 12 MB.')
+  }
+
+  const blob = await compressImageForTour(file)
+  const ext = blob.type === 'image/webp' ? 'webp' : 'jpg'
+  const path = `tour-${tourId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+
+  const { error } = await supabase.storage.from('tour-media').upload(path, blob, {
+    cacheControl: '31536000',
+    contentType: blob.type,
+    upsert: false,
+  })
+  if (error) {
+    throw new Error(
+      /bucket|not found|policy/i.test(error.message)
+        ? 'Photo storage is not ready. Apply migration 025 (tour-media bucket), then try again.'
+        : 'Could not upload photo. Please try again.',
+    )
+  }
+
+  const { data } = supabase.storage.from('tour-media').getPublicUrl(path)
+  return { url: data.publicUrl, path }
+}
+
+async function compressImageForTour(file: File): Promise<Blob> {
+  const maxEdge = 1920
+  const quality = 0.82
+  try {
+    const bitmap = await createImageBitmap(file)
+    const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height))
+    const w = Math.max(1, Math.round(bitmap.width * scale))
+    const h = Math.max(1, Math.round(bitmap.height * scale))
+    const canvas = document.createElement('canvas')
+    canvas.width = w
+    canvas.height = h
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return file
+    ctx.drawImage(bitmap, 0, 0, w, h)
+    bitmap.close()
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg', quality),
+    )
+    return blob || file
+  } catch {
+    return file
+  }
 }
 
 /** Soft-remove (or restore) a product. Inactive products are hidden from the public site/pages. */
 export async function setProductActive(id: number, isActive: boolean): Promise<void> {
   await requireAdmin()
   const { error } = await supabase.from('tours').update({ is_active: isActive }).eq('id', id)
-  if (error) throw new Error(error.message)
+  if (error) throw new Error(friendlyDbError(error.message))
 }
 
 export async function fetchTransportationRequests(

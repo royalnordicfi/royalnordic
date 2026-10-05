@@ -219,7 +219,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
       
       setAvailability(transformedData)
     } catch (err) {
-      setError('Failed to load availability')
+      console.error(err)
+      setError('We could not load available dates right now. Please refresh and try again.')
       console.error('Availability error:', err)
       // Fallback to empty array to prevent white page
       setAvailability([])
@@ -454,7 +455,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // Find the tour date ID for the selected date
       const selectedDateData = availability.find(d => d.date === formData.preferredDate)
       if (!selectedDateData) {
-        throw new Error('Selected date not found')
+        throw new Error('This date is no longer available. Please choose another date.')
       }
       
       // Use a fallback ID if not provided (for mock data)
@@ -464,7 +465,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
       const availableSlots = getAvailableSlots(formData.preferredDate)
       const requestedSlots = formData.adults + formData.children
       if (requestedSlots > availableSlots) {
-        throw new Error(`Only ${availableSlots} slots available for this date`)
+        throw new Error(
+          availableSlots <= 0
+            ? 'This date is sold out. Please choose another date.'
+            : `Only ${availableSlots} place${availableSlots === 1 ? '' : 's'} left on this date. Please reduce guests or choose another date.`,
+        )
       }
 
       const subtotal = (formData.adults * liveAdultPrice) + (formData.children * liveChildPrice)
@@ -528,23 +533,30 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
     } catch (err) {
       console.error('Booking error:', err)
-      // Clean up Stripe error messages
-      let errorMessage = 'Booking failed'
+      let errorMessage = 'We could not start checkout. Please try again or contact us.'
       if (err instanceof Error) {
-        if (err.message.includes('Stripe is not configured')) {
-          errorMessage = 'Card payments are currently unavailable. Please use crypto payment or contact us directly at contact@royalnordic.fi'
-        } else if (err.message.includes('email_invalid')) {
-          errorMessage = 'Invalid email address'
-        } else if (err.message.includes('card_declined')) {
-          errorMessage = 'Payment was declined'
-        } else if (err.message.includes('insufficient_funds')) {
-          errorMessage = 'Insufficient funds'
-        } else if (err.message.includes('expired_card')) {
-          errorMessage = 'Card has expired'
-        } else if (err.message.includes('incorrect_cvc')) {
-          errorMessage = 'Incorrect CVC code'
-        } else {
-          errorMessage = err.message
+        const m = err.message
+        if (/sold out|no longer available|Only \d+ place/i.test(m)) {
+          errorMessage = m
+        } else if (m.includes('Stripe is not configured')) {
+          errorMessage =
+            'Card payments are currently unavailable. Please contact us at contact@royalnordic.fi'
+        } else if (/email_invalid|Invalid email/i.test(m)) {
+          errorMessage = 'Please enter a valid email address.'
+        } else if (/discount|promo|WINTER20|pricing rules/i.test(m)) {
+          errorMessage = 'That discount code could not be applied. Remove it or check the spelling.'
+        } else if (m.includes('card_declined')) {
+          errorMessage = 'Payment was declined. Try another card or contact your bank.'
+        } else if (m.includes('insufficient_funds')) {
+          errorMessage = 'Payment failed due to insufficient funds.'
+        } else if (m.includes('expired_card')) {
+          errorMessage = 'That card has expired. Please use another card.'
+        } else if (m.includes('incorrect_cvc')) {
+          errorMessage = 'The security code looks incorrect. Please try again.'
+        } else if (/network|fetch|Failed to fetch|timeout/i.test(m)) {
+          errorMessage = 'Network issue — check your connection and try again.'
+        } else if (!/constraint|undefined|null|NaN|stack|postgres|supabase|JWT|RLS/i.test(m) && m.length < 160) {
+          errorMessage = m
         }
       }
       setError(errorMessage)
@@ -576,7 +588,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // Find the tour date ID for the selected date
       const selectedDateData = availability.find(d => d.date === formData.preferredDate)
       if (!selectedDateData) {
-        throw new Error('Selected date not found')
+        throw new Error('This date is no longer available. Please choose another date.')
       }
       
       const tourDateId = selectedDateData.id || Date.now()
@@ -1142,39 +1154,49 @@ const BookingForm: React.FC<BookingFormProps> = ({
               </div>
             )}
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Adults ({formData.adults} × €{formatEuroAmount(liveAdultPrice)})</span>
-              <span className="text-gray-800 font-medium">€{formatEuroAmount(formData.adults * liveAdultPrice)}</span>
+              <span className="text-gray-600">
+                {formData.adults} {formData.adults === 1 ? 'Adult' : 'Adults'} × €
+                {formatEuroAmount(liveAdultPrice)}
+              </span>
+              <span className="text-gray-800 font-medium">
+                €{formatEuroAmount(formData.adults * liveAdultPrice)}
+              </span>
             </div>
             {formData.children > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Children ({formData.children} × €{formatEuroAmount(liveChildPrice)})</span>
-                <span className="text-gray-800 font-medium">€{formatEuroAmount(formData.children * liveChildPrice)}</span>
+                <span className="text-gray-600">
+                  {formData.children} {formData.children === 1 ? 'Child' : 'Children'} × €
+                  {formatEuroAmount(liveChildPrice)}
+                </span>
+                <span className="text-gray-800 font-medium">
+                  €{formatEuroAmount(formData.children * liveChildPrice)}
+                </span>
               </div>
             )}
             {(() => {
-              const subtotal = (formData.adults * liveAdultPrice) + (formData.children * liveChildPrice)
+              const subtotal = formData.adults * liveAdultPrice + formData.children * liveChildPrice
               const discount = getDiscountAmount(subtotal)
               return discount > 0 ? (
                 <>
                   <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
-                    <span className="text-gray-600">Subtotal:</span>
+                    <span className="text-gray-600">Regular price</span>
                     <span className="text-gray-800 font-medium">€{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-emerald-600 font-semibold">
-                      Discount ({WINTER_PROMOTION.discountPercent}% · {WINTER_PROMOTION.discountCode}):
+                    <span className="text-emerald-700 font-semibold">
+                      Special offer ({WINTER_PROMOTION.discountCode})
                     </span>
-                    <span className="text-emerald-600 font-semibold">-€{discount.toFixed(2)}</span>
+                    <span className="text-emerald-700 font-semibold">-€{discount.toFixed(2)}</span>
                   </div>
                 </>
               ) : null
             })()}
             <div className="border-t border-gray-300 pt-2">
               <div className="flex justify-between items-center">
-                <span className={ui.totalLabel}>Total:</span>
+                <span className={ui.totalLabel}>Total</span>
                 <span className={ui.totalValue}>€{calculateTotal().toFixed(2)}</span>
               </div>
-              <p className="text-xs text-gray-500 mt-1">Includes VAT</p>
+              <p className="text-xs text-gray-500 mt-1">Includes VAT · Secure Stripe checkout</p>
             </div>
           </div>
         </div>
@@ -1186,7 +1208,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           <div className={ui.payInfo}>
             <p>Free cancellation up to 24 hours before departure.</p>
             {isNorthernLightsTour && (
-              <p>Northern Lights guarantee: if lights are not seen, choose a 100% refund or reschedule — see Terms.</p>
+              <p>Northern Lights guarantee: 100% refund if the aurora is not captured on our professional cameras — see Terms.</p>
             )}
             <p>After payment you receive a confirmation email with pickup details.</p>
           </div>

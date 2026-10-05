@@ -1,28 +1,34 @@
 # Product truth — Guaranteed Northern Lights Tour
 
-Canonical customer-facing rules (site + Terms):
+## Operational source of truth
+
+Commercial content (prices, sale, copy, highlights, inclusions, photos, FAQ, SEO) is managed in **Royal Nordic Admin → Tours** and stored on `public.tours` (migration `025_tour_cms.sql`).
+
+Checkout always charges `tours.adult_price` (and child_price). Historical bookings keep the amount paid at booking time.
+
+## Fallback constants (prerender / offline)
+
+`src/seo/guaranteedNorthernLightsTour.ts` holds fallback catalog values used when CMS data is unavailable or for static prerender:
+
+- Current adult price: €99 (`GUARANTEED_NL_CATALOG_ADULT_PRICE`)
+- Reference price: €129 (`GUARANTEED_NL_REFERENCE_ADULT_PRICE`)
 
 ## Guarantee
 
-If the Northern Lights are not seen during the Guaranteed Northern Lights Tour, the customer chooses:
+If the Northern Lights cannot be captured by our professional DSLR cameras during the tour, the customer receives a **100% refund**.
 
-1. **100% refund**, or
-2. **Reschedule** the tour for another available date.
-
-Do not market “free return trip only,” vouchers in place of refund, or “not a cash refund.”
+If the Aurora is captured in our photographs, the tour is considered successful even if it appears faint to the naked eye.
 
 ## Photography
 
-Royal Nordic / the guide **takes professional photos of the customers with the Northern Lights**.
+Royal Nordic / the guide **takes professional photos of the customers with the Northern Lights** (included).
 
-Do not market this as photography tips, guidance, assistance with the guest’s own camera, or “learn how to photograph the aurora” on product pages. Blog DIY tips are separate editorial content.
+## Apply migration
 
-## Catalog facts (unchanged by wording work)
+```bash
+# via Supabase CLI or dashboard SQL
+supabase db push
+# or run supabase/migrations/025_tour_cms.sql
+```
 
-- Path: `/northern-lights-tour`
-- Tour id: `1`
-- Catalog adult price: €129 (see `GUARANTEED_NL_CATALOG_ADULT_PRICE`)
-- Max per vehicle: 8
-- Season: mid-September through mid-April (`09-15`–`04-15`)
-
-SEO source of truth: `src/seo/guaranteedNorthernLightsTour.ts`
+After migration, edit tour id 1 in Admin — do not hardcode commercial changes in React for normal operations.

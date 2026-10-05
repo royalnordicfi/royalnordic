@@ -526,7 +526,7 @@ app.post('/api/admin/setup', (req, res) => {
                       <li>All necessary equipment provided</li>
                       <li>Hot drinks and snacks included</li>
                       <li>Professional photos of you with the Northern Lights</li>
-                      <li>If no lights: 100% refund or reschedule to another available date</li>
+                      <li>100% refund if the aurora is not captured on our professional cameras</li>
                     </ul>
                   </div>
                   
@@ -586,7 +586,7 @@ What to Expect:
 - All necessary equipment provided
 - Hot drinks and snacks included
 - Professional photos of you with the Northern Lights
-- If no lights: 100% refund or reschedule to another available date
+- 100% refund if the aurora is not captured on our professional cameras
 
 We'll send you detailed meeting instructions and what to bring 24 hours before your tour. If you have any questions, don't hesitate to contact us!
 
@@ -711,7 +711,7 @@ app.post('/api/send-stripe-confirmation', async (req, res) => {
                   <li>All necessary equipment provided</li>
                   <li>Hot drinks and snacks included</li>
                   <li>Professional photos of you with the Northern Lights</li>
-                  <li>If no lights: 100% refund or reschedule to another available date</li>
+                  <li>100% refund if the aurora is not captured on our professional cameras</li>
                 </ul>
               </div>
               

@@ -12,6 +12,8 @@ export type TourCardProps = {
   pickup?: boolean
   badge?: string
   priceFrom?: number
+  /** Optional struck-through reference price (sale presentation) */
+  referencePrice?: number
   ctaLabel?: string
   className?: string
   /** @deprecated Uniform cards only — ignored for sizing */
@@ -31,11 +33,16 @@ const TourCard = ({
   pickup,
   badge,
   priceFrom,
-  ctaLabel = 'Explore',
+  referencePrice,
+  ctaLabel = 'Check availability',
   className = '',
   imagePosition = 'center',
 }: TourCardProps) => {
   const meta = [duration, groupSize, pickup ? 'Hotel pickup' : null].filter(Boolean).join(' · ')
+  const showSale =
+    typeof priceFrom === 'number' &&
+    typeof referencePrice === 'number' &&
+    referencePrice > priceFrom
 
   return (
     <Link to={to} className={`rn-tour-card group ${className}`}>
@@ -65,7 +72,17 @@ const TourCard = ({
         <div className="rn-tour-card__foot">
           {typeof priceFrom === 'number' ? (
             <p className="rn-tour-card__price">
-              From <span>€{priceFrom}</span>
+              {showSale ? (
+                <>
+                  <span className="rn-tour-card__was">€{referencePrice}</span>{' '}
+                  <span>€{priceFrom}</span>
+                  <span className="rn-tour-card__per"> / adult</span>
+                </>
+              ) : (
+                <>
+                  From <span>€{priceFrom}</span>
+                </>
+              )}
             </p>
           ) : (
             <span />

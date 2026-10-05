@@ -1,3 +1,9 @@
+import type {
+  CmsFaqItem,
+  CmsGalleryItem,
+  CmsListItem,
+} from '../lib/tourCms'
+
 export type BookingSource =
   | 'direct_website'
   | 'getyourguide'
@@ -97,6 +103,34 @@ export type Product = {
   operational_notes: string | null
   platform_availability: string | null
   commission_percent: number | null
+  tagline?: string | null
+  card_description?: string | null
+  full_description?: string | null
+  highlights?: CmsListItem[]
+  included_items?: CmsListItem[]
+  excluded_items?: CmsListItem[]
+  what_to_expect?: string | null
+  important_info?: string | null
+  know_before?: string | null
+  what_to_bring?: string | null
+  pickup_info?: string | null
+  cancellation_info?: string | null
+  guarantee_info?: string | null
+  reference_price?: number | null
+  sale_enabled?: boolean
+  sale_label?: string | null
+  sale_starts_at?: string | null
+  sale_ends_at?: string | null
+  badge?: string | null
+  group_size_text?: string | null
+  meeting_point?: string | null
+  seo_title?: string | null
+  seo_description?: string | null
+  seo_image?: string | null
+  hero_image_url?: string | null
+  gallery?: CmsGalleryItem[]
+  faq?: CmsFaqItem[]
+  cms_updated_at?: string | null
 }
 
 export type Customer = {

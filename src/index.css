@@ -21,6 +21,9 @@
   --rn-aurora-hover: #0c7a54;
   --rn-aurora-soft: #8dceb2;
   --rn-aurora-glow: rgba(15, 143, 99, 0.14);
+  --rn-sale: #c45c4a;
+  --rn-sale-soft: #e8a99a;
+  --rn-sale-muted: rgba(196, 92, 74, 0.12);
   --rn-ice: #7dd3fc;
 
   --rn-panel: #f7f8f6;
@@ -1022,8 +1025,9 @@
     bottom: -0.85rem;
     z-index: 2;
     display: flex;
-    align-items: baseline;
-    gap: 0.35rem;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.15rem;
     border-radius: var(--rn-radius-sm);
     border: 1px solid rgba(125, 236, 192, 0.18);
     background: linear-gradient(155deg, var(--rn-surface-2), var(--rn-elevated));
@@ -1037,11 +1041,30 @@
     text-transform: uppercase;
     color: var(--rn-text-dim);
   }
+  .rn-price-chip__row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+  .rn-price-chip__was {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--rn-text-dim);
+    text-decoration: line-through;
+    text-decoration-color: color-mix(in srgb, var(--rn-sale) 70%, transparent);
+  }
   .rn-price-chip__value {
     font-family: var(--rn-font-display);
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     font-weight: 600;
     color: var(--rn-snow);
+  }
+  .rn-price-chip__save {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--rn-sale-soft);
   }
   @media (min-width: 640px) {
     .rn-price-chip {
@@ -1050,8 +1073,167 @@
       padding: 0.65rem 1.05rem;
     }
     .rn-price-chip__value {
-      font-size: 1.3rem;
+      font-size: 1.4rem;
     }
+  }
+
+  /* Premium sale price — restrained, never marketplace-cheap */
+  .rn-sale-price__badge {
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--rn-sale-soft);
+  }
+  .rn-sale-price--light .rn-sale-price__badge {
+    color: var(--rn-sale);
+  }
+  .rn-sale-price__row {
+    margin-top: 0.35rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.45rem 0.65rem;
+  }
+  .rn-sale-price__was {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--rn-text-dim);
+    text-decoration: line-through;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: color-mix(in srgb, var(--rn-sale) 75%, transparent);
+  }
+  .rn-sale-price--light .rn-sale-price__was {
+    color: var(--rn-panel-muted);
+  }
+  .rn-sale-price__now {
+    font-family: var(--rn-font-display);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--rn-text);
+  }
+  .rn-sale-price--light .rn-sale-price__now {
+    color: var(--rn-panel-ink);
+  }
+  .rn-sale-price--sm .rn-sale-price__now {
+    font-size: 1.35rem;
+  }
+  .rn-sale-price--md .rn-sale-price__now {
+    font-size: 2rem;
+  }
+  .rn-sale-price--lg .rn-sale-price__now {
+    font-size: 2.35rem;
+  }
+  .rn-sale-price__note {
+    font-size: 0.875rem;
+    color: var(--rn-text-muted);
+  }
+  .rn-sale-price--light .rn-sale-price__note {
+    color: var(--rn-panel-muted);
+  }
+  .rn-sale-price__save {
+    margin-top: 0.4rem;
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--rn-sale);
+  }
+
+  .rn-benefit-rail {
+    display: grid;
+    gap: 0.65rem;
+  }
+  @media (min-width: 640px) {
+    .rn-benefit-rail {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem 1.25rem;
+    }
+  }
+  .rn-benefit-rail li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    font-size: 13.5px;
+    line-height: 1.4;
+    color: var(--rn-text-muted);
+  }
+  .rn-benefit-rail__mark {
+    flex-shrink: 0;
+    margin-top: 0.15em;
+    color: var(--rn-aurora-soft);
+    font-size: 0.85em;
+    font-weight: 700;
+  }
+
+  .rn-guarantee-callout {
+    border-left: 2px solid color-mix(in srgb, var(--rn-aurora) 55%, transparent);
+    padding: 0.85rem 0 0.85rem 1.1rem;
+  }
+  .rn-guarantee-callout__title {
+    font-family: var(--rn-font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--rn-text);
+  }
+  .rn-guarantee-callout__body {
+    margin-top: 0.4rem;
+    max-width: 36rem;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--rn-text-muted);
+  }
+
+  .rn-cms-prose p {
+    margin-top: 0.75rem;
+    line-height: 1.65;
+    color: var(--rn-text-muted);
+  }
+  .rn-cms-prose p:first-child {
+    margin-top: 0;
+  }
+  .rn-cms-prose strong {
+    color: var(--rn-text);
+    font-weight: 600;
+  }
+  .rn-cms-list {
+    margin-top: 0.75rem;
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.45rem;
+  }
+  .rn-cms-list li {
+    position: relative;
+    padding-left: 1rem;
+    color: var(--rn-text-muted);
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .rn-cms-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--rn-aurora-soft) 80%, transparent);
+  }
+
+  .rn-tour-card__was {
+    text-decoration: line-through;
+    text-decoration-color: color-mix(in srgb, var(--rn-sale) 70%, transparent);
+    color: var(--rn-text-dim);
+    font-weight: 500;
+  }
+  .rn-tour-card__per {
+    font-weight: 400;
+    color: var(--rn-text-dim);
+    font-size: 0.85em;
   }
 
   .rn-float-badge {

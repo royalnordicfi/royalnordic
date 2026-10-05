@@ -6,7 +6,14 @@ import ReviewCarousel from './ReviewCarousel'
 import TourCard from './TourCard'
 import { reviewsFor } from '../data/reviews'
 import { fetchActiveTourIds, SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS } from '../lib/productVisibility'
-import { GUARANTEED_NL_CATALOG_ADULT_PRICE } from '../seo/guaranteedNorthernLightsTour'
+import { useTourCms } from '../hooks/useTourCms'
+import { getDisplayPricing } from '../lib/tourCms'
+import {
+  GUARANTEED_NL_CATALOG_ADULT_PRICE,
+  GUARANTEED_NL_GUARANTEE_SHORT,
+  GUARANTEED_NL_HERO_PROMISE,
+  GUARANTEED_NL_REFERENCE_ADULT_PRICE,
+} from '../seo/guaranteedNorthernLightsTour'
 
 const ALL_TOURS = [
   {
@@ -15,13 +22,13 @@ const ALL_TOURS = [
     image: '/nortti1.jpg',
     imageAlt: 'Guaranteed Northern Lights Tour',
     title: 'Guaranteed Northern Lights Tour',
-    description:
-      'Full evening aurora hunt with hotel pickup. If lights are not seen: 100% refund or reschedule — see Terms.',
-    duration: '2–12 hours',
+    description: `${GUARANTEED_NL_HERO_PROMISE} Hotel pickup and free professional photos included.`,
+    duration: '2–10 hours',
     groupSize: 'Max 8 / vehicle',
     pickup: true,
     badge: 'Guaranteed',
     priceFrom: GUARANTEED_NL_CATALOG_ADULT_PRICE as number | undefined,
+    referencePrice: GUARANTEED_NL_REFERENCE_ADULT_PRICE as number | undefined,
   },
   {
     tourId: 8 as number | null,
@@ -57,21 +64,37 @@ const ALL_TOURS = [
 
 const NorthernLightsTours: React.FC = () => {
   const [activeIds, setActiveIds] = useState<Set<number> | null>(null)
+  const { tour: nlTour } = useTourCms(1)
 
   useEffect(() => {
     fetchActiveTourIds().then(setActiveIds)
   }, [])
 
   const tours = useMemo(() => {
-    if (!activeIds) return ALL_TOURS
-    return ALL_TOURS.filter((t) => t.tourId == null || activeIds.has(t.tourId))
-  }, [activeIds])
+    const base = !activeIds ? ALL_TOURS : ALL_TOURS.filter((t) => t.tourId == null || activeIds.has(t.tourId))
+    if (!nlTour) return base
+    const pricing = getDisplayPricing(nlTour)
+    return base.map((t) => {
+      if (t.tourId !== 1) return t
+      return {
+        ...t,
+        title: nlTour.public_name || t.title,
+        description: nlTour.card_description || t.description,
+        duration: nlTour.duration_text || t.duration,
+        groupSize: nlTour.group_size_text || t.groupSize,
+        badge: nlTour.badge || t.badge,
+        image: nlTour.hero_image_url || nlTour.gallery?.[0]?.url || t.image,
+        priceFrom: pricing.current,
+        referencePrice: pricing.saleActive ? pricing.reference ?? undefined : undefined,
+      }
+    })
+  }, [activeIds, nlTour])
 
   return (
     <div className="rn-page">
       <CategoryHero
         title="Northern Lights Tours in Rovaniemi"
-        subtitle="Small-group aurora hunts — signature tour includes a 100% refund or reschedule if no lights appear (see Terms)."
+        subtitle={`Small-group aurora hunts from Rovaniemi. ${GUARANTEED_NL_GUARANTEE_SHORT}`}
         image="/nortti5.jpg"
         compact
       />
@@ -93,7 +116,8 @@ const NorthernLightsTours: React.FC = () => {
                 pickup={tour.pickup}
                 badge={tour.badge}
                 priceFrom={tour.priceFrom}
-                ctaLabel={tour.priceFrom ? 'Explore' : 'Request availability'}
+                referencePrice={'referencePrice' in tour ? tour.referencePrice : undefined}
+                ctaLabel={tour.to === '/northern-lights-tour' ? 'Check availability' : tour.priceFrom ? 'Book now' : 'Request availability'}
                 className={`rn-stagger-${(i % 4) + 1}`}
               />
             ))}

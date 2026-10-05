@@ -1,23 +1,25 @@
-const TrustStrip = () => {
-  const items = [
-    {
-      title: 'Northern Lights guarantee',
-      text: '100% refund or reschedule if no lights appear — see Terms.',
-    },
-    {
-      title: 'Small groups',
-      text: 'Max 8 guests per vehicle on our Guaranteed tour.',
-    },
-    {
-      title: 'Hotel pickup',
-      text: 'Pickup in the Rovaniemi area — flexible aurora hunting.',
-    },
-    {
-      title: 'Book direct',
-      text: 'Secure Stripe checkout and WhatsApp support.',
-    },
-  ]
+import { GUARANTEED_NL_GUARANTEE_SHORT } from '../seo/guaranteedNorthernLightsTour'
 
+const items = [
+  {
+    title: 'Northern Lights guarantee',
+    text: GUARANTEED_NL_GUARANTEE_SHORT,
+  },
+  {
+    title: 'Small groups',
+    text: 'Max 8 guests per vehicle on our Guaranteed tour.',
+  },
+  {
+    title: 'Professional photos',
+    text: 'Your guide photographs you with the aurora — included free.',
+  },
+  {
+    title: 'Book direct',
+    text: 'Secure Stripe checkout and WhatsApp support.',
+  },
+]
+
+const TrustStrip = () => {
   return (
     <div
       className="relative z-10 -mt-10 px-3.5 sm:-mt-16 sm:px-6 lg:-mt-20 lg:px-8"

@@ -8,6 +8,8 @@
  * Writes:
  * - dist/northern-lights-tour.html (build artifact)
  * - public/northern-lights-tour.html (so Vercel Vite packaging includes the HTML file)
+ *
+ * Prices/copy here are prerender fallbacks. Live site reads Admin CMS (tours table) at runtime.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -21,9 +23,9 @@ const SITE = 'https://royalnordic.fi'
 const PATH = '/northern-lights-tour'
 const TITLE = 'Guaranteed Northern Lights Tour Rovaniemi | Royal Nordic'
 const DESCRIPTION =
-  'Book a guaranteed Northern Lights / aurora tour from Rovaniemi: small-group hunt, hotel pickup, English & Finnish guides, professional photos of you with the aurora. If lights are not seen: 100% refund or reschedule. Free cancellation 24h.'
+  'Book a guaranteed Northern Lights tour from Rovaniemi from €99: small-group aurora hunt, hotel pickup, expert guides, and free professional photos of you with the aurora. See the Aurora or get your money back. Free cancellation 24h.'
 const OG_IMAGE = `${SITE}/nortti1.jpg`
-const CATALOG_ADULT_PRICE = 129 // mirrors GUARANTEED_NL_CATALOG_ADULT_PRICE in src/seo/guaranteedNorthernLightsTour.ts
+const CATALOG_ADULT_PRICE = 99 // mirrors GUARANTEED_NL_CATALOG_ADULT_PRICE; live price from Admin/DB
 
 function isInSeason(date = new Date()) {
   const md = `${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`
@@ -102,16 +104,17 @@ function injectJsonLd(html, blocks) {
   const scripts = blocks
     .map(
       ({ id, data }) =>
-        `<script id="jsonld-${id}" type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n    </script>`
+        `<script id="jsonld-${id}" type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n    </script>`,
     )
     .join('\n\n    ')
   return html.replace(
     '</head>',
-    `\n    <!-- Route-specific structured data (prerender) -->\n    ${scripts}\n  </head>`
+    `\n    <!-- Route-specific structured data (prerender) -->\n    ${scripts}\n  </head>`,
   )
 }
 
-function buildNlJsonLd(date = new Date()) {
+function buildNlJsonLd() {
+  const date = new Date()
   const { availability, availabilityStarts } = offerAvailability(date)
   const offer = {
     '@type': 'Offer',
@@ -128,7 +131,7 @@ function buildNlJsonLd(date = new Date()) {
     '@type': 'Product',
     name: 'Guaranteed Northern Lights Tour',
     description:
-      'Guaranteed Northern Lights (aurora) tour from Rovaniemi, Finnish Lapland: small-group hunt with hotel pickup, English and Finnish guides, flexible duration, and professional photos of you with the aurora. If the Northern Lights are not seen, choose a 100% refund or reschedule to another available date (see Terms).',
+      'Guaranteed Northern Lights (aurora) tour from Rovaniemi, Finnish Lapland: small-group hunt with hotel pickup, English and Finnish guides, flexible 2–10 hour duration, and free professional photos of you with the aurora. If the Northern Lights cannot be captured by our professional DSLR cameras, you receive a 100% refund (see Terms).',
     image: OG_IMAGE,
     url: `${SITE}${PATH}`,
     brand: { '@type': 'Brand', name: 'Royal Nordic' },
@@ -162,10 +165,10 @@ function buildNlJsonLd(date = new Date()) {
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'What does the Northern Lights guarantee mean?',
+        name: 'What happens if we don’t see the Northern Lights?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'If the Northern Lights are not seen during your tour, you can choose either a 100% refund or reschedule your tour for another available date. See our Terms & Conditions for the full promise.',
+          text: 'If the Northern Lights cannot be captured by our professional DSLR cameras during the tour, you receive a 100% refund. If the Aurora is captured in our photographs, the tour is considered successful even if it appears faint to the naked eye.',
         },
       },
       {
@@ -173,7 +176,7 @@ function buildNlJsonLd(date = new Date()) {
         name: 'Are professional photos included?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes. Your guide takes professional photos of you with the Northern Lights during the tour.',
+          text: 'Yes — free. Your guide takes professional photos of you with the Northern Lights during the tour.',
         },
       },
       {
@@ -189,23 +192,7 @@ function buildNlJsonLd(date = new Date()) {
         name: 'How long is the tour?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Duration is flexible based on aurora forecasts — typically around six hours, and between about 2 and 12 hours when we need to travel farther for clearer skies.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Is this suitable for children?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Children are welcome. Child pricing applies for ages 0–17. The evening can be long and cold outdoors, so warm clothing and stamina matter more than age alone.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'When is the season?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'This aurora hunt runs in the Northern Lights season, typically from mid-September through mid-April from Rovaniemi in Finnish Lapland.',
+          text: 'Duration is flexible based on aurora forecasts — typically around six hours, and between about 2 and 10 hours when we travel farther for clearer skies.',
         },
       },
     ],
@@ -229,7 +216,6 @@ export function renderMoneyPageHtml(baseHtml) {
   })
   html = injectJsonLd(html, buildNlJsonLd())
 
-  // Lightweight crawlable landmark (SPA still mounts into #root).
   if (!html.includes('id="prerender-nl-landmark"')) {
     html = html.replace(
       '<div id="root"></div>',
@@ -238,10 +224,10 @@ export function renderMoneyPageHtml(baseHtml) {
       <article id="prerender-nl-landmark">
         <h1>Guaranteed Northern Lights Tour</h1>
         <p>${DESCRIPTION}</p>
-        <p>Small-group aurora hunt from Rovaniemi with hotel pickup, flexible duration, professional photos of you with the aurora, and a Northern Lights guarantee (100% refund or reschedule if no lights appear — see Terms). From €${CATALOG_ADULT_PRICE} per adult.</p>
+        <p>Small-group aurora hunt from Rovaniemi with hotel pickup, professional photos of you with the aurora, and a 100% camera-capture guarantee. Special offer from €${CATALOG_ADULT_PRICE} per adult.</p>
         <p><a href="${canonical}#book">Book the Guaranteed Northern Lights Tour in Rovaniemi</a></p>
       </article>
-    </noscript>`
+    </noscript>`,
     )
   }
   return html
@@ -253,20 +239,18 @@ export function writeMoneyPageFiles(html) {
   fs.writeFileSync(outPath, html, 'utf8')
   console.log(`prerender-routes: wrote ${path.relative(root, outPath)}`)
 
-  // Vercel's Vite packaging sometimes keeps public/ HTML + dist/index.html+assets,
-  // but drops other HTML created only under dist/. Mirror into public/ so the
-  // next packaging pass (and local preview) still serve the money document.
   const publicPath = path.join(root, 'public', 'northern-lights-tour.html')
   fs.writeFileSync(publicPath, html, 'utf8')
   console.log(`prerender-routes: wrote ${path.relative(root, publicPath)}`)
 
-  const vercelStatic = path.join(root, '.vercel', 'output', 'static')
-  if (fs.existsSync(vercelStatic)) {
-    const vercelPath = path.join(vercelStatic, 'northern-lights-tour.html')
-    fs.writeFileSync(vercelPath, html, 'utf8')
-    console.log(`prerender-routes: wrote ${path.relative(root, vercelPath)}`)
+  const vercelStatic = path.join(root, '.vercel', 'output', 'static', 'northern-lights-tour.html')
+  try {
+    fs.mkdirSync(path.dirname(vercelStatic), { recursive: true })
+    fs.writeFileSync(vercelStatic, html, 'utf8')
+    console.log(`prerender-routes: wrote ${path.relative(root, vercelStatic)}`)
+  } catch {
+    // optional
   }
-  return outPath
 }
 
 function main() {
@@ -275,15 +259,11 @@ function main() {
     console.error('prerender-routes: dist/index.html missing — run vite build first')
     process.exit(1)
   }
-
   const baseHtml = fs.readFileSync(indexPath, 'utf8')
   const html = renderMoneyPageHtml(baseHtml)
   writeMoneyPageFiles(html)
 }
 
-const isDirectRun =
+const isDirect =
   process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
-
-if (isDirectRun) {
-  main()
-}
+if (isDirect) main()

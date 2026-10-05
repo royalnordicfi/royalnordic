@@ -7,6 +7,7 @@ import BookingDetailPage from './admin/pages/BookingDetailPage'
 import ManualBookingPage from './admin/pages/ManualBookingPage'
 import CalendarPage from './admin/pages/CalendarPage'
 import ProductsPage from './admin/pages/ProductsPage'
+import ProductEditorPage from './admin/pages/ProductEditorPage'
 import FleetPage from './admin/pages/FleetPage'
 import CustomersPage from './admin/pages/CustomersPage'
 import RevenuePage from './admin/pages/RevenuePage'
@@ -46,6 +47,7 @@ function AdminApp() {
           <Route path="availability" element={<AvailabilityPage />} />
           <Route path="requests" element={<RequestsPage />} />
           <Route path="products" element={<ProductsPage />} />
+          <Route path="products/:id" element={<ProductEditorPage />} />
           <Route path="fleet" element={<FleetPage />} />
           <Route path="customers" element={<CustomersPage />} />
           <Route path="revenue" element={<RevenuePage />} />

@@ -21,6 +21,11 @@ export default {
           hover: '#0d9f6e',
           soft: '#7decc0',
         },
+        sale: {
+          DEFAULT: '#c45c4a',
+          soft: '#e8a99a',
+          muted: 'rgba(196, 92, 74, 0.14)',
+        },
         ice: '#7dd3fc',
         panel: {
           DEFAULT: '#f4f7f9',

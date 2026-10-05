@@ -1,4 +1,9 @@
 import { Link } from 'react-router-dom'
+import {
+  GUARANTEED_NL_CATALOG_ADULT_PRICE,
+  GUARANTEED_NL_HERO_PROMISE,
+  GUARANTEED_NL_REFERENCE_ADULT_PRICE,
+} from '../seo/guaranteedNorthernLightsTour'
 
 const Hero = () => {
   return (
@@ -31,14 +36,29 @@ const Hero = () => {
             Guaranteed Northern&nbsp;Lights
           </h1>
           <p className="rn-hero-lede mt-4 max-w-[30rem] text-[15px] leading-relaxed text-white/78 sm:mt-6 sm:text-[17px] sm:leading-[1.65]">
-            Small-group aurora hunts across Finnish Lapland, led by local guides who know the sky.
+            {GUARANTEED_NL_HERO_PROMISE} Small-group aurora hunts with free professional photos of you
+            beneath the sky.
+          </p>
+          <p className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm text-white/70">
+            <span>
+              <span className="line-through decoration-sale/80 text-white/45">
+                €{GUARANTEED_NL_REFERENCE_ADULT_PRICE}
+              </span>{' '}
+              <span className="font-display text-2xl font-semibold text-white">
+                €{GUARANTEED_NL_CATALOG_ADULT_PRICE}
+              </span>
+              <span className="ml-1">/ adult</span>
+            </span>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sale-soft">
+              Special offer · Save €30
+            </span>
           </p>
           <div className="rn-hero-cta mt-8 flex flex-wrap items-center gap-2.5 sm:mt-10 sm:gap-4">
-            <Link to="/northern-lights-tour" className="rn-btn-primary px-7 sm:px-8">
-              Explore the Northern Lights
+            <Link to="/northern-lights-tour" className="rn-btn-primary min-h-[48px] px-7 sm:px-8">
+              Book Northern Lights
             </Link>
             <Link to={{ pathname: '/', hash: 'experiences' }} className="rn-hero-ghost">
-              Browse experiences
+              Explore experiences
             </Link>
           </div>
         </div>
