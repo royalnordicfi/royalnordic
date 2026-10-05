@@ -37,9 +37,10 @@ const FALLBACK: TourPageFallback = {
   ],
   excluded: ['Meals and personal expenses', 'Return journey (book separately if needed)'],
   gallery: [
-    { src: '/transportation1.jpg', alt: 'Private Lapland transfer vehicle' },
-    { src: '/transportation2.jpg', alt: 'Winter road transfer in Finnish Lapland' },
-    { src: '/transportation3.jpg', alt: 'Airport and hotel transfer service' },
+    { src: '/royal-trans-1.jpg', alt: 'Royal Nordic private transfer vehicle' },
+    { src: '/royal-trans-2.jpg', alt: 'Private Lapland transfer on winter roads' },
+    { src: '/royal-trans-3.jpg', alt: 'Airport and hotel transfer service' },
+    { src: '/royal-trans-4.jpg', alt: 'Door-to-door transfer across Finnish Lapland' },
   ],
   faqs: [
     {

@@ -8,7 +8,7 @@ import { SAARISELKA_VEHICLE_PRICE } from './TransportationSaariselka'
 const TRANSFERS = [
   {
     to: '/transportation-rovaniemi-saariselka',
-    image: '/transportation1.jpg',
+    image: '/royal-trans-1.jpg',
     imageAlt: 'Private transfer between Rovaniemi and Saariselkä',
     title: 'Rovaniemi ⇄ Saariselkä',
     description: 'Private door-to-door transfer. Flat rate per vehicle, one way — book and pay online.',
@@ -22,7 +22,7 @@ const TRANSFERS = [
   },
   {
     to: '/transportation-rovaniemi-levi',
-    image: '/transportation2.jpg',
+    image: '/royal-trans-2.jpg',
     imageAlt: 'Private transfer from Rovaniemi to Levi',
     title: 'Rovaniemi – Levi / Kittilä',
     description: 'Private vehicle with professional driver. Request timing and we confirm by email.',
@@ -36,7 +36,7 @@ const TRANSFERS = [
   },
   {
     to: '/transportation-customized',
-    image: '/transportation3.jpg',
+    image: '/royal-trans-3.jpg',
     imageAlt: 'Custom Lapland transportation',
     title: 'Customized Transportation',
     description: 'Airport pickups, multi-stop days, and routes across Finnish Lapland on request.',
@@ -56,14 +56,14 @@ const TransportationCategory = () => {
       <CategoryHero
         title="Private Transfers in Finnish Lapland"
         subtitle="Door-to-door rides between Rovaniemi, Saariselkä, Levi, Kittilä and custom routes — timed around flights and hotels."
-        image="/transportation3.jpg"
+        image="/royal-trans-4.jpg"
         compact
       />
 
       <section className="rn-section-tight rn-hero-follow relative pt-0 pb-10 sm:pb-12">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
         <div className="rn-container relative space-y-10">
-          <div className="rn-card-grid lg:!grid-cols-3">
+          <div className="rn-card-grid sm:!grid-cols-2 lg:!grid-cols-3">
             {TRANSFERS.map((item) => (
               <TourCard
                 key={item.to}

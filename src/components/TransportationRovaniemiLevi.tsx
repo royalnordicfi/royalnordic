@@ -8,7 +8,11 @@ import ExperienceInclusions from './experience/ExperienceInclusions'
 import ExperienceAccordion from './experience/ExperienceAccordion'
 import BookingAside from './experience/BookingAside'
 
-const GALLERY = [{ src: '/transportation1.jpg', alt: 'Private transfer between Rovaniemi and Levi' }]
+const GALLERY = [
+  { src: '/royal-trans-2.jpg', alt: 'Private transfer between Rovaniemi and Levi' },
+  { src: '/royal-trans-1.jpg', alt: 'Royal Nordic private transfer vehicle' },
+  { src: '/royal-trans-4.jpg', alt: 'Lapland door-to-door transfer' },
+]
 
 const HIGHLIGHTS = [
   'Private vehicle with driver — up to 8 passengers',

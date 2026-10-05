@@ -8,7 +8,11 @@ import ExperienceItinerary from './experience/ExperienceItinerary'
 import ExperienceInclusions from './experience/ExperienceInclusions'
 import ExperienceAccordion from './experience/ExperienceAccordion'
 
-const GALLERY = [{ src: '/transportation2.jpg', alt: 'Private customized transportation in Lapland' }]
+const GALLERY = [
+  { src: '/royal-trans-3.jpg', alt: 'Private customized transportation in Lapland' },
+  { src: '/royal-trans-4.jpg', alt: 'Flexible private transfer across Finnish Lapland' },
+  { src: '/royal-trans-1.jpg', alt: 'Royal Nordic transfer vehicle' },
+]
 
 const HIGHLIGHTS = [
   'Custom routes across Lapland — airport, hotels, multi-stop days',

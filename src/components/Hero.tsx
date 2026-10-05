@@ -47,7 +47,7 @@ const Hero = () => {
               Book Northern Lights
             </Link>
           </div>
-          <p className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm text-white/65">
+          <p className="mt-5 flex flex-col gap-1 text-sm text-white/65 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-3 sm:gap-y-1">
             <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/55">
               Flagship offer
             </span>

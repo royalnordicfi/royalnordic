@@ -28,7 +28,7 @@ const Transportations = () => {
             {/* Background Image */}
             <div className="relative h-48 sm:h-52 overflow-hidden">
               <img
-                src="/transportation1.jpg"
+                src="/royal-trans-1.jpg"
                 alt="Transportation Services"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 loading="lazy"

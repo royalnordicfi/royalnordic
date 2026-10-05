@@ -16,7 +16,7 @@ const SECONDARY = [
   {
     title: 'Transfers',
     to: '/transportation',
-    image: '/transportation1.jpg',
+    image: '/royal-trans-1.jpg',
     hint: 'Private rides across Lapland',
   },
 ]
