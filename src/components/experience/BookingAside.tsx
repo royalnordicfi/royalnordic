@@ -11,8 +11,7 @@ type Props = {
 }
 
 /**
- * Warm-white booking surface — signature commerce contrast on Arctic dark.
- * Keep visual weight light; details live in the form progressive flow.
+ * Premium booking assistant surface — sticky sibling to tour content.
  */
 export default function BookingAside({
   priceFrom,
@@ -31,7 +30,7 @@ export default function BookingAside({
 
   return (
     <div className={`rn-book-panel-light rn-book-signature ${className}`}>
-      <div className="border-b border-black/[0.06] px-5 py-5 sm:px-6 sm:py-5">
+      <div className="border-b border-black/[0.06] px-5 py-5 sm:px-6">
         {showSale ? (
           <SalePrice
             current={priceFrom}
@@ -51,16 +50,18 @@ export default function BookingAside({
             </div>
           </>
         )}
-        {offerLine ? (
+        {offerLine && !showSale ? (
           <p className="mt-3 text-[12.5px] leading-snug text-panel-muted">
             <span className="font-medium text-panel-ink">Direct booking · </span>
             {offerLine}
           </p>
         ) : null}
-        <ul className="mt-4 space-y-1.5 text-[12px] leading-snug text-panel-muted">
-          {trustLines.map((line) => (
+        <ul className="mt-4 space-y-2 text-[12.5px] leading-snug text-panel-muted">
+          {trustLines.slice(0, 4).map((line) => (
             <li key={line} className="flex items-start gap-2">
-              <span className="mt-[0.35em] h-1 w-1 shrink-0 rounded-full bg-aurora/80" aria-hidden />
+              <span className="mt-0.5 shrink-0 text-aurora" aria-hidden>
+                ✓
+              </span>
               <span>{line}</span>
             </li>
           ))}

@@ -16,6 +16,7 @@ import {
 import { WINTER_PROMOTION } from '../config/winterPromotion'
 import {
   getWinterDiscountAmount,
+  isTourExcludedFromWinterPromo,
   isValidWinterPromoCode,
   markCodeAppliedThisSession,
   trackWinterPromoEvent,
@@ -426,12 +427,24 @@ const BookingForm: React.FC<BookingFormProps> = ({
     return subtotal - discount
   }
 
+  const promoOpts = { tourId, tourName }
+  const promoAllowed = !isTourExcludedFromWinterPromo(tourId, tourName)
+
+  // Catalogue-sale tours (Guaranteed NL): never accept or apply WINTER20.
+  useEffect(() => {
+    if (!promoAllowed && formData.discountCode) {
+      setFormData((prev) => ({ ...prev, discountCode: '' }))
+    }
+  }, [promoAllowed, formData.discountCode])
+
   const getDiscountAmount = (subtotal: number) => {
-    return getWinterDiscountAmount(subtotal, formData.discountCode)
+    if (!promoAllowed) return 0
+    return getWinterDiscountAmount(subtotal, formData.discountCode, undefined, undefined, promoOpts)
   }
 
   const isDiscountValid = () => {
-    return isValidWinterPromoCode(formData.discountCode)
+    if (!promoAllowed) return false
+    return isValidWinterPromoCode(formData.discountCode, undefined, undefined, promoOpts)
   }
 
   const getAvailableSlots = (date: string) => {
@@ -473,8 +486,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
       }
 
       const subtotal = (formData.adults * liveAdultPrice) + (formData.children * liveChildPrice)
-      const discount = getDiscountAmount(subtotal)
+      const discount = promoAllowed ? getDiscountAmount(subtotal) : 0
       const totalPrice = subtotal - discount
+      const discountCode = promoAllowed ? formData.discountCode.trim().toUpperCase() : ''
       if (discount > 0) {
         markCodeAppliedThisSession()
         trackWinterPromoEvent('winter20_code_applied', {
@@ -504,7 +518,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           total_price: totalPrice.toString(),
           subtotal: subtotal.toString(),
           discount: discount.toString(),
-          discount_code: formData.discountCode.trim().toUpperCase(),
+          discount_code: discountCode,
           phone: formData.phone,
           special_requests: formData.specialRequests
         }
@@ -593,8 +607,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
       
       const tourDateId = selectedDateData.id || Date.now()
       const subtotal = (formData.adults * liveAdultPrice) + (formData.children * liveChildPrice)
-      const discount = getDiscountAmount(subtotal)
+      const discount = promoAllowed ? getDiscountAmount(subtotal) : 0
       const totalPrice = subtotal - discount
+      const discountCode = promoAllowed ? formData.discountCode.trim().toUpperCase() : ''
       if (discount > 0) {
         markCodeAppliedThisSession()
         trackWinterPromoEvent('winter20_code_applied', {
@@ -623,7 +638,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         total_price: totalPrice,
         subtotal: subtotal,
         discount: discount,
-        discount_code: formData.discountCode.trim().toUpperCase(),
+        discount_code: discountCode,
         tour_name: tourName,
         tour_date: tourDate,
         tour_date_iso: tourDateIso,
@@ -1102,35 +1117,41 @@ const BookingForm: React.FC<BookingFormProps> = ({
           />
         </div>
 
-        {/* Discount Code */}
-        <div>
-          <h4 className={ui.heading}>Discount Code</h4>
-          <div className="flex gap-2">
-            <input 
-              type="text" 
-              name="discountCode"
-              value={formData.discountCode}
-              onChange={handleChange}
-              placeholder={`Enter code (e.g. ${WINTER_PROMOTION.discountCode})`}
-              className={dark ? `${ui.input} flex-1 uppercase` : 'flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm uppercase'}
-              style={{ textTransform: 'uppercase' }}
-              autoComplete="off"
-            />
+        {/* Discount Code — hidden when tour already has a catalogue sale (e.g. NL €99) */}
+        {promoAllowed ? (
+          <div>
+            <h4 className={ui.heading}>Discount Code</h4>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                name="discountCode"
+                value={formData.discountCode}
+                onChange={handleChange}
+                placeholder={`Enter code (e.g. ${WINTER_PROMOTION.discountCode})`}
+                className={
+                  dark
+                    ? `${ui.input} flex-1 uppercase`
+                    : 'flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm uppercase'
+                }
+                style={{ textTransform: 'uppercase' }}
+                autoComplete="off"
+              />
+              {isDiscountValid() && (
+                <div className={ui.validBox}>
+                  <span className={ui.validText}>✓ Valid</span>
+                </div>
+              )}
+            </div>
+            {formData.discountCode && !isDiscountValid() && (
+              <p className={ui.discountBad}>Invalid code or promotion is not active</p>
+            )}
             {isDiscountValid() && (
-              <div className={ui.validBox}>
-                <span className={ui.validText}>✓ Valid</span>
-              </div>
+              <p className={ui.discountOk}>
+                {WINTER_PROMOTION.discountPercent}% off eligible direct booking
+              </p>
             )}
           </div>
-          {formData.discountCode && !isDiscountValid() && (
-            <p className={ui.discountBad}>Invalid code or promotion is not active</p>
-          )}
-          {isDiscountValid() && (
-            <p className={ui.discountOk}>
-              {WINTER_PROMOTION.discountPercent}% off eligible direct booking
-            </p>
-          )}
-        </div>
+        ) : null}
 
         {/* Total Price */}
         <div className={ui.summary}>

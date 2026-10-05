@@ -1,6 +1,8 @@
 import {
   PROMO_BAR_HEIGHT_PX,
   PROMO_BAR_HEIGHT_VAR,
+  WINTER20_EXCLUDED_TOUR_IDS,
+  WINTER20_EXCLUDED_TOUR_NAMES,
   WINTER_PROMOTION,
   type WinterPromotionConfig,
 } from '../config/winterPromotion.ts'
@@ -53,12 +55,20 @@ export function normalizePromoCode(code: string): string {
   return code.trim().toUpperCase()
 }
 
+export function isTourExcludedFromWinterPromo(tourId?: number, tourName?: string): boolean {
+  if (tourId != null && WINTER20_EXCLUDED_TOUR_IDS.has(tourId)) return true
+  if (tourName && WINTER20_EXCLUDED_TOUR_NAMES.has(tourName)) return true
+  return false
+}
+
 export function isValidWinterPromoCode(
   code: string,
   config: WinterPromotionConfig = WINTER_PROMOTION,
-  now: Date = new Date()
+  now: Date = new Date(),
+  opts?: { tourId?: number; tourName?: string },
 ): boolean {
   if (!isCampaignActive(config, now)) return false
+  if (isTourExcludedFromWinterPromo(opts?.tourId, opts?.tourName)) return false
   return normalizePromoCode(code) === normalizePromoCode(config.discountCode)
 }
 
@@ -67,10 +77,11 @@ export function getWinterDiscountAmount(
   subtotal: number,
   code: string,
   config: WinterPromotionConfig = WINTER_PROMOTION,
-  now: Date = new Date()
+  now: Date = new Date(),
+  opts?: { tourId?: number; tourName?: string },
 ): number {
   if (!Number.isFinite(subtotal) || subtotal <= 0) return 0
-  if (!isValidWinterPromoCode(code, config, now)) return 0
+  if (!isValidWinterPromoCode(code, config, now, opts)) return 0
   const raw = subtotal * (config.discountPercent / 100)
   return Math.round(raw * 100) / 100
 }
@@ -222,6 +233,8 @@ export function validateCheckoutDiscount(input: {
   discountCode: string
   config?: WinterPromotionConfig
   now?: Date
+  tourId?: number
+  tourName?: string
 }): string | null {
   const config = input.config ?? WINTER_PROMOTION
   const now = input.now ?? new Date()
@@ -229,12 +242,13 @@ export function validateCheckoutDiscount(input: {
   const amount = Number(input.amount)
   const claimedDiscount = Number(input.discount) || 0
   const code = input.discountCode || ''
+  const opts = { tourId: input.tourId, tourName: input.tourName }
 
   if (!Number.isFinite(subtotal) || subtotal < 0) return 'Invalid subtotal'
   if (!Number.isFinite(amount) || amount < 0) return 'Invalid amount'
 
-  const expectedDiscount = getWinterDiscountAmount(subtotal, code, config, now)
-  const expectedTotal = getExpectedTotalAfterPromo(subtotal, code, config, now)
+  const expectedDiscount = getWinterDiscountAmount(subtotal, code, config, now, opts)
+  const expectedTotal = Math.round((subtotal - expectedDiscount) * 100) / 100
 
   if (Math.abs(claimedDiscount - expectedDiscount) > 0.02) {
     return 'Discount does not match campaign rules'

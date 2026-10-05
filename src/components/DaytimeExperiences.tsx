@@ -6,6 +6,8 @@ import ReviewCarousel from './ReviewCarousel'
 import TourCard from './TourCard'
 import { reviewsFor } from '../data/reviews'
 import { fetchActiveTourIds } from '../lib/productVisibility'
+import { fetchPublicTourCards, type TourCms } from '../lib/tourCms'
+import { mergeTourCardCms, tourCmsMap } from '../lib/mergeTourCardCms'
 
 const ALL_EXPERIENCES = [
   {
@@ -65,15 +67,21 @@ const ALL_EXPERIENCES = [
 
 const DaytimeExperiences: React.FC = () => {
   const [activeIds, setActiveIds] = useState<Set<number> | null>(null)
+  const [cmsById, setCmsById] = useState<Map<number, TourCms>>(() => new Map())
 
   useEffect(() => {
     fetchActiveTourIds().then(setActiveIds)
+    fetchPublicTourCards()
+      .then((cards) => setCmsById(tourCmsMap(cards)))
+      .catch(() => undefined)
   }, [])
 
   const experiences = useMemo(() => {
-    if (!activeIds) return ALL_EXPERIENCES
-    return ALL_EXPERIENCES.filter((e) => e.tourId == null || activeIds.has(e.tourId))
-  }, [activeIds])
+    const base = !activeIds
+      ? ALL_EXPERIENCES
+      : ALL_EXPERIENCES.filter((e) => e.tourId == null || activeIds.has(e.tourId))
+    return base.map((e) => mergeTourCardCms(e, cmsById))
+  }, [activeIds, cmsById])
 
   return (
     <div className="rn-page">
@@ -101,6 +109,7 @@ const DaytimeExperiences: React.FC = () => {
                 pickup={exp.pickup}
                 badge={'badge' in exp ? exp.badge : undefined}
                 priceFrom={exp.priceFrom}
+                referencePrice={exp.referencePrice}
                 imagePosition={exp.imagePosition}
                 ctaLabel={exp.priceFrom != null ? 'Explore' : 'Request availability'}
                 className={`rn-stagger-${(i % 4) + 1}`}
@@ -120,7 +129,6 @@ const DaytimeExperiences: React.FC = () => {
           { to: '/northern-lights-tour', label: 'Guaranteed Northern Lights', primary: true },
           { to: '/contact', label: 'Contact us' },
         ]}
-        className="border-t-0 pt-0"
       />
       <Footer />
     </div>

@@ -6,12 +6,13 @@ import MobileBookingBar from './MobileBookingBar'
 import ProductFaq from './seo/ProductFaq'
 import ReviewCarousel from './ReviewCarousel'
 import ExperienceProductLayout from './experience/ExperienceProductLayout'
-import ExperienceHighlights from './experience/ExperienceHighlights'
 import ExperienceItinerary from './experience/ExperienceItinerary'
 import ExperienceInclusions from './experience/ExperienceInclusions'
 import ExperienceAccordion from './experience/ExperienceAccordion'
 import BookingAside from './experience/BookingAside'
 import SafeRichText from './SafeRichText'
+import TourSection from './tour/TourSection'
+import TourGuarantee from './tour/TourGuarantee'
 import { reviewsFor } from '../data/reviews'
 import { useTourCms } from '../hooks/useTourCms'
 import { displayName, getDisplayPricing } from '../lib/tourCms'
@@ -56,32 +57,31 @@ const NorthernLightsTour = () => {
   const title = tour ? displayName(tour) : 'Guaranteed Northern Lights Tour'
   const lede = tour?.tagline?.trim() || GUARANTEED_NL_HERO_PROMISE
   const benefits =
-    tour?.highlights?.length
+    tour?.highlights?.length > 0
       ? tour.highlights.map((h) => h.text)
       : [...GUARANTEED_NL_BENEFITS]
   const gallery =
-    tour?.gallery?.length
+    tour?.gallery?.length > 0
       ? tour.gallery.map((g) => ({ src: g.url, alt: g.alt }))
       : FALLBACK_GALLERY
   const included =
-    tour?.included_items?.length
+    tour?.included_items?.length > 0
       ? tour.included_items.map((i) => i.text)
       : [
-          '100% Aurora Guarantee — full refund if not captured on our cameras (see Terms)',
-          'Free professional photos of you with the Northern Lights',
-          'Small group — max 8 people per vehicle',
-          'Hotel pickup and drop-off in the Rovaniemi area',
-          'Flexible 2–10 hour hunt based on live aurora forecasts',
-          'English & Finnish speaking local guides',
-          'Warm drinks and snacks',
+          'Hotel pickup and drop-off',
+          'Professional photos of you with the Northern Lights',
+          'Warm transportation',
+          'Hot drinks and snacks',
+          'Expert Aurora guide',
+          '100% Aurora Guarantee',
         ]
   const excluded =
-    tour?.excluded_items?.length
+    tour?.excluded_items?.length > 0
       ? tour.excluded_items.map((i) => i.text)
-      : ['Clothing and personal equipment (bring warm Arctic layers)']
+      : ['Arctic clothing', 'Personal equipment']
   const guarantee = tour?.guarantee_info?.trim() || GUARANTEED_NL_GUARANTEE_FULL
   const faqs =
-    tour?.faq?.length
+    tour?.faq?.length > 0
       ? tour.faq.map((f) => ({ question: f.question, answer: f.answer }))
       : [...guaranteedNlFaqs]
 
@@ -89,9 +89,7 @@ const NorthernLightsTour = () => {
     if (!tour?.seo_title && !tour?.seo_description) return
     if (tour.seo_title) document.title = tour.seo_title
     const desc = document.querySelector('meta[name="description"]')
-    if (desc && tour.seo_description) {
-      desc.setAttribute('content', tour.seo_description)
-    }
+    if (desc && tour.seo_description) desc.setAttribute('content', tour.seo_description)
   }, [tour])
 
   const scrollToBook = () => {
@@ -106,24 +104,20 @@ const NorthernLightsTour = () => {
     {
       time: '18:30',
       title: 'Pickup',
-      text:
-        tour?.pickup_info?.trim() ||
-        'Standard pickup from 18:30. Exact time confirmed after booking — be ready 10–30 minutes before.',
+      text: 'Hotel pickup in the Rovaniemi area. Exact time confirmed after booking.',
     },
     {
       title: 'Aurora hunt',
-      text:
-        tour?.what_to_expect?.trim() ||
-        'We drive to the best viewing spots for that night based on live forecasts — farther when skies are clearer.',
+      text: 'We chase clearer skies using live forecasts — farther when conditions call for it.',
     },
     {
       title: 'Photo stops',
-      text: 'Warm drinks, snacks, and time outdoors while your guide takes professional photos of you with the Northern Lights.',
+      text: 'Warm drinks and time outdoors while your guide photographs you with the aurora.',
     },
     {
       time: 'Return',
       title: 'Drop-off',
-      text: 'Return depends on distance traveled — usually between midnight and early morning.',
+      text: 'Return to your hotel — usually between midnight and early morning.',
     },
   ]
 
@@ -141,7 +135,7 @@ const NorthernLightsTour = () => {
         benefits={benefits}
         proof={
           <p>
-            <strong>★★★★★</strong> Real guest reviews · Small groups · Free professional aurora photos
+            <strong>★★★★★</strong> Real guest reviews · Small groups · Free professional photos
           </p>
         }
         heroAction={
@@ -149,25 +143,30 @@ const NorthernLightsTour = () => {
             <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
               Check availability
             </button>
-            <p className="text-sm text-text-muted">
-              {pricing.saleActive && pricing.reference != null ? (
-                <>
-                  <span className="line-through decoration-sale/70 text-text-dim">
-                    €{pricing.reference}
-                  </span>{' '}
-                </>
-              ) : null}
-              <span className="font-semibold text-white">€{pricing.current}</span>
-              <span className="text-text-muted"> / adult</span>
-            </p>
+            {pricing.saleActive && pricing.reference != null ? (
+              <p className="text-sm text-text-muted">
+                <span className="line-through decoration-sale/70 text-text-dim">€{pricing.reference}</span>{' '}
+                <span className="font-semibold text-white">€{pricing.current}</span>
+                <span> / adult</span>
+                {pricing.saveAmount > 0 ? (
+                  <span className="ml-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-sale-soft">
+                    Save €{pricing.saveAmount}
+                  </span>
+                ) : null}
+              </p>
+            ) : (
+              <p className="text-sm text-text-muted">
+                <span className="font-semibold text-white">€{pricing.current}</span> / adult
+              </p>
+            )}
           </>
         }
         images={gallery}
         facts={[
-          { label: 'Duration', value: tour?.duration_text || '2–10 h (~6h)' },
+          { label: 'Duration', value: tour?.duration_text || '2–10 hours' },
           { label: 'Group', value: tour?.group_size_text || 'Max 8 / vehicle' },
-          { label: 'Pickup', value: tour?.meeting_point ? 'Hotel included' : 'Hotel included' },
-          { label: 'Guarantee', value: '100% refund' },
+          { label: 'Pickup', value: 'Rovaniemi hotels' },
+          { label: 'Guarantee', value: '100% refund*' },
         ]}
         booking={
           <>
@@ -175,17 +174,11 @@ const NorthernLightsTour = () => {
               priceFrom={pricing.current}
               referencePrice={pricing.saleActive ? pricing.reference ?? undefined : undefined}
               priceNote="/ adult"
-              offerLine={
-                pricing.saleActive && pricing.saveAmount > 0
-                  ? `${pricing.label || 'Special offer'} · Save €${pricing.saveAmount}`
-                  : undefined
-              }
               trustLines={[
-                'Free cancellation 24h before',
-                'Secure Stripe payment',
-                'Hotel pickup & drop-off',
-                'Free professional photos included',
-                '100% refund if aurora not captured on camera',
+                'Free cancellation up to 24h',
+                'Secure payment',
+                'Professional photos included',
+                '100% Aurora Guarantee',
               ]}
             >
               {loading && !tour ? (
@@ -213,17 +206,16 @@ const NorthernLightsTour = () => {
         }
         afterContent={
           <>
-            <section className="border-t border-white/[0.06] bg-black/20 py-14 sm:py-16">
+            <section className="border-t border-white/[0.06] py-12 sm:py-14">
               <div className="rn-container">
                 <p className="rn-eyebrow">Real memories from our tours</p>
                 <h2 className="rn-h2 mt-2 text-white">Professional photos included free</h2>
                 <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-text-muted">
-                  Your guide takes professional photographs of you with the Northern Lights — not tips for your
-                  own camera.
+                  Your guide takes professional photographs of you with the Northern Lights.
                 </p>
-                <div className="mt-8 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:gap-4">
+                <div className="mt-7 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
                   {gallery.slice(0, 6).map((img) => (
-                    <figure key={img.src} className="rn-reveal overflow-hidden rounded-rn">
+                    <figure key={img.src} className="overflow-hidden rounded-rn">
                       <img
                         src={img.src}
                         alt={img.alt}
@@ -242,12 +234,13 @@ const NorthernLightsTour = () => {
               title="Guests on this experience"
               className="border-t border-white/[0.06]"
             />
-            <section className="border-t border-white/[0.06] py-14 sm:py-16">
+            <section className="border-t border-white/[0.06] py-12 sm:py-14">
               <div className="rn-container flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
                 <div className="max-w-lg">
                   <h2 className="rn-h2 text-white">Ready for the Aurora?</h2>
                   <p className="mt-2 text-[15px] text-text-muted">
-                    From €{pricing.current} per adult. Check dates and book in minutes.
+                    {pricing.saleActive ? `Special offer €${pricing.current}` : `From €${pricing.current}`} per
+                    adult. Check dates and book in minutes.
                   </p>
                 </div>
                 <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
@@ -258,131 +251,81 @@ const NorthernLightsTour = () => {
           </>
         }
       >
-        <section className="rn-reveal">
-          <div className="rn-guarantee-callout">
-            <h2 className="rn-guarantee-callout__title">100% Aurora Guarantee</h2>
-            <p className="rn-guarantee-callout__body">{guarantee}</p>
-          </div>
-        </section>
+        <TourSection eyebrow="Promise" title="Aurora guarantee">
+          <TourGuarantee detail={guarantee} />
+        </TourSection>
 
-        <section className="rn-reveal">
-          <h2 className="font-display font-semibold text-white">Why Royal Nordic</h2>
+        <TourSection eyebrow="About" title="About this experience">
           {tour?.full_description ? (
-            <div className="mt-3">
-              <SafeRichText text={tour.full_description} />
-            </div>
+            <SafeRichText text={tour.full_description} />
           ) : (
-            <p className="mt-3 leading-relaxed text-text-muted">
-              Hunt the Aurora Borealis from Rovaniemi with local guides who read live solar and weather data, then
-              drive as far as needed for clearer skies. Hotel pickup, a warm vehicle, hot drinks, and professional
-              photos of you with the Northern Lights are included.
+            <p className="leading-relaxed text-text-muted">
+              Hunt the Aurora from Rovaniemi with local guides who read live solar and weather data, then drive as
+              far as needed for clearer skies. Hotel pickup, warm drinks, and professional photos of you with the
+              Northern Lights are included.
             </p>
           )}
-          <div className="mt-5">
-            <ExperienceHighlights
-              items={
-                benefits.length
-                  ? benefits.slice(0, 3).map((b) => b)
-                  : [
-                      'Live aurora and weather data — we drive as far as needed for clearer skies',
-                      'Your guide takes professional photos of you beneath the aurora — included free',
-                      'See the Aurora or get your money back — based on what our DSLR cameras capture',
-                    ]
-              }
-            />
-          </div>
-        </section>
+        </TourSection>
 
-        <section className="rn-reveal">
-          <h2 className="font-display font-semibold text-white">How the aurora hunt works</h2>
-          <div className="mt-5">
-            <ExperienceItinerary steps={itinerary} />
-          </div>
-        </section>
+        <TourSection eyebrow="Highlights" title="Why you’ll love it" tone="band">
+          <ul className="rn-benefit-rail !mt-0">
+            {benefits.map((item) => (
+              <li key={item}>
+                <span className="rn-benefit-rail__mark" aria-hidden>
+                  ✓
+                </span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </TourSection>
 
-        <section className="rn-reveal">
+        <TourSection eyebrow="Itinerary" title="How the experience works">
+          <ExperienceItinerary steps={itinerary} />
+        </TourSection>
+
+        <TourSection eyebrow="Details" title="What’s included">
           <ExperienceInclusions included={included} notIncluded={excluded} />
-        </section>
+        </TourSection>
 
-        {(tour?.important_info || tour?.know_before || tour?.what_to_bring || tour?.cancellation_info) && (
-          <section className="rn-reveal space-y-6">
-            {tour.important_info ? (
-              <div>
-                <h2 className="font-display font-semibold text-white">Important information</h2>
-                <div className="mt-3">
-                  <SafeRichText text={tour.important_info} />
-                </div>
-              </div>
-            ) : null}
-            {tour.know_before ? (
-              <div>
-                <h2 className="font-display font-semibold text-white">Know before you go</h2>
-                <div className="mt-3">
-                  <SafeRichText text={tour.know_before} />
-                </div>
-              </div>
-            ) : null}
-            {tour.what_to_bring ? (
-              <div>
-                <h2 className="font-display font-semibold text-white">What to bring</h2>
-                <div className="mt-3">
-                  <SafeRichText text={tour.what_to_bring} />
-                </div>
-              </div>
-            ) : null}
-            {tour.cancellation_info ? (
-              <div>
-                <h2 className="font-display font-semibold text-white">Cancellation</h2>
-                <div className="mt-3">
-                  <SafeRichText text={tour.cancellation_info} />
-                </div>
-              </div>
-            ) : null}
-          </section>
-        )}
-
-        <section className="rn-reveal">
-          <h2 className="font-display font-semibold text-white">Practical information</h2>
-          <div className="mt-4">
+        {(tour?.important_info ||
+          tour?.know_before ||
+          tour?.what_to_bring ||
+          tour?.pickup_info ||
+          tour?.cancellation_info) && (
+          <TourSection eyebrow="Plan ahead" title="Important information">
             <ExperienceAccordion
               items={[
-                {
-                  title: 'What to bring',
-                  content:
-                    tour?.what_to_bring?.trim() ||
-                    'Dress in warm layers: thermal base, insulating mid-layer, windproof outerwear, warm boots, hat, and gloves.',
-                },
-                {
-                  title: 'Good to know',
-                  content: (
-                    <ul className="space-y-2">
-                      <li>Auroras often look more colourful in photos than with the naked eye.</li>
-                      <li>Our guarantee is based on what our professional cameras capture during your tour.</li>
-                      <li>Free cancellation up to 24 hours before departure.</li>
-                    </ul>
-                  ),
-                },
-                {
-                  title: 'Guarantee & cancellation',
-                  content: (
-                    <p>
-                      {guarantee} See our{' '}
-                      <Link
-                        to="/terms-conditions"
-                        className="font-semibold text-aurora-soft underline-offset-2 hover:underline"
-                      >
-                        Terms &amp; Conditions
-                      </Link>
-                      .
-                    </p>
-                  ),
-                },
-              ]}
+                tour?.pickup_info
+                  ? { title: 'Pickup & meeting', content: tour.pickup_info }
+                  : null,
+                tour?.what_to_bring
+                  ? { title: 'What to bring', content: tour.what_to_bring }
+                  : {
+                      title: 'What to bring',
+                      content:
+                        'Warm Arctic layers: thermal base, insulating mid-layer, windproof outerwear, boots, hat, gloves.',
+                    },
+                tour?.know_before
+                  ? { title: 'Know before you go', content: tour.know_before }
+                  : null,
+                tour?.important_info
+                  ? { title: 'Good to know', content: tour.important_info }
+                  : null,
+                tour?.cancellation_info
+                  ? { title: 'Cancellation', content: tour.cancellation_info }
+                  : {
+                      title: 'Cancellation',
+                      content: 'Free cancellation up to 24 hours before departure.',
+                    },
+              ].filter(Boolean) as { title: string; content: string }[]}
             />
-          </div>
-        </section>
+          </TourSection>
+        )}
 
-        <ProductFaq items={faqs} schemaId="nl-faq" tone="dark" />
+        <div className="rn-tour-section">
+          <ProductFaq items={faqs} schemaId="nl-faq" tone="dark" />
+        </div>
       </ExperienceProductLayout>
 
       <Footer />

@@ -43,16 +43,20 @@ serve(async (req) => {
     }
 
     // Server-side promo validation (must match src/config/winterPromotion.ts)
+    // Tour id 1 (Guaranteed NL) has a catalogue sale — never stack WINTER20.
     const PROMO_ENABLED = true
     const PROMO_CODE = 'WINTER20'
     const PROMO_PERCENT = 20
+    const PROMO_EXCLUDED_TOUR_IDS = new Set([1])
     if (subtotal != null) {
       const sub = Number(subtotal)
       const claimedDiscount = Number(discount || 0)
       const code = String(discount_code || '').trim().toUpperCase()
       const charged = Number(total_price)
+      const promoTourId = parseInt(String(tour_id || ''), 10)
+      const promoAllowed = !PROMO_EXCLUDED_TOUR_IDS.has(promoTourId)
       const expectedDiscount =
-        PROMO_ENABLED && code === PROMO_CODE
+        PROMO_ENABLED && promoAllowed && code === PROMO_CODE
           ? Math.round(sub * (PROMO_PERCENT / 100) * 100) / 100
           : 0
       const expectedTotal = Math.round((sub - expectedDiscount) * 100) / 100

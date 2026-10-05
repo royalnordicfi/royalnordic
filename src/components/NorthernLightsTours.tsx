@@ -6,8 +6,8 @@ import ReviewCarousel from './ReviewCarousel'
 import TourCard from './TourCard'
 import { reviewsFor } from '../data/reviews'
 import { fetchActiveTourIds, SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS } from '../lib/productVisibility'
-import { useTourCms } from '../hooks/useTourCms'
-import { getDisplayPricing } from '../lib/tourCms'
+import { fetchPublicTourCards, type TourCms } from '../lib/tourCms'
+import { mergeTourCardCms, tourCmsMap } from '../lib/mergeTourCardCms'
 import {
   GUARANTEED_NL_CATALOG_ADULT_PRICE,
   GUARANTEED_NL_GUARANTEE_SHORT,
@@ -64,31 +64,21 @@ const ALL_TOURS = [
 
 const NorthernLightsTours: React.FC = () => {
   const [activeIds, setActiveIds] = useState<Set<number> | null>(null)
-  const { tour: nlTour } = useTourCms(1)
+  const [cmsById, setCmsById] = useState<Map<number, TourCms>>(() => new Map())
 
   useEffect(() => {
     fetchActiveTourIds().then(setActiveIds)
+    fetchPublicTourCards()
+      .then((cards) => setCmsById(tourCmsMap(cards)))
+      .catch(() => undefined)
   }, [])
 
   const tours = useMemo(() => {
-    const base = !activeIds ? ALL_TOURS : ALL_TOURS.filter((t) => t.tourId == null || activeIds.has(t.tourId))
-    if (!nlTour) return base
-    const pricing = getDisplayPricing(nlTour)
-    return base.map((t) => {
-      if (t.tourId !== 1) return t
-      return {
-        ...t,
-        title: nlTour.public_name || t.title,
-        description: nlTour.card_description || t.description,
-        duration: nlTour.duration_text || t.duration,
-        groupSize: nlTour.group_size_text || t.groupSize,
-        badge: nlTour.badge || t.badge,
-        image: nlTour.hero_image_url || nlTour.gallery?.[0]?.url || t.image,
-        priceFrom: pricing.current,
-        referencePrice: pricing.saleActive ? pricing.reference ?? undefined : undefined,
-      }
-    })
-  }, [activeIds, nlTour])
+    const base = !activeIds
+      ? ALL_TOURS
+      : ALL_TOURS.filter((t) => t.tourId == null || activeIds.has(t.tourId))
+    return base.map((t) => mergeTourCardCms(t, cmsById))
+  }, [activeIds, cmsById])
 
   return (
     <div className="rn-page">

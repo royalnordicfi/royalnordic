@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import BookingForm from './BookingForm'
 import Footer from './Footer'
 import MobileBookingBar from './MobileBookingBar'
@@ -9,68 +8,42 @@ import ExperienceItinerary from './experience/ExperienceItinerary'
 import ExperienceInclusions from './experience/ExperienceInclusions'
 import ExperienceAccordion from './experience/ExperienceAccordion'
 import BookingAside from './experience/BookingAside'
-import { getAllTours } from '../lib/api'
+import TourSection from './tour/TourSection'
+import { useCmsTourPresentation, type TourPageFallback } from '../hooks/useCmsTourPresentation'
 
-const GALLERY = [
-  { src: '/snowshoe1.jpg', alt: 'Snowshoeing in Lapland winter forest' },
-  { src: '/snowshoe2.jpg', alt: 'Snowshoe rental adventure near Rovaniemi' },
-  { src: '/snowshoe3.jpg', alt: 'Winter landscape on snowshoes in Finnish Lapland' },
-  { src: '/snowshoe4.jpg', alt: 'Exploring Lapland on traditional snowshoes' },
-  { src: '/snowshoe5.jpg', alt: 'Snowshoe trek through pristine wilderness' },
-  { src: '/snowshoe6.jpg', alt: 'Snowshoe equipment delivery in Rovaniemi' },
-]
-
-const HIGHLIGHTS = [
-  'Equipment delivered to your lodging in Rovaniemi',
-  'Safety briefing and local route tips — explore at your own pace',
-  'Not a guided tour: we deliver, brief you, and collect when you are done',
-]
-
-const SnowshoeRental = () => {
-  const [tourData, setTourData] = useState({
-    adult_price: 79,
-    child_price: 49,
-    max_capacity: 3,
-  })
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const loadTourData = async () => {
-      try {
-        const tours = await getAllTours()
-        const snowshoeTour = tours.find((tour) => tour.id === 2)
-        if (snowshoeTour) {
-          setTourData({
-            adult_price: snowshoeTour.adult_price,
-            child_price: snowshoeTour.child_price,
-            max_capacity: snowshoeTour.max_capacity,
-          })
-        }
-      } catch (error) {
-        console.error('Error loading tour data:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadTourData()
-  }, [])
-
-  const price = loading ? 79 : tourData.adult_price
-
-  const scrollToBook = () => {
-    document.getElementById('book')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
-  const included = [
+const FALLBACK: TourPageFallback = {
+  title: 'Snowshoe Adventure',
+  lede: 'Snowshoe rental with delivery to your lodging, safety briefing, and pickup when you are done.',
+  adultPrice: 79,
+  childPrice: 49,
+  maxCapacity: 3,
+  duration: 'Flexible rental',
+  groupSize: 'Any size',
+  pickupFact: 'Rovaniemi',
+  description:
+    'Rent professional snowshoes and explore near Rovaniemi at your own pace. We deliver to your accommodation, run a safety briefing, and collect the gear when you finish. Suited to families and groups who want a self-guided winter outing without a full-day guided tour.',
+  benefits: [
+    'Equipment delivered to your lodging in Rovaniemi',
+    'Safety briefing and local route tips — explore at your own pace',
+    'Not a guided tour: we deliver, brief you, and collect when you are done',
+  ],
+  included: [
     'Professional snowshoe equipment for all sizes',
     'Detailed safety briefing and instructions',
     'Equipment delivery to your accommodation',
     'Equipment pickup when finished',
     'Local area recommendations',
-  ]
-
-  const faqs = [
+  ],
+  excluded: [],
+  gallery: [
+    { src: '/snowshoe1.jpg', alt: 'Snowshoeing in Lapland winter forest' },
+    { src: '/snowshoe2.jpg', alt: 'Snowshoe rental adventure near Rovaniemi' },
+    { src: '/snowshoe3.jpg', alt: 'Winter landscape on snowshoes in Finnish Lapland' },
+    { src: '/snowshoe4.jpg', alt: 'Exploring Lapland on traditional snowshoes' },
+    { src: '/snowshoe5.jpg', alt: 'Snowshoe trek through pristine wilderness' },
+    { src: '/snowshoe6.jpg', alt: 'Snowshoe equipment delivery in Rovaniemi' },
+  ],
+  faqs: [
     {
       question: 'Is this a guided tour?',
       answer:
@@ -95,7 +68,19 @@ const SnowshoeRental = () => {
       question: 'Is this suitable for children?',
       answer: 'Yes. Children are welcome with an adult. Child pricing applies for ages 0–17.',
     },
-  ]
+  ],
+  whatToBring:
+    'This is equipment rental, not a guided tour. We deliver, brief you, and collect — you choose your own pace and routes near Rovaniemi.',
+  knowBefore:
+    'Typically available from early November through early April, depending on snow conditions.',
+}
+
+const SnowshoeRental = () => {
+  const cms = useCmsTourPresentation(2, FALLBACK)
+
+  const scrollToBook = () => {
+    document.getElementById('book')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   const itinerary = [
     {
@@ -126,22 +111,23 @@ const SnowshoeRental = () => {
         breadcrumbs={[
           { label: 'Home', to: '/' },
           { label: 'Renting equipment', to: '/renting-equipment' },
-          { label: 'Snowshoe Adventure' },
+          { label: cms.title },
         ]}
         eyebrow="Rovaniemi · Self-guided rental"
-        title="Snowshoe Adventure"
-        lede="Snowshoe rental with delivery to your lodging, safety briefing, and pickup when you are done."
-        images={GALLERY}
+        title={cms.title}
+        lede={cms.lede}
+        images={cms.gallery}
         facts={[
-          { label: 'Duration', value: 'Flexible rental' },
-          { label: 'Group', value: 'Any size' },
-          { label: 'Location', value: 'Rovaniemi' },
+          { label: 'Duration', value: cms.duration || 'Flexible rental' },
+          { label: 'Group', value: cms.groupSize || 'Any size' },
+          { label: 'Location', value: cms.pickupFact },
           { label: 'Delivery', value: 'To your lodging' },
         ]}
         booking={
           <BookingAside
-            priceFrom={price}
-            offerLine="WINTER20 · Save 20% at checkout"
+            priceFrom={cms.pricing.current}
+            referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}
+            offerLine={cms.pricing.saleActive ? undefined : 'WINTER20 · Save 20% at checkout'}
             trustLines={[
               'Delivery to lodging',
               'Secure Stripe payment',
@@ -149,15 +135,15 @@ const SnowshoeRental = () => {
               'Explore at your own pace',
             ]}
           >
-            {loading ? (
+            {cms.loading && !cms.tour ? (
               <p className="py-10 text-center text-sm text-panel-muted">Loading availability…</p>
             ) : (
               <BookingForm
                 tourId={2}
-                tourName="Snowshoe Adventure"
-                adultPrice={tourData.adult_price}
-                childPrice={tourData.child_price}
-                maxCapacity={tourData.max_capacity}
+                tourName={cms.bookingTourName}
+                adultPrice={cms.adultPrice}
+                childPrice={cms.childPrice}
+                maxCapacity={cms.maxCapacity}
                 seasonStart="11-01"
                 seasonEnd="04-01"
                 chrome="embedded"
@@ -167,60 +153,47 @@ const SnowshoeRental = () => {
           </BookingAside>
         }
       >
-        <section className="rn-reveal">
-          <h2 className="font-display font-semibold text-white">Overview</h2>
-          <p className="mt-3 leading-relaxed text-text-muted">
-            Rent professional snowshoes and explore near Rovaniemi at your own pace. We deliver to your
-            accommodation, run a safety briefing, and collect the gear when you finish.
-          </p>
-          <p className="mt-3 leading-relaxed text-text-muted">
-            Suited to families and groups who want a self-guided winter outing without a full-day guided tour.
-          </p>
-        </section>
+        <TourSection eyebrow="About" title="Overview">
+          <p className="leading-relaxed text-text-muted">{cms.fullDescription || FALLBACK.description}</p>
+        </TourSection>
 
-        <section className="rn-reveal">
-          <h2 className="font-display font-semibold text-white">Highlights</h2>
-          <div className="mt-5">
-            <ExperienceHighlights items={HIGHLIGHTS} />
-          </div>
-        </section>
+        <TourSection eyebrow="Highlights" title="Highlights" tone="band">
+          <ExperienceHighlights items={cms.benefits} />
+        </TourSection>
 
-        <section className="rn-reveal">
-          <h2 className="font-display font-semibold text-white">How it works</h2>
-          <div className="mt-5">
-            <ExperienceItinerary steps={itinerary} />
-          </div>
-        </section>
+        <TourSection eyebrow="Itinerary" title="How it works">
+          <ExperienceItinerary steps={itinerary} />
+        </TourSection>
 
-        <section className="rn-reveal">
-          <ExperienceInclusions included={included} />
-        </section>
+        <TourSection eyebrow="Details" title="What’s included">
+          <ExperienceInclusions
+            included={cms.included}
+            notIncluded={cms.excluded.length > 0 ? cms.excluded : undefined}
+          />
+        </TourSection>
 
-        <section className="rn-reveal">
-          <h2 className="font-display font-semibold text-white">Practical information</h2>
-          <div className="mt-4">
-            <ExperienceAccordion
-              items={[
-                {
-                  title: 'Self-guided format',
-                  content:
-                    'This is equipment rental, not a guided tour. We deliver, brief you, and collect — you choose your own pace and routes near Rovaniemi.',
-                },
-                {
-                  title: 'Season',
-                  content:
-                    'Typically available from early November through early April, depending on snow conditions.',
-                },
-              ]}
-            />
-          </div>
-        </section>
+        <TourSection eyebrow="Plan ahead" title="Practical information">
+          <ExperienceAccordion
+            items={[
+              {
+                title: 'Self-guided format',
+                content: cms.whatToBring || FALLBACK.whatToBring!,
+              },
+              {
+                title: 'Season',
+                content: cms.knowBefore || FALLBACK.knowBefore!,
+              },
+            ]}
+          />
+        </TourSection>
 
-        <ProductFaq items={faqs} schemaId="snowshoe-faq" tone="dark" />
+        <div className="rn-tour-section">
+          <ProductFaq items={cms.faqs} schemaId="snowshoe-faq" tone="dark" />
+        </div>
       </ExperienceProductLayout>
 
       <Footer />
-      <MobileBookingBar priceFrom={price} onBook={scrollToBook} />
+      <MobileBookingBar priceFrom={cms.pricing.current} onBook={scrollToBook} />
     </div>
   )
 }

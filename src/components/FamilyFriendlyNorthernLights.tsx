@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import BookingForm from './BookingForm'
 import Footer from './Footer'
@@ -10,62 +9,40 @@ import ExperienceItinerary from './experience/ExperienceItinerary'
 import ExperienceInclusions from './experience/ExperienceInclusions'
 import ExperienceAccordion from './experience/ExperienceAccordion'
 import BookingAside from './experience/BookingAside'
-import { getAllTours } from '../lib/api'
+import TourSection from './tour/TourSection'
+import { useCmsTourPresentation, type TourPageFallback } from '../hooks/useCmsTourPresentation'
 
-const GALLERY = [
-  { src: '/family1.jpg', alt: 'Family watching the Northern Lights in Lapland' },
-  { src: '/family2.jpg', alt: 'Family aurora evening near Rovaniemi' },
-  { src: '/family3.jpg', alt: 'Parents and children on a Northern Lights tour' },
-  { src: '/family4.jpg', alt: 'Winter night family experience in Finnish Lapland' },
-]
-
-const INCLUDED = [
-  'Hotel pickup and drop-off',
-  'Professional local guide (English & Finnish)',
-  'Hot drinks and snacks',
-  'Professional photos of you with the Northern Lights',
-  'Warm vehicle for the journey',
-]
-
-const HIGHLIGHTS = [
-  'About 2 hours — shorter evening format for families',
-  'Hotel pickup and viewing stops away from city lights',
-  'Hot drinks, snacks, and stories about the aurora and Lapland',
-]
-
-const FamilyFriendlyNorthernLights = () => {
-  const [tourData, setTourData] = useState({
-    adult_price: 79,
-    child_price: 59,
-    max_capacity: 16,
-  })
-
-  useEffect(() => {
-    const loadTourData = async () => {
-      try {
-        const tours = await getAllTours()
-        const familyTour = tours.find((tour) => tour.id === 8)
-        if (familyTour) {
-          setTourData({
-            adult_price: Number(familyTour.adult_price) || 79,
-            child_price: Number(familyTour.child_price) || 59,
-            max_capacity: familyTour.max_capacity || 16,
-          })
-        }
-      } catch (error) {
-        console.error('Error loading tour data:', error)
-      }
-    }
-    loadTourData()
-  }, [])
-
-  const price = tourData.adult_price
-
-  const scrollToBook = () => {
-    document.getElementById('book')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
-  const faqs = [
+const FALLBACK: TourPageFallback = {
+  title: 'Family-Friendly Northern Lights Tour',
+  lede: 'Two-hour aurora evening from Rovaniemi — pickup, warm drinks, guide for all ages. Aurora not guaranteed.',
+  adultPrice: 79,
+  childPrice: 59,
+  maxCapacity: 16,
+  duration: '2 hours',
+  groupSize: 'Max 16',
+  pickupFact: 'Rovaniemi',
+  description:
+    'Hotel pickup in Rovaniemi, then darker viewing spots chosen for the evening’s weather. A shorter format for families and all ages.',
+  benefits: [
+    'About 2 hours — shorter evening format for families',
+    'Hotel pickup and viewing stops away from city lights',
+    'Hot drinks, snacks, and stories about the aurora and Lapland',
+  ],
+  included: [
+    'Hotel pickup and drop-off',
+    'Professional local guide (English & Finnish)',
+    'Hot drinks and snacks',
+    'Professional photos of you with the Northern Lights',
+    'Warm vehicle for the journey',
+  ],
+  excluded: ['Warm winter clothing (bring layered outdoor clothing)'],
+  gallery: [
+    { src: '/family1.jpg', alt: 'Family watching the Northern Lights in Lapland' },
+    { src: '/family2.jpg', alt: 'Family aurora evening near Rovaniemi' },
+    { src: '/family3.jpg', alt: 'Parents and children on a Northern Lights tour' },
+    { src: '/family4.jpg', alt: 'Winter night family experience in Finnish Lapland' },
+  ],
+  faqs: [
     {
       question: 'Are the Northern Lights guaranteed on this tour?',
       answer:
@@ -85,7 +62,17 @@ const FamilyFriendlyNorthernLights = () => {
       question: 'How long is the tour?',
       answer: 'About 2 hours including pickup, viewing stops with hot drinks, and return to Rovaniemi.',
     },
-  ]
+  ],
+  whatToBring: 'Designed for all ages — a shorter, comfortable evening. Dress warmly; viewing stops are outdoors.',
+  knowBefore: 'Free cancellation up to 24 hours before departure.',
+}
+
+const FamilyFriendlyNorthernLights = () => {
+  const cms = useCmsTourPresentation(8, FALLBACK)
+
+  const scrollToBook = () => {
+    document.getElementById('book')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   const itinerary = [
     {
@@ -109,23 +96,24 @@ const FamilyFriendlyNorthernLights = () => {
         breadcrumbs={[
           { label: 'Home', to: '/' },
           { label: 'Northern Lights', to: '/northern-lights-tours' },
-          { label: 'Family-Friendly Northern Lights' },
+          { label: cms.title },
         ]}
         eyebrow="Rovaniemi · Family aurora"
-        title="Family-Friendly Northern Lights Tour"
-        lede="Two-hour aurora evening from Rovaniemi — pickup, warm drinks, guide for all ages. Aurora not guaranteed."
-        images={GALLERY}
+        title={cms.title}
+        lede={cms.lede}
+        images={cms.gallery}
         facts={[
-          { label: 'Duration', value: '2 hours' },
-          { label: 'Group', value: 'Max 16' },
-          { label: 'Pickup', value: 'Rovaniemi' },
+          { label: 'Duration', value: cms.duration || '2 hours' },
+          { label: 'Group', value: cms.groupSize || 'Max 16' },
+          { label: 'Pickup', value: cms.pickupFact },
           { label: 'Languages', value: 'English · Finnish' },
         ]}
         booking={
           <>
             <BookingAside
-              priceFrom={price}
-              offerLine="WINTER20 · Save 20% at checkout"
+              priceFrom={cms.pricing.current}
+              referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}
+              offerLine={cms.pricing.saleActive ? undefined : 'WINTER20 · Save 20% at checkout'}
               trustLines={[
                 'Free cancellation 24h before',
                 'Secure Stripe payment',
@@ -133,17 +121,21 @@ const FamilyFriendlyNorthernLights = () => {
                 'Family format · aurora not guaranteed',
               ]}
             >
-              <BookingForm
-                tourId={8}
-                tourName="Family-Friendly Northern Lights Tour"
-                adultPrice={tourData.adult_price}
-                childPrice={tourData.child_price}
-                maxCapacity={tourData.max_capacity}
-                seasonStart="09-15"
-                seasonEnd="04-15"
-                chrome="embedded"
-                tone="light"
-              />
+              {cms.loading && !cms.tour ? (
+                <p className="py-10 text-center text-sm text-panel-muted">Loading availability…</p>
+              ) : (
+                <BookingForm
+                  tourId={8}
+                  tourName={cms.bookingTourName}
+                  adultPrice={cms.adultPrice}
+                  childPrice={cms.childPrice}
+                  maxCapacity={cms.maxCapacity}
+                  seasonStart="09-15"
+                  seasonEnd="04-15"
+                  chrome="embedded"
+                  tone="light"
+                />
+              )}
             </BookingAside>
             <p className="mt-3 text-center text-sm text-text-muted">
               <Link to="/northern-lights-tour" className="font-medium text-aurora-soft hover:underline">
@@ -153,80 +145,64 @@ const FamilyFriendlyNorthernLights = () => {
           </>
         }
       >
-        <section className="rn-reveal">
-          <h2 className="font-display font-semibold text-white">Overview</h2>
-          <p className="mt-3 leading-relaxed text-text-muted">
-            Hotel pickup in Rovaniemi, then darker viewing spots chosen for the evening’s weather and aurora
-            activity. Your guide shares stories about the Northern Lights and Lapland while you stay warm with hot
-            drinks and snacks.
-          </p>
-          <p className="mt-3 leading-relaxed text-text-muted">
-            A shorter format designed for families and all ages. For our refund-or-reschedule guarantee, see the{' '}
+        <TourSection eyebrow="About" title="About this experience">
+          <p className="leading-relaxed text-text-muted">
+            {cms.fullDescription || FALLBACK.description}{' '}
+            For our 100% camera-capture Aurora guarantee, see the{' '}
             <Link to="/northern-lights-tour" className="font-medium text-aurora-soft hover:underline">
               Guaranteed Northern Lights Tour
             </Link>
             .
           </p>
-        </section>
+        </TourSection>
 
-        <section className="rn-reveal">
-          <h2 className="font-display font-semibold text-white">Highlights</h2>
-          <div className="mt-5">
-            <ExperienceHighlights items={HIGHLIGHTS} />
-          </div>
-        </section>
+        <TourSection eyebrow="Highlights" title="Why you’ll love it" tone="band">
+          <ExperienceHighlights items={cms.benefits} />
+        </TourSection>
 
-        <section className="rn-reveal">
-          <h2 className="font-display font-semibold text-white">Itinerary</h2>
-          <div className="mt-5">
-            <ExperienceItinerary steps={itinerary} />
-          </div>
-        </section>
+        <TourSection eyebrow="Itinerary" title="How the experience works">
+          <ExperienceItinerary steps={itinerary} />
+        </TourSection>
 
-        <section className="rn-reveal">
-          <ExperienceInclusions
-            included={INCLUDED}
-            notIncluded={['Warm winter clothing (bring layered outdoor clothing)']}
+        <TourSection eyebrow="Details" title="What’s included">
+          <ExperienceInclusions included={cms.included} notIncluded={cms.excluded} />
+        </TourSection>
+
+        <TourSection eyebrow="Plan ahead" title="Important information">
+          <ExperienceAccordion
+            items={[
+              {
+                title: 'Aurora expectations',
+                content: (
+                  <>
+                    Northern Lights are a natural phenomenon and cannot be guaranteed on this tour. For a
+                    guaranteed product, see our{' '}
+                    <Link to="/northern-lights-tour" className="font-medium text-aurora-soft hover:underline">
+                      Guaranteed Northern Lights Tour
+                    </Link>
+                    .
+                  </>
+                ),
+              },
+              {
+                title: 'Families & clothing',
+                content: cms.whatToBring || FALLBACK.whatToBring!,
+              },
+              {
+                title: 'Cancellation',
+                content: cms.cancellationInfo || cms.knowBefore || FALLBACK.knowBefore!,
+              },
+            ]}
           />
-        </section>
+        </TourSection>
 
-        <section className="rn-reveal">
-          <h2 className="font-display font-semibold text-white">Practical information</h2>
-          <div className="mt-4">
-            <ExperienceAccordion
-              items={[
-                {
-                  title: 'Aurora expectations',
-                  content: (
-                    <>
-                      Northern Lights are a natural phenomenon and cannot be guaranteed on this tour. For a
-                      guaranteed product, see our{' '}
-                      <Link to="/northern-lights-tour" className="font-medium text-aurora-soft hover:underline">
-                        Guaranteed Northern Lights Tour
-                      </Link>
-                      .
-                    </>
-                  ),
-                },
-                {
-                  title: 'Families & clothing',
-                  content:
-                    'Designed for all ages — a shorter, comfortable evening for families. Dress warmly; we have a warm vehicle, but viewing stops are outdoors.',
-                },
-                {
-                  title: 'Cancellation',
-                  content: 'Free cancellation up to 24 hours before departure.',
-                },
-              ]}
-            />
-          </div>
-        </section>
-
-        <ProductFaq items={faqs} schemaId="family-nl-faq" tone="dark" />
+        <div className="rn-tour-section">
+          <ProductFaq items={cms.faqs} schemaId="family-nl-faq" tone="dark" />
+        </div>
       </ExperienceProductLayout>
 
       <Footer />
-      <MobileBookingBar priceFrom={price} onBook={scrollToBook} />
+      <MobileBookingBar priceFrom={cms.pricing.current} onBook={scrollToBook} />
     </div>
   )
 }

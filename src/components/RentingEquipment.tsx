@@ -4,10 +4,12 @@ import CategoryPageEnd from './CategoryPageEnd'
 import Footer from './Footer'
 import TourCard from './TourCard'
 import { fetchActiveTourIds } from '../lib/productVisibility'
+import { fetchPublicTourCards, type TourCms } from '../lib/tourCms'
+import { mergeTourCardCms, tourCmsMap } from '../lib/mergeTourCardCms'
 
 const ALL_RENTALS = [
   {
-    tourId: 2,
+    tourId: 2 as number | null,
     to: '/snowshoe-rental',
     image: '/snowshoe1.jpg',
     imageAlt: 'Snowshoeing in Lapland forest',
@@ -17,21 +19,27 @@ const ALL_RENTALS = [
     groupSize: 'Solo or groups',
     pickup: true,
     badge: 'Self-guided',
-    priceFrom: 79,
+    priceFrom: 79 as number | undefined,
   },
 ]
 
 const RentingEquipment: React.FC = () => {
   const [activeIds, setActiveIds] = useState<Set<number> | null>(null)
+  const [cmsById, setCmsById] = useState<Map<number, TourCms>>(() => new Map())
 
   useEffect(() => {
     fetchActiveTourIds().then(setActiveIds)
+    fetchPublicTourCards()
+      .then((cards) => setCmsById(tourCmsMap(cards)))
+      .catch(() => undefined)
   }, [])
 
   const rentals = useMemo(() => {
-    if (!activeIds) return ALL_RENTALS
-    return ALL_RENTALS.filter((r) => activeIds.has(r.tourId))
-  }, [activeIds])
+    const base = !activeIds
+      ? ALL_RENTALS
+      : ALL_RENTALS.filter((r) => r.tourId != null && activeIds.has(r.tourId))
+    return base.map((r) => mergeTourCardCms(r, cmsById))
+  }, [activeIds, cmsById])
 
   return (
     <div className="rn-page">
@@ -62,6 +70,7 @@ const RentingEquipment: React.FC = () => {
                     pickup={rental.pickup}
                     badge={rental.badge}
                     priceFrom={rental.priceFrom}
+                    referencePrice={rental.referencePrice}
                   />
                 ))}
               </div>

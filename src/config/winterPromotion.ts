@@ -39,28 +39,34 @@ export type WinterPromotionConfig = {
 }
 
 export const WINTER_PROMOTION: WinterPromotionConfig = {
+  // Bar advertises the live NL catalogue sale (€129 → €99). Do NOT stack WINTER20 on that product.
   enabled: true,
-  campaignVersion: 'winter20-v2',
-  title: 'Winter Booking Offer',
-  announcementText:
-    'Direct booking · Save 20% with WINTER20',
-  popupHeading: 'Save 20% when you book direct',
+  campaignVersion: 'nl-sale-99-v1',
+  title: 'Northern Lights special',
+  announcementText: 'Northern Lights special · Was €129 → now €99',
+  popupHeading: 'Northern Lights from €99',
   popupBody:
-    'Use code WINTER20 on eligible tours at checkout. Value first — the discount is optional.',
+    'Guaranteed Aurora tour special offer: was €129, now €99 per adult. Book direct — no code needed.',
   discountPercent: 20,
   discountCode: 'WINTER20',
   destinationPath: '/northern-lights-tour',
   destinationHash: 'book',
-  popupEnabled: true,
+  popupEnabled: false,
   announcementBarEnabled: true,
   popupDelayMs: 4000,
   popupDismissalDays: 7,
   startDate: null,
   endDate: null,
-  // BookingForm products (NL, family NL, ice fishing, Ranua, Korouoma, snowshoe).
-  // Inquiry-only products (customized, transfers) do not use this checkout discount field.
   allToursEligible: false,
 }
+
+/** Tours that already have a catalogue sale — WINTER20 must not stack. */
+export const WINTER20_EXCLUDED_TOUR_IDS = new Set<number>([1])
+export const WINTER20_EXCLUDED_TOUR_NAMES = new Set<string>([
+  'Guaranteed Northern Lights Tour',
+  'Northern Lights Tour',
+  'Guaranteed Northern Lights & Photography Tour',
+])
 
 /** CSS custom property used to offset the fixed header under the bar */
 export const PROMO_BAR_HEIGHT_VAR = '--rn-promo-bar-height'

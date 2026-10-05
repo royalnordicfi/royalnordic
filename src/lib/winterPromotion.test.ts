@@ -83,4 +83,45 @@ describe('winterPromotion', () => {
       })
     )
   })
+
+  it('rejects WINTER20 on Guaranteed Northern Lights (tour id 1)', () => {
+    assert.equal(
+      getWinterDiscountAmount(99, 'WINTER20', base, new Date(), { tourId: 1 }),
+      0,
+    )
+    assert.equal(
+      isValidWinterPromoCode('WINTER20', base, new Date(), {
+        tourName: 'Guaranteed Northern Lights Tour',
+      }),
+      false,
+    )
+    assert.equal(
+      validateCheckoutDiscount({
+        amount: 99,
+        subtotal: 99,
+        discount: 0,
+        discountCode: 'WINTER20',
+        config: base,
+        tourId: 1,
+      }),
+      null,
+    )
+    assert.ok(
+      validateCheckoutDiscount({
+        amount: 79.2,
+        subtotal: 99,
+        discount: 19.8,
+        discountCode: 'WINTER20',
+        config: base,
+        tourId: 1,
+      }),
+    )
+  })
+
+  it('still applies WINTER20 on other tours', () => {
+    assert.equal(
+      getWinterDiscountAmount(100, 'WINTER20', base, new Date(), { tourId: 4 }),
+      20,
+    )
+  })
 })

@@ -38,21 +38,16 @@ const ProductFaq: React.FC<ProductFaqProps> = ({ items, schemaId, tone = 'dark' 
   return (
     <>
       <JsonLd id={schemaId} data={faqSchema} />
-      <div
-        className={
-          snow
-            ? 'rounded-rn-lg border border-black/5 bg-frost p-4 sm:p-6'
-            : 'rounded-lg border border-white/10 bg-white/5 p-3 sm:rounded-xl sm:p-4 lg:p-6 backdrop-blur-sm'
-        }
-      >
+      <div className={snow ? 'p-0' : 'p-0'}>
+        <p className="rn-tour-section__eyebrow">FAQ</p>
         <h2
           className={
             snow
-              ? 'mb-4 font-display text-2xl font-semibold text-ink'
-              : 'mb-3 font-luxury text-lg font-bold text-white sm:mb-4 sm:text-xl lg:text-2xl'
+              ? 'rn-tour-section__title mb-4 text-ink'
+              : 'rn-tour-section__title mb-4'
           }
         >
-          Frequently Asked Questions
+          Questions
         </h2>
         <dl className="space-y-4">
           {items.map((item) => (
