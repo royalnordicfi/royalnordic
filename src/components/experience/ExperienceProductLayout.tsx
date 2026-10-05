@@ -39,12 +39,12 @@ export default function ExperienceProductLayout({
   return (
     <div className="rn-product">
       <div className="rn-product__glow" aria-hidden />
-      <div className="rn-container rn-shell-pad rn-shell-pad--product pb-16 sm:pb-20">
+      <div className="rn-container-product rn-shell-pad rn-shell-pad--product pb-16 sm:pb-24">
         <ExperienceBreadcrumb items={breadcrumbs} />
 
-        <div className="mt-5 grid items-start gap-10 lg:mt-7 lg:grid-cols-12 lg:gap-x-12 xl:gap-x-14">
+        <div className="mt-5 grid items-start gap-10 lg:mt-8 lg:grid-cols-12 lg:gap-x-14 xl:gap-x-16">
           <div className="min-w-0 lg:col-span-7">
-            <header className="rn-product__intro rn-reveal max-w-2xl">
+            <header className="rn-product__intro rn-reveal max-w-rn-narrow">
               <p className="rn-eyebrow">{eyebrow}</p>
               <h1 className="rn-product__title mt-2.5 font-display font-semibold text-white">
                 {title}

@@ -40,6 +40,11 @@ export const TOUR_PUBLIC_PAGES: Record<
     fallbackPath: '/northern-lights-tours',
     label: 'Family-Friendly Northern Lights Tour',
   },
+  9: {
+    path: '/transportation-rovaniemi-saariselka',
+    fallbackPath: '/transportation',
+    label: 'Rovaniemi ⇄ Saariselkä Private Transfer',
+  },
 }
 
 export function tourIdForPublicPath(pathname: string): number | null {

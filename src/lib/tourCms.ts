@@ -32,6 +32,8 @@ export type TourCms = {
   child_price: number
   max_capacity: number
   is_active: boolean
+  /** per_person (default) or per_vehicle — transfers charge adult_price once */
+  pricing_model: 'per_person' | 'per_vehicle'
   duration_text: string | null
   inclusions: string | null
   operational_notes: string | null
@@ -146,6 +148,8 @@ export function normalizeTourCms(row: Record<string, unknown>): TourCms {
     child_price: Number(row.child_price) || 0,
     max_capacity: Number(row.max_capacity) || 8,
     is_active: row.is_active !== false,
+    pricing_model:
+      row.pricing_model === 'per_vehicle' ? 'per_vehicle' : 'per_person',
     duration_text: (row.duration_text as string | null) ?? null,
     inclusions: (row.inclusions as string | null) ?? null,
     operational_notes: (row.operational_notes as string | null) ?? null,

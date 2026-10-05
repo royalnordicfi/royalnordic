@@ -1,28 +1,26 @@
-import { GUARANTEED_NL_GUARANTEE_SHORT } from '../seo/guaranteedNorthernLightsTour'
-
 const items = [
   {
-    title: 'Northern Lights guarantee',
-    text: GUARANTEED_NL_GUARANTEE_SHORT,
+    title: 'Local expertise',
+    text: 'Rovaniemi-based team planning around real Lapland conditions.',
   },
   {
     title: 'Small groups',
-    text: 'Max 8 guests per vehicle on our Guaranteed tour.',
+    text: 'Intimate groups on our guided experiences — not bus tours.',
   },
   {
-    title: 'Professional photos',
-    text: 'Your guide photographs you with the aurora — included free.',
+    title: 'Professional photography',
+    text: 'On our Guaranteed aurora hunt, your guide photographs you with the lights.',
   },
   {
-    title: 'Book direct',
-    text: 'Secure Stripe checkout and WhatsApp support.',
+    title: 'Flexible private travel',
+    text: 'Custom itineraries and private transfers across Finnish Lapland.',
   },
 ]
 
 const TrustStrip = () => {
   return (
     <div
-      className="relative z-10 -mt-10 px-3.5 sm:-mt-16 sm:px-6 lg:-mt-20 lg:px-8"
+      className="relative z-10 -mt-10 px-[var(--rn-gutter)] sm:-mt-16 sm:px-[var(--rn-gutter-sm)] lg:-mt-20 lg:px-[var(--rn-gutter-lg)]"
       aria-label="Why travellers book Royal Nordic"
     >
       <div className="rn-container !px-0">

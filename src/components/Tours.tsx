@@ -46,7 +46,7 @@ const Tours = () => {
     <section id="tours" className="py-16 sm:py-20 lg:py-24 bg-black relative">
       {/* Background fade effect */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black"></div>
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="rn-container relative z-10">
         {/* Section Header */}
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-luxury font-bold mb-4 sm:mb-6 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 bg-clip-text text-transparent">

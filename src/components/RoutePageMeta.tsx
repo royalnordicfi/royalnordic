@@ -94,6 +94,11 @@ const META: Record<
     title: 'Rovaniemi to Levi Private Transfer | Royal Nordic',
     description: 'Private transportation between Rovaniemi and Levi / Kittilä. Request a quote.',
   },
+  '/transportation-rovaniemi-saariselka': {
+    title: 'Rovaniemi Saariselkä Private Transfer | Royal Nordic',
+    description:
+      'Book a private Rovaniemi–Saariselkä transfer from €649 per vehicle one way. Airport and hotel pickup across Finnish Lapland.',
+  },
   '/transportation-customized': {
     title: 'Custom Private Transfer Lapland | Royal Nordic',
     description: 'Customized private transportation across Finnish Lapland. Request a personalized quote.',

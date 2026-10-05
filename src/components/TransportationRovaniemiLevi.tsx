@@ -29,9 +29,9 @@ const TransportationRovaniemiLevi = () => {
     additionalInfo: '',
   })
 
+  /** Indicative per-vehicle rate for quote requests (not online checkout). */
   const pricing = {
-    adult: 399,
-    child: 299,
+    vehicle: 399,
   }
   const inputClass = 'rn-form-input'
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -137,20 +137,20 @@ const TransportationRovaniemiLevi = () => {
         ]}
         eyebrow="Lapland · Ski resort transfer"
         title="Private Transportation: Rovaniemi – Levi/Kittilä"
-        lede="Private transfer between Rovaniemi and Levi/Kittilä — from €399/adult, up to 8 passengers."
+        lede="Private transfer between Rovaniemi and Levi/Kittilä — indicative from €399 per vehicle, up to 8 passengers."
         images={GALLERY}
         facts={[
           { label: 'Duration', value: '2–3 hours' },
           { label: 'Capacity', value: 'Up to 8' },
           { label: 'Route', value: 'Rovaniemi → Levi/Kittilä' },
-          { label: 'From', value: `€${pricing.adult} adult` },
+          { label: 'From', value: `€${pricing.vehicle} / vehicle` },
         ]}
         booking={
           <BookingAside
-            priceFrom={pricing.adult}
-            priceNote="/ adult"
+            priceFrom={pricing.vehicle}
+            priceNote="/ vehicle (indicative)"
             trustLines={[
-              `Child rate €${pricing.child} (0–17)`,
+              'Priced per vehicle, not per passenger',
               'Private vehicle up to 8 passengers',
               'Flexible pickup times',
               'Quote confirmed by email',
@@ -279,8 +279,8 @@ const TransportationRovaniemiLevi = () => {
             group, luggage help, and drivers who know winter road conditions on the 2–3 hour route.
           </p>
           <p className="mt-3 leading-relaxed text-text-muted">
-            Published rates start at €{pricing.adult} per adult and €{pricing.child} per child (0–17). Send your
-            details for final confirmation.
+            Indicative rates start at €{pricing.vehicle} per vehicle one way. Send your details for a final
+            quote based on timing and luggage.
           </p>
         </section>
 
@@ -311,8 +311,8 @@ const TransportationRovaniemiLevi = () => {
                   title: 'Pricing',
                   content: (
                     <>
-                      From €{pricing.adult} per adult and €{pricing.child} per child (0–17). Final quote
-                      confirmed after you send your request.
+                      From €{pricing.vehicle} per vehicle (indicative, one way). Final quote confirmed after
+                      you send your request.
                     </>
                   ),
                 },

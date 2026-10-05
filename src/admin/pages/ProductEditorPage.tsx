@@ -112,6 +112,7 @@ export default function ProductEditorPage() {
         full_description: product.full_description,
         adult_price: Number(product.adult_price),
         child_price: Number(product.child_price),
+        pricing_model: product.pricing_model === 'per_vehicle' ? 'per_vehicle' : 'per_person',
         reference_price:
           product.reference_price == null || product.reference_price === ('' as unknown)
             ? null
@@ -435,6 +436,21 @@ export default function ProductEditorPage() {
                 />
               </Field>
             </div>
+            <Field label="Pricing model">
+              <select
+                className="field"
+                value={product.pricing_model === 'per_vehicle' ? 'per_vehicle' : 'per_person'}
+                onChange={(e) =>
+                  patch(
+                    'pricing_model',
+                    e.target.value === 'per_vehicle' ? 'per_vehicle' : 'per_person',
+                  )
+                }
+              >
+                <option value="per_person">Per person (adults × price + children × price)</option>
+                <option value="per_vehicle">Per vehicle (charge adult price once)</option>
+              </select>
+            </Field>
             <label className="flex items-center gap-2 text-sm text-zinc-800">
               <input
                 type="checkbox"

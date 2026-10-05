@@ -38,7 +38,7 @@ const FeaturedExperience = () => {
 
   return (
     <section
-      className="relative overflow-hidden bg-midnight pb-16 pt-10 sm:pb-20 sm:pt-12 lg:pb-24 lg:pt-14"
+      className="relative overflow-hidden bg-midnight pb-14 pt-8 sm:pb-16 sm:pt-10 lg:pb-20 lg:pt-12"
       aria-label={title}
     >
       <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />

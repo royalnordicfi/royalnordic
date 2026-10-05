@@ -49,7 +49,12 @@ export default {
         modern: ['Inter', 'system-ui', 'sans-serif'],
       },
       maxWidth: {
-        rn: '72rem',
+        rn: 'var(--rn-container)',
+        'rn-wide': 'var(--rn-container-wide)',
+        'rn-product': 'var(--rn-container-product)',
+        'rn-narrow': 'var(--rn-container-narrow)',
+        'rn-booking': 'var(--rn-booking-max)',
+        'rn-measure': 'var(--rn-measure-lede)',
       },
       borderRadius: {
         rn: '10px',

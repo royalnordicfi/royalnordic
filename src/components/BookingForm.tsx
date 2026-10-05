@@ -23,6 +23,8 @@ import {
 } from '../lib/winterPromotion'
 import { formatEuroAmount } from '../lib/tourPricing'
 
+export type BookingPricingModel = 'per_person' | 'per_vehicle'
+
 interface BookingFormProps {
   tourId: number
   tourName: string
@@ -35,6 +37,11 @@ interface BookingFormProps {
   chrome?: 'default' | 'embedded'
   /** dark = graphite booking UI inside rn-book-panel */
   tone?: 'light' | 'dark'
+  /**
+   * per_vehicle: charge adultPrice once for the vehicle (passengers do not multiply).
+   * per_person (default): adults × adult + children × child.
+   */
+  pricingModel?: BookingPricingModel
 }
 
 type FieldKey = 'preferredDate' | 'fullName' | 'email'
@@ -86,7 +93,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
   seasonEnd,
   chrome = 'default',
   tone = 'light',
+  pricingModel = 'per_person',
 }) => {
+  const perVehicle = pricingModel === 'per_vehicle'
   const navigate = useNavigate()
   const dateSectionRef = useRef<HTMLDivElement>(null)
   const fullNameRef = useRef<HTMLInputElement>(null)
@@ -422,13 +431,14 @@ const BookingForm: React.FC<BookingFormProps> = ({
   // }
 
   const calculateTotal = () => {
-    const subtotal = (formData.adults * liveAdultPrice) + (formData.children * liveChildPrice)
+    const subtotal = computeSubtotal(formData.adults, formData.children)
     const discount = getDiscountAmount(subtotal)
     return subtotal - discount
   }
 
   const promoOpts = { tourId, tourName }
-  const promoAllowed = !isTourExcludedFromWinterPromo(tourId, tourName)
+  // Catalogue-sale NL + per-vehicle transfers: never stack WINTER20.
+  const promoAllowed = !perVehicle && !isTourExcludedFromWinterPromo(tourId, tourName)
 
   // Catalogue-sale tours (Guaranteed NL): never accept or apply WINTER20.
   useEffect(() => {
@@ -436,6 +446,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
       setFormData((prev) => ({ ...prev, discountCode: '' }))
     }
   }, [promoAllowed, formData.discountCode])
+
+  const computeSubtotal = (adults: number, children: number) => {
+    if (perVehicle) return liveAdultPrice
+    return adults * liveAdultPrice + children * liveChildPrice
+  }
 
   const getDiscountAmount = (subtotal: number) => {
     if (!promoAllowed) return 0
@@ -485,7 +500,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         )
       }
 
-      const subtotal = (formData.adults * liveAdultPrice) + (formData.children * liveChildPrice)
+      const subtotal = computeSubtotal(formData.adults, formData.children)
       const discount = promoAllowed ? getDiscountAmount(subtotal) : 0
       const totalPrice = subtotal - discount
       const discountCode = promoAllowed ? formData.discountCode.trim().toUpperCase() : ''
@@ -519,6 +534,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           subtotal: subtotal.toString(),
           discount: discount.toString(),
           discount_code: discountCode,
+          pricing_model: pricingModel,
           phone: formData.phone,
           special_requests: formData.specialRequests
         }
@@ -606,7 +622,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
       }
       
       const tourDateId = selectedDateData.id || Date.now()
-      const subtotal = (formData.adults * liveAdultPrice) + (formData.children * liveChildPrice)
+      const subtotal = computeSubtotal(formData.adults, formData.children)
       const discount = promoAllowed ? getDiscountAmount(subtotal) : 0
       const totalPrice = subtotal - discount
       const discountCode = promoAllowed ? formData.discountCode.trim().toUpperCase() : ''
@@ -724,7 +740,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
   const ui = dark
     ? {
-        wrap: chrome === 'embedded' ? 'rn-book-dark max-w-lg mx-auto lg:mx-0' : 'rn-book-dark bg-surface-elevated rounded-rn border border-white/10 p-6 max-w-lg mx-auto lg:mx-0',
+        wrap: chrome === 'embedded' ? 'rn-book-dark rn-booking-width mx-auto lg:mx-0' : 'rn-book-dark bg-surface-elevated rounded-rn border border-white/10 p-6 rn-booking-width mx-auto lg:mx-0',
         hint: 'mb-4 text-xs text-text-dim',
         heading: 'rn-bf-heading',
         navBtn: 'rn-bf-chip',
@@ -754,7 +770,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         sectionGap: 'space-y-6',
       }
     : {
-        wrap: chrome === 'embedded' ? 'max-w-lg mx-auto lg:mx-0' : 'bg-white rounded-xl shadow-xl p-6 max-w-lg mx-auto lg:mx-0',
+        wrap: chrome === 'embedded' ? 'rn-booking-width mx-auto lg:mx-0' : 'bg-white rounded-xl shadow-xl p-6 rn-booking-width mx-auto lg:mx-0',
         hint: chrome === 'embedded' ? 'text-panel-muted text-xs mb-4' : 'text-gray-600 text-sm text-center mb-6',
         heading: embeddedLight
           ? 'text-[11px] font-medium uppercase tracking-[0.16em] text-panel-muted mb-3'
@@ -1041,7 +1057,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
             )}
             
             {/* Capacity Warning */}
-            {formData.preferredDate && formData.adults + formData.children >= selectedSeatsLeft && (
+            {formData.preferredDate &&
+              !perVehicle &&
+              formData.adults + formData.children >= selectedSeatsLeft && (
               <div className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded p-2">
                 Maximum capacity reached for this date ({selectedSeatsLeft} people)
               </div>
@@ -1174,28 +1192,47 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 </span>
               </div>
             )}
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">
-                {formData.adults} {formData.adults === 1 ? 'Adult' : 'Adults'} × €
-                {formatEuroAmount(liveAdultPrice)}
-              </span>
-              <span className="text-gray-800 font-medium">
-                €{formatEuroAmount(formData.adults * liveAdultPrice)}
-              </span>
-            </div>
-            {formData.children > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">
-                  {formData.children} {formData.children === 1 ? 'Child' : 'Children'} × €
-                  {formatEuroAmount(liveChildPrice)}
-                </span>
-                <span className="text-gray-800 font-medium">
-                  €{formatEuroAmount(formData.children * liveChildPrice)}
-                </span>
-              </div>
+            {perVehicle ? (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Private vehicle (one way)</span>
+                  <span className="text-gray-800 font-medium">
+                    €{formatEuroAmount(liveAdultPrice)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Passengers</span>
+                  <span className="text-gray-800 font-medium">
+                    {formData.adults + formData.children} (does not change price)
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">
+                    {formData.adults} {formData.adults === 1 ? 'Adult' : 'Adults'} × €
+                    {formatEuroAmount(liveAdultPrice)}
+                  </span>
+                  <span className="text-gray-800 font-medium">
+                    €{formatEuroAmount(formData.adults * liveAdultPrice)}
+                  </span>
+                </div>
+                {formData.children > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">
+                      {formData.children} {formData.children === 1 ? 'Child' : 'Children'} × €
+                      {formatEuroAmount(liveChildPrice)}
+                    </span>
+                    <span className="text-gray-800 font-medium">
+                      €{formatEuroAmount(formData.children * liveChildPrice)}
+                    </span>
+                  </div>
+                )}
+              </>
             )}
             {(() => {
-              const subtotal = formData.adults * liveAdultPrice + formData.children * liveChildPrice
+              const subtotal = computeSubtotal(formData.adults, formData.children)
               const discount = getDiscountAmount(subtotal)
               return discount > 0 ? (
                 <>

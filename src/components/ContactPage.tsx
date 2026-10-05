@@ -34,11 +34,11 @@ const ContactPage = () => {
         compact
       />
 
-      <main className="rn-section-tight rn-hero-follow relative flex-1 bg-midnight pt-0 pb-14 sm:pb-16">
+      <main className="rn-hero-follow relative flex-1 bg-midnight pb-16 pt-2 sm:pb-20 sm:pt-4 lg:pb-24 lg:pt-6">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-70" aria-hidden />
         <div className="rn-container relative z-10">
-          <div className="grid gap-10 lg:grid-cols-12 lg:gap-12 lg:items-start">
-            <div className="space-y-8 lg:col-span-4">
+          <div className="grid gap-12 lg:grid-cols-12 lg:gap-16 xl:gap-20 lg:items-start">
+            <div className="space-y-10 lg:col-span-4 xl:col-span-5">
               <div>
                 <p className="rn-eyebrow">Direct lines</p>
                 <ul className="mt-4 space-y-3 text-sm">
@@ -84,8 +84,10 @@ const ContactPage = () => {
               </p>
             </div>
 
-            <div className="lg:col-span-8">
-              <ContactForm />
+            <div className="lg:col-span-8 xl:col-span-7">
+              <div className="max-w-2xl lg:max-w-none">
+                <ContactForm />
+              </div>
             </div>
           </div>
         </div>

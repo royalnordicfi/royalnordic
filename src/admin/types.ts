@@ -98,6 +98,7 @@ export type Product = {
   child_price: number
   max_capacity: number
   is_active: boolean
+  pricing_model?: 'per_person' | 'per_vehicle'
   duration_text: string | null
   inclusions: string | null
   operational_notes: string | null

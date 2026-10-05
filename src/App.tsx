@@ -10,7 +10,8 @@ import ExploreCategories from './components/ExploreCategories';
 import ReviewsHome from './components/ReviewsHome';
 import PrivateCustomSection from './components/PrivateCustomSection';
 import GuidesTeaser from './components/GuidesTeaser';
-import Contact from './components/Contact';
+import HomeTransfersTeaser from './components/HomeTransfersTeaser';
+import FinalCta from './components/FinalCta';
 import ContactPage from './components/ContactPage';
 import Footer from './components/Footer';
 import NorthernLightsTour from './components/NorthernLightsTour';
@@ -37,6 +38,7 @@ import LaplandHotelsGuide from './components/blog/LaplandHotelsGuide';
 import GlassIglooGuide from './components/blog/GlassIglooGuide';
 import LaplandCabinsGuide from './components/blog/LaplandCabinsGuide';
 import TransportationRovaniemiLevi from './components/TransportationRovaniemiLevi';
+import TransportationSaariselka from './components/TransportationSaariselka';
 import TransportationCustomized from './components/TransportationCustomized';
 import TransportationCategory from './components/TransportationCategory';
 import PaymentSuccess from './components/PaymentSuccess';
@@ -76,12 +78,13 @@ function App() {
               <Hero />
               <TrustStrip />
               <FeaturedExperience />
-              <EditorialMoment />
               <ExploreCategories />
-              <ReviewsHome />
+              <EditorialMoment />
               <PrivateCustomSection />
+              <HomeTransfersTeaser />
+              <ReviewsHome />
               <GuidesTeaser />
-              <Contact />
+              <FinalCta />
               <Footer />
             </>
           } />
@@ -171,6 +174,14 @@ function App() {
           {/* Transportation Routes */}
           <Route path="/transportation" element={<TransportationCategory />} />
           <Route path="/transportation-rovaniemi-levi" element={<TransportationRovaniemiLevi />} />
+          <Route
+            path="/transportation-rovaniemi-saariselka"
+            element={
+              <ActiveTourGate tourId={9}>
+                <TransportationSaariselka />
+              </ActiveTourGate>
+            }
+          />
           <Route path="/transportation-customized" element={<TransportationCustomized />} />
           
           <Route path="/payment-success" element={<PaymentSuccess />} />

@@ -25,10 +25,10 @@ const MobileBookingBar = ({
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-[#040807]/96 px-4 py-3 backdrop-blur-md lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-[#040807]/96 py-3 backdrop-blur-md lg:hidden"
       style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
     >
-      <div className="mx-auto flex max-w-rn items-center justify-between gap-3">
+      <div className="rn-container flex items-center justify-between gap-3">
         <div className="min-w-0">
           {showSale ? (
             <>

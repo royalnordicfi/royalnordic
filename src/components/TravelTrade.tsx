@@ -74,8 +74,13 @@ const TravelTrade: React.FC = () => {
       to: '/daytime-experiences',
     },
     {
-      title: 'Private transfers & custom tours',
-      detail: 'Levi/Kittilä routes, airport pickups, and tailored itineraries for agencies and private travellers.',
+      title: 'Private transfers',
+      detail: 'Rovaniemi–Saariselkä (€649/vehicle online), Levi/Kittilä routes, and airport pickups.',
+      to: '/transportation',
+    },
+    {
+      title: 'Private & custom tours',
+      detail: 'Tailored itineraries for agencies and private travellers around your brief.',
       to: '/customized-tour',
     },
   ]

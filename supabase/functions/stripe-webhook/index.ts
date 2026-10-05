@@ -104,7 +104,10 @@ serve(async (req) => {
       }
 
       const remainingSlots = dateData.available_slots - (dateData.total_booked || 0)
-      const requestedSlots = adults + children
+      const pricingModel = String(metadata.pricing_model || '')
+      const isPerVehicle = pricingModel === 'per_vehicle' || tourId === 9
+      // Per-vehicle products consume 1 calendar slot (the vehicle), not passenger count.
+      const requestedSlots = isPerVehicle ? 1 : adults + children
       if (requestedSlots > remainingSlots) {
         console.error('Not enough slots available', { remainingSlots, requestedSlots })
         throw new Error(`Only ${remainingSlots} slots available`)

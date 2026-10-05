@@ -34,7 +34,8 @@ serve(async (req) => {
       tour_date,
       crypto_type,
       special_requests,
-      payment_type
+      payment_type,
+      pricing_model,
     } = await req.json()
 
     // Validate required fields
@@ -47,24 +48,33 @@ serve(async (req) => {
     const PROMO_ENABLED = true
     const PROMO_CODE = 'WINTER20'
     const PROMO_PERCENT = 20
-    const PROMO_EXCLUDED_TOUR_IDS = new Set([1])
+    const PROMO_EXCLUDED_TOUR_IDS = new Set([1, 9])
+    const promoTourId = parseInt(String(tour_id || ''), 10)
+    const isPerVehicle =
+      String(pricing_model || '') === 'per_vehicle' || promoTourId === 9
     if (subtotal != null) {
       const sub = Number(subtotal)
       const claimedDiscount = Number(discount || 0)
       const code = String(discount_code || '').trim().toUpperCase()
       const charged = Number(total_price)
-      const promoTourId = parseInt(String(tour_id || ''), 10)
-      const promoAllowed = !PROMO_EXCLUDED_TOUR_IDS.has(promoTourId)
-      const expectedDiscount =
-        PROMO_ENABLED && promoAllowed && code === PROMO_CODE
-          ? Math.round(sub * (PROMO_PERCENT / 100) * 100) / 100
-          : 0
-      const expectedTotal = Math.round((sub - expectedDiscount) * 100) / 100
-      if (Math.abs(claimedDiscount - expectedDiscount) > 0.02) {
-        throw new Error('Invalid discount code or discount amount')
-      }
-      if (Math.abs(charged - expectedTotal) > 0.02) {
-        throw new Error('Payment amount does not match pricing rules')
+      // Per-vehicle transfers: total must equal subtotal with zero discount (flat vehicle fare).
+      if (isPerVehicle) {
+        if (Math.abs(claimedDiscount) > 0.02 || Math.abs(charged - sub) > 0.02) {
+          throw new Error('Payment amount does not match per-vehicle pricing')
+        }
+      } else {
+        const promoAllowed = !PROMO_EXCLUDED_TOUR_IDS.has(promoTourId)
+        const expectedDiscount =
+          PROMO_ENABLED && promoAllowed && code === PROMO_CODE
+            ? Math.round(sub * (PROMO_PERCENT / 100) * 100) / 100
+            : 0
+        const expectedTotal = Math.round((sub - expectedDiscount) * 100) / 100
+        if (Math.abs(claimedDiscount - expectedDiscount) > 0.02) {
+          throw new Error('Invalid discount code or discount amount')
+        }
+        if (Math.abs(charged - expectedTotal) > 0.02) {
+          throw new Error('Payment amount does not match pricing rules')
+        }
       }
     }
 
@@ -86,7 +96,8 @@ serve(async (req) => {
     }
 
     const remainingSlots = dateData.available_slots - dateData.total_booked
-    const requestedSlots = adults + children
+    // Per-vehicle products consume 1 calendar slot (the vehicle), not passenger count.
+    const requestedSlots = isPerVehicle ? 1 : adults + children
 
     if (requestedSlots > remainingSlots) {
       console.error('Not enough slots available')

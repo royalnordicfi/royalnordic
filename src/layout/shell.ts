@@ -30,6 +30,7 @@ const PRODUCT_EXACT = new Set([
   '/monster-truck-northern-lights',
   '/customized-tour',
   '/transportation-rovaniemi-levi',
+  '/transportation-rovaniemi-saariselka',
   '/transportation-customized',
 ])
 

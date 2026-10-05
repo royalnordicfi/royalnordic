@@ -107,10 +107,33 @@ const NorthernLightsTours: React.FC = () => {
                 badge={tour.badge}
                 priceFrom={tour.priceFrom}
                 referencePrice={'referencePrice' in tour ? tour.referencePrice : undefined}
-                ctaLabel={tour.to === '/northern-lights-tour' ? 'Check availability' : tour.priceFrom ? 'Book now' : 'Request availability'}
+                ctaLabel={
+                  tour.to === '/northern-lights-tour'
+                    ? 'Check availability'
+                    : tour.priceFrom
+                      ? 'Check availability'
+                      : 'Request availability'
+                }
                 className={`rn-stagger-${(i % 4) + 1}`}
               />
             ))}
+          </div>
+
+          <div className="mx-auto mt-12 max-w-rn-measure border-t border-white/[0.08] pt-8 sm:mt-14 sm:pt-10">
+            <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">
+              Which tour is right for me?
+            </h2>
+            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-text-muted sm:text-[15px]">
+              <li>
+                <span className="font-medium text-white">Guaranteed Northern Lights</span> — our
+                flagship small-group aurora hunt with professional photos and a camera-capture
+                refund guarantee.
+              </li>
+              <li>
+                <span className="font-medium text-white">Family-Friendly</span> — a shorter evening
+                format for mixed ages. Aurora is not guaranteed on this tour.
+              </li>
+            </ul>
           </div>
         </div>
       </section>

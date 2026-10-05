@@ -38,7 +38,7 @@ const PrivateCustomSection = () => {
             </p>
             <div className="mt-7 flex flex-col gap-2.5 sm:mt-7 sm:flex-row sm:items-center sm:gap-3">
               <Link to="/customized-tour" className="rn-btn-primary w-full justify-center sm:w-auto">
-                Request a custom tour
+                Plan your private experience
               </Link>
               <Link to="/travel-trade" className="rn-btn-secondary w-full justify-center sm:w-auto">
                 Travel trade partners

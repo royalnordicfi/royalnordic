@@ -14,6 +14,8 @@ export type TourCardProps = {
   priceFrom?: number
   /** Optional struck-through reference price (sale presentation) */
   referencePrice?: number
+  /** Shown after price — default "/ adult" on sale rows, omitted for "From €X" */
+  priceUnit?: string
   ctaLabel?: string
   className?: string
   /** @deprecated Uniform cards only — ignored for sizing */
@@ -34,6 +36,7 @@ const TourCard = ({
   badge,
   priceFrom,
   referencePrice,
+  priceUnit = '/ adult',
   ctaLabel = 'Check availability',
   className = '',
   imagePosition = 'center',
@@ -76,11 +79,12 @@ const TourCard = ({
                 <>
                   <span className="rn-tour-card__was">€{referencePrice}</span>{' '}
                   <span>€{priceFrom}</span>
-                  <span className="rn-tour-card__per"> / adult</span>
+                  <span className="rn-tour-card__per"> {priceUnit}</span>
                 </>
               ) : (
                 <>
-                  From <span>€{priceFrom}</span>
+                  <span>€{priceFrom}</span>
+                  <span className="rn-tour-card__per"> {priceUnit}</span>
                 </>
               )}
             </p>
