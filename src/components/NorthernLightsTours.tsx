@@ -92,7 +92,7 @@ const NorthernLightsTours: React.FC = () => {
       <section className="rn-section-tight rn-hero-follow relative pt-0 pb-10 sm:pb-12">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
         <div className="rn-container relative">
-          <div className={`rn-card-grid ${tours.length <= 2 ? 'lg:!grid-cols-2' : ''}`}>
+          <div className="rn-card-grid sm:!grid-cols-2 lg:!grid-cols-3">
             {tours.map((tour, i) => (
               <TourCard
                 key={tour.to}
