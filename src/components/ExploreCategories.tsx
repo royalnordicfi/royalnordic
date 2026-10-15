@@ -48,7 +48,7 @@ const ExploreCategories = () => {
             className="group rn-reveal rn-explore-tile rn-explore-tile--lead relative min-h-[220px] overflow-hidden rounded-rn-lg border border-white/[0.07] sm:min-h-[300px] lg:col-span-7 lg:min-h-[460px]"
           >
             <img
-              src="/lights3.jpg"
+              src="/nordicci1.jpg"
               alt=""
               className="absolute inset-0 h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.03]"
               loading="lazy"
