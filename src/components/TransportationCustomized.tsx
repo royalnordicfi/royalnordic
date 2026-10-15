@@ -6,7 +6,6 @@ import ExperienceProductLayout from './experience/ExperienceProductLayout'
 import ExperienceHighlights from './experience/ExperienceHighlights'
 import ExperienceInclusions from './experience/ExperienceInclusions'
 import ExperienceAccordion from './experience/ExperienceAccordion'
-import BookingAside from './experience/BookingAside'
 import { LEVI_VEHICLE_PRICE } from '../lib/transferPricing'
 
 const GALLERY = [
@@ -108,10 +107,6 @@ const TransportationCustomized = () => {
     }
     setFieldErrors(next)
     return Object.keys(next).length === 0
-  }
-
-  const scrollToForm = () => {
-    document.getElementById('custom-quote-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -236,28 +231,6 @@ const TransportationCustomized = () => {
           { label: 'Coverage', value: 'Finnish Lapland' },
           { label: 'Booking', value: 'Quote on request' },
         ]}
-        booking={
-          <BookingAside
-            quoteLabel="Custom quote"
-            priceNote="Any group size · reply within ~24 hours"
-            trustLines={[
-              'Any group size',
-              'Quote within ~24h',
-              'Not an instant booking',
-              'No payment on this form',
-            ]}
-          >
-            <div className="space-y-3">
-              <p className="text-[13px] leading-relaxed text-panel-muted">
-                Submit your route, passengers and luggage — we reply with a quote. This is a request,
-                not a confirmed reservation.
-              </p>
-              <button type="button" onClick={scrollToForm} className="rn-btn-primary w-full min-h-[48px]">
-                Request a Custom Quote
-              </button>
-            </div>
-          </BookingAside>
-        }
       >
         <section className="rn-reveal">
           <h2 className="font-display font-semibold text-white">Overview</h2>
