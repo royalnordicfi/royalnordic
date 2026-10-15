@@ -1734,6 +1734,91 @@
     padding-block: clamp(2.25rem, 4vw, 3.25rem);
   }
 
+  /* Partner Bókun booking + RN promo */
+  .rn-bokun__host {
+    width: 100%;
+  }
+  .rn-bokun__host .bokunWidget,
+  .rn-bokun__host iframe {
+    max-width: 100%;
+  }
+  .rn-promo-code {
+    border: 1px solid rgba(12, 20, 28, 0.08);
+    border-radius: var(--rn-radius-sm);
+    background: linear-gradient(180deg, #fbfcfc 0%, #f3f5f4 100%);
+    padding: 0.75rem 0.85rem;
+  }
+  .rn-promo-code__eyebrow {
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #3d4a5c;
+  }
+  .rn-promo-code__title {
+    margin-top: 0.35rem;
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--rn-panel-ink);
+  }
+  .rn-promo-code__code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    letter-spacing: 0.04em;
+    color: #1e3a5f;
+  }
+  .rn-promo-code__hint {
+    margin-top: 0.35rem;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--rn-panel-muted);
+  }
+  .rn-promo-code__row {
+    margin-top: 0.65rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .rn-promo-code__chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 6px;
+    border: 1px dashed rgba(30, 58, 95, 0.35);
+    background: #fff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #1e3a5f;
+  }
+  .rn-promo-code__copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid rgba(12, 20, 28, 0.12);
+    background: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--rn-panel-ink);
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .rn-promo-code__copy:hover {
+    border-color: rgba(30, 58, 95, 0.35);
+    background: #f7f9fb;
+  }
+  .rn-promo-code__prices {
+    margin-top: 0.55rem;
+    font-size: 10.5px;
+    line-height: 1.4;
+    color: var(--rn-panel-muted);
+  }
+
   .rn-form-label {
     @apply mb-1.5 block text-[10.5px] font-semibold uppercase tracking-[0.13em];
     color: var(--rn-panel-muted);

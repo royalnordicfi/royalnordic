@@ -1,129 +1,117 @@
-import React, { useState } from 'react'
-import { Mail } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import Footer from './Footer'
+import MobileBookingBar from './MobileBookingBar'
 import ExperienceProductLayout from './experience/ExperienceProductLayout'
 import ExperienceHighlights from './experience/ExperienceHighlights'
 import ExperienceItinerary from './experience/ExperienceItinerary'
 import ExperienceInclusions from './experience/ExperienceInclusions'
 import ExperienceAccordion from './experience/ExperienceAccordion'
+import BokunExperienceCalendar from './bokun/BokunExperienceCalendar'
+import RnPromoCodeCard from './bokun/RnPromoCodeCard'
+import {
+  BOKUN_SNOWMOBILE_EXPERIENCE_ID,
+  RN_SNOWMOBILE_PROMO,
+} from '../lib/bokun'
 
 const GALLERY = [
-  { src: '/snowmobiling1.jpeg', alt: 'Snowmobile safari in Lapland wilderness' },
-  { src: '/snowmobiling2.jpeg', alt: 'Snowmobiling through snowy forest near Rovaniemi' },
+  {
+    src: '/snowmobiling1.jpg',
+    alt: 'Snowmobile riders on a snowy trail through Arctic forest near Rovaniemi',
+  },
+  {
+    src: '/snowmobiling5.jpg',
+    alt: 'Guided snowmobile safari across open Lapland winter landscape',
+  },
+  {
+    src: '/snowmobiling.jpg',
+    alt: 'Arctic snowmobile adventure in Finnish Lapland',
+  },
+  {
+    src: '/snowmobiling2.jpg',
+    alt: 'Snowmobiles parked in deep snow during a wilderness stop',
+  },
+  {
+    src: '/snowmobiling3.jpg',
+    alt: 'Travellers enjoying a snowmobile safari in Rovaniemi',
+  },
+  {
+    src: '/snowmobiling4.jpg',
+    alt: 'Winter forest trail on a guided Lapland snowmobile tour',
+  },
+  {
+    src: '/snowmobiling6.jpg',
+    alt: 'Snowmobile convoy through snow-covered trees in Lapland',
+  },
+]
+
+const BENEFITS = [
+  'About 75 minutes of guided snowmobile driving',
+  'Shared snowmobile for two adults',
+  'Thermal clothing and safety gear included',
+  'Hot berry juice and cookies on the route',
+  'Return transfers with the operator',
 ]
 
 const HIGHLIGHTS = [
-  'Partner-led safaris from 30 minutes to 3 hours',
-  'Routes through Lapland forest — briefing and gear from the provider',
-  'Request by form; we confirm availability and price by email',
+  'Explore Rovaniemi’s Arctic wilderness by snowmobile.',
+  'Enjoy approximately 75 minutes of guided snowmobile driving.',
+  'Ride through peaceful snow-covered forests and winter landscapes.',
+  'Learn to operate a snowmobile with professional instruction.',
+  'Experience Finnish Lapland from a different perspective.',
+  'Stay comfortable with provided thermal clothing and safety equipment.',
+  'Enjoy a warming refreshment break during the adventure.',
 ]
 
-const SnowmobileSafari: React.FC = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    preferredDate: '',
-    duration: '1',
-    adults: 1,
-    children: 0,
-    message: '',
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+const INCLUDED = [
+  'Guided snowmobile safari',
+  'Approximately 75 minutes of snowmobile driving',
+  'Shared snowmobile for two adults',
+  'Professional local guide',
+  'Safety briefing and driving instructions',
+  'Thermal overalls',
+  'Winter boots',
+  'Gloves',
+  'Balaclava',
+  'Helmet',
+  'Hot berry juice and cookies',
+  'Return transfers arranged by the operator',
+]
 
-  const inputClass = 'rn-form-input'
+const NOT_INCLUDED = [
+  `Optional single-driver supplement (€${RN_SNOWMOBILE_PROMO.singleDriverSupplement} per person, where available)`,
+  'Personal purchases',
+  'Services not listed in your selected booking option',
+]
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData({
-      ...formData,
-      [name]: name === 'adults' || name === 'children' ? parseInt(value) || 0 : value,
-    })
-  }
+const ITINERARY = [
+  {
+    title: 'Meet & prepare',
+    text: 'Join the Lapland Legacy team for pickup or meeting arrangements confirmed in your booking. Receive thermal clothing and a clear safety briefing.',
+  },
+  {
+    title: 'Drive into the wilderness',
+    text: 'Follow your guide along snowy forest trails with about 75 minutes of snowmobile driving. Two adults normally share one machine and may switch drivers.',
+  },
+  {
+    title: 'Arctic pause',
+    text: 'Stop for warm berry juice and cookies while taking in the winter landscape.',
+  },
+  {
+    title: 'Return',
+    text: 'Ride back with the group and transfer to your pickup or drop-off point according to the operator’s arrangements.',
+  },
+]
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setSubmitStatus('idle')
+const scrollToBook = () => {
+  document.getElementById('book')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 
-    try {
-      const message = `Snowmobile Safari Request
-
-Duration: ${formData.duration} hour(s)
-Preferred Date: ${formData.preferredDate || 'Not specified'}
-Adults: ${formData.adults}
-Children: ${formData.children}
-Total Participants: ${formData.adults + formData.children}
-
-${formData.message ? `Additional Message:\n${formData.message}` : ''}`
-
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-customized-tour-request`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          message: message,
-          to: ['royalnordicfi@gmail.com', 'contact@royalnordic.fi'],
-          subject: 'New Snowmobile Safari Request - ROYAL NORDIC',
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to send request')
-      }
-
-      setSubmitStatus('success')
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        preferredDate: '',
-        duration: '1',
-        adults: 1,
-        children: 0,
-        message: '',
-      })
-
-      setTimeout(() => {
-        setSubmitStatus('idle')
-      }, 5000)
-    } catch (error) {
-      console.error('Error sending request:', error)
-      setSubmitStatus('error')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const included = [
-    'Professional snowmobile equipment provided',
-    'Experienced guides for safety',
-    'Scenic routes through Lapland wilderness',
-    'Suitable for all skill levels',
-    'Safety briefing included',
-    'Warm clothing available if needed',
-  ]
-
-  const itinerary = [
-    {
-      title: 'Send your request',
-      text: 'Preferred date, duration (0.5–3 h), and group size via the form.',
-    },
-    {
-      title: 'We coordinate with our partner',
-      text: 'Royal Nordic confirms availability and pricing by email.',
-    },
-    {
-      title: 'Briefing & ride',
-      text: 'On-site safety briefing, then guided route through snowy forest with the partner team.',
-    },
-  ]
+/**
+ * Partner snowmobile safari — marketed by Royal Nordic, operated by Lapland Legacy.
+ * Booking and payment run entirely in the Bókun widget (no Stripe for this product).
+ */
+const SnowmobileSafari = () => {
+  const { adultRegular, childRegular, privateFrom, code } = RN_SNOWMOBILE_PROMO
 
   return (
     <div className="rn-page pb-24 lg:pb-0">
@@ -131,202 +119,222 @@ ${formData.message ? `Additional Message:\n${formData.message}` : ''}`
         breadcrumbs={[
           { label: 'Home', to: '/' },
           { label: 'Day Tours', to: '/daytime-experiences' },
-          { label: 'Snowmobile Safari' },
+          { label: 'Arctic Snowmobile Safari' },
         ]}
-        eyebrow="Rovaniemi · Partner activity"
-        title="Snowmobile Safari"
-        lede="Snowmobiling through Lapland forest with our partner — request date, duration, and group size by form."
+        eyebrow="Rovaniemi · Operated by Lapland Legacy"
+        title="Rovaniemi: Arctic Snowmobile Safari – 2-Hour Wilderness Adventure"
+        lede="Experience the thrill of snowmobiling through snow-covered forests and breathtaking Arctic scenery in Finnish Lapland."
+        benefits={BENEFITS}
+        proof={
+          <p>
+            Sold by Royal Nordic · Delivered by Lapland Legacy · Book online with exclusive code{' '}
+            <strong className="text-aurora-soft">{code}</strong>
+          </p>
+        }
+        heroAction={
+          <>
+            <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
+              Check availability
+            </button>
+            <p className="text-sm text-text-muted">
+              From <span className="font-semibold text-white">€{adultRegular}</span> / adult · €
+              {childRegular} / child (3–14)
+            </p>
+          </>
+        }
         images={GALLERY}
         facts={[
-          { label: 'Duration', value: '0.5h, 1h, 2h, or 3h' },
-          { label: 'Location', value: 'Rovaniemi' },
-          { label: 'Format', value: 'Partner-led' },
-          { label: 'Booking', value: 'Request by form' },
+          { label: 'Total time', value: 'About 2.5 hours' },
+          { label: 'Driving', value: '~75 minutes' },
+          { label: 'Group', value: 'Shared / 2 per sled' },
+          { label: 'Transfers', value: 'Operator return' },
         ]}
         booking={
-          <div className="rn-book-panel-light rn-reveal">
-            <div className="border-b border-black/[0.06] px-5 py-5 sm:px-6">
-              <h2 className="font-display text-xl font-semibold text-panel-ink">Request snowmobile safari</h2>
-              <p className="mt-1 text-sm text-panel-muted">Partner activity — we confirm availability by email.</p>
+          <div className="rn-book-panel-light rn-book-signature rn-book-aside">
+            <div className="rn-book-aside__summary">
+              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-panel-muted">
+                From
+              </p>
+              <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                <p className="font-display text-[1.45rem] font-semibold leading-none tracking-tight text-panel-ink">
+                  €{adultRegular}
+                </p>
+                <span className="text-[12px] text-panel-muted">/ adult</span>
+                <span className="text-[12px] text-panel-muted">· €{childRegular} / child</span>
+              </div>
+              <p className="mt-2 text-[11.5px] leading-snug text-panel-muted">
+                Private from €{privateFrom} · Prices match Lapland Legacy; checkout totals come from
+                Bókun.
+              </p>
+              <ul className="rn-book-aside__trust" aria-label="Booking reassurances">
+                <li>
+                  <span className="rn-book-aside__trust-mark" aria-hidden>
+                    ✓
+                  </span>
+                  <span>Secure Bókun checkout</span>
+                </li>
+                <li>
+                  <span className="rn-book-aside__trust-mark" aria-hidden>
+                    ✓
+                  </span>
+                  <span>Gear included</span>
+                </li>
+                <li>
+                  <span className="rn-book-aside__trust-mark" aria-hidden>
+                    ✓
+                  </span>
+                  <span>Local guide</span>
+                </li>
+                <li>
+                  <span className="rn-book-aside__trust-mark" aria-hidden>
+                    ✓
+                  </span>
+                  <span>Partner-operated</span>
+                </li>
+              </ul>
             </div>
-            <div className="p-4 sm:p-5">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  className={inputClass}
-                  placeholder="Your full name"
-                />
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={inputClass}
-                  placeholder="your.email@example.com"
-                />
-                <input
-                  type="tel"
-                  name="phone"
-                  required
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className={inputClass}
-                  placeholder="+358 45 1234567"
-                />
-                <input
-                  type="date"
-                  name="preferredDate"
-                  value={formData.preferredDate}
-                  onChange={handleChange}
-                  className={inputClass}
-                />
-                <select
-                  name="duration"
-                  value={formData.duration}
-                  onChange={handleChange}
-                  required
-                  className={inputClass}
-                >
-                  <option value="0.5">0.5 hours</option>
-                  <option value="1">1 hour</option>
-                  <option value="2">2 hours</option>
-                  <option value="3">3 hours</option>
-                </select>
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-panel-ink">Adults</label>
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, adults: Math.max(1, formData.adults - 1) })}
-                      className="h-10 w-10 rounded-lg border border-black/10 bg-black/[0.03] text-panel-ink hover:bg-black/[0.06]"
-                    >
-                      -
-                    </button>
-                    <span className="min-w-[2rem] text-center font-semibold text-panel-ink">{formData.adults}</span>
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, adults: formData.adults + 1 })}
-                      className="h-10 w-10 rounded-lg border border-black/10 bg-black/[0.03] text-panel-ink hover:bg-black/[0.06]"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-panel-ink">Children</label>
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, children: Math.max(0, formData.children - 1) })}
-                      className="h-10 w-10 rounded-lg border border-black/10 bg-black/[0.03] text-panel-ink hover:bg-black/[0.06]"
-                    >
-                      -
-                    </button>
-                    <span className="min-w-[2rem] text-center font-semibold text-panel-ink">{formData.children}</span>
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, children: formData.children + 1 })}
-                      className="h-10 w-10 rounded-lg border border-black/10 bg-black/[0.03] text-panel-ink hover:bg-black/[0.06]"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-
-                <textarea
-                  name="message"
-                  rows={4}
-                  value={formData.message}
-                  onChange={handleChange}
-                  className={`${inputClass} resize-none`}
-                  placeholder="Any additional requests or information..."
-                />
-
-                {submitStatus === 'success' && (
-                  <p className="rounded-lg bg-aurora/10 px-3 py-2 text-center text-sm text-aurora-soft">
-                    Thank you! We&apos;ll get back to you as soon as possible with availability and pricing details.
-                  </p>
-                )}
-
-                {submitStatus === 'error' && (
-                  <p className="rounded-lg bg-red-500/10 px-3 py-2 text-center text-sm text-red-400">
-                    Something went wrong. Please try again or contact us directly.
-                  </p>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="rn-btn-primary flex w-full items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                      Sending request…
-                    </>
-                  ) : (
-                    <>
-                      Send request
-                      <Mail className="h-5 w-5" aria-hidden />
-                    </>
-                  )}
-                </button>
-              </form>
+            <div className="rn-book-aside__body space-y-3">
+              <RnPromoCodeCard />
+              <BokunExperienceCalendar experienceId={BOKUN_SNOWMOBILE_EXPERIENCE_ID} />
+              <p className="text-[11px] leading-snug text-panel-muted">
+                Payment is processed in Bókun — not through Royal Nordic Stripe. Booking terms,
+                cancellation, and liability follow Lapland Legacy’s checkout.
+              </p>
             </div>
           </div>
         }
+        bookingBelow={
+          <p className="text-center text-[12px] text-text-muted">
+            Prefer another day adventure?{' '}
+            <Link to="/daytime-experiences" className="font-medium text-aurora-soft hover:underline">
+              Browse day tours
+            </Link>
+          </p>
+        }
       >
-        <section className="rn-reveal">
-          <h2 className="font-display font-semibold text-white">Overview</h2>
-          <p className="mt-3 leading-relaxed text-text-muted">
-            Snowmobile safaris are run by our trusted partner near Rovaniemi. Routes cross snowy forest and open
-            Lapland terrain with a safety briefing before you ride.
-          </p>
-          <p className="mt-3 leading-relaxed text-text-muted">
-            Beginners and experienced riders are welcome. Submit the form with your preferred date and duration;
-            we reply with availability and pricing — no payment on this form.
-          </p>
+        <section className="rn-tour-section rn-reveal">
+          <p className="rn-tour-section__eyebrow">About</p>
+          <h2 className="rn-tour-section__title">About this experience</h2>
+          <div className="rn-tour-section__body space-y-3 text-[15px] leading-relaxed text-text-muted">
+            <p>
+              Discover the excitement of snowmobiling in Finnish Lapland on a guided adventure through
+              the winter wilderness surrounding Rovaniemi.
+            </p>
+            <p>
+              Your experience begins with a safety briefing and an introduction to snowmobile driving.
+              An experienced local guide explains how to operate the machine and ensures everyone is
+              comfortable before setting off.
+            </p>
+            <p>
+              Once ready, follow your guide into snowy forests — peaceful Arctic scenery and winding
+              winter trails create the setting for an outdoor adventure with about 75 minutes of
+              snowmobile driving. Two adults normally share one snowmobile, with the chance to switch
+              drivers along the way.
+            </p>
+            <p>
+              A short break with warm berry juice and cookies lets you take in the atmosphere of the
+              Arctic wilderness. Thermal winter clothing and essential safety equipment are provided.
+            </p>
+            <p>
+              Royal Nordic markets this safari; Lapland Legacy operates and delivers it. Booking and
+              payment run through the Bókun calendar on this page.
+            </p>
+          </div>
         </section>
 
-        <section className="rn-reveal">
-          <h2 className="font-display font-semibold text-white">Highlights</h2>
+        <section className="rn-tour-section rn-reveal">
+          <p className="rn-tour-section__eyebrow">Highlights</p>
+          <h2 className="rn-tour-section__title">Why you’ll love it</h2>
           <div className="mt-5">
             <ExperienceHighlights items={HIGHLIGHTS} />
           </div>
         </section>
 
-        <section className="rn-reveal">
-          <h2 className="font-display font-semibold text-white">Itinerary</h2>
+        <section className="rn-tour-section rn-reveal">
+          <p className="rn-tour-section__eyebrow">Itinerary</p>
+          <h2 className="rn-tour-section__title">How the experience works</h2>
           <div className="mt-5">
-            <ExperienceItinerary steps={itinerary} />
+            <ExperienceItinerary steps={ITINERARY} />
           </div>
         </section>
 
-        <section className="rn-reveal">
-          <ExperienceInclusions included={included} />
+        <section className="rn-tour-section rn-reveal">
+          <p className="rn-tour-section__eyebrow">Details</p>
+          <h2 className="rn-tour-section__title">What’s included</h2>
+          <div className="mt-5">
+            <ExperienceInclusions included={INCLUDED} notIncluded={NOT_INCLUDED} />
+          </div>
         </section>
 
-        <section className="rn-reveal">
-          <h2 className="font-display font-semibold text-white">Practical information</h2>
+        <section className="rn-tour-section rn-reveal">
+          <p className="rn-tour-section__eyebrow">Plan ahead</p>
+          <h2 className="rn-tour-section__title">Important information</h2>
           <div className="mt-4">
             <ExperienceAccordion
               items={[
                 {
-                  title: 'Third-party activity',
+                  title: 'Driving licence & passengers',
                   content:
-                    'This snowmobile safari is provided by our trusted partner. After you submit your request, we coordinate with the provider and get back to you with availability and pricing details.',
+                    'Snowmobile drivers must hold a valid Category B driving licence accepted in Finland. Guests without a licence may join as passengers where permitted. Two adults normally share one snowmobile; driver changes may be possible during the safari.',
                 },
                 {
-                  title: 'How booking works',
+                  title: 'Children',
                   content:
-                    'Send your preferred date, duration, and group size. We reply by email — no payment on this form.',
+                    'Children participate according to Lapland Legacy’s age, height, and safety rules. Small children may travel in a sleigh pulled by the guide’s snowmobile. Children taller than 130 cm may ride behind an adult at the adult rate, subject to operator confirmation.',
+                },
+                {
+                  title: 'Single-driver option',
+                  content: `A single-driver supplement (€${RN_SNOWMOBILE_PROMO.singleDriverSupplement} per person) may be available so you can drive your own snowmobile throughout the safari. Select it in Bókun when offered.`,
+                },
+                {
+                  title: 'Meeting point & transfers',
+                  content:
+                    'Comfortable return transfers are included and arranged by Lapland Legacy. Exact pickup or meeting details are confirmed with your Bókun booking — do not assume Royal Nordic hotel-pickup rules from other tours.',
+                },
+                {
+                  title: 'Weather & routes',
+                  content:
+                    'Snowmobile routes and timing can vary with weather and safety conditions. All participants must follow the guide’s instructions.',
+                },
+                {
+                  title: 'Cancellation & liability',
+                  content:
+                    'Cancellation deadlines, refunds, weather cancellations, insurance, and snowmobile damage excess follow Lapland Legacy’s terms shown in the Bókun checkout. This product does not use Royal Nordic’s Northern Lights guarantee or Stripe booking policies.',
+                },
+                {
+                  title: 'Duration',
+                  content:
+                    'The safari is marketed as a 2-hour style outing. Partner details indicate about 2.5 hours total including briefing, transfers, and a break, with approximately 75 minutes of actual snowmobile driving — not 2.5 hours of continuous driving.',
+                },
+              ]}
+            />
+          </div>
+        </section>
+
+        <section className="rn-tour-section rn-reveal">
+          <p className="rn-tour-section__eyebrow">FAQ</p>
+          <h2 className="rn-tour-section__title">Questions</h2>
+          <div className="mt-4">
+            <ExperienceAccordion
+              items={[
+                {
+                  title: 'How much driving is there?',
+                  content:
+                    'Approximately 1 hour 15 minutes of actual driving time, with two adults sharing each snowmobile and the chance to switch drivers.',
+                },
+                {
+                  title: 'Do I need a driving licence?',
+                  content:
+                    'Yes, to drive. Category B licences valid for driving in Finland are required. Guests may join as passengers without driving.',
+                },
+                {
+                  title: 'Is this suitable for first-time riders?',
+                  content:
+                    'Yes. The route is chosen as an introduction, with safety briefing and driving instruction before you set off.',
+                },
+                {
+                  title: 'How do I get the Royal Nordic discount?',
+                  content: `Copy code ${code} from the booking panel and enter it during Bókun checkout. Final discounted totals are confirmed by Bókun when the promotion is active and eligible.`,
                 },
               ]}
             />
@@ -334,6 +342,12 @@ ${formData.message ? `Additional Message:\n${formData.message}` : ''}`
         </section>
       </ExperienceProductLayout>
 
+      <MobileBookingBar
+        priceFrom={adultRegular}
+        priceNote="/ adult"
+        ctaLabel="Check availability"
+        onBook={scrollToBook}
+      />
       <Footer />
     </div>
   )

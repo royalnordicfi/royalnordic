@@ -78,9 +78,10 @@ const META: Record<
       'Contact Royal Nordic in Rovaniemi — phone, email, or enquiry form for tours, bookings, private itineraries, and travel-trade partnerships.',
   },
   '/snowmobile-safari': {
-    title: 'Snowmobile Safari Rovaniemi | Request Availability | Royal Nordic',
-    description: 'Partner snowmobile safari near Rovaniemi. Request availability and a personalized quote.',
-    ogImage: 'https://royalnordic.fi/snowmobiling.jpg',
+    title: 'Snowmobile Safari Rovaniemi | Arctic Adventure | Royal Nordic',
+    description:
+      "Explore snowy Arctic forests on a guided snowmobile safari in Rovaniemi. Discover Lapland's winter wilderness and enjoy an exclusive Royal Nordic offer.",
+    ogImage: 'https://royalnordic.fi/snowmobiling1.jpg',
   },
   '/monster-truck-northern-lights': {
     title: 'Monster Truck Northern Lights | Request Availability | Royal Nordic',

@@ -52,15 +52,16 @@ const ALL_EXPERIENCES = [
   {
     tourId: null as number | null,
     to: '/snowmobile-safari',
-    image: '/snowmobiling2.jpg',
-    imageAlt: 'Snowmobile safari in Lapland',
-    title: 'Snowmobile Safari',
-    description: 'Partner-operated snowmobile routes near Rovaniemi — request times and pricing.',
-    duration: '0.5–3 hours',
-    groupSize: 'Flexible',
-    pickup: false,
+    image: '/snowmobiling1.jpg',
+    imageAlt: 'Guided Arctic snowmobile safari near Rovaniemi',
+    title: 'Arctic Snowmobile Safari',
+    description:
+      'Guided 2-hour wilderness safari with ~75 minutes of driving — book online with exclusive code RN10.',
+    duration: 'About 2.5 hours',
+    groupSize: '2 per snowmobile',
+    pickup: true,
     badge: 'Partner',
-    priceFrom: undefined as number | undefined,
+    priceFrom: 119 as number | undefined,
     imagePosition: 'center',
   },
 ]
@@ -87,7 +88,7 @@ const DaytimeExperiences: React.FC = () => {
     <div className="rn-page">
       <CategoryHero
         title="Daytime Experiences in Lapland"
-        subtitle="Ice fishing, wildlife, canyon hikes, and partner snowmobile trips — small groups from Rovaniemi."
+        subtitle="Ice fishing, wildlife, canyon hikes, and Arctic snowmobile safari — small groups from Rovaniemi."
         image="/korouoma1.jpg"
         compact
       />

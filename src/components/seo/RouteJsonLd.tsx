@@ -106,6 +106,19 @@ const PRODUCTS: ProductDef[] = [
     ],
   },
   {
+    path: '/snowmobile-safari',
+    name: 'Rovaniemi: Arctic Snowmobile Safari – 2-Hour Wilderness Adventure',
+    description:
+      'Guided snowmobile safari through Arctic forests near Rovaniemi with about 75 minutes of driving, thermal gear, refreshments, and return transfers.',
+    image: `${SITE}/snowmobiling1.jpg`,
+    price: 119,
+    breadcrumbs: [
+      { name: 'Home', path: '/' },
+      { name: 'Daytime Experiences', path: '/daytime-experiences' },
+      { name: 'Arctic Snowmobile Safari', path: '/snowmobile-safari' },
+    ],
+  },
+  {
     path: '/snowshoe-rental',
     name: 'Snowshoe Adventure',
     description:
