@@ -1,13 +1,40 @@
 import { Link } from 'react-router-dom'
 import { useTourCms } from '../hooks/useTourCms'
 import { displayName, getDisplayPricing } from '../lib/tourCms'
+import { RN_SNOWMOBILE_PROMO } from '../lib/bokun'
 import {
   GUARANTEED_NL_CATALOG_ADULT_PRICE,
-  GUARANTEED_NL_GUARANTEE_SHORT,
-  GUARANTEED_NL_HERO_PROMISE,
   GUARANTEED_NL_REFERENCE_ADULT_PRICE,
 } from '../seo/guaranteedNorthernLightsTour'
 
+type OfferCard = {
+  to: string
+  image: string
+  imageAlt: string
+  eyebrow: string
+  title: string
+  description: string
+  badge: string
+  current: number
+  reference: number
+  discountLabel: string
+  note: string
+  cta: string
+}
+
+function formatMoney(n: number) {
+  return Number.isInteger(n) ? String(n) : n.toFixed(2)
+}
+
+function discountPercent(reference: number, current: number) {
+  if (reference <= 0 || current >= reference) return 0
+  return Math.round(((reference - current) / reference) * 100)
+}
+
+/**
+ * Homepage offers strip — compact dual cards for live discounts
+ * (Guaranteed NL catalogue sale + RN10 snowmobile).
+ */
 const FeaturedExperience = () => {
   const { tour } = useTourCms(1)
   const pricing = tour
@@ -18,107 +45,110 @@ const FeaturedExperience = () => {
         reference: GUARANTEED_NL_REFERENCE_ADULT_PRICE,
         saveAmount: 30,
         label: 'Special offer',
-        child: GUARANTEED_NL_CATALOG_ADULT_PRICE,
       }
 
-  const title = tour ? displayName(tour) : 'Guaranteed Northern Lights Tour'
-  const lede = tour?.tagline?.trim() || GUARANTEED_NL_HERO_PROMISE
-  const card =
-    tour?.card_description?.trim() ||
-    `${lede} Small groups, hotel pickup, and free professional photos of you beneath the aurora.`
-  const meta = tour?.highlights?.length
-    ? tour.highlights.slice(0, 4).map((h) => h.text)
-    : [
-        'Max 8 guests per vehicle',
-        'Hotel pickup in Rovaniemi',
-        'Free professional photos of you with the aurora',
-        GUARANTEED_NL_GUARANTEE_SHORT,
-      ]
-  const image = tour?.hero_image_url || tour?.gallery?.[0]?.url || '/nordicci1.jpg'
+  const nlCurrent = pricing.current
+  const nlReference =
+    pricing.saleActive && pricing.reference != null
+      ? pricing.reference
+      : GUARANTEED_NL_REFERENCE_ADULT_PRICE
+  const nlPct = discountPercent(nlReference, nlCurrent)
+
+  const snow = RN_SNOWMOBILE_PROMO
+  const snowPct = snow.percent
+
+  const offers: OfferCard[] = [
+    {
+      to: '/northern-lights-tour',
+      image: tour?.hero_image_url || tour?.gallery?.[0]?.url || '/nordicci1.jpg',
+      imageAlt: 'Guests under the Northern Lights in Finnish Lapland',
+      eyebrow: 'Rovaniemi · Aurora',
+      title: tour ? displayName(tour) : 'Guaranteed Northern Lights Tour',
+      description: '100% aurora guarantee, hotel pickup, and free professional photos.',
+      badge: tour?.badge || 'Special offer',
+      current: nlCurrent,
+      reference: nlReference,
+      discountLabel: nlPct > 0 ? `−${nlPct}%` : 'Offer',
+      note: 'Catalogue price · no code needed',
+      cta: 'Book aurora',
+    },
+    {
+      to: '/snowmobile-safari',
+      image: '/snowmobiling1.jpg',
+      imageAlt: 'Arctic snowmobile safari near Rovaniemi',
+      eyebrow: 'Rovaniemi · Partner',
+      title: 'Arctic Snowmobile Safari',
+      description: `Guided wilderness ride with ~75 minutes of driving. Use code ${snow.code} at checkout.`,
+      badge: `${snow.code} · −${snowPct}%`,
+      current: snow.adultWithCode,
+      reference: snow.adultRegular,
+      discountLabel: `−${snowPct}%`,
+      note: `With code ${snow.code} at Bókun checkout`,
+      cta: 'Book safari',
+    },
+  ]
 
   return (
     <section
-      className="relative overflow-hidden bg-midnight pb-14 pt-8 sm:pb-16 sm:pt-10 lg:pb-20 lg:pt-12"
-      aria-label={title}
+      className="rn-offers relative overflow-hidden bg-midnight pb-12 pt-8 sm:pb-14 sm:pt-10 lg:pb-16 lg:pt-12"
+      aria-labelledby="rn-offers-heading"
     >
       <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent via-black/40 to-black sm:h-36"
-        aria-hidden
-      />
       <div className="rn-container relative">
-        <div className="flex flex-col gap-9 lg:flex-row lg:items-center lg:gap-16 xl:gap-20">
-          <div className="rn-reveal relative w-full shrink-0 pb-3 lg:w-[44%] lg:pb-0">
-            <div className="rn-signature-glow" aria-hidden />
-            <div className="rn-signature-card group relative">
-              <div className="rn-signature-card__media rn-signature-card__media--tall">
+        <header className="rn-reveal max-w-2xl">
+          <p className="rn-eyebrow">This season</p>
+          <h2 id="rn-offers-heading" className="rn-h2 mt-2.5 text-white">
+            Offers & discounts
+          </h2>
+          <p className="mt-3 max-w-xl text-[14.5px] leading-relaxed text-text-muted sm:text-[15px]">
+            Clear savings on our flagship aurora evening and partner snowmobile safari — discount
+            shown up front, final total confirmed at checkout.
+          </p>
+        </header>
+
+        <div className="rn-offers__grid mt-8 sm:mt-9">
+          {offers.map((offer, i) => (
+            <Link
+              key={offer.to}
+              to={offer.to}
+              className="rn-offer-card rn-reveal group"
+              style={{ ['--rn-offer-delay' as string]: `${i * 90}ms` }}
+            >
+              <div className="rn-offer-card__media">
                 <img
-                  src={image}
-                  alt="A guest points up at a vivid green aurora over Finnish Lapland"
-                  className="rn-signature-card__img"
+                  src={offer.image}
+                  alt={offer.imageAlt}
+                  className="rn-offer-card__img"
                   loading="lazy"
+                  decoding="async"
                 />
-                <div className="rn-tour-card__shade" aria-hidden />
-                <span className="rn-signature-card__label">
-                  {tour?.badge || 'Signature · Guaranteed'}
+                <div className="rn-offer-card__shade" aria-hidden />
+                <span className="rn-offer-card__badge">{offer.badge}</span>
+                <span className="rn-offer-card__pct" aria-label={`${offer.discountLabel} off`}>
+                  {offer.discountLabel}
                 </span>
               </div>
-            </div>
-            <div className="rn-price-chip">
-              {pricing.saleActive && pricing.reference != null ? (
-                <>
-                  <span className="rn-price-chip__label">{pricing.label || 'Special offer'}</span>
-                  <div className="rn-price-chip__row">
-                    <span className="rn-price-chip__was">€{pricing.reference}</span>
-                    <span className="rn-price-chip__value">€{pricing.current}</span>
-                  </div>
-                  {pricing.saveAmount > 0 ? (
-                    <span className="rn-price-chip__save">Save €{pricing.saveAmount}</span>
-                  ) : null}
-                </>
-              ) : (
-                <>
-                  <span className="rn-price-chip__label">From</span>
-                  <div className="rn-price-chip__row">
-                    <span className="rn-price-chip__value">€{pricing.current}</span>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
 
-          <div className="rn-reveal min-w-0 flex-1">
-            <p className="rn-eyebrow">Rovaniemi · Flagship experience</p>
-            <h2 className="rn-h2 mt-2.5 text-white">{title}</h2>
-            <p className="mt-4 max-w-lg text-[14.5px] leading-relaxed text-text-muted sm:text-[15.5px] sm:leading-[1.65]">
-              {card}
-            </p>
-            <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
-              {meta.map((line) => (
-                <li key={line} className="flex items-start gap-2.5 text-[13px] text-text-muted">
-                  <span
-                    className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-aurora-soft/70"
-                    aria-hidden
-                  />
-                  <span>{line}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link
-                to="/northern-lights-tour"
-                className="rn-btn-primary w-full justify-center px-7 sm:w-auto min-h-[48px]"
-              >
-                Check availability
-              </Link>
-              <Link
-                to="/northern-lights-tours"
-                className="text-center text-sm font-semibold text-white/70 transition hover:text-aurora-soft sm:text-left"
-              >
-                Compare aurora evenings →
-              </Link>
-            </div>
-          </div>
+              <div className="rn-offer-card__body">
+                <p className="rn-offer-card__eyebrow">{offer.eyebrow}</p>
+                <h3 className="rn-offer-card__title">{offer.title}</h3>
+                <p className="rn-offer-card__desc">{offer.description}</p>
+
+                <div className="rn-offer-card__foot">
+                  <div className="rn-offer-card__price" aria-label={`Was €${formatMoney(offer.reference)}, now €${formatMoney(offer.current)}`}>
+                    <span className="rn-offer-card__was">€{formatMoney(offer.reference)}</span>
+                    <span className="rn-offer-card__now">€{formatMoney(offer.current)}</span>
+                    <span className="rn-offer-card__unit">/ adult</span>
+                  </div>
+                  <span className="rn-offer-card__cta">
+                    {offer.cta}
+                    <span aria-hidden> →</span>
+                  </span>
+                </div>
+                <p className="rn-offer-card__note">{offer.note}</p>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </section>

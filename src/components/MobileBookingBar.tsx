@@ -33,10 +33,16 @@ const MobileBookingBar = ({
           {showSale ? (
             <>
               <p className="flex items-baseline gap-2">
-                <span className="text-sm text-white/45 line-through decoration-sale/80">€{referencePrice}</span>
-                <span className="font-display text-xl font-semibold leading-none text-white">€{priceFrom}</span>
+                <span className="text-sm text-white/45 line-through decoration-[color-mix(in_srgb,var(--rn-sale)_80%,transparent)]">
+                  €{Number.isInteger(referencePrice) ? referencePrice : referencePrice.toFixed(2)}
+                </span>
+                <span className="font-display text-xl font-semibold leading-none text-[var(--rn-sale)]">
+                  €{Number.isInteger(priceFrom) ? priceFrom : priceFrom.toFixed(2)}
+                </span>
               </p>
-              <p className="mt-0.5 text-[10px] uppercase tracking-[0.14em] text-sale">/ adult · special offer</p>
+              <p className="mt-0.5 text-[10px] uppercase tracking-[0.14em] text-[var(--rn-sale-soft)]">
+                / adult · special offer
+              </p>
             </>
           ) : (
             <>

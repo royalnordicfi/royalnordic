@@ -52,10 +52,10 @@ const Hero = () => {
               Flagship offer
             </span>
             <span>
-              <span className="line-through decoration-sale/80 text-white/40">
+              <span className="line-through decoration-[color-mix(in_srgb,var(--rn-sale)_80%,transparent)] text-white/40">
                 €{GUARANTEED_NL_REFERENCE_ADULT_PRICE}
               </span>{' '}
-              <span className="font-display text-xl font-semibold text-white">
+              <span className="font-display text-xl font-semibold text-[var(--rn-sale)]">
                 €{GUARANTEED_NL_CATALOG_ADULT_PRICE}
               </span>
               <span className="ml-1">/ adult · Guaranteed Northern Lights</span>

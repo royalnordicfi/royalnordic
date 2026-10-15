@@ -14,13 +14,22 @@ export type TourCardProps = {
   priceFrom?: number
   /** Optional struck-through reference price (sale presentation) */
   referencePrice?: number
-  /** Shown after price — default "/ adult" on sale rows, omitted for "From €X" */
+  /** Shown after price — default "/ adult" */
   priceUnit?: string
   ctaLabel?: string
   className?: string
   /** @deprecated Uniform cards only — ignored for sizing */
   featured?: boolean
   imagePosition?: string
+}
+
+function formatMoney(n: number) {
+  return Number.isInteger(n) ? String(n) : n.toFixed(2)
+}
+
+function discountPercent(reference: number, current: number) {
+  if (reference <= 0 || current >= reference) return 0
+  return Math.round(((reference - current) / reference) * 100)
 }
 
 const TourCard = ({
@@ -37,7 +46,7 @@ const TourCard = ({
   priceFrom,
   referencePrice,
   priceUnit = '/ adult',
-  ctaLabel = 'Check availability',
+  ctaLabel = 'Explore',
   className = '',
   imagePosition = 'center',
 }: TourCardProps) => {
@@ -46,6 +55,7 @@ const TourCard = ({
     typeof priceFrom === 'number' &&
     typeof referencePrice === 'number' &&
     referencePrice > priceFrom
+  const pct = showSale ? discountPercent(referencePrice!, priceFrom!) : 0
 
   return (
     <Link to={to} className={`rn-tour-card group ${className}`}>
@@ -66,6 +76,11 @@ const TourCard = ({
         />
         <div className="rn-tour-card__shade" aria-hidden />
         {badge && <span className="rn-tour-card__badge">{badge}</span>}
+        {pct > 0 ? (
+          <span className="rn-tour-card__pct" aria-label={`${pct}% off`}>
+            −{pct}%
+          </span>
+        ) : null}
       </div>
       <div className="rn-tour-card__body">
         <p className="rn-tour-card__eyebrow">{location}</p>
@@ -74,20 +89,19 @@ const TourCard = ({
         {meta && <p className="rn-tour-card__meta">{meta}</p>}
         <div className="rn-tour-card__foot">
           {typeof priceFrom === 'number' ? (
-            <p className="rn-tour-card__price">
+            <div className="rn-tour-card__price">
               {showSale ? (
-                <>
-                  <span className="rn-tour-card__was">€{referencePrice}</span>{' '}
-                  <span>€{priceFrom}</span>
-                  <span className="rn-tour-card__per"> {priceUnit}</span>
-                </>
+                <p className="rn-tour-card__price-row">
+                  <span className="rn-tour-card__was">€{formatMoney(referencePrice!)}</span>
+                  <span className="rn-tour-card__now">€{formatMoney(priceFrom)}</span>
+                </p>
               ) : (
-                <>
-                  <span>€{priceFrom}</span>
-                  <span className="rn-tour-card__per"> {priceUnit}</span>
-                </>
+                <p className="rn-tour-card__price-row">
+                  <span className="rn-tour-card__now rn-tour-card__now--plain">€{formatMoney(priceFrom)}</span>
+                </p>
               )}
-            </p>
+              <span className="rn-tour-card__per">{priceUnit}</span>
+            </div>
           ) : (
             <span />
           )}

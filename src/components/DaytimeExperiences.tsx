@@ -60,8 +60,9 @@ const ALL_EXPERIENCES = [
     duration: 'About 2.5 hours',
     groupSize: '2 per snowmobile',
     pickup: true,
-    badge: 'Partner',
-    priceFrom: 119 as number | undefined,
+    badge: 'RN10 · −10%',
+    priceFrom: 107.1 as number | undefined,
+    referencePrice: 119 as number | undefined,
     imagePosition: 'center',
   },
 ]

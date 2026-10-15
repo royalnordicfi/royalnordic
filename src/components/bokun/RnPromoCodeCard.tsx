@@ -61,8 +61,12 @@ export default function RnPromoCodeCard({ className = '', autoApplied = false }:
       </div>
 
       <p className="rn-promo-code__prices">
-        Example with {code}: adult €{adultRegular} → €{adultWithCode.toFixed(2)} · child €{childRegular}{' '}
-        → €{childWithCode.toFixed(2)}. Final total is confirmed in checkout.
+        Example with {code}: adult{' '}
+        <span className="rn-promo-code__was">€{adultRegular}</span>{' '}
+        <span className="rn-promo-code__now">€{adultWithCode.toFixed(2)}</span>
+        {' · '}child <span className="rn-promo-code__was">€{childRegular}</span>{' '}
+        <span className="rn-promo-code__now">€{childWithCode.toFixed(2)}</span>. Final total is
+        confirmed in checkout.
       </p>
     </div>
   )

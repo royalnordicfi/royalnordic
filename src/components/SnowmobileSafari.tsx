@@ -8,6 +8,7 @@ import ExperienceInclusions from './experience/ExperienceInclusions'
 import ExperienceAccordion from './experience/ExperienceAccordion'
 import BokunExperienceCalendar from './bokun/BokunExperienceCalendar'
 import RnPromoCodeCard from './bokun/RnPromoCodeCard'
+import SalePrice from './SalePrice'
 import {
   BOKUN_SNOWMOBILE_EXPERIENCE_ID,
   RN_SNOWMOBILE_PROMO,
@@ -111,7 +112,8 @@ const scrollToBook = () => {
  * Booking and payment run entirely in the Bókun widget (no Stripe for this product).
  */
 const SnowmobileSafari = () => {
-  const { adultRegular, childRegular, privateFrom, code } = RN_SNOWMOBILE_PROMO
+  const { adultRegular, adultWithCode, childRegular, childWithCode, privateFrom, code, percent } =
+    RN_SNOWMOBILE_PROMO
 
   return (
     <div className="rn-page pb-24 lg:pb-0">
@@ -128,7 +130,7 @@ const SnowmobileSafari = () => {
         proof={
           <p>
             Sold by Royal Nordic · Delivered by Lapland Legacy · Book online with exclusive code{' '}
-            <strong className="text-aurora-soft">{code}</strong>
+            <strong className="text-aurora-soft">{code}</strong> (−{percent}%)
           </p>
         }
         heroAction={
@@ -136,10 +138,16 @@ const SnowmobileSafari = () => {
             <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
               Check availability
             </button>
-            <p className="text-sm text-text-muted">
-              From <span className="font-semibold text-white">€{adultRegular}</span> / adult · €
-              {childRegular} / child (3–14)
-            </p>
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm text-text-muted">
+              <span className="rn-tour-card__was text-[1.05rem]">€{adultRegular}</span>
+              <span className="font-display text-xl font-semibold text-[var(--rn-sale)]">
+                €{adultWithCode.toFixed(2)}
+              </span>
+              <span>/ adult with {code}</span>
+              <span className="text-text-dim">
+                · child €{childRegular} → €{childWithCode.toFixed(2)}
+              </span>
+            </div>
           </>
         }
         images={GALLERY}
@@ -152,19 +160,18 @@ const SnowmobileSafari = () => {
         booking={
           <div className="rn-book-panel-light rn-book-signature rn-book-aside">
             <div className="rn-book-aside__summary">
-              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-panel-muted">
-                From
-              </p>
-              <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                <p className="font-display text-[1.45rem] font-semibold leading-none tracking-tight text-panel-ink">
-                  €{adultRegular}
-                </p>
-                <span className="text-[12px] text-panel-muted">/ adult</span>
-                <span className="text-[12px] text-panel-muted">· €{childRegular} / child</span>
-              </div>
+              <SalePrice
+                current={adultWithCode}
+                reference={adultRegular}
+                note={`/ adult with ${code}`}
+                size="sm"
+                tone="light"
+                compact
+                showBadge
+              />
               <p className="mt-2 text-[11.5px] leading-snug text-panel-muted">
-                Private from €{privateFrom} · Prices match Lapland Legacy; checkout totals come from
-                Bókun.
+                Child €{childRegular} → €{childWithCode.toFixed(2)} with {code} · Private from €
+                {privateFrom}. Retail matches Lapland Legacy; enter {code} in Bókun for the discount.
               </p>
               <ul className="rn-book-aside__trust" aria-label="Booking reassurances">
                 <li>
@@ -343,9 +350,9 @@ const SnowmobileSafari = () => {
       </ExperienceProductLayout>
 
       <MobileBookingBar
-        priceFrom={adultRegular}
-        priceNote="/ adult"
-        ctaLabel="Check availability"
+        priceFrom={adultWithCode}
+        referencePrice={adultRegular}
+        label="Check availability"
         onBook={scrollToBook}
       />
       <Footer />
