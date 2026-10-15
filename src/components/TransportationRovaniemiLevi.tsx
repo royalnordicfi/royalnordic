@@ -7,6 +7,7 @@ import ExperienceItinerary from './experience/ExperienceItinerary'
 import ExperienceInclusions from './experience/ExperienceInclusions'
 import ExperienceAccordion from './experience/ExperienceAccordion'
 import BookingAside from './experience/BookingAside'
+import { FIXED_TRANSFER_CAPACITY_LABEL, LEVI_VEHICLE_PRICE } from '../lib/transferPricing'
 
 const GALLERY = [
   { src: '/royal-trans-2.jpg', alt: 'Private transfer between Rovaniemi and Levi' },
@@ -15,7 +16,7 @@ const GALLERY = [
 ]
 
 const HIGHLIGHTS = [
-  'Private vehicle with driver — up to 8 passengers',
+  'Private vehicle with driver — up to 8 passengers subject to luggage',
   'Direct Rovaniemi ↔ Levi/Kittilä route, about 2–3 hours',
   'Flexible pickup times; quote confirmed by email after request',
 ]
@@ -35,7 +36,7 @@ const TransportationRovaniemiLevi = () => {
 
   /** Indicative per-vehicle rate for quote requests (not online checkout). */
   const pricing = {
-    vehicle: 399,
+    vehicle: LEVI_VEHICLE_PRICE,
   }
   const inputClass = 'rn-form-input'
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -106,7 +107,7 @@ const TransportationRovaniemiLevi = () => {
 
   const included = [
     'Private vehicle with professional driver',
-    'Comfortable seating for up to 8 passengers',
+    'Comfortable seating for up to 8 passengers (subject to luggage)',
     'Flexible departure times',
     'Direct route to Levi/Kittilä ski resorts',
     'Luggage assistance',
@@ -141,11 +142,11 @@ const TransportationRovaniemiLevi = () => {
         ]}
         eyebrow="Lapland · Ski resort transfer"
         title="Private Transportation: Rovaniemi – Levi/Kittilä"
-        lede="Private transfer between Rovaniemi and Levi/Kittilä — indicative from €399 per vehicle, up to 8 passengers."
+        lede={`Private transfer between Rovaniemi and Levi/Kittilä — indicative from €${LEVI_VEHICLE_PRICE} per vehicle, ${FIXED_TRANSFER_CAPACITY_LABEL.toLowerCase()}.`}
         images={GALLERY}
         facts={[
           { label: 'Duration', value: '2–3 hours' },
-          { label: 'Capacity', value: 'Up to 8' },
+          { label: 'Capacity', value: FIXED_TRANSFER_CAPACITY_LABEL },
           { label: 'Route', value: 'Rovaniemi → Levi/Kittilä' },
           { label: 'From', value: `€${pricing.vehicle} / vehicle` },
         ]}
@@ -155,7 +156,7 @@ const TransportationRovaniemiLevi = () => {
             priceNote="/ vehicle (indicative)"
             trustLines={[
               'Per vehicle pricing',
-              'Up to 8 passengers',
+              FIXED_TRANSFER_CAPACITY_LABEL,
               'Flexible pickup',
               'Confirmed by email',
             ]}

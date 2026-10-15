@@ -17,6 +17,7 @@ serve(async (req) => {
   }
 
   try {
+    const body = await req.json()
     const {
       name,
       email,
@@ -28,9 +29,27 @@ serve(async (req) => {
       preferredDate,
       preferredTime,
       groupSize,
+      tripType,
+      returnDate,
+      returnTime,
+      adults,
+      children,
+      infants,
+      totalPassengers,
+      largeSuitcases,
+      smallBags,
+      specialLuggage,
+      specialRequirements,
       to,
-      subject
-    } = await req.json()
+      subject,
+    } = body
+
+    if (!name || !email) {
+      return new Response(
+        JSON.stringify({ error: 'Name and email are required' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 },
+      )
+    }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
@@ -42,7 +61,7 @@ serve(async (req) => {
       console.log('Resend configuration missing, cannot send email')
       return new Response(
         JSON.stringify({ error: 'Email service not configured' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 },
       )
     }
 
@@ -60,7 +79,7 @@ serve(async (req) => {
           preferred_time: preferredTime || '',
           group_size: groupSize || '',
           additional_info: additionalInfo || '',
-          status: 'new'
+          status: 'new',
         })
 
       if (insertError) {
@@ -81,6 +100,26 @@ serve(async (req) => {
     const safeDate = preferredDate ? String(preferredDate) : 'Not provided'
     const safeTime = preferredTime ? String(preferredTime) : 'Not provided'
     const safeGroup = groupSize ? String(groupSize) : 'Not specified'
+    const safeTrip =
+      tripType === 'round_trip' ? 'Round trip' : tripType === 'one_way' ? 'One way' : 'Not specified'
+    const safeReturn =
+      tripType === 'round_trip'
+        ? `${returnDate || '—'} ${returnTime || ''}`.trim()
+        : 'N/A'
+    const safePax =
+      totalPassengers != null
+        ? String(totalPassengers)
+        : adults != null || children != null || infants != null
+          ? `${adults ?? 0} adults, ${children ?? 0} children, ${infants ?? 0} infants`
+          : 'Not specified'
+    const safeLuggage = [
+      largeSuitcases != null ? `${largeSuitcases} large` : null,
+      smallBags != null ? `${smallBags} small/carry-on` : null,
+    ]
+      .filter(Boolean)
+      .join(', ') || 'Not specified'
+    const safeSpecialLuggage = specialLuggage ? String(specialLuggage) : 'N/A'
+    const safeSpecialReq = specialRequirements ? String(specialRequirements) : 'N/A'
     const safeInfo = additionalInfo ? String(additionalInfo) : 'N/A'
 
     const emailContent = `
@@ -90,13 +129,23 @@ Customer Details:
 - Name: ${safeName}
 - Email: ${safeEmail}
 - Phone: ${safePhone}
-- Destination: ${safeDestination}
-- Pickup Details: ${safePickup}
-- Preferred Date: ${safeDate}
-- Preferred Time: ${safeTime}
-- Group Size: ${safeGroup}
 
-Additional Information:
+Journey:
+- Pickup: ${safePickup}
+- Destination: ${safeDestination}
+- Date: ${safeDate}
+- Pickup time: ${safeTime}
+- Trip type: ${safeTrip}
+- Return: ${safeReturn}
+
+Group & luggage:
+- Passengers: ${safeGroup}
+- Total passengers: ${safePax}
+- Luggage: ${safeLuggage}
+- Additional luggage / equipment: ${safeSpecialLuggage}
+- Special requirements: ${safeSpecialReq}
+
+Additional information:
 ${safeInfo}
 
 This request was submitted through your website's transportation form.
@@ -104,11 +153,16 @@ This request was submitted through your website's transportation form.
 
     const details: DetailRow[] = [
       { label: 'Service', value: safeService },
-      { label: 'Destination', value: safeDestination },
       { label: 'Pickup', value: safePickup },
+      { label: 'Destination', value: safeDestination },
       { label: 'Preferred date', value: safeDate },
       { label: 'Preferred time', value: safeTime },
-      { label: 'Group size', value: safeGroup },
+      { label: 'Trip type', value: safeTrip },
+      { label: 'Return', value: safeReturn },
+      { label: 'Passengers', value: safeGroup },
+      { label: 'Luggage', value: safeLuggage },
+      { label: 'Additional luggage / equipment', value: safeSpecialLuggage },
+      { label: 'Special requirements', value: safeSpecialReq },
       { label: 'Additional information', value: safeInfo },
     ]
 
@@ -135,12 +189,17 @@ This request was submitted through your website's transportation form.
             <p><strong>Name:</strong> ${escapeHtml(safeName)}</p>
             <p><strong>Email:</strong> ${escapeHtml(safeEmail)}</p>
             <p><strong>Phone:</strong> ${escapeHtml(safePhone)}</p>
+            <p><strong>Pickup:</strong> ${escapeHtml(safePickup)}</p>
             <p><strong>Destination:</strong> ${escapeHtml(safeDestination)}</p>
-            <p><strong>Pickup Details:</strong> ${escapeHtml(safePickup)}</p>
-            <p><strong>Preferred Date:</strong> ${escapeHtml(safeDate)}</p>
-            <p><strong>Preferred Time:</strong> ${escapeHtml(safeTime)}</p>
-            <p><strong>Group Size:</strong> ${escapeHtml(safeGroup)}</p>
-            <p><strong>Additional Information:</strong></p>
+            <p><strong>Date:</strong> ${escapeHtml(safeDate)}</p>
+            <p><strong>Pickup time:</strong> ${escapeHtml(safeTime)}</p>
+            <p><strong>Trip type:</strong> ${escapeHtml(safeTrip)}</p>
+            <p><strong>Return:</strong> ${escapeHtml(safeReturn)}</p>
+            <p><strong>Passengers:</strong> ${escapeHtml(safeGroup)}</p>
+            <p><strong>Luggage:</strong> ${escapeHtml(safeLuggage)}</p>
+            <p><strong>Additional luggage / equipment:</strong> ${escapeHtml(safeSpecialLuggage)}</p>
+            <p><strong>Special requirements:</strong> ${escapeHtml(safeSpecialReq)}</p>
+            <p><strong>Additional information:</strong></p>
             <p style="white-space:pre-wrap;">${escapeHtml(safeInfo)}</p>
             <hr>
             <p><em>This request was submitted through your website's transportation form.</em></p>
@@ -166,23 +225,33 @@ This request was submitted through your website's transportation form.
 
       console.log('Business response status:', businessResponse.status)
       console.log('Customer response status:', customerResponse.status)
+
+      if (!businessResponse.ok) {
+        const errText = await businessResponse.text()
+        console.error('Business email failed:', errText)
+        return new Response(
+          JSON.stringify({ error: 'Failed to send transportation request emails' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 },
+        )
+      }
+
       console.log('Transportation request emails sent successfully')
       return new Response(
         JSON.stringify({ success: true, message: 'Transportation request emails sent successfully' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       )
     } catch (emailError) {
       console.error('Email Error:', emailError)
       return new Response(
         JSON.stringify({ error: 'Failed to send transportation request emails' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 },
       )
     }
   } catch (error) {
     console.error('Function Error:', error)
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 },
     )
   }
 })

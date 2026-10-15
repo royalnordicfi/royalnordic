@@ -3,7 +3,11 @@ import CategoryHero from './CategoryHero'
 import CategoryPageEnd from './CategoryPageEnd'
 import Footer from './Footer'
 import TourCard from './TourCard'
-import { SAARISELKA_VEHICLE_PRICE } from './TransportationSaariselka'
+import {
+  FIXED_TRANSFER_CAPACITY_LABEL,
+  LEVI_VEHICLE_PRICE,
+  SAARISELKA_VEHICLE_PRICE,
+} from '../lib/transferPricing'
 
 const TRANSFERS = [
   {
@@ -13,7 +17,7 @@ const TRANSFERS = [
     title: 'Rovaniemi ⇄ Saariselkä',
     description: 'Private door-to-door transfer. Flat rate per vehicle, one way — book and pay online.',
     duration: '3–3.5 hours',
-    groupSize: 'Up to 8',
+    groupSize: FIXED_TRANSFER_CAPACITY_LABEL,
     pickup: true,
     badge: 'Book online',
     priceFrom: SAARISELKA_VEHICLE_PRICE,
@@ -27,10 +31,10 @@ const TRANSFERS = [
     title: 'Rovaniemi – Levi / Kittilä',
     description: 'Private vehicle with professional driver. Request timing and we confirm by email.',
     duration: '2–3 hours',
-    groupSize: 'Up to 8',
+    groupSize: FIXED_TRANSFER_CAPACITY_LABEL,
     pickup: true,
     badge: 'On request',
-    priceFrom: 399,
+    priceFrom: LEVI_VEHICLE_PRICE,
     priceUnit: '/ vehicle (indicative)',
     ctaLabel: 'Request transfer',
   },
@@ -39,13 +43,14 @@ const TRANSFERS = [
     image: '/royal-trans-3.jpg',
     imageAlt: 'Custom Lapland transportation',
     title: 'Customized Transportation',
-    description: 'Airport pickups, multi-stop days, and routes across Finnish Lapland on request.',
-    duration: 'Flexible',
-    groupSize: 'Up to 8',
-    pickup: true,
+    description:
+      'Airport pickups, multi-stop days, and routes for groups of any size — we arrange suitable vehicles.',
+    duration: 'Flexible group sizes',
+    groupSize: 'Custom routes · Private transportation',
+    pickup: false,
     badge: 'On request',
     priceFrom: undefined as number | undefined,
-    priceUnit: '/ vehicle',
+    priceUnit: '/ quote',
     ctaLabel: 'Request quote',
   },
 ]
@@ -88,8 +93,9 @@ const TransportationCategory = () => {
             <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">How pricing works</h2>
             <p className="mt-3 text-sm leading-relaxed text-text-muted sm:text-[15px]">
               Fixed-route transfers are priced per vehicle, not per passenger. The Saariselkä route can be
-              booked and paid online at €{SAARISELKA_VEHICLE_PRICE} one way. Levi/Kittilä and custom routes
-              are confirmed by request so we can match your flight and luggage needs.
+              booked and paid online at €{SAARISELKA_VEHICLE_PRICE} one way. Levi/Kittilä (from €
+              {LEVI_VEHICLE_PRICE}) and custom routes for any group size are confirmed by request so we can
+              match your flight, luggage and fleet needs.
             </p>
           </div>
         </div>

@@ -75,7 +75,7 @@ const TravelTrade: React.FC = () => {
     },
     {
       title: 'Private transfers',
-      detail: 'Rovaniemi–Saariselkä (€649/vehicle online), Levi/Kittilä routes, and airport pickups.',
+      detail: 'Rovaniemi–Saariselkä (€849/vehicle online), Levi/Kittilä routes, and airport pickups.',
       to: '/transportation',
     },
     {

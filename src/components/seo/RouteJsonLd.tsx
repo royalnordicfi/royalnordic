@@ -21,7 +21,7 @@ const organization = {
     'Premium Lapland tours from Rovaniemi — Northern Lights, daytime adventures, and private transfers in Finnish Lapland.',
   telephone: '+3584578345138',
   email: 'contact@royalnordic.fi',
-  priceRange: '€59-€399',
+  priceRange: '€59-€849',
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Rovaniemi',

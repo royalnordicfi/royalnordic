@@ -9,23 +9,27 @@ import ExperienceAccordion from './experience/ExperienceAccordion'
 import BookingAside from './experience/BookingAside'
 import TourSection from './tour/TourSection'
 import { useCmsTourPresentation, type TourPageFallback } from '../hooks/useCmsTourPresentation'
+import {
+  FIXED_TRANSFER_CAPACITY_LABEL,
+  SAARISELKA_TOUR_ID,
+  SAARISELKA_VEHICLE_PRICE,
+} from '../lib/transferPricing'
 
-export const SAARISELKA_TOUR_ID = 9
-export const SAARISELKA_VEHICLE_PRICE = 649
+export { SAARISELKA_TOUR_ID, SAARISELKA_VEHICLE_PRICE }
 
 const FALLBACK: TourPageFallback = {
   title: 'Rovaniemi ⇄ Saariselkä Private Transfer',
-  lede: 'Private door-to-door transfer between Rovaniemi and Saariselkä. €649 per vehicle, one way.',
+  lede: `Private door-to-door transfer between Rovaniemi and Saariselkä. €${SAARISELKA_VEHICLE_PRICE} per vehicle, one way.`,
   adultPrice: SAARISELKA_VEHICLE_PRICE,
   childPrice: SAARISELKA_VEHICLE_PRICE,
   maxCapacity: 8,
   duration: 'About 3–3.5 hours',
-  groupSize: 'Up to 8 passengers / vehicle',
+  groupSize: FIXED_TRANSFER_CAPACITY_LABEL,
   pickupFact: 'Airport, hotel or accommodation',
   description:
     'Private vehicle with professional driver between Rovaniemi and Saariselkä. Price is per vehicle for one way — changing passenger count within capacity does not change the fare. Confirm direction, pickup time, flight number and luggage when you book.',
   benefits: [
-    '€649 flat rate per vehicle, one way',
+    `€${SAARISELKA_VEHICLE_PRICE} flat rate per vehicle, one way`,
     'Door-to-door: airport, hotel or accommodation',
     'Up to 8 passengers depending on luggage',
   ],
@@ -44,7 +48,7 @@ const FALLBACK: TourPageFallback = {
   ],
   faqs: [
     {
-      question: 'Is €649 per person or per vehicle?',
+      question: `Is €${SAARISELKA_VEHICLE_PRICE} per person or per vehicle?`,
       answer:
         'Per vehicle, one way. Passenger count within capacity (up to 8, luggage dependent) does not multiply the price.',
     },
@@ -69,6 +73,8 @@ const FALLBACK: TourPageFallback = {
 
 const TransportationSaariselka = () => {
   const cms = useCmsTourPresentation(SAARISELKA_TOUR_ID, FALLBACK)
+  /** Public rate SoT in code — keep `tours.adult_price` (id 9) in sync for Stripe checkout */
+  const vehiclePrice = SAARISELKA_VEHICLE_PRICE
 
   const scrollToBook = () => {
     document.getElementById('book')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -84,20 +90,24 @@ const TransportationSaariselka = () => {
         ]}
         eyebrow="Private transfer · Per vehicle"
         title={cms.title}
-        lede={cms.lede}
+        lede={
+          cms.tour
+            ? `Private door-to-door transfer between Rovaniemi and Saariselkä. €${vehiclePrice} per vehicle, one way.`
+            : cms.lede
+        }
         images={cms.gallery}
         facts={[
-          { label: 'Price', value: `€${cms.adultPrice} / vehicle` },
+          { label: 'Price', value: `€${vehiclePrice} / vehicle` },
           { label: 'Duration', value: cms.duration || 'About 3–3.5 hours' },
-          { label: 'Capacity', value: cms.groupSize || 'Up to 8' },
+          { label: 'Capacity', value: cms.groupSize || FIXED_TRANSFER_CAPACITY_LABEL },
           { label: 'Pickup', value: cms.pickupFact },
         ]}
         booking={
           <BookingAside
-            priceFrom={cms.pricing.current}
+            priceFrom={vehiclePrice}
             priceNote="/ vehicle · one way"
             trustLines={[
-              '€649 flat / vehicle',
+              `€${vehiclePrice} flat / vehicle`,
               'Secure payment',
               'Airport or hotel',
               'Free cancellation',
@@ -109,8 +119,8 @@ const TransportationSaariselka = () => {
               <BookingForm
                 tourId={SAARISELKA_TOUR_ID}
                 tourName={cms.bookingTourName}
-                adultPrice={cms.adultPrice}
-                childPrice={cms.childPrice}
+                adultPrice={vehiclePrice}
+                childPrice={vehiclePrice}
                 maxCapacity={cms.maxCapacity}
                 pricingModel="per_vehicle"
                 chrome="embedded"
@@ -159,7 +169,7 @@ const TransportationSaariselka = () => {
 
       <Footer />
       <MobileBookingBar
-        priceFrom={cms.pricing.current}
+        priceFrom={vehiclePrice}
         onBook={scrollToBook}
         label="Book transfer"
       />

@@ -1,9 +1,12 @@
 import SalePrice from '../SalePrice'
 
 type Props = {
-  priceFrom: number
+  /** Omit for quote-only panels (custom transportation) */
+  priceFrom?: number
   referencePrice?: number
   priceNote?: string
+  /** Replaces the “From €X” row when priceFrom is omitted */
+  quoteLabel?: string
   trustLines?: string[]
   offerLine?: string
   children: React.ReactNode
@@ -18,6 +21,7 @@ export default function BookingAside({
   priceFrom,
   referencePrice,
   priceNote = '/ adult',
+  quoteLabel,
   trustLines = [
     'Free cancellation up to 24h before',
     'Secure Stripe payment',
@@ -27,22 +31,25 @@ export default function BookingAside({
   children,
   className = '',
 }: Props) {
-  const showSale = typeof referencePrice === 'number' && referencePrice > priceFrom
+  const showSale =
+    typeof priceFrom === 'number' &&
+    typeof referencePrice === 'number' &&
+    referencePrice > priceFrom
   const trust = trustLines.slice(0, 4)
 
   return (
     <div className={`rn-book-panel-light rn-book-signature rn-book-aside ${className}`}>
       <div className="rn-book-aside__summary">
-        {showSale ? (
+        {showSale && typeof priceFrom === 'number' ? (
           <SalePrice
             current={priceFrom}
-            reference={referencePrice}
+            reference={referencePrice!}
             note={priceNote}
             size="sm"
             tone="light"
             compact
           />
-        ) : (
+        ) : typeof priceFrom === 'number' ? (
           <>
             <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-panel-muted">From</p>
             <div className="mt-1 flex items-baseline gap-1.5">
@@ -51,6 +58,15 @@ export default function BookingAside({
               </p>
               <span className="text-[12px] text-panel-muted">{priceNote}</span>
             </div>
+          </>
+        ) : (
+          <>
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-panel-muted">
+              {quoteLabel || 'Personalized quote'}
+            </p>
+            <p className="mt-1.5 text-[13px] leading-snug text-panel-muted">
+              {priceNote || 'Tell us your route — we reply with a quote.'}
+            </p>
           </>
         )}
         {offerLine && !showSale ? (
