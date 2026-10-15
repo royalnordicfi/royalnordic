@@ -13,6 +13,5 @@ SET
     {"id":"h2","text":"Door-to-door: airport, hotel or accommodation","sort":1},
     {"id":"h3","text":"Up to 8 passengers depending on luggage","sort":2}
   ]'::jsonb,
-  seo_description = 'Book a private Rovaniemi–Saariselkä transfer from €849 per vehicle one way. Airport and hotel pickup across Finnish Lapland.',
-  updated_at = NOW()
+  seo_description = 'Book a private Rovaniemi–Saariselkä transfer from €849 per vehicle one way. Airport and hotel pickup across Finnish Lapland.'
 WHERE id = 9;
