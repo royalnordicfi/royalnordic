@@ -185,9 +185,20 @@ const SnowmobileSafari = () => {
           <h2 className="rn-tour-section__title">The experience</h2>
           <div className="rn-tour-section__body space-y-3 text-[15px] leading-relaxed text-text-muted">
             <p>
-              After a safety briefing, follow your guide into snowy forests around Rovaniemi. Two
-              adults share a snowmobile and may switch drivers. A short break with warm berry juice
-              and cookies is included; thermal clothing is provided.
+              See Lapland from a snowmobile on a guided safari through the winter wilderness around
+              Rovaniemi. After a clear safety briefing and driving instruction, follow your local
+              guide along snow-covered forest trails and across quiet frozen landscapes.
+            </p>
+            <p>
+              The route is designed as a welcoming introduction for first-time riders, with time to
+              settle into the machine and take in the nature and winter life around you. You get
+              approximately 1 hour 15 minutes of driving — two adults normally share each snowmobile
+              and can switch drivers along the way. Your guide sets the pace to the group and the
+              conditions of the day.
+            </p>
+            <p>
+              Warm winter clothing and safety equipment are provided. A short stop with hot berry
+              juice and cookies closes the outing before your return transfer.
             </p>
             <p>
               Sold by Royal Nordic · Operated by Lapland Legacy · Booked in Bókun on this page.
