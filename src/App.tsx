@@ -49,6 +49,7 @@ import TermsConditions from './components/TermsConditions';
 import ScrollToTop from './components/ScrollToTop';
 import WhatsAppWidget from './components/WhatsAppWidget';
 import SnowmobileSafari from './components/SnowmobileSafari';
+import ReindeerRides from './components/ReindeerRides';
 import MonsterTruckNorthernLights from './components/MonsterTruckNorthernLights';
 import RoutePageMeta from './components/RoutePageMeta';
 import RouteJsonLd from './components/seo/RouteJsonLd';
@@ -148,6 +149,7 @@ function App() {
           <Route path="/travel-trade" element={<TravelTrade />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/snowmobile-safari" element={<SnowmobileSafari />} />
+          <Route path="/reindeer-rides" element={<ReindeerRides />} />
           <Route
             path="/monster-truck-northern-lights"
             element={

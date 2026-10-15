@@ -1955,6 +1955,21 @@
   .rn-bokun__host iframe {
     max-width: 100%;
   }
+  .rn-bokun--product-list .rn-bokun__host {
+    min-height: 20rem;
+  }
+  .rn-reindeer-widget {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    border-radius: var(--rn-radius-md);
+    overflow: hidden;
+  }
+  .rn-reindeer-widget .bokunWidget,
+  .rn-reindeer-widget iframe {
+    width: 100% !important;
+    max-width: 100%;
+  }
   .rn-promo-code {
     display: flex;
     flex-direction: column;

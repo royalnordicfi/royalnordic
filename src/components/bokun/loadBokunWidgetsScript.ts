@@ -1,41 +1,51 @@
-import { BOKUN_LOADER_SRC } from '../../lib/bokun'
+import { BOKUN_BOOKING_CHANNEL_UUID, bokunLoaderSrc } from '../../lib/bokun'
 
-const SCRIPT_ID = 'bokun-widgets-loader'
-let loadPromise: Promise<void> | null = null
+const promises = new Map<string, Promise<void>>()
+
+function scriptIdFor(channelUuid: string) {
+  return `bokun-widgets-loader-${channelUuid}`
+}
 
 /**
- * Loads the official Bókun WidgetsLoader once per page session.
- * Safe for SPA navigation — does not inject duplicates.
+ * Loads the official Bókun WidgetsLoader for a booking channel.
+ * One script tag per channel — partners (Lapland Legacy, Santa Claus Reindeer)
+ * must not share a single channel UUID.
  */
-export function loadBokunWidgetsScript(): Promise<void> {
+export function loadBokunWidgetsScript(
+  bookingChannelUUID: string = BOKUN_BOOKING_CHANNEL_UUID,
+): Promise<void> {
   if (typeof document === 'undefined') return Promise.resolve()
 
-  const existing = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null
+  const id = scriptIdFor(bookingChannelUUID)
+  const existing = document.getElementById(id) as HTMLScriptElement | null
   if (existing) {
+    const cached = promises.get(bookingChannelUUID)
+    if (cached) return cached
     if ((window as unknown as { BokunWidgetsLoader?: unknown }).BokunWidgetsLoader) {
       return Promise.resolve()
     }
-    return (
-      loadPromise ??
-      new Promise((resolve, reject) => {
-        existing.addEventListener('load', () => resolve(), { once: true })
-        existing.addEventListener('error', () => reject(new Error('Bókun loader failed')), {
-          once: true,
-        })
+    const pending = new Promise<void>((resolve, reject) => {
+      existing.addEventListener('load', () => resolve(), { once: true })
+      existing.addEventListener('error', () => reject(new Error('Bókun loader failed')), {
+        once: true,
       })
-    )
+    })
+    promises.set(bookingChannelUUID, pending)
+    return pending
   }
 
-  loadPromise = new Promise((resolve, reject) => {
+  const loadPromise = new Promise<void>((resolve, reject) => {
     const script = document.createElement('script')
-    script.id = SCRIPT_ID
-    script.src = BOKUN_LOADER_SRC
+    script.id = id
+    script.src = bokunLoaderSrc(bookingChannelUUID)
     script.async = true
+    script.dataset.bokunChannel = bookingChannelUUID
     script.onload = () => resolve()
     script.onerror = () => reject(new Error('Bókun loader failed to load'))
     document.head.appendChild(script)
   })
 
+  promises.set(bookingChannelUUID, loadPromise)
   return loadPromise
 }
 

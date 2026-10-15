@@ -83,6 +83,11 @@ const META: Record<
       "Explore snowy Arctic forests on a guided snowmobile safari in Rovaniemi. Discover Lapland's winter wilderness and enjoy an exclusive Royal Nordic offer.",
     ogImage: 'https://royalnordic.fi/snowmobiling1.jpg',
   },
+  '/reindeer-rides': {
+    title: 'Reindeer Rides in Rovaniemi | Royal Nordic',
+    description: 'Experience the magic of Lapland with reindeer rides near Santa Claus Village, Rovaniemi.',
+    ogImage: 'https://royalnordic.fi/snowshoe3.jpg',
+  },
   '/monster-truck-northern-lights': {
     title: 'Monster Truck Northern Lights | Request Availability | Royal Nordic',
     description: 'Partner monster-truck aurora experience from Rovaniemi. Request availability and a quote.',
