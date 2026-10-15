@@ -12,6 +12,8 @@ type Props = {
   booking: React.ReactNode
   /** Optional note/link under the sticky booking card (outside the sticky box) */
   bookingBelow?: React.ReactNode
+  /** Placed directly under the gallery (before facts / editorial) */
+  afterGallery?: React.ReactNode
   children: React.ReactNode
   afterContent?: React.ReactNode
   proof?: React.ReactNode
@@ -33,6 +35,7 @@ export default function ExperienceProductLayout({
   facts,
   booking,
   bookingBelow,
+  afterGallery,
   children,
   afterContent,
   proof,
@@ -84,6 +87,8 @@ export default function ExperienceProductLayout({
                 <ExperienceGallery images={images} />
               </div>
             ) : null}
+
+            {afterGallery ? <div className="mt-5 sm:mt-6">{afterGallery}</div> : null}
 
             {facts.length > 0 ? (
               <div className="mt-6 sm:mt-7">
