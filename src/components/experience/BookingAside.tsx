@@ -52,14 +52,14 @@ export default function BookingAside({
         ) : typeof priceFrom === 'number' ? (
           <>
             <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-panel-muted">From</p>
-            <div className="mt-1.5 flex items-baseline gap-1.5">
+            <div className="mt-1 flex items-baseline gap-1.5">
               <p
-                className="text-[1.7rem] font-bold leading-none tracking-tight text-panel-ink"
+                className="rn-book-aside__price font-bold leading-none tracking-tight text-panel-ink"
                 style={{ fontFamily: 'var(--rn-font-body)' }}
               >
                 €{priceFrom}
               </p>
-              <span className="text-[12px] font-medium text-panel-muted">{priceNote}</span>
+              <span className="text-[11.5px] font-medium text-panel-muted">{priceNote}</span>
             </div>
           </>
         ) : (
@@ -67,13 +67,13 @@ export default function BookingAside({
             <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-panel-muted">
               {quoteLabel || 'Personalized quote'}
             </p>
-            <p className="mt-1.5 text-[13px] leading-snug text-panel-muted">
+            <p className="mt-1 text-[12.5px] leading-snug text-panel-muted">
               {priceNote || 'Tell us your route — we reply with a quote.'}
             </p>
           </>
         )}
         {offerLine && !showSale ? (
-          <p className="mt-2 text-[11.5px] leading-snug text-panel-muted">
+          <p className="mt-1.5 text-[11px] leading-snug text-panel-muted">
             <span className="font-medium text-panel-ink">Direct booking · </span>
             {offerLine}
           </p>

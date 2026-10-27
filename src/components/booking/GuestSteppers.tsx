@@ -9,6 +9,8 @@ type Props = {
   formatMoney: (n: number) => string
   /** Overrides the default per-vehicle pricing note. */
   priceNote?: string
+  /** Private groups use “guests”; transfers use “passengers”. */
+  partyNoun?: 'guests' | 'passengers'
 }
 
 export default function GuestSteppers({
@@ -21,8 +23,10 @@ export default function GuestSteppers({
   onChange,
   formatMoney,
   priceNote,
+  partyNoun = 'guests',
 }: Props) {
   const perVehicle = pricingModel === 'per_vehicle'
+  const usePassengers = perVehicle && partyNoun === 'passengers'
   const party = adults + children
   const room = Math.max(0, maxGuests - party)
 
@@ -42,7 +46,9 @@ export default function GuestSteppers({
     <div className="rn-guest-steppers">
       <div className="rn-guest-steppers__row">
         <div>
-          <p className="rn-book-widget__label">{perVehicle ? 'Passengers (adults)' : 'Adults'}</p>
+          <p className="rn-book-widget__label">
+            {usePassengers ? 'Passengers (adults)' : perVehicle ? 'Adults in your group' : 'Adults'}
+          </p>
           <p className="rn-guest-steppers__meta">
             {perVehicle ? 'Age 18+' : `Age 18+ · €${formatMoney(adultPrice)}`}
           </p>
@@ -65,7 +71,9 @@ export default function GuestSteppers({
 
       <div className="rn-guest-steppers__row">
         <div>
-          <p className="rn-book-widget__label">{perVehicle ? 'Passengers (children)' : 'Children'}</p>
+          <p className="rn-book-widget__label">
+            {usePassengers ? 'Passengers (children)' : perVehicle ? 'Children in your group' : 'Children'}
+          </p>
           <p className="rn-guest-steppers__meta">
             {perVehicle ? 'Age 0–17' : `Age 0–17 · €${formatMoney(childPrice)}`}
           </p>

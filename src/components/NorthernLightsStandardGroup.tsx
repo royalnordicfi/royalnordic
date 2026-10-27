@@ -176,13 +176,6 @@ const NorthernLightsStandardGroup = () => {
             />
           </BookingAside>
         }
-        bookingBelow={
-          <p className="mt-3 text-center text-sm text-text-muted">
-            <Link to="/northern-lights-tour" className="font-medium text-aurora-soft hover:underline">
-              Prefer a small group with hotel pickup?
-            </Link>
-          </p>
-        }
       >
         <TourSection eyebrow="About" title="About this experience">
           <p className="leading-relaxed text-text-muted">

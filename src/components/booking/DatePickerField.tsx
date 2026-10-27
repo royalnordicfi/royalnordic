@@ -82,12 +82,13 @@ function computePlacement(trigger: DOMRect, panelHeight: number): PanelPlacement
       top: trigger.bottom + GAP,
       left,
       width,
-      maxHeight: Math.min(estimated + 24, spaceBelow),
+      // Cap to free space under the trigger — content can scroll if needed.
+      maxHeight: spaceBelow,
       placement: 'below',
     }
   }
 
-  const maxHeight = Math.min(estimated + 24, spaceAbove)
+  const maxHeight = spaceAbove
   const rendered = Math.min(estimated, maxHeight)
   const top = Math.max(topBound, trigger.top - GAP - rendered)
   return {

@@ -195,6 +195,7 @@ export default function BookingWidget({
             pricingModel={pricingModel}
             formatMoney={formatEuroAmount}
             priceNote={guestPriceNote}
+            partyNoun={requiresHotelPickup || !perVehicle ? 'guests' : 'passengers'}
             onChange={({ adults: a, children: c }) => {
               setAdults(a)
               setChildren(c)

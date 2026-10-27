@@ -7,7 +7,7 @@
  * product — experience / booking pages; content starts below chrome + breath
  * standard — editorial / form / legal / utility; content starts below chrome
  */
-export type ShellMode = 'overlay' | 'product' | 'standard'
+export type ShellMode = 'overlay' | 'product' | 'standard' | 'checkout'
 
 /** Only intentional cinematic / category heroes may overlay photography. */
 const OVERLAY_EXACT = new Set([
@@ -37,7 +37,17 @@ const PRODUCT_EXACT = new Set([
   '/transportation-customized',
 ])
 
+/** Logo-only chrome — no promo bar, main nav, or floating widgets. */
+export function isMinimalChromePath(pathname: string): boolean {
+  return (
+    pathname === '/checkout' ||
+    pathname.startsWith('/payment-') ||
+    pathname.startsWith('/crypto-payment')
+  )
+}
+
 export function resolveShellMode(pathname: string): ShellMode {
+  if (pathname === '/checkout') return 'checkout'
   if (OVERLAY_EXACT.has(pathname)) return 'overlay'
   if (PRODUCT_EXACT.has(pathname)) return 'product'
   if (pathname.startsWith('/blog/')) return 'standard'

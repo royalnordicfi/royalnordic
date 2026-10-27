@@ -20,7 +20,18 @@ import {
 import { WINTER_PROMOTION } from '../config/winterPromotion'
 import { CHECKOUT_RETURN_PATH_KEY } from './PaymentCancelled'
 import { useTourAvailability } from '../hooks/useTourAvailability'
-import Footer from './Footer'
+import { useTourCms } from '../hooks/useTourCms'
+
+function CheckoutBrandBar() {
+  return (
+    <header className="rn-checkout-brand">
+      <Link to="/" className="rn-checkout-brand__link" aria-label="Royal Nordic home">
+        <img src="/logo.png" alt="" width={28} height={28} className="rn-checkout-brand__mark" />
+        <span className="rn-checkout-brand__name">Royal Nordic</span>
+      </Link>
+    </header>
+  )
+}
 
 export default function CheckoutPage() {
   const navigate = useNavigate()
@@ -61,6 +72,13 @@ export default function CheckoutPage() {
     seasonEnd: draft?.seasonEnd,
     pricingModel: draft?.pricingModel,
   })
+
+  const { tour: cmsTour } = useTourCms(draft?.tourId || 0)
+  const summaryImage =
+    cmsTour?.hero_image_url ||
+    cmsTour?.gallery?.[0]?.url ||
+    cmsTour?.seo_image ||
+    ''
 
   // Sync live prices into draft when availability returns.
   useEffect(() => {
@@ -307,8 +325,9 @@ export default function CheckoutPage() {
 
   if (!draft) {
     return (
-      <div className="rn-page">
-        <main className="rn-container rn-checkout rn-checkout--empty">
+      <div className="rn-checkout-page">
+        <CheckoutBrandBar />
+        <main className="rn-checkout rn-checkout--empty">
           <h1 className="rn-checkout__title">Checkout</h1>
           <p className="rn-checkout__lede">
             No booking selection found. Choose a date on a tour page to continue.
@@ -317,7 +336,6 @@ export default function CheckoutPage() {
             Browse Northern Lights tours
           </Link>
         </main>
-        <Footer />
       </div>
     )
   }
@@ -326,8 +344,9 @@ export default function CheckoutPage() {
   const dateLabel = `${formatTourDateLong(draft.tourDateIso)}${departureSuffixForTour(draft.tourName, draft.departureTime)}`
 
   return (
-    <div className="rn-page">
-      <main className="rn-container rn-checkout">
+    <div className="rn-checkout-page">
+      <CheckoutBrandBar />
+      <main className="rn-checkout">
         <div className="rn-checkout__intro">
           <p className="rn-checkout__eyebrow">Secure checkout</p>
           <h1 className="rn-checkout__title">Complete your booking</h1>
@@ -465,6 +484,11 @@ export default function CheckoutPage() {
 
           <aside className="rn-checkout__summary">
             <div className="rn-checkout__summary-card">
+              {summaryImage ? (
+                <div className="rn-checkout__thumb">
+                  <img src={summaryImage} alt="" width={120} height={90} loading="lazy" decoding="async" />
+                </div>
+              ) : null}
               <p className="rn-checkout__eyebrow">Booking summary</p>
               <h2 className="rn-checkout__summary-title">{draft.tourName}</h2>
               <dl className="rn-checkout__summary-list">
@@ -528,7 +552,6 @@ export default function CheckoutPage() {
           </aside>
         </div>
       </main>
-      <Footer />
 
       {showCrypto ? (
         <div className="rn-checkout-modal" role="dialog" aria-modal="true" aria-label="Crypto booking">

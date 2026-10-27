@@ -53,7 +53,7 @@ export default function ExperienceProductLayout({
         <div
           className={
             booking
-              ? 'mt-5 grid gap-10 lg:mt-8 lg:grid-cols-12 lg:items-stretch lg:gap-x-14 xl:gap-x-16'
+              ? 'mt-5 grid gap-8 lg:mt-8 lg:grid-cols-12 lg:items-stretch lg:gap-x-10 xl:gap-x-14'
               : 'mt-5 lg:mt-8'
           }
         >

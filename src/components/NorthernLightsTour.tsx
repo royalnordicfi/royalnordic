@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from 'react'
-import { Link } from 'react-router-dom'
 import BookingWidget from './booking/BookingWidget'
 import Footer from './Footer'
 import MobileBookingBar from './MobileBookingBar'
@@ -194,20 +193,6 @@ const NorthernLightsTour = () => {
               />
             )}
           </BookingAside>
-        }
-        bookingBelow={
-          <p className="text-center text-[12px] text-text-muted">
-            <Link to="/northern-lights-tours" className="font-medium text-aurora-soft hover:underline">
-              Compare Northern Lights tours
-            </Link>
-            {' · '}
-            <Link
-              to="/northern-lights-private-tour"
-              className="font-medium text-aurora-soft hover:underline"
-            >
-              Private group option
-            </Link>
-          </p>
         }
         afterContent={
           <>

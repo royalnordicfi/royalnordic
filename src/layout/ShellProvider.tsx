@@ -1,6 +1,7 @@
 import { useLayoutEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { resolveShellMode, type ShellMode } from './shell'
+import { setPromoBarCssVar } from '../lib/winterPromotion'
 
 /**
  * Syncs shell mode onto <html> before paint so chrome clearance never jumps.
@@ -19,6 +20,12 @@ export default function ShellProvider({ children }: { children: React.ReactNode 
       root.setAttribute('data-rn-shell-legacy', 'hero')
     } else {
       root.removeAttribute('data-rn-shell-legacy')
+    }
+    if (mode === 'checkout') {
+      setPromoBarCssVar(false)
+      root.style.setProperty('--rn-header-h', '3.25rem')
+    } else {
+      root.style.removeProperty('--rn-header-h')
     }
   }, [mode, pathname])
 

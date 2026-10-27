@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS } from './lib/productVisibility';
 import ActiveTourGate from './components/ActiveTourGate';
-import Header from './components/Header';
 import Hero from './components/Hero';
 import EditorialMoment from './components/EditorialMoment';
 import TrustStrip from './components/TrustStrip';
@@ -50,17 +49,15 @@ import CheckoutPage from './components/CheckoutPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsConditions from './components/TermsConditions';
 import ScrollToTop from './components/ScrollToTop';
-import WhatsAppWidget from './components/WhatsAppWidget';
 import SnowmobileSafari from './components/SnowmobileSafari';
 import ReindeerRides from './components/ReindeerRides';
 import MonsterTruckNorthernLights from './components/MonsterTruckNorthernLights';
 import RoutePageMeta from './components/RoutePageMeta';
 import RouteJsonLd from './components/seo/RouteJsonLd';
 import TravelTrade from './components/TravelTrade';
-import PromotionAnnouncementBar from './components/PromotionAnnouncementBar';
-import WinterPromoPopup from './components/WinterPromoPopup';
 import NotFound from './components/NotFound';
 import ShellProvider from './layout/ShellProvider';
+import SiteChrome from './layout/SiteChrome';
 import RevealObserver from './components/RevealObserver';
 
 function App() {
@@ -72,9 +69,7 @@ function App() {
         <RevealObserver />
         <RoutePageMeta />
         <RouteJsonLd />
-        <PromotionAnnouncementBar />
-        <Header />
-        <WinterPromoPopup />
+        <SiteChrome />
         
         <Routes>
           {/* Homepage */}
@@ -215,9 +210,6 @@ function App() {
           <Route path="/terms-conditions" element={<TermsConditions />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-        
-        {/* WhatsApp Widget - appears on all pages */}
-        <WhatsAppWidget />
       </div>
       </ShellProvider>
     </Router>
