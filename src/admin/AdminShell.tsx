@@ -180,7 +180,7 @@ export default function AdminShell() {
           </div>
         </nav>
 
-        <main className="mx-auto w-full min-w-0 max-w-6xl flex-1 px-3 pb-12 pt-4 sm:px-5 sm:pt-5 md:px-6 md:pt-6">
+        <main className="mx-auto w-full min-w-0 max-w-6xl flex-1 px-3 pb-16 pt-4 sm:px-5 sm:pt-5 md:px-6 md:pt-6">
           <Outlet />
         </main>
       </div>

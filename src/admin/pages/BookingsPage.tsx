@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { fetchOpsBookings } from '../adminApi'
-import type { OpsBooking } from '../types'
+import { fetchOpsBookings, fetchProducts } from '../adminApi'
+import type { OpsBooking, Product } from '../types'
 import { Badge, statusTone } from '../components/Badge'
 import {
   EMAIL_LABELS,
@@ -10,29 +10,81 @@ import {
   STATUS_LABELS,
   weekdayForTourDate,
 } from '../types'
+import { todayTourDateISO } from '../../lib/tourDate'
+import {
+  Card,
+  ErrorBanner,
+  PageHeader,
+  PrimaryButton,
+  SecondaryButton,
+  inputClass,
+  selectClass,
+} from '../components/ui'
+
+const ATTENTION_CHIPS: { id: string; label: string }[] = [
+  { id: '', label: 'All' },
+  { id: 'pending', label: 'Pending' },
+  { id: 'payment', label: 'Unpaid' },
+  { id: 'guide', label: 'No guide' },
+  { id: 'vehicle', label: 'No vehicle' },
+  { id: 'email', label: 'Email failed' },
+]
+
+const WHEN_CHIPS: { id: string; label: string }[] = [
+  { id: '', label: 'Any date' },
+  { id: 'today', label: 'Today' },
+  { id: 'upcoming', label: 'Upcoming' },
+  { id: 'past', label: 'Past' },
+]
 
 export default function BookingsPage() {
   const [params, setParams] = useSearchParams()
   const [rows, setRows] = useState<OpsBooking[]>([])
+  const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [search, setSearch] = useState(params.get('q') || '')
   const status = params.get('status') || 'all'
   const source = params.get('source') || 'all'
   const attention = params.get('attention') || ''
-
+  const when = params.get('when') || ''
+  const tourId = params.get('tour') || ''
   const [refreshing, setRefreshing] = useState(false)
+
+  const today = todayTourDateISO()
+
+  const dateBounds = useMemo(() => {
+    if (when === 'today') return { fromDate: today, toDate: today }
+    if (when === 'upcoming') return { fromDate: today, toDate: undefined }
+    if (when === 'past') return { fromDate: undefined, toDate: today }
+    return { fromDate: undefined, toDate: undefined }
+  }, [when, today])
 
   const load = (soft = false) => {
     if (soft && rows.length > 0) setRefreshing(true)
     else setLoading(true)
+    setError('')
     fetchOpsBookings({
       status,
       source,
       search,
       attention: (attention as 'payment' | 'guide' | 'vehicle' | 'email' | 'pending') || undefined,
+      fromDate: dateBounds.fromDate,
+      toDate: when === 'past' ? undefined : dateBounds.toDate,
     })
-      .then(setRows)
+      .then((data) => {
+        let next = data
+        if (when === 'past') {
+          next = next.filter((b) => (b.tour_dates?.date || '') < today)
+        }
+        if (when === 'upcoming') {
+          next = next.filter((b) => (b.tour_dates?.date || '') >= today)
+        }
+        if (tourId) {
+          next = next.filter((b) => String(b.tour_id) === tourId)
+        }
+        setRows(next)
+      })
       .catch((e) => setError(e instanceof Error ? e.message : 'Failed'))
       .finally(() => {
         setLoading(false)
@@ -41,165 +93,238 @@ export default function BookingsPage() {
   }
 
   useEffect(() => {
+    fetchProducts()
+      .then((p) => setProducts(p.filter((x) => x.is_active !== false)))
+      .catch(() => undefined)
+  }, [])
+
+  useEffect(() => {
     load(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, source, attention])
+  }, [status, source, attention, when, tourId])
+
+  const applySearch = () => {
+    setParams((p) => {
+      const n = new URLSearchParams(p)
+      if (search.trim()) n.set('q', search.trim())
+      else n.delete('q')
+      return n
+    })
+    load()
+  }
+
+  const unpaidCount = useMemo(
+    () => rows.filter((b) => b.payment_status === 'unpaid' && b.status !== 'cancelled').length,
+    [rows],
+  )
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between gap-2">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">Bookings</h1>
-          <p className="text-xs text-zinc-500 mt-0.5">
+    <div className="space-y-4">
+      <PageHeader
+        title="Bookings"
+        subtitle={
+          <>
             {rows.length} shown
-            {attention ? ` · filter: ${attention}` : ''}
+            {unpaidCount > 0 ? ` · ${unpaidCount} unpaid` : ''}
             {refreshing ? ' · updating…' : ''}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => load(true)}
-            disabled={refreshing}
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium disabled:opacity-50"
-          >
-            Refresh
-          </button>
-          <Link
-            to="/manual"
-            className="bg-emerald-700 text-white text-sm font-medium px-3 py-2 rounded-lg"
-          >
-            + Manual
-          </Link>
-        </div>
+          </>
+        }
+        actions={
+          <>
+            <SecondaryButton onClick={() => load(true)} disabled={refreshing}>
+              Refresh
+            </SecondaryButton>
+            <Link to="/manual">
+              <PrimaryButton>+ Booking</PrimaryButton>
+            </Link>
+          </>
+        }
+      />
+
+      <div className="flex flex-wrap gap-1.5">
+        {WHEN_CHIPS.map((chip) => {
+          const active = when === chip.id
+          return (
+            <button
+              key={chip.id || 'any-date'}
+              type="button"
+              onClick={() =>
+                setParams((p) => {
+                  const n = new URLSearchParams(p)
+                  if (chip.id) n.set('when', chip.id)
+                  else n.delete('when')
+                  return n
+                })
+              }
+              className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+                active
+                  ? 'bg-zinc-900 text-white'
+                  : 'bg-white text-zinc-600 ring-1 ring-zinc-200 hover:bg-zinc-50'
+              }`}
+            >
+              {chip.label}
+            </button>
+          )
+        })}
       </div>
 
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-        <input
-          className="min-h-[44px] rounded-lg border border-gray-300 px-3 py-2.5 text-base sm:text-sm"
-          placeholder="Search name, email, ref, tour…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
+      <div className="flex flex-wrap gap-1.5">
+        {ATTENTION_CHIPS.map((chip) => {
+          const active = attention === chip.id
+          return (
+            <button
+              key={chip.id || 'all'}
+              type="button"
+              onClick={() =>
+                setParams((p) => {
+                  const n = new URLSearchParams(p)
+                  if (chip.id) n.set('attention', chip.id)
+                  else n.delete('attention')
+                  return n
+                })
+              }
+              className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+                active
+                  ? 'bg-emerald-700 text-white'
+                  : 'bg-white text-zinc-600 ring-1 ring-zinc-200 hover:bg-zinc-50'
+              }`}
+            >
+              {chip.label}
+            </button>
+          )
+        })}
+      </div>
+
+      <Card className="space-y-2 !p-3">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          <input
+            className={inputClass}
+            placeholder="Search name, email, ref, tour…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') applySearch()
+            }}
+          />
+          <select
+            className={selectClass}
+            value={tourId}
+            onChange={(e) =>
               setParams((p) => {
                 const n = new URLSearchParams(p)
-                if (search) n.set('q', search)
-                else n.delete('q')
+                if (e.target.value) n.set('tour', e.target.value)
+                else n.delete('tour')
                 return n
               })
-              load()
             }
-          }}
-        />
-        <select
-          className="min-h-[44px] rounded-lg border border-gray-300 px-3 py-2.5 text-base sm:text-sm"
-          value={status}
-          onChange={(e) =>
-            setParams((p) => {
-              const n = new URLSearchParams(p)
-              n.set('status', e.target.value)
-              return n
-            })
-          }
-        >
-          <option value="all">All statuses</option>
-          {Object.entries(STATUS_LABELS).map(([k, v]) => (
-            <option key={k} value={k}>
-              {v}
-            </option>
-          ))}
-        </select>
-        <select
-          className="min-h-[44px] rounded-lg border border-gray-300 px-3 py-2.5 text-base sm:text-sm"
-          value={source}
-          onChange={(e) =>
-            setParams((p) => {
-              const n = new URLSearchParams(p)
-              n.set('source', e.target.value)
-              return n
-            })
-          }
-        >
-          <option value="all">All sources</option>
-          {Object.entries(SOURCE_LABELS).map(([k, v]) => (
-            <option key={k} value={k}>
-              {v}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {attention && (
-        <button
-          type="button"
-          className="text-sm text-emerald-800 font-medium"
-          onClick={() =>
-            setParams((p) => {
-              const n = new URLSearchParams(p)
-              n.delete('attention')
-              return n
-            })
-          }
-        >
-          Clear attention filter
-        </button>
-      )}
-
-      <button type="button" onClick={load} className="text-sm text-emerald-800 font-medium">
-        Apply search
-      </button>
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 text-sm p-3 rounded-lg">
-          {error}
+          >
+            <option value="">All products</option>
+            {products.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.public_name || p.name}
+              </option>
+            ))}
+          </select>
+          <select
+            className={selectClass}
+            value={status}
+            onChange={(e) =>
+              setParams((p) => {
+                const n = new URLSearchParams(p)
+                n.set('status', e.target.value)
+                return n
+              })
+            }
+          >
+            <option value="all">All statuses</option>
+            {Object.entries(STATUS_LABELS).map(([k, v]) => (
+              <option key={k} value={k}>
+                {v}
+              </option>
+            ))}
+          </select>
+          <select
+            className={selectClass}
+            value={source}
+            onChange={(e) =>
+              setParams((p) => {
+                const n = new URLSearchParams(p)
+                n.set('source', e.target.value)
+                return n
+              })
+            }
+          >
+            <option value="all">All sources</option>
+            {Object.entries(SOURCE_LABELS).map(([k, v]) => (
+              <option key={k} value={k}>
+                {v}
+              </option>
+            ))}
+          </select>
         </div>
-      )}
+        <SecondaryButton onClick={applySearch} className="w-full sm:w-auto">
+          Apply search
+        </SecondaryButton>
+      </Card>
+
+      {error ? <ErrorBanner>{error}</ErrorBanner> : null}
 
       {loading ? (
-        <p className="text-gray-600 text-sm">Loading…</p>
+        <p className="text-sm text-zinc-500">Loading…</p>
       ) : rows.length === 0 ? (
-        <p className="text-gray-500 text-sm">No bookings match.</p>
+        <Card>
+          <p className="text-sm text-zinc-500">No bookings match.</p>
+        </Card>
       ) : (
         <ul className="space-y-2">
           {rows.map((b) => {
             const d = b.tour_dates?.date
+            const isPrivate =
+              b.tour_id === 11 ||
+              /private northern lights/i.test(b.tours?.public_name || b.tours?.name || '')
+            const awaitingPay =
+              b.payment_status === 'unpaid' && b.status !== 'cancelled' && b.status !== 'confirmed'
             return (
               <li key={b.id}>
                 <Link
                   to={`/bookings/${b.id}`}
-                  className="block bg-white border border-gray-200 rounded-xl p-3 hover:border-emerald-300"
+                  className="block rounded-xl border border-zinc-200 bg-white p-3 shadow-sm transition-colors hover:border-emerald-300"
                 >
-                  <div className="flex justify-between gap-2 items-start">
+                  <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <div className="font-semibold text-sm">
+                      <div className="truncate text-sm font-semibold text-zinc-900">
                         {b.booking_ref || `RN-${b.id}`} · {b.customer_name}
                       </div>
-                      <div className="text-xs text-gray-600 mt-1">
-                        {d ? `${d} (${weekdayForTourDate(d)})` : '—'} {b.tour_time || ''} ·{' '}
+                      <div className="mt-1 text-xs text-zinc-600">
+                        {d ? `${d} (${weekdayForTourDate(d)})` : '—'}
+                        {b.tour_time ? ` · ${b.tour_time}` : ''} ·{' '}
                         {b.tours?.public_name || b.tours?.name}
-                        {b.tour_id === 11 ||
-                        /private northern lights/i.test(b.tours?.public_name || b.tours?.name || '')
-                          ? ' · PRIVATE TOUR'
-                          : ''}
+                        {isPrivate ? ' · PRIVATE TOUR' : ''}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {b.adults}+{b.children} · €{Number(b.total_price).toFixed(0)} ·{' '}
-                        {SOURCE_LABELS[b.source] || b.source} · Email:{' '}
-                        {EMAIL_LABELS[b.email_status || 'not_sent']}
+                      <div className="mt-1 text-xs text-zinc-500">
+                        {b.adults + b.children} guests · €{Number(b.total_price).toFixed(0)} ·{' '}
+                        {SOURCE_LABELS[b.source] || b.source}
+                        {b.payment_link_url ? ' · Payment link ready' : ''}
                       </div>
                     </div>
-                    <div className="flex flex-col items-end gap-1">
+                    <div className="flex shrink-0 flex-col items-end gap-1">
                       <Badge tone={statusTone(b.status)}>{STATUS_LABELS[b.status]}</Badge>
                       <Badge tone={statusTone(b.payment_status)}>
                         {PAYMENT_LABELS[b.payment_status] || b.payment_status}
                       </Badge>
+                      {awaitingPay ? (
+                        <span className="text-[10px] font-semibold uppercase tracking-wide text-amber-700">
+                          Awaiting payment
+                        </span>
+                      ) : null}
                     </div>
                   </div>
-                  <div className="text-xs text-gray-500 mt-2">
-                    {b.customer_email} · {b.customer_phone || 'no phone'} · Guide:{' '}
-                    {b.guides?.name || '—'} · Vehicle: {b.vehicles?.name || '—'} · Pickup:{' '}
-                    {b.pickup_location || '—'}
+                  <div className="mt-2 truncate text-xs text-zinc-500">
+                    {b.customer_email}
+                    {b.pickup_location ? ` · Pickup: ${b.pickup_location}` : ''}
+                    {b.guides?.name ? ` · ${b.guides.name}` : ''}
+                    {' · Email: '}
+                    {EMAIL_LABELS[b.email_status || 'not_sent']}
                   </div>
                 </Link>
               </li>

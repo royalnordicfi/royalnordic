@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import {
+  createAdminPaymentLink,
   fetchBooking,
   fetchBookingEmails,
   fetchBookingEvents,
@@ -24,10 +25,21 @@ import {
   type BookingStatus,
   type PaymentStatus,
 } from '../types'
+import {
+  Card,
+  ErrorBanner,
+  Field,
+  PrimaryButton,
+  SecondaryButton,
+  inputClass,
+  selectClass,
+  textareaClass,
+} from '../components/ui'
 
 export default function BookingDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const bookingId = Number(id)
   const [booking, setBooking] = useState<OpsBooking | null>(null)
   const [events, setEvents] = useState<BookingEvent[]>([])
@@ -38,6 +50,8 @@ export default function BookingDetailPage() {
   const [msg, setMsg] = useState('')
   const [saving, setSaving] = useState(false)
   const [confirmAction, setConfirmAction] = useState<'soft' | 'hard' | null>(null)
+  const [paymentLinkBusy, setPaymentLinkBusy] = useState(false)
+  const [emailPaymentBusy, setEmailPaymentBusy] = useState(false)
 
   const [customerName, setCustomerName] = useState('')
   const [customerEmail, setCustomerEmail] = useState('')
@@ -97,6 +111,16 @@ export default function BookingDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingId])
 
+  useEffect(() => {
+    if (searchParams.get('payment_link') === '1') {
+      setMsg(
+        searchParams.get('emailed') === '1'
+          ? 'Payment link created and emailed to customer'
+          : 'Payment link created — copy or email from the Payment link section',
+      )
+    }
+  }, [searchParams])
+
   const save = async (patch?: Parameters<typeof updateBookingOps>[1]) => {
     setSaving(true)
     setMsg('')
@@ -121,7 +145,12 @@ export default function BookingDetailPage() {
       })
       applyBooking(updated)
       setMsg('Saved')
-      setEvents(await fetchBookingEvents(bookingId))
+      const [ev, em] = await Promise.all([
+        fetchBookingEvents(bookingId),
+        fetchBookingEmails(bookingId),
+      ])
+      setEvents(ev)
+      setEmails(em)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Save failed')
     } finally {
@@ -131,8 +160,8 @@ export default function BookingDetailPage() {
 
   const sendEmail = async () => {
     setSaving(true)
-    setMsg('')
     setError('')
+    setMsg('')
     try {
       const r = await sendBookingConfirmationEmail(bookingId)
       setMsg(r.message)
@@ -145,41 +174,85 @@ export default function BookingDetailPage() {
     }
   }
 
-  if (!booking && !error) return <p className="text-sm text-gray-600">Loading…</p>
+  const createLink = async (sendEmailToCustomer: boolean) => {
+    setPaymentLinkBusy(true)
+    setEmailPaymentBusy(sendEmailToCustomer)
+    setError('')
+    setMsg('')
+    try {
+      const link = await createAdminPaymentLink(bookingId, { sendEmail: sendEmailToCustomer })
+      if (link.email_error) {
+        setError(`Link created, but email failed: ${link.email_error}`)
+      } else {
+        setMsg(
+          link.email_sent
+            ? link.livemode
+              ? 'Live payment link created and emailed — verify before relying on it'
+              : 'TEST payment link created and emailed'
+            : link.livemode
+              ? 'Live payment link created — verify before sending to customer'
+              : 'TEST payment link created',
+        )
+      }
+      await load()
+      try {
+        await navigator.clipboard.writeText(link.url)
+      } catch {
+        /* ignore */
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Payment link failed')
+    } finally {
+      setPaymentLinkBusy(false)
+      setEmailPaymentBusy(false)
+    }
+  }
+
+  if (!booking && !error) return <p className="text-sm text-zinc-500">Loading…</p>
   if (!booking) {
     return (
       <div className="space-y-3">
-        <Link to="/bookings" className="text-sm text-emerald-800">
+        <Link to="/bookings" className="text-sm font-medium text-emerald-800">
           ← Bookings
         </Link>
-        <div className="bg-red-50 border border-red-200 text-red-800 text-sm p-3 rounded-lg">{error}</div>
+        <ErrorBanner>{error}</ErrorBanner>
       </div>
     )
   }
 
   const date = booking.tour_dates?.date || ''
   const emailStatus = booking.email_status || 'not_sent'
+  const linkExpired =
+    !!booking.payment_link_expires_at &&
+    new Date(booking.payment_link_expires_at).getTime() < Date.now()
+  const canCharge =
+    !booking.deleted_at &&
+    booking.payment_status !== 'paid' &&
+    booking.status !== 'cancelled' &&
+    Number(booking.total_price) > 0
 
   return (
     <div className="space-y-4 pb-28">
-      <Link to="/bookings" className="text-sm text-emerald-800 font-medium">
+      <Link to="/bookings" className="text-sm font-medium text-emerald-800 hover:underline">
         ← Bookings
       </Link>
 
-      <div className="flex justify-between gap-2 items-start">
+      <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <h1 className="text-xl font-semibold tracking-tight">
+          <h1 className="text-xl font-semibold tracking-tight text-zinc-900">
             {booking.booking_ref || `RN-${booking.id}`}
           </h1>
-          <p className="text-sm text-gray-600 truncate">
+          <p className="truncate text-sm text-zinc-500">
             {booking.tours?.public_name || booking.tours?.name} · {date}{' '}
             {date ? `(${weekdayForTourDate(date)})` : ''} · {booking.tour_time || 'Time TBD'}
           </p>
-          {booking.deleted_at && (
-            <p className="text-xs text-amber-700 mt-1">Soft-deleted {new Date(booking.deleted_at).toLocaleString()}</p>
-          )}
+          {booking.deleted_at ? (
+            <p className="mt-1 text-xs text-amber-700">
+              Soft-deleted {new Date(booking.deleted_at).toLocaleString()}
+            </p>
+          ) : null}
         </div>
-        <div className="flex flex-col gap-1 items-end shrink-0">
+        <div className="flex shrink-0 flex-col items-end gap-1">
           <Badge tone={statusTone(booking.status)}>{STATUS_LABELS[booking.status]}</Badge>
           <Badge tone={statusTone(booking.payment_status)}>
             {PAYMENT_LABELS[booking.payment_status]}
@@ -190,159 +263,270 @@ export default function BookingDetailPage() {
         </div>
       </div>
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 text-sm p-3 rounded-lg">{error}</div>
-      )}
-      {msg && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm p-3 rounded-lg">
+      {error ? <ErrorBanner>{error}</ErrorBanner> : null}
+      {msg ? (
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-sm text-emerald-900">
           {msg}
         </div>
-      )}
+      ) : null}
 
-      <Card title="Customer">
-        <label className="block text-xs text-gray-500 mb-1">Name</label>
-        <input className="w-full border rounded-lg px-3 py-2 text-sm mb-3" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
-        <label className="block text-xs text-gray-500 mb-1">Email</label>
-        <input className="w-full border rounded-lg px-3 py-2 text-sm mb-3" type="email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
-        <label className="block text-xs text-gray-500 mb-1">Phone</label>
-        <input className="w-full border rounded-lg px-3 py-2 text-sm" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} />
-      </Card>
+      <Section title="Customer">
+        <Field label="Name">
+          <input className={inputClass} value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+        </Field>
+        <Field label="Email" className="mt-3">
+          <input
+            className={inputClass}
+            type="email"
+            value={customerEmail}
+            onChange={(e) => setCustomerEmail(e.target.value)}
+          />
+        </Field>
+        <Field label="Phone" className="mt-3">
+          <input className={inputClass} value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} />
+        </Field>
+      </Section>
 
-      <Card title="Tour">
+      <Section title="Tour">
         <Row k="Product" v={booking.tours?.public_name || booking.tours?.name || '—'} />
         <Row k="Date" v={date ? `${date} · ${weekdayForTourDate(date)}` : '—'} />
         <Row k="Source" v={SOURCE_LABELS[booking.source] || booking.source} />
         <Row k="Stripe" v={booking.stripe_payment_intent_id || '—'} />
-        <div className="grid grid-cols-3 gap-2 mt-2">
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">Adults</label>
-            <input type="number" min={0} className="w-full border rounded-lg px-3 py-2 text-sm" value={adults} onChange={(e) => setAdults(Number(e.target.value))} />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">Children</label>
-            <input type="number" min={0} className="w-full border rounded-lg px-3 py-2 text-sm" value={children} onChange={(e) => setChildren(Number(e.target.value))} />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">Total €</label>
-            <input className="w-full border rounded-lg px-3 py-2 text-sm" value={totalPrice} onChange={(e) => setTotalPrice(e.target.value)} />
-          </div>
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          <Field label="Adults">
+            <input
+              type="number"
+              min={0}
+              className={inputClass}
+              value={adults}
+              onChange={(e) => setAdults(Number(e.target.value))}
+            />
+          </Field>
+          <Field label="Children">
+            <input
+              type="number"
+              min={0}
+              className={inputClass}
+              value={children}
+              onChange={(e) => setChildren(Number(e.target.value))}
+            />
+          </Field>
+          <Field label="Total €">
+            <input className={inputClass} value={totalPrice} onChange={(e) => setTotalPrice(e.target.value)} />
+          </Field>
         </div>
-      </Card>
+      </Section>
 
-      <Card title="Operations">
-        <label className="block text-xs text-gray-500 mb-1">Tour time</label>
-        <input className="w-full border rounded-lg px-3 py-2 text-sm mb-3" value={tourTime} onChange={(e) => setTourTime(e.target.value)} placeholder="18:30" />
-        <label className="block text-xs text-gray-500 mb-1">Pickup</label>
-        <input className="w-full border rounded-lg px-3 py-2 text-sm mb-3" value={pickup} onChange={(e) => setPickup(e.target.value)} />
-        <label className="block text-xs text-gray-500 mb-1">Guide</label>
-        <select className="w-full border rounded-lg px-3 py-2 text-sm mb-3" value={guideId} onChange={(e) => setGuideId(e.target.value)}>
-          <option value="">Unassigned</option>
-          {guides.map((g) => (
-            <option key={g.id} value={g.id}>
-              {g.name}
-              {g.languages ? ` · ${g.languages}` : ''}
-            </option>
-          ))}
-        </select>
-        <label className="block text-xs text-gray-500 mb-1">Vehicle</label>
-        <select className="w-full border rounded-lg px-3 py-2 text-sm mb-3" value={vehicleId} onChange={(e) => setVehicleId(e.target.value)}>
-          <option value="">Unassigned</option>
-          {vehicles.map((v) => (
-            <option key={v.id} value={v.id}>
-              {v.name} (cap {v.passenger_capacity})
-              {v.status === 'maintenance' ? ' · maintenance' : ''}
-            </option>
-          ))}
-        </select>
-        <label className="block text-xs text-gray-500 mb-1">Booking status</label>
-        <select className="w-full border rounded-lg px-3 py-2 text-sm mb-3" value={status} onChange={(e) => setStatus(e.target.value as BookingStatus)}>
-          {Object.entries(STATUS_LABELS).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-        <label className="block text-xs text-gray-500 mb-1">Payment status</label>
-        <select className="w-full border rounded-lg px-3 py-2 text-sm mb-3" value={paymentStatus} onChange={(e) => setPaymentStatus(e.target.value as PaymentStatus)}>
-          {Object.entries(PAYMENT_LABELS).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-        <label className="block text-xs text-gray-500 mb-1">Source</label>
-        <select className="w-full border rounded-lg px-3 py-2 text-sm mb-3" value={source} onChange={(e) => setSource(e.target.value as BookingSource)}>
-          {Object.entries(SOURCE_LABELS).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-        <label className="block text-xs text-gray-500 mb-1">Customer requests</label>
-        <p className="text-sm bg-gray-50 border rounded-lg p-2 mb-3 whitespace-pre-wrap">
+      <Section title="Operations">
+        <Field label="Tour time">
+          <input
+            className={inputClass}
+            value={tourTime}
+            onChange={(e) => setTourTime(e.target.value)}
+            placeholder="18:30"
+          />
+        </Field>
+        <Field label="Pickup" className="mt-3">
+          <input className={inputClass} value={pickup} onChange={(e) => setPickup(e.target.value)} />
+        </Field>
+        <Field label="Guide" className="mt-3">
+          <select className={selectClass} value={guideId} onChange={(e) => setGuideId(e.target.value)}>
+            <option value="">Unassigned</option>
+            {guides.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
+                {g.languages ? ` · ${g.languages}` : ''}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Vehicle" className="mt-3">
+          <select className={selectClass} value={vehicleId} onChange={(e) => setVehicleId(e.target.value)}>
+            <option value="">Unassigned</option>
+            {vehicles.map((v) => (
+              <option key={v.id} value={v.id}>
+                {v.name} (cap {v.passenger_capacity})
+                {v.status === 'maintenance' ? ' · maintenance' : ''}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Booking status" className="mt-3">
+          <select
+            className={selectClass}
+            value={status}
+            onChange={(e) => setStatus(e.target.value as BookingStatus)}
+          >
+            {Object.entries(STATUS_LABELS).map(([k, v]) => (
+              <option key={k} value={k}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Payment status" className="mt-3">
+          <select
+            className={selectClass}
+            value={paymentStatus}
+            onChange={(e) => setPaymentStatus(e.target.value as PaymentStatus)}
+          >
+            {Object.entries(PAYMENT_LABELS).map(([k, v]) => (
+              <option key={k} value={k}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Source" className="mt-3">
+          <select
+            className={selectClass}
+            value={source}
+            onChange={(e) => setSource(e.target.value as BookingSource)}
+          >
+            {Object.entries(SOURCE_LABELS).map(([k, v]) => (
+              <option key={k} value={k}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <p className="mb-1 mt-3 text-[11px] font-medium uppercase tracking-[0.08em] text-zinc-500">
+          Customer requests
+        </p>
+        <p className="mb-3 whitespace-pre-wrap rounded-lg border border-zinc-200 bg-zinc-50 p-2 text-sm">
           {booking.special_requests || '—'}
         </p>
-        <label className="block text-xs text-gray-500 mb-1">Internal notes</label>
-        <textarea className="w-full border rounded-lg px-3 py-2 text-sm min-h-[88px]" value={internalNotes} onChange={(e) => setInternalNotes(e.target.value)} />
-      </Card>
+        <Field label="Internal notes">
+          <textarea
+            className={textareaClass}
+            value={internalNotes}
+            onChange={(e) => setInternalNotes(e.target.value)}
+          />
+        </Field>
+      </Section>
 
-      <Card title="Email">
+      <Section title="Payment link">
+        {booking.payment_link_url ? (
+          <>
+            <Row
+              k="Expires"
+              v={
+                booking.payment_link_expires_at
+                  ? `${new Date(booking.payment_link_expires_at).toLocaleString()}${
+                      linkExpired ? ' · expired' : ''
+                    }`
+                  : '—'
+              }
+            />
+            <p className="mt-2 break-all rounded-lg bg-zinc-50 p-2 text-xs text-zinc-700">
+              {booking.payment_link_url}
+            </p>
+            <SecondaryButton
+              className="mt-2 w-full"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(booking.payment_link_url || '')
+                  setMsg('Payment link copied')
+                } catch {
+                  setError('Could not copy link')
+                }
+              }}
+            >
+              Copy payment link
+            </SecondaryButton>
+          </>
+        ) : (
+          <p className="text-sm text-zinc-500">No active payment link.</p>
+        )}
+        <PrimaryButton
+          className="mt-3 w-full"
+          disabled={paymentLinkBusy || !canCharge}
+          onClick={() => createLink(false)}
+        >
+          {paymentLinkBusy && !emailPaymentBusy
+            ? 'Creating link…'
+            : booking.payment_link_url
+              ? 'Regenerate payment link'
+              : 'Create Stripe payment link'}
+        </PrimaryButton>
+        <SecondaryButton
+          className="mt-2 w-full"
+          disabled={paymentLinkBusy || !canCharge}
+          onClick={() => createLink(true)}
+        >
+          {emailPaymentBusy ? 'Creating & emailing…' : 'Create link + email Pay securely'}
+        </SecondaryButton>
+        <p className="mt-2 text-[11px] text-zinc-500">
+          Booking stays unpaid until Stripe confirms. Do not share live links with customers until
+          TEST verification is approved.
+        </p>
+      </Section>
+
+      <Section title="Email">
         <Row k="Status" v={EMAIL_LABELS[emailStatus]} />
         <Row
           k="Last sent"
           v={booking.email_last_sent_at ? new Date(booking.email_last_sent_at).toLocaleString() : '—'}
         />
-        {booking.email_last_error && <Row k="Last error" v={booking.email_last_error} />}
-        <button
-          type="button"
-          disabled={saving || !!booking.deleted_at}
+        {booking.email_last_error ? <Row k="Last error" v={booking.email_last_error} /> : null}
+        <PrimaryButton
+          className="mt-3 w-full !bg-zinc-900 hover:!bg-zinc-800"
+          disabled={
+            saving ||
+            !!booking.deleted_at ||
+            (booking.payment_type === 'admin_payment_link' && booking.payment_status !== 'paid')
+          }
           onClick={sendEmail}
-          className="mt-3 w-full bg-gray-900 text-white py-2.5 rounded-lg text-sm font-semibold disabled:opacity-50"
         >
           {emailStatus === 'sent' ? 'Resend confirmation' : 'Send confirmation'}
-        </button>
-        <p className="text-[11px] text-gray-500 mt-2">
-          Uses the existing customer confirmation template via Resend.
+        </PrimaryButton>
+        <p className="mt-2 text-[11px] text-zinc-500">
+          Payment-link bookings receive confirmation automatically after Stripe payment.
         </p>
-        {emails.length > 0 && (
-          <ul className="mt-3 space-y-2 text-xs border-t pt-3">
+        {emails.length > 0 ? (
+          <ul className="mt-3 space-y-2 border-t border-zinc-100 pt-3 text-xs">
             {emails.map((em) => (
               <li key={em.id} className="flex justify-between gap-2">
                 <span>
                   {em.status} · {em.to_email}
                   {em.error_message ? ` · ${em.error_message}` : ''}
                 </span>
-                <span className="text-gray-400 shrink-0">
+                <span className="shrink-0 text-zinc-400">
                   {new Date(em.created_at).toLocaleString()}
                 </span>
               </li>
             ))}
           </ul>
-        )}
-      </Card>
+        ) : null}
+      </Section>
 
-      <Card title="Timeline">
+      <Section title="Timeline">
         {events.length === 0 ? (
-          <p className="text-sm text-gray-500">No events yet.</p>
+          <p className="text-sm text-zinc-500">No events yet.</p>
         ) : (
           <ul className="space-y-2 text-sm">
             {events.map((ev) => (
-              <li key={ev.id} className="border-b border-gray-100 pb-2">
-                <div className="font-medium">{ev.event_type}</div>
-                <div className="text-xs text-gray-500">
+              <li key={ev.id} className="border-b border-zinc-100 pb-2 last:border-0">
+                <div className="font-medium text-zinc-900">{ev.event_type}</div>
+                <div className="text-xs text-zinc-500">
                   {new Date(ev.created_at).toLocaleString()} · {ev.created_by || '—'}
                 </div>
-                {(ev.from_value || ev.to_value) && (
-                  <div className="text-xs text-gray-600">
+                {ev.from_value || ev.to_value ? (
+                  <div className="text-xs text-zinc-600">
                     {ev.from_value || '—'} → {ev.to_value || '—'}
                   </div>
-                )}
-                {ev.note && <div className="text-xs mt-1">{ev.note}</div>}
+                ) : null}
+                {ev.note ? <div className="mt-1 text-xs">{ev.note}</div> : null}
               </li>
             ))}
           </ul>
         )}
-      </Card>
+      </Section>
 
-      <Card title="Danger zone">
+      <Section title="Danger zone">
         {booking.deleted_at ? (
-          <button
-            type="button"
-            className="w-full bg-emerald-700 text-white py-2.5 rounded-lg text-sm font-semibold"
+          <PrimaryButton
+            className="w-full"
             onClick={async () => {
               setSaving(true)
               try {
@@ -357,49 +541,45 @@ export default function BookingDetailPage() {
             }}
           >
             Restore booking
-          </button>
+          </PrimaryButton>
         ) : (
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <button
               type="button"
-              className="flex-1 border border-amber-300 text-amber-900 py-2.5 rounded-lg text-sm font-semibold"
+              className="flex-1 rounded-lg border border-amber-300 py-2.5 text-sm font-semibold text-amber-900"
               onClick={() => setConfirmAction('soft')}
             >
               Soft delete
             </button>
             <button
               type="button"
-              className="flex-1 border border-red-300 text-red-800 py-2.5 rounded-lg text-sm font-semibold"
+              className="flex-1 rounded-lg border border-red-300 py-2.5 text-sm font-semibold text-red-800"
               onClick={() => setConfirmAction('hard')}
             >
               Hard delete
             </button>
           </div>
         )}
-      </Card>
+      </Section>
 
-      {confirmAction && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-4">
-          <div className="bg-white rounded-xl p-4 max-w-md w-full space-y-3 shadow-xl">
-            <h3 className="font-semibold">
+      {confirmAction ? (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center">
+          <div className="w-full max-w-md space-y-3 rounded-xl bg-white p-4 shadow-xl">
+            <h3 className="font-semibold text-zinc-900">
               {confirmAction === 'soft' ? 'Soft delete this booking?' : 'Permanently delete?'}
             </h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-zinc-600">
               {confirmAction === 'soft'
-                ? 'The booking will be cancelled (frees capacity), hidden from lists, and can be restored. Timeline and email log stay.'
-                : 'This permanently removes the booking and its timeline/email log (CASCADE). Capacity is freed via cancel first. Cannot be undone.'}
+                ? 'The booking will be cancelled (frees capacity), hidden from lists, and can be restored.'
+                : 'Permanently removes the booking and its timeline/email log. Cannot be undone.'}
             </p>
             <div className="flex gap-2">
-              <button
-                type="button"
-                className="flex-1 border rounded-lg py-2.5 text-sm"
-                onClick={() => setConfirmAction(null)}
-              >
+              <SecondaryButton className="flex-1" onClick={() => setConfirmAction(null)}>
                 Keep
-              </button>
+              </SecondaryButton>
               <button
                 type="button"
-                className="flex-1 bg-red-600 text-white rounded-lg py-2.5 text-sm font-semibold"
+                className="flex-1 rounded-lg bg-red-600 py-2.5 text-sm font-semibold text-white"
                 onClick={async () => {
                   setSaving(true)
                   setConfirmAction(null)
@@ -424,17 +604,16 @@ export default function BookingDetailPage() {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
 
-      <div className="fixed bottom-0 left-0 right-0 md:left-56 bg-white/95 backdrop-blur border-t border-gray-200 p-3 flex gap-2">
-        <button
-          type="button"
+      <div className="fixed bottom-0 left-0 right-0 z-30 flex gap-2 border-t border-zinc-200 bg-white/95 p-3 backdrop-blur md:left-56">
+        <PrimaryButton
+          className="flex-1"
           disabled={saving || !!booking.deleted_at}
           onClick={() => save()}
-          className="flex-1 bg-emerald-700 text-white py-3 rounded-lg font-semibold disabled:opacity-50"
         >
           {saving ? 'Saving…' : 'Save'}
-        </button>
+        </PrimaryButton>
         <button
           type="button"
           disabled={saving || !!booking.deleted_at}
@@ -442,7 +621,7 @@ export default function BookingDetailPage() {
             setStatus('cancelled')
             save({ status: 'cancelled' })
           }}
-          className="px-4 bg-red-600 text-white py-3 rounded-lg font-semibold disabled:opacity-50"
+          className="rounded-lg bg-red-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
         >
           Cancel
         </button>
@@ -453,7 +632,7 @@ export default function BookingDetailPage() {
             setStatus('completed')
             save({ status: 'completed' })
           }}
-          className="px-4 bg-gray-900 text-white py-3 rounded-lg font-semibold disabled:opacity-50"
+          className="rounded-lg bg-zinc-900 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
         >
           Done
         </button>
@@ -462,20 +641,20 @@ export default function BookingDetailPage() {
   )
 }
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
-      <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{title}</h2>
+    <Card className="space-y-2">
+      <h2 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-400">{title}</h2>
       {children}
-    </section>
+    </Card>
   )
 }
 
 function Row({ k, v }: { k: string; v: string }) {
   return (
-    <div className="flex justify-between gap-3 text-sm py-1 border-b border-gray-50 last:border-0">
-      <span className="text-gray-500 shrink-0">{k}</span>
-      <span className="font-medium text-right break-all">{v}</span>
+    <div className="flex justify-between gap-3 border-b border-zinc-50 py-1 text-sm last:border-0">
+      <span className="shrink-0 text-zinc-500">{k}</span>
+      <span className="break-all text-right font-medium text-zinc-900">{v}</span>
     </div>
   )
 }

@@ -54,10 +54,9 @@ export default function ProductsPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-bold">Tours / Experiences</h1>
-        <p className="text-sm text-zinc-600">
-          Edit prices, sale, descriptions, highlights, inclusions, photos and SEO here. Changes go live on
-          royalnordic.fi after save — no code deploy required for normal commercial updates.
+        <h1 className="text-xl font-semibold tracking-tight text-zinc-900">Tours</h1>
+        <p className="mt-0.5 text-xs text-zinc-500">
+          Prices, copy, photos, and SEO sync to the public site and manual booking.
         </p>
       </div>
 

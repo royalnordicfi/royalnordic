@@ -28,6 +28,9 @@ export type BrandedEmailContent = {
   nextSteps: string[]
   customerEmail: string
   customerName: string
+  /** Optional primary CTA (e.g. Pay securely) */
+  ctaLabel?: string
+  ctaUrl?: string
 }
 
 const SUPPORT_EMAIL = 'contact@royalnordic.fi'
@@ -95,6 +98,22 @@ export function renderBrandedEmail(content: BrandedEmailContent) {
 
   const nextStepsText = content.nextSteps.map((step) => `- ${step}`).join('\n')
 
+  const ctaHtml =
+    content.ctaLabel && content.ctaUrl
+      ? `<table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 0 28px;">
+          <tr>
+            <td style="border-radius:8px;background:#047857;">
+              <a href="${escapeHtml(content.ctaUrl)}" style="display:inline-block;padding:14px 22px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;">
+                ${escapeHtml(content.ctaLabel)}
+              </a>
+            </td>
+          </tr>
+        </table>`
+      : ''
+
+  const ctaText =
+    content.ctaLabel && content.ctaUrl ? `\n${content.ctaLabel}: ${content.ctaUrl}\n` : ''
+
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -102,55 +121,57 @@ export function renderBrandedEmail(content: BrandedEmailContent) {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(content.subject)}</title>
 </head>
-<body style="margin:0;padding:0;background:#f4f4f5;font-family:Georgia,'Times New Roman',serif;color:#18181b;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f4f5;padding:24px 12px;">
+<body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#0c1410;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#ffffff;padding:24px 12px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border:1px solid #e4e4e7;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border:1px solid #e8ebe8;border-radius:12px;overflow:hidden;">
           <tr>
-            <td style="background:#0a0a0a;padding:28px 28px 24px;text-align:center;">
-              <div style="font-family:Georgia,serif;font-size:22px;letter-spacing:0.08em;text-transform:uppercase;color:#ffffff;">Royal Nordic</div>
-              <div style="margin-top:6px;font-family:Arial,sans-serif;font-size:12px;color:#a1a1aa;">Finnish Lapland</div>
+            <td style="background:#ffffff;padding:22px 28px 18px;text-align:center;border-bottom:1px solid #ecefec;">
+              <img src="${SITE_URL}/logo.png" width="28" height="28" alt="" style="display:inline-block;vertical-align:middle;margin-right:8px;" />
+              <span style="display:inline-block;vertical-align:middle;font-family:Georgia,serif;font-size:18px;font-weight:600;letter-spacing:-0.02em;color:#0c1410;">Royal Nordic</span>
             </td>
           </tr>
           <tr>
-            <td style="padding:32px 28px 8px;font-family:Arial,Helvetica,sans-serif;">
-              <h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;color:#18181b;font-weight:700;">${escapeHtml(content.title)}</h1>
-              <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#3f3f46;">
+            <td style="padding:28px 28px 8px;">
+              <h1 style="margin:0 0 12px;font-family:Georgia,serif;font-size:22px;line-height:1.3;color:#0c1410;font-weight:600;">${escapeHtml(content.title)}</h1>
+              <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#3d4a44;">
                 ${content.introHtml}
               </p>
 
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#fafafa;border:1px solid #e4e4e7;margin:0 0 24px;">
+              ${ctaHtml}
+
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#fafbfa;border:1px solid #e8ebe8;border-radius:8px;margin:0 0 24px;">
                 <tr>
-                  <td style="padding:20px 20px 8px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:#71717a;font-weight:700;">${escapeHtml(content.detailsHeading)}</td>
+                  <td style="padding:18px 18px 8px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#5b6b63;font-weight:700;">${escapeHtml(content.detailsHeading)}</td>
                 </tr>
                 <tr>
-                  <td style="padding:0 20px 20px;font-size:14px;line-height:1.7;color:#27272a;">
+                  <td style="padding:0 18px 18px;font-size:14px;line-height:1.7;color:#0c1410;">
                     ${detailRowsHtml}
                   </td>
                 </tr>
               </table>
 
-              <h2 style="margin:0 0 10px;font-size:16px;color:#18181b;">What happens next</h2>
-              <ul style="margin:0 0 24px;padding-left:18px;font-size:14px;line-height:1.7;color:#3f3f46;">
+              <h2 style="margin:0 0 10px;font-size:15px;color:#0c1410;">What happens next</h2>
+              <ul style="margin:0 0 24px;padding-left:18px;font-size:14px;line-height:1.7;color:#3d4a44;">
                 ${nextStepsHtml}
               </ul>
 
-              <h2 style="margin:0 0 10px;font-size:16px;color:#18181b;">Need help?</h2>
-              <p style="margin:0 0 28px;font-size:14px;line-height:1.7;color:#3f3f46;">
+              <h2 style="margin:0 0 10px;font-size:15px;color:#0c1410;">Need help?</h2>
+              <p style="margin:0 0 28px;font-size:14px;line-height:1.7;color:#3d4a44;">
                 Email <a href="mailto:${SUPPORT_EMAIL}" style="color:#047857;text-decoration:none;">${SUPPORT_EMAIL}</a><br />
                 Phone <a href="tel:${SUPPORT_PHONE_TEL}" style="color:#047857;text-decoration:none;">${SUPPORT_PHONE}</a><br />
                 Web <a href="${SITE_URL}" style="color:#047857;text-decoration:none;">royalnordic.fi</a>
               </p>
 
-              <p style="margin:0;font-size:14px;line-height:1.6;color:#52525b;">
+              <p style="margin:0;font-size:14px;line-height:1.6;color:#5b6b63;">
                 See you in Lapland,<br />
-                <strong style="color:#18181b;">The Royal Nordic team</strong>
+                <strong style="color:#0c1410;">The Royal Nordic team</strong>
               </p>
             </td>
           </tr>
           <tr>
-            <td style="padding:20px 28px;border-top:1px solid #e4e4e7;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.5;color:#a1a1aa;text-align:center;">
+            <td style="padding:18px 28px;border-top:1px solid #ecefec;font-size:11px;line-height:1.5;color:#8a9690;text-align:center;">
               Royal Nordic · Rovaniemi, Finnish Lapland<br />
               This email was sent to ${escapeHtml(content.customerEmail)}
             </td>
@@ -167,7 +188,7 @@ export function renderBrandedEmail(content: BrandedEmailContent) {
 Hi ${content.customerName},
 
 ${content.introText}
-
+${ctaText}
 ${content.detailsHeading.toUpperCase()}
 ${detailRowsText}
 
@@ -203,8 +224,11 @@ export function buildCustomerConfirmationEmail(booking: BookingEmailData) {
     { label: 'Experience', value: experience },
     { label: 'Date', value: dateLabel },
     { label: 'Guests', value: guests },
-    { label: 'Total paid', value: `€${total}` },
+    { label: 'Total', value: `€${total}` },
   ]
+  if (booking.meetingPoint) {
+    details.push({ label: 'Meeting / pickup', value: booking.meetingPoint })
+  }
   if (booking.specialRequests) {
     details.push({ label: 'Notes', value: booking.specialRequests })
   }
@@ -213,21 +237,60 @@ export function buildCustomerConfirmationEmail(booking: BookingEmailData) {
     subject: `Booking confirmed — ${experience} | Royal Nordic`,
     title: 'Your booking is confirmed',
     introHtml: `Hi ${escapeHtml(booking.customerName)}, thank you for booking with Royal Nordic.
-                Payment is received and your place is reserved.`,
-    introText:
-      'Thank you for booking with Royal Nordic. Payment is received and your place is reserved.',
+                Your place is reserved.`,
+    introText: 'Thank you for booking with Royal Nordic. Your place is reserved.',
     detailsHeading: 'Booking details',
     details,
     nextSteps: [
       isStandardGroupTour(null, booking.tourName)
         ? `Meet at ${booking.meetingPoint || 'Ruokasenkatu 3, 96100 Rovaniemi, Finland'}. Departure is ${booking.departureTime || '20:00'}. Hotel pickup is not included. Bring your own thermal clothing.`
-        : 'We will confirm your pickup time and meeting details before the tour.',
+        : booking.meetingPoint
+          ? 'Hotel pickup is included. Exact pickup time is confirmed before departure.'
+          : 'We will confirm your pickup time and meeting details before the tour.',
       'Dress for Arctic conditions: warm layers, proper winter footwear, hat and gloves.',
       'Free cancellation up to 24 hours before departure. Cancellations within 24 hours are non-refundable (see Terms).',
       `Keep this email for your records — quote booking #${booking.bookingId} if you contact us.`,
     ],
     customerEmail: booking.customerEmail,
     customerName: booking.customerName,
+  })
+}
+
+/** Payment request for unpaid admin payment-link bookings. */
+export function buildPaymentRequestEmail(
+  booking: BookingEmailData & { paymentUrl: string; expiresAt?: string },
+) {
+  const experience = displayTourName(booking.tourName)
+  const dateLabel = formatBookingDateLabel(booking.tourDate, booking.tourName, booking.departureTime)
+  const guests = formatGuestSummary(booking.adults, booking.children)
+  const total = formatEuro(booking.totalPrice)
+
+  return renderBrandedEmail({
+    subject: `Complete payment — ${experience} | Royal Nordic`,
+    title: 'Complete your booking payment',
+    introHtml: `Hi ${escapeHtml(booking.customerName)}, your Royal Nordic booking is reserved pending payment.
+                Use the secure button below to pay €${escapeHtml(total)}.`,
+    introText: `Your Royal Nordic booking is reserved pending payment. Pay €${total} using the secure link.`,
+    detailsHeading: 'Booking details',
+    details: [
+      { label: 'Booking ID', value: `#${booking.bookingId}` },
+      { label: 'Experience', value: experience },
+      { label: 'Date', value: dateLabel },
+      { label: 'Guests', value: guests },
+      { label: 'Amount due', value: `€${total}` },
+      ...(booking.expiresAt
+        ? [{ label: 'Link expires', value: booking.expiresAt }]
+        : []),
+    ],
+    nextSteps: [
+      'Pay securely via Stripe to confirm your place.',
+      'After payment you will receive a booking confirmation email.',
+      'If the link expires, reply to this email and we will send a new one.',
+    ],
+    customerEmail: booking.customerEmail,
+    customerName: booking.customerName,
+    ctaLabel: 'Pay securely',
+    ctaUrl: booking.paymentUrl,
   })
 }
 

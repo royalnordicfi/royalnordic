@@ -47,6 +47,9 @@ export type OpsBooking = {
   special_requests: string | null
   internal_notes: string | null
   stripe_payment_intent_id: string | null
+  stripe_checkout_session_id?: string | null
+  payment_link_url?: string | null
+  payment_link_expires_at?: string | null
   guide_id: number | null
   vehicle_id: number | null
   tour_id: number
@@ -57,7 +60,13 @@ export type OpsBooking = {
   email_status?: EmailStatus
   email_last_sent_at?: string | null
   email_last_error?: string | null
-  tours?: { id: number; name: string; public_name?: string | null; max_capacity?: number }
+  tours?: {
+    id: number
+    name: string
+    public_name?: string | null
+    max_capacity?: number
+    pricing_model?: 'per_person' | 'per_vehicle'
+  }
   tour_dates?: { id: number; date: string }
   guides?: { id: number; name: string; phone?: string | null } | null
   vehicles?: {

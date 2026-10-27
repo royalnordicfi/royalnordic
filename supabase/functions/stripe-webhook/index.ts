@@ -53,6 +53,7 @@ serve(async (req) => {
       }
 
       const metadata = session.metadata || {}
+      const existingBookingId = parseInt(String(metadata.existing_booking_id || ''), 10)
       const tourId = parseInt(String(metadata.tour_id || ''), 10)
       const tourDateId = parseInt(String(metadata.tour_date_id || ''), 10)
       const adults = parseInt(String(metadata.adults || '0'), 10)
@@ -68,10 +69,6 @@ serve(async (req) => {
           ? session.payment_intent
           : session.payment_intent?.id || null
 
-      if (!tourId || !tourDateId || !customerName || !customerEmail || !paymentIntentId) {
-        throw new Error('Missing required checkout metadata')
-      }
-
       const totalPrice =
         typeof session.amount_total === 'number'
           ? session.amount_total / 100
@@ -82,20 +79,114 @@ serve(async (req) => {
       const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
       // Idempotency: same PaymentIntent must not create duplicate bookings.
-      const { data: existing, error: existingError } = await supabase
-        .from('bookings')
-        .select('id')
-        .eq('stripe_payment_intent_id', paymentIntentId)
-        .maybeSingle()
+      if (paymentIntentId) {
+        const { data: existing, error: existingError } = await supabase
+          .from('bookings')
+          .select('id')
+          .eq('stripe_payment_intent_id', paymentIntentId)
+          .maybeSingle()
 
-      if (existingError) {
-        console.error('Error checking existing booking:', existingError)
-        throw new Error('Failed to check existing booking')
+        if (existingError) {
+          console.error('Error checking existing booking:', existingError)
+          throw new Error('Failed to check existing booking')
+        }
+
+        if (existing?.id) {
+          console.log('Booking already exists for payment intent', paymentIntentId, existing.id)
+          return json({ success: true, booking_id: existing.id, duplicate: true })
+        }
       }
 
-      if (existing?.id) {
-        console.log('Booking already exists for payment intent', paymentIntentId, existing.id)
-        return json({ success: true, booking_id: existing.id, duplicate: true })
+      // Admin payment link: confirm an existing pending booking (do not insert a second row).
+      if (existingBookingId > 0) {
+        if (!paymentIntentId) throw new Error('Missing payment intent for admin payment link')
+
+        const { data: pending, error: pendingError } = await supabase
+          .from('bookings')
+          .select(
+            'id, booking_ref, customer_name, customer_email, customer_phone, adults, children, total_price, status, payment_status, tour_id, tour_date_id, tour_time, pickup_location, deleted_at, tours(name, public_name), tour_dates(date)',
+          )
+          .eq('id', existingBookingId)
+          .maybeSingle()
+
+        if (pendingError || !pending) throw new Error('Pending booking not found for payment link')
+        if (pending.deleted_at) throw new Error('Cannot pay a deleted booking')
+        if (pending.status === 'cancelled') throw new Error('Cannot pay a cancelled booking')
+        if (pending.payment_status === 'paid') {
+          return json({ success: true, booking_id: pending.id, duplicate: true })
+        }
+
+        const expected = Math.round(Number(pending.total_price) * 100) / 100
+        if (Math.abs(expected - totalPrice) > 0.02) {
+          throw new Error(
+            `Payment amount €${totalPrice} does not match booking total €${expected}`,
+          )
+        }
+
+        const { error: confirmError } = await supabase
+          .from('bookings')
+          .update({
+            status: 'confirmed',
+            payment_status: 'paid',
+            stripe_payment_intent_id: paymentIntentId,
+            stripe_checkout_session_id: session.id,
+            payment_link_url: null,
+            email_status: 'queued',
+          })
+          .eq('id', pending.id)
+
+        if (confirmError) throw new Error(confirmError.message)
+
+        await supabase.from('booking_events').insert([
+          {
+            booking_id: pending.id,
+            event_type: 'payment_received',
+            from_value: 'unpaid',
+            to_value: 'paid',
+            note: `Stripe payment link completed · ${session.id}`,
+            created_by: 'stripe-webhook',
+          },
+        ])
+
+        const tourName =
+          (pending.tours as { public_name?: string; name?: string } | null)?.public_name ||
+          (pending.tours as { name?: string } | null)?.name ||
+          'Tour'
+        const tourDate = String((pending.tour_dates as { date?: string } | null)?.date || '').slice(
+          0,
+          10,
+        )
+
+        const emailData = {
+          bookingId: pending.id,
+          customerName: pending.customer_name,
+          customerEmail: pending.customer_email,
+          customerPhone: pending.customer_phone || '',
+          tourName,
+          tourDate,
+          adults: pending.adults,
+          children: pending.children,
+          totalPrice: expected,
+          specialRequests: '',
+          paymentStatus: 'confirmed' as const,
+          createdAt: new Date().toISOString(),
+          departureTime: String(pending.tour_time || ''),
+          meetingPoint: String(pending.pickup_location || ''),
+        }
+        const adminOk = await sendEmailNotification(emailData, 'admin')
+        const customerOk = await sendEmailNotification(emailData, 'customer')
+        await markEmailStatus(supabase, pending.id, pending.customer_email, customerOk, adminOk)
+
+        return json({
+          success: true,
+          booking_id: pending.id,
+          booking_ref: pending.booking_ref || `RN-${pending.id}`,
+          admin_payment_link: true,
+        })
+      }
+
+      if (!tourId || !tourDateId || !customerName || !customerEmail || !paymentIntentId) {
+        throw new Error('Missing required checkout metadata')
       }
 
       const { data: dateData, error: dateError } = await supabase
@@ -222,14 +313,8 @@ serve(async (req) => {
         .eq('id', booking.id)
         .is('booking_ref', null)
 
-      const { error: updateError } = await supabase
-        .from('tour_dates')
-        .update({ total_booked: (dateData.total_booked || 0) + requestedSlots })
-        .eq('id', tourDateId)
-
-      if (updateError) {
-        console.error('Error updating slots:', updateError)
-      }
+      // Inventory is updated by the bookings trigger (update_tour_date_slots).
+      // Do not double-count total_booked here.
 
       const { data: tourData } = await supabase.from('tours').select('name').eq('id', tourId).single()
       const { data: dateDataForEmail } = await supabase

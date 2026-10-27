@@ -57,9 +57,10 @@ const bookingSelectFull = `
   id, booking_ref, customer_name, customer_email, customer_phone,
   adults, children, total_price, status, payment_status, payment_type, crypto_type,
   source, pickup_location, tour_time, special_requests, internal_notes,
-  stripe_payment_intent_id, guide_id, vehicle_id, tour_id, tour_date_id,
+  stripe_payment_intent_id, stripe_checkout_session_id, payment_link_url, payment_link_expires_at,
+  guide_id, vehicle_id, tour_id, tour_date_id,
   created_at, updated_at, deleted_at, email_status, email_last_sent_at, email_last_error,
-  tours ( id, name, public_name, max_capacity ),
+  tours ( id, name, public_name, max_capacity, pricing_model ),
   tour_dates ( id, date ),
   guides ( id, name, phone ),
   vehicles ( id, name, passenger_capacity, registration_number )
@@ -587,6 +588,8 @@ export async function createManualBooking(input: {
   children: number
   total_price: number
   payment_status: PaymentStatus
+  payment_type?: string
+  booking_status?: BookingStatus
   pickup_location?: string
   source: BookingSource
   notes?: string
@@ -595,10 +598,20 @@ export async function createManualBooking(input: {
   send_confirmation?: boolean
 }): Promise<OpsBooking> {
   await requireAdmin()
+  const product = await fetchProduct(input.tour_id)
+  const perVehicle = product?.pricing_model === 'per_vehicle'
   const tourDate = await ensureTourDate(input.tour_id, input.tour_date)
   const pax = input.adults + input.children
   const remaining = tourDate.available_slots - tourDate.total_booked
-  if (pax > remaining) {
+  if (perVehicle) {
+    if (remaining < 1) {
+      throw new Error(`This exclusive departure on ${input.tour_date} is already reserved`)
+    }
+    const cap = product?.max_capacity || 8
+    if (pax < 1 || pax > cap) {
+      throw new Error(`This experience accepts 1–${cap} guests`)
+    }
+  } else if (pax > remaining) {
     throw new Error(
       `Not enough capacity on ${input.tour_date}: ${remaining} seats left, booking needs ${pax}`,
     )
@@ -629,6 +642,10 @@ export async function createManualBooking(input: {
     await assertNoAssignmentConflict('vehicle', input.vehicle_id, tourDate.id, 0)
   }
 
+  const status: BookingStatus =
+    input.booking_status ||
+    (input.payment_status === 'paid' ? 'confirmed' : 'pending')
+
   const payload = {
     tour_id: input.tour_id,
     tour_date_id: tourDate.id,
@@ -638,9 +655,9 @@ export async function createManualBooking(input: {
     adults: input.adults,
     children: input.children,
     total_price: input.total_price,
-    status: input.payment_status === 'paid' ? 'confirmed' : 'pending',
+    status,
     payment_status: input.payment_status,
-    payment_type: 'manual',
+    payment_type: input.payment_type || 'manual',
     source: input.source,
     pickup_location: input.pickup_location || null,
     tour_time: input.tour_time || null,
@@ -720,6 +737,37 @@ export async function createManualBooking(input: {
   }
 
   return booking
+}
+
+export async function createAdminPaymentLink(
+  bookingId: number,
+  options?: { sendEmail?: boolean },
+): Promise<{
+  url: string
+  session_id: string
+  expires_at: string
+  livemode: boolean
+  email_sent: boolean
+  email_error: string | null
+}> {
+  const session = await requireAdmin()
+  const { data, error } = await supabase.functions.invoke('create-admin-payment-link', {
+    body: { booking_id: bookingId, send_email: options?.sendEmail === true },
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  })
+  if (error) throw new Error(error.message)
+  if (!data?.url) throw new Error(data?.error || 'Payment link was not created')
+  if (data.livemode === true) {
+    console.warn('Live-mode payment link created — confirm ops policy before sharing with customers')
+  }
+  return {
+    url: String(data.url),
+    session_id: String(data.session_id || ''),
+    expires_at: String(data.expires_at || ''),
+    livemode: Boolean(data.livemode),
+    email_sent: Boolean(data.email_sent),
+    email_error: data.email_error ? String(data.email_error) : null,
+  }
 }
 
 export async function sendBookingConfirmationEmail(bookingId: number): Promise<{
