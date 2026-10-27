@@ -1056,24 +1056,50 @@
     }
   }
 
-  /* Equal cards. auto-fit gives one column on phones, two on tablets, three on wide desktops. */
+  /* Equal cards: compact centered row on desktop, two on tablet, one on phone. */
   .rn-card-grid--balanced {
     align-items: stretch;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17.5rem), 1fr));
-    gap: 1.25rem;
+    max-width: 58rem;
+    margin-inline: auto;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  @media (min-width: 640px) {
+    .rn-card-grid--balanced {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem 1.1rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .rn-card-grid--balanced {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.05rem 1.15rem;
+    }
+  }
+  .rn-card-grid--balanced .rn-tour-card__media {
+    aspect-ratio: 16 / 10;
   }
   .rn-card-grid--balanced .rn-tour-card__title {
-    min-height: 2.55em;
+    min-height: 2.45em;
+    font-size: 1.05rem;
+  }
+  @media (min-width: 640px) {
+    .rn-card-grid--balanced .rn-tour-card__title {
+      font-size: 1.12rem;
+    }
   }
   .rn-card-grid--balanced .rn-tour-card__desc {
-    min-height: 2.8em;
+    min-height: 2.7em;
   }
   .rn-card-grid--balanced .rn-tour-card__meta {
-    min-height: 2.2em;
+    min-height: 2em;
   }
   .rn-card-grid--balanced .rn-tour-card__foot {
     margin-top: auto;
-    padding-top: 0.7rem;
+    padding-top: 0.55rem;
+  }
+  .rn-card-grid--balanced .rn-tour-card__body {
+    padding-top: 0.45rem;
   }
 
   /* Calendar day selection — fast, subtle */
@@ -1240,29 +1266,31 @@
     gap: 0.4rem;
   }
   .rn-tour-card__was {
-    font-family: var(--rn-font-display);
-    font-size: 1rem;
+    font-family: var(--rn-font-body);
+    font-size: 0.92rem;
     font-weight: 500;
     letter-spacing: -0.01em;
-    color: var(--rn-text-dim);
+    color: color-mix(in srgb, var(--rn-text-dim) 88%, transparent);
     text-decoration: line-through;
     text-decoration-thickness: 1.5px;
-    text-decoration-color: color-mix(in srgb, var(--rn-sale) 75%, transparent);
+    text-decoration-color: color-mix(in srgb, var(--rn-sale) 70%, transparent);
   }
   .rn-tour-card__now {
-    font-family: var(--rn-font-display);
-    font-size: 1.25rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
+    font-family: var(--rn-font-body);
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
     line-height: 1;
     color: var(--rn-sale);
+    font-variant-numeric: tabular-nums;
   }
   .rn-tour-card__now--plain {
     color: #fff;
   }
   .rn-tour-card__from {
+    font-family: var(--rn-font-body);
     font-size: 0.68rem;
-    font-weight: 600;
+    font-weight: 650;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--rn-text-dim);
@@ -1670,11 +1698,12 @@
 
   .rn-tour-card__per {
     display: block;
-    margin-top: 0.2rem;
-    font-size: 0.72rem;
+    margin-top: 0.22rem;
+    font-family: var(--rn-font-body);
+    font-size: 0.68rem;
     font-weight: 500;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    text-transform: none;
     color: var(--rn-text-dim);
   }
 

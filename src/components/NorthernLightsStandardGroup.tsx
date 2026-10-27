@@ -37,7 +37,7 @@ const FALLBACK: TourPageFallback = {
   seasonEnd: STANDARD_GROUP_SEASON_END,
   departureTime: STANDARD_GROUP_DEPARTURE,
   description:
-    'Experience the magical Northern Lights on our affordable Standard Group bus tour from Rovaniemi. Travel comfortably into the Lappish wilderness with an experienced English-speaking guide as we search for clear skies and the best possible conditions to witness the Aurora Borealis. This is a large-group bus experience with up to 50 guests.',
+    'Experience the magical Northern Lights on our affordable Standard Group bus tour from Rovaniemi. Travel comfortably into the Lappish wilderness with an experienced English-speaking guide as we search for clear skies and the best possible conditions to witness the Aurora Borealis. This is a large-group bus experience with up to 50 guests. Professional Northern Lights photography is included, along with our Northern Lights guarantee.',
   benefits: [
     'Large-group bus tour for up to 50 guests',
     'Departs Ruokasenkatu 3 at 20:00',
@@ -156,24 +156,20 @@ const NorthernLightsStandardGroup = () => {
               'Meeting point only',
             ]}
           >
-            {cms.loading && !cms.tour ? (
-              <p className="py-10 text-center text-sm text-panel-muted">Loading availability…</p>
-            ) : (
-              <BookingForm
-                tourId={STANDARD_GROUP_TOUR_ID}
-                tourName={cms.bookingTourName}
-                adultPrice={cms.adultPrice}
-                childPrice={cms.childPrice}
-                maxCapacity={capacity}
-                seasonStart={cms.seasonStart || STANDARD_GROUP_SEASON_START}
-                seasonEnd={cms.seasonEnd || STANDARD_GROUP_SEASON_END}
-                departureTime={departure}
-                meetingPointDeparture
-                meetingPoint={meetingPoint}
-                chrome="embedded"
-                tone="light"
-              />
-            )}
+            <BookingForm
+              tourId={STANDARD_GROUP_TOUR_ID}
+              tourName={cms.bookingTourName}
+              adultPrice={cms.adultPrice}
+              childPrice={cms.childPrice}
+              maxCapacity={capacity}
+              seasonStart={cms.seasonStart || STANDARD_GROUP_SEASON_START}
+              seasonEnd={cms.seasonEnd || STANDARD_GROUP_SEASON_END}
+              departureTime={departure}
+              meetingPointDeparture
+              meetingPoint={meetingPoint}
+              chrome="embedded"
+              tone="light"
+            />
           </BookingAside>
         }
         bookingBelow={
@@ -186,14 +182,13 @@ const NorthernLightsStandardGroup = () => {
       >
         <TourSection eyebrow="About" title="About this experience">
           <p className="leading-relaxed text-text-muted">
-            {cms.fullDescription || FALLBACK.description} Professional Northern Lights photography is
-            included, along with our Northern Lights guarantee. If the auroras are not captured on our
-            cameras, you can receive a refund or reschedule according to our guarantee conditions.
+            {cms.fullDescription || FALLBACK.description}
           </p>
           <p className="mt-4 leading-relaxed text-text-muted">
             The tour departs from {meetingPoint} at {departure} and lasts approximately 5 hours, depending
-            on weather and viewing conditions. This is a large shared group. It is not a private tour, and
-            hotel pickup is not included.
+            on weather and viewing conditions. This is a large shared group — not a private tour — and hotel
+            pickup is not included. If the auroras are not captured on our cameras, you can receive a refund
+            or reschedule according to our guarantee conditions.
           </p>
         </TourSection>
 

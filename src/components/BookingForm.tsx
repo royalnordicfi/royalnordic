@@ -126,7 +126,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
   })
 
   const [availability, setAvailability] = useState<TourDate[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldKey, string>>>({})
   const [currentMonth, setCurrentMonth] = useState(() => initialCalendarMonth(seasonStart, seasonEnd))
@@ -169,24 +169,24 @@ const BookingForm: React.FC<BookingFormProps> = ({
   // Load availability data
   const loadAvailability = async () => {
     try {
+      setLoading(true)
       setError('')
-      // Use the new Supabase function instead of the old API
-      // Add aggressive cache-busting to ensure fresh data
       const cacheBuster = Date.now() + Math.random()
       const { data, error } = await supabase.functions.invoke(`get-tour-availability?t=${cacheBuster}`, {
-        body: { 
+        body: {
           tourId,
-          _cacheBust: cacheBuster, // Force fresh data
-          _timestamp: new Date().toISOString() // Additional cache busting
-        }
+          _cacheBust: cacheBuster,
+          _timestamp: new Date().toISOString(),
+        },
       })
-      
-      console.log('Raw API response:', data)
-      
+
       if (error) {
         throw new Error(error.message)
       }
-      
+      if (!data || !Array.isArray(data.availableDates)) {
+        throw new Error('Availability response was incomplete')
+      }
+
       if (typeof data.adultPrice === 'number' && Number.isFinite(data.adultPrice)) {
         setLiveAdultPrice(data.adultPrice)
       }
@@ -194,62 +194,28 @@ const BookingForm: React.FC<BookingFormProps> = ({
         setLiveChildPrice(data.childPrice)
       }
 
-      // Transform the response to match the expected format
-      const transformedData = data.availableDates.map((date: any, index: number) => {
-        // Debug: Log any malformed dates
-        if (!date || !date.date || !date.id) {
-          console.log('Malformed date at index', index, ':', date)
-        }
-        
-        return {
+      const transformedData = data.availableDates
+        .map((date: any) => ({
           id: date.id,
           tour_id: tourId,
           date: date.date,
           available_slots: date.totalSlots,
           total_booked: date.bookedSlots,
-          remaining_slots: date.availableSpots
-        }
-      }).filter(date => date.id && date.date) // Filter out malformed dates
-      
-      console.log('Availability data loaded:', transformedData.length, 'dates')
-      console.log('First few dates:', transformedData.slice(0, 5))
-      console.log('Sample date object:', transformedData[0])
-      console.log('Sample date details:', {
-        id: transformedData[0]?.id,
-        date: transformedData[0]?.date,
-        remaining_slots: transformedData[0]?.remaining_slots,
-        available_slots: transformedData[0]?.available_slots
-      })
-      
-      // Debug: Check if September 15th is in the data
-      const sept15 = transformedData.find((d: any) => d.date === '2025-09-15')
-      console.log('September 15th in data:', sept15)
-      
-      // Debug: Check if September 1st is in the data (should NOT be)
-      const sept1 = transformedData.find((d: any) => d.date === '2025-09-01')
-      console.log('September 1st in data:', sept1)
-      
-      // Debug: Check if October 1st is in the data (should be)
-      const oct1 = transformedData.find((d: any) => d.date === '2025-10-01')
-      console.log('October 1st in data:', oct1)
-      
-      // Debug: Check for any empty or malformed dates
-      const malformedDates = transformedData.filter(d => !d.id || !d.date)
-      if (malformedDates.length > 0) {
-        console.log('Malformed dates found:', malformedDates)
-      }
-      
+          remaining_slots: date.availableSpots,
+        }))
+        .filter((date: TourDate) => date.id && date.date)
+
       setAvailability(transformedData)
     } catch (err) {
-      console.error(err)
-      setError('We could not load available dates right now. Please refresh and try again.')
       console.error('Availability error:', err)
-      // Fallback to empty array to prevent white page
+      setError('We could not load available dates right now. Please refresh and try again.')
       setAvailability([])
     } finally {
       setLoading(false)
     }
   }
+
+  const hasOpenDates = availability.some((date) => (date.remaining_slots || 0) > 0)
 
   // Load availability data on component mount
   useEffect(() => {
@@ -894,99 +860,123 @@ const BookingForm: React.FC<BookingFormProps> = ({
           
           {/* Available Dates Grid */}
           <div className={`grid grid-cols-7 ${embeddedLight ? 'gap-0.5' : 'gap-1'}`}>
-            {availability.length > 0 ? getCalendarGrid().map((day, index) => {
-              if (day === null) {
-                return (
+            {loading
+              ? Array.from({ length: 35 }, (_, index) => (
                   <div
-                    key={`empty-${index}`}
-                    className={embeddedLight ? 'h-[2.35rem] sm:h-[2.45rem]' : 'h-12 sm:h-14'}
+                    key={`loading-${index}`}
+                    className={
+                      embeddedLight
+                        ? 'h-[2.35rem] sm:h-[2.45rem] animate-pulse rounded bg-black/[0.04]'
+                        : 'h-12 sm:h-14 bg-gray-100 rounded animate-pulse'
+                    }
                   />
-                )
-              }
-              
-              const { day: calendarDay, date, available, remainingSlots, isFullBooked } = day
-              const isAvailable = available && remainingSlots >= (formData.adults + formData.children)
-              const isSelected = formData.preferredDate === date
-              const priceClass = isSelected
-                ? lightCalendar
-                  ? 'text-white/85'
-                  : 'text-emerald-100'
-                : lightCalendar
-                ? 'text-emerald-900/55'
-                : 'text-emerald-700'
-
-              const lightDayClass = (() => {
-                if (isSelected) return 'rn-bf-light-day rn-bf-light-day--selected'
-                if (!isAvailable) return 'rn-bf-light-day rn-bf-light-day--muted'
-                if (fieldErrors.preferredDate) return 'rn-bf-light-day rn-bf-light-day--error'
-                return 'rn-bf-light-day rn-bf-light-day--available'
-              })()
-
-              return (
-                <button
-                  key={date} 
-                  type="button"
-                  onClick={() => {
-                    if (!isAvailable) return
-                    setFormData({ ...formData, preferredDate: date })
-                    clearFieldError('preferredDate')
-                    setError('')
-                  }}
-                  className={dark
-                    ? `rn-bf-day ${
-                        isSelected
-                          ? 'rn-bf-day--selected'
-                          : isFullBooked
-                          ? 'rn-bf-day--full'
-                          : isAvailable
-                          ? 'rn-bf-day--available'
-                          : 'rn-bf-day--disabled'
-                      }`
-                    : lightDayClass}
-                  disabled={!isAvailable}
-                  aria-label={
-                    isAvailable
-                      ? `${calendarDay}, €${formatEuroAmount(liveAdultPrice)}`
-                      : `${calendarDay}, unavailable`
+                ))
+              : getCalendarGrid().map((day, index) => {
+                  if (day === null) {
+                    return (
+                      <div
+                        key={`empty-${index}`}
+                        className={embeddedLight ? 'h-[2.35rem] sm:h-[2.45rem]' : 'h-12 sm:h-14'}
+                      />
+                    )
                   }
-                >
-                  <div className={lightCalendar ? 'rn-bf-day-num' : 'text-[11px] sm:text-sm font-semibold tabular-nums'}>
-                    {calendarDay}
-                  </div>
-                  {isAvailable && (
-                    <div
+
+                  const { day: calendarDay, date, available, remainingSlots, isFullBooked } = day
+                  const isAvailable =
+                    available && remainingSlots >= formData.adults + formData.children
+                  const isSelected = formData.preferredDate === date
+                  const priceClass = isSelected
+                    ? lightCalendar
+                      ? 'text-white/85'
+                      : 'text-emerald-100'
+                    : lightCalendar
+                      ? 'text-emerald-900/55'
+                      : 'text-emerald-700'
+
+                  const lightDayClass = (() => {
+                    if (isSelected) return 'rn-bf-light-day rn-bf-light-day--selected'
+                    if (!isAvailable) return 'rn-bf-light-day rn-bf-light-day--muted'
+                    if (fieldErrors.preferredDate) return 'rn-bf-light-day rn-bf-light-day--error'
+                    return 'rn-bf-light-day rn-bf-light-day--available'
+                  })()
+
+                  return (
+                    <button
+                      key={date}
+                      type="button"
+                      onClick={() => {
+                        if (!isAvailable) return
+                        setFormData({ ...formData, preferredDate: date })
+                        clearFieldError('preferredDate')
+                        setError('')
+                      }}
                       className={
-                        lightCalendar
-                          ? `rn-bf-day-price ${priceClass}`
-                          : `text-[9px] sm:text-[10px] font-medium mt-0.5 ${priceClass}`
+                        dark
+                          ? `rn-bf-day ${
+                              isSelected
+                                ? 'rn-bf-day--selected'
+                                : isFullBooked
+                                  ? 'rn-bf-day--full'
+                                  : isAvailable
+                                    ? 'rn-bf-day--available'
+                                    : 'rn-bf-day--disabled'
+                            }`
+                          : lightDayClass
+                      }
+                      disabled={!isAvailable}
+                      aria-label={
+                        isAvailable
+                          ? `${calendarDay}, €${formatEuroAmount(liveAdultPrice)}`
+                          : `${calendarDay}, unavailable`
                       }
                     >
-                      €{formatEuroAmount(liveAdultPrice)}
-                    </div>
-                  )}
-                  {isAvailable && !embeddedLight && remainingSlots <= 4 && (
-                    <div className={`text-[8px] sm:text-[10px] mt-0.5 ${
-                      isSelected ? 'text-emerald-100' : 'text-gray-500'
-                    }`}>
-                      {remainingSlots} left
-                    </div>
-                  )}
-                </button>
-              )
-            }) : (
-              // Show loading state when availability data is not loaded
-              Array.from({ length: 35 }, (_, index) => (
-                <div
-                  key={`loading-${index}`}
-                  className={
-                    embeddedLight
-                      ? 'h-[2.35rem] sm:h-[2.45rem] animate-pulse rounded bg-black/[0.04]'
-                      : 'h-12 sm:h-14 bg-gray-100 rounded animate-pulse'
-                  }
-                />
-              ))
-            )}
+                      <div
+                        className={
+                          lightCalendar
+                            ? 'rn-bf-day-num'
+                            : 'text-[11px] sm:text-sm font-semibold tabular-nums'
+                        }
+                      >
+                        {calendarDay}
+                      </div>
+                      {isAvailable && (
+                        <div
+                          className={
+                            lightCalendar
+                              ? `rn-bf-day-price ${priceClass}`
+                              : `text-[9px] sm:text-[10px] font-medium mt-0.5 ${priceClass}`
+                          }
+                        >
+                          €{formatEuroAmount(liveAdultPrice)}
+                        </div>
+                      )}
+                      {isAvailable && !embeddedLight && remainingSlots <= 4 && (
+                        <div
+                          className={`text-[8px] sm:text-[10px] mt-0.5 ${
+                            isSelected ? 'text-emerald-100' : 'text-gray-500'
+                          }`}
+                        >
+                          {remainingSlots} left
+                        </div>
+                      )}
+                    </button>
+                  )
+                })}
           </div>
+
+          {!loading && !hasOpenDates && !error && (
+            <p
+              className={
+                embeddedLight
+                  ? 'mt-3 rounded-md border border-black/[0.08] bg-black/[0.03] px-3 py-2.5 text-[12.5px] leading-snug text-panel-ink'
+                  : 'mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm text-amber-900'
+              }
+              role="status"
+            >
+              No available dates right now. Please check another month, or contact us if you need help
+              finding a departure.
+            </p>
+          )}
 
           <p className={`${ui.priceNote}${embeddedLight ? ' rn-bf-price-note' : ''}`}>
             Showing prices in EUR (Euro)

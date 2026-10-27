@@ -47,7 +47,15 @@ const MobileBookingBar = ({
           ) : (
             <>
               <p className="text-[10px] uppercase tracking-[0.14em] text-text-dim">From</p>
-              <p className="font-display text-xl font-semibold leading-none text-white">€{priceFrom}</p>
+              <p
+                className="text-[1.35rem] font-bold leading-none tracking-tight text-white"
+                style={{ fontFamily: 'var(--rn-font-body)' }}
+              >
+                €{priceFrom}
+                <span className="ml-1.5 text-[11px] font-medium tracking-normal text-text-dim">
+                  / adult
+                </span>
+              </p>
             </>
           )}
         </div>

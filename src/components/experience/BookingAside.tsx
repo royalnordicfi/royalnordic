@@ -52,11 +52,14 @@ export default function BookingAside({
         ) : typeof priceFrom === 'number' ? (
           <>
             <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-panel-muted">From</p>
-            <div className="mt-1 flex items-baseline gap-1.5">
-              <p className="font-display text-[1.45rem] font-semibold leading-none tracking-tight text-panel-ink">
+            <div className="mt-1.5 flex items-baseline gap-1.5">
+              <p
+                className="text-[1.7rem] font-bold leading-none tracking-tight text-panel-ink"
+                style={{ fontFamily: 'var(--rn-font-body)' }}
+              >
                 €{priceFrom}
               </p>
-              <span className="text-[12px] text-panel-muted">{priceNote}</span>
+              <span className="text-[12px] font-medium text-panel-muted">{priceNote}</span>
             </div>
           </>
         ) : (
