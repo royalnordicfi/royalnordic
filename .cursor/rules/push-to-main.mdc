@@ -1,0 +1,14 @@
+---
+description: Commit finished work and push to main by default
+alwaysApply: true
+---
+
+# Push to main by default
+
+When a task is finished and there are commits to publish (or uncommitted work that belongs in the completed task):
+
+1. Commit with a concise message (HEREDOC), excluding secrets, scratch assets, and `supabase/.temp/*`.
+2. Push to `origin/main` with a normal `git push` (never `--force` on main).
+3. Do this at the end of the task without waiting for an explicit “push” ask.
+
+Still ask first only for destructive git operations, force-push, amending pushed commits, or commits that would include secrets.
