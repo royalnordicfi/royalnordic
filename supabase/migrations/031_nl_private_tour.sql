@@ -142,10 +142,10 @@ INSERT INTO public.tours (
   'per_vehicle',
   'Private Northern Lights Tour Rovaniemi | Royal Nordic',
   'Book an exclusive private Northern Lights tour in Rovaniemi for up to eight guests. Hotel pickup, professional photography and Northern Lights guarantee included. €1,349 per private group.',
-  '/nortti11.jpg',
-  '/nortti11.jpg',
+  '/nordicci7.jpg',
+  '/nordicci7.jpg',
   '[
-    {"id":"g1","url":"/nortti11.jpg","alt":"Private Northern Lights experience under the aurora in Finnish Lapland","sort":0,"is_hero":true},
+    {"id":"g1","url":"/nordicci7.jpg","alt":"Private Northern Lights experience under the aurora in Finnish Lapland","sort":0,"is_hero":true},
     {"id":"g2","url":"/nortti10.jpg","alt":"Aurora Borealis over Arctic wilderness near Rovaniemi","sort":1,"is_hero":false},
     {"id":"g3","url":"/nortti8.jpg","alt":"Green northern lights above snowy Lapland forest","sort":2,"is_hero":false},
     {"id":"g4","url":"/lights8.jpg","alt":"Aurora reflecting above the Arctic landscape","sort":3,"is_hero":false},

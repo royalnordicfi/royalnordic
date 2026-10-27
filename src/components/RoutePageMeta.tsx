@@ -33,7 +33,7 @@ const META: Record<
     title: 'Private Northern Lights Tour Rovaniemi | Royal Nordic',
     description:
       'Book an exclusive private Northern Lights tour in Rovaniemi for up to eight guests. Hotel pickup, professional photography and Northern Lights guarantee included. €1,349 per private group.',
-    ogImage: 'https://royalnordic.fi/nortti11.jpg',
+    ogImage: 'https://royalnordic.fi/nordicci7.jpg',
   },
   '/northern-lights-tours': {
     title: 'Northern Lights Tours Rovaniemi | Royal Nordic',

@@ -55,7 +55,7 @@ const FALLBACK: TourPageFallback = {
   excluded: ['Thermal clothing', 'Food and drinks', 'Personal purchases'],
   gallery: [
     {
-      src: '/nortti11.jpg',
+      src: '/nordicci7.jpg',
       alt: 'Private Northern Lights experience under the aurora in Finnish Lapland',
     },
     { src: '/nortti10.jpg', alt: 'Aurora Borealis over Arctic wilderness near Rovaniemi' },

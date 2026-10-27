@@ -58,7 +58,7 @@ const PRODUCTS: ProductDef[] = [
     name: 'Private Northern Lights Tour – 100% Guarantee',
     description:
       'Exclusive private Northern Lights tour in Rovaniemi for up to eight guests. Hotel pickup, professional aurora photography, and Northern Lights guarantee. €1,349 per private group.',
-    image: `${SITE}/nortti11.jpg`,
+    image: `${SITE}/nordicci7.jpg`,
     price: 1349,
     breadcrumbs: [
       { name: 'Home', path: '/' },

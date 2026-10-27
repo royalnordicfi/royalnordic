@@ -44,7 +44,7 @@ const ALL_TOURS = [
   {
     tourId: PRIVATE_NL_TOUR_ID as number | null,
     to: PRIVATE_NL_PATH,
-    image: '/nortti11.jpg',
+    image: '/nordicci7.jpg',
     imageAlt: 'Private Northern Lights tour for an exclusive group',
     title: PRIVATE_NL_LISTING_TITLE,
     description:
@@ -133,6 +133,9 @@ const NorthernLightsTours: React.FC = () => {
         ...merged,
         title: t.title,
         pickup: t.pickup,
+        // Keep curated banner photos distinct — do not let CMS homogenize cards.
+        image: t.image,
+        imageAlt: t.imageAlt,
       }
     })
   }, [activeIds, cmsById])
