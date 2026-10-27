@@ -200,6 +200,13 @@ const NorthernLightsTour = () => {
             <Link to="/northern-lights-tours" className="font-medium text-aurora-soft hover:underline">
               Compare Northern Lights tours
             </Link>
+            {' · '}
+            <Link
+              to="/northern-lights-private-tour"
+              className="font-medium text-aurora-soft hover:underline"
+            >
+              Private group option
+            </Link>
           </p>
         }
         afterContent={

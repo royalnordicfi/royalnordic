@@ -61,7 +61,7 @@ export const WINTER_PROMOTION: WinterPromotionConfig = {
 }
 
 /** Tours that already have a catalogue sale or flat vehicle pricing — WINTER20 must not stack. */
-export const WINTER20_EXCLUDED_TOUR_IDS = new Set<number>([1, 9, 10])
+export const WINTER20_EXCLUDED_TOUR_IDS = new Set<number>([1, 9, 10, 11])
 export const WINTER20_EXCLUDED_TOUR_NAMES = new Set<string>([
   'Guaranteed Northern Lights Tour',
   'Northern Lights Tour',
@@ -70,6 +70,8 @@ export const WINTER20_EXCLUDED_TOUR_NAMES = new Set<string>([
   'Rovaniemi ⇄ Saariselkä Private Transfer',
   'Northern Lights Standard Group – 100% Guarantee',
   'Northern Lights Standard Group — Bus Tour',
+  'Private Northern Lights Tour – 100% Guarantee',
+  'Private Northern Lights Tour — Exclusive Group',
 ])
 
 /** CSS custom property used to offset the fixed header under the bar */

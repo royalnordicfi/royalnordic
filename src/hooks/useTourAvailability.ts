@@ -21,6 +21,8 @@ type Options = {
   maxCapacity?: number
   seasonStart?: string
   seasonEnd?: string
+  /** Flat exclusive allocation (private tour / transfer) — inventory is not per guest. */
+  pricingModel?: 'per_person' | 'per_vehicle'
 }
 
 export function useTourAvailability({
@@ -30,7 +32,9 @@ export function useTourAvailability({
   maxCapacity,
   seasonStart,
   seasonEnd,
+  pricingModel = 'per_person',
 }: Options) {
+  const exclusiveSlot = pricingModel === 'per_vehicle'
   const [availability, setAvailability] = useState<TourDate[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -104,10 +108,15 @@ export function useTourAvailability({
     (date: string) => {
       const dateData = availability.find((d) => d.date === date)
       const remaining = dateData?.remaining_slots || 0
+      // Per-vehicle / private group: one open allocation unlocks up to maxCapacity guests.
+      if (exclusiveSlot) {
+        if (remaining < 1) return 0
+        return Math.max(1, maxCapacity || 1)
+      }
       if (maxCapacity && maxCapacity > 0) return Math.min(remaining, maxCapacity)
       return remaining
     },
-    [availability, maxCapacity],
+    [availability, maxCapacity, exclusiveSlot],
   )
 
   const findDateRow = useCallback(
@@ -143,7 +152,8 @@ export function useTourAvailability({
           seasonStart && seasonEnd ? isDateInTourSeason(dateString, seasonStart, seasonEnd) : true
         const remaining = dateData?.remaining_slots ?? 0
         const isFullBooked = Boolean(dateData && remaining === 0)
-        const isAvailable = !isPastDate && inSeason && Boolean(dateData) && remaining >= partySize
+        const inventoryOk = exclusiveSlot ? remaining >= 1 : remaining >= partySize
+        const isAvailable = !isPastDate && inSeason && Boolean(dateData) && inventoryOk
 
         return {
           day,
@@ -156,7 +166,7 @@ export function useTourAvailability({
         }
       })
     },
-    [availability, seasonStart, seasonEnd],
+    [availability, seasonStart, seasonEnd, exclusiveSlot],
   )
 
   return {

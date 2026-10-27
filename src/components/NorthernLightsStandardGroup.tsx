@@ -246,6 +246,13 @@ const NorthernLightsStandardGroup = () => {
             </Link>{' '}
             is the small-group tour with hotel pickup.{' '}
             <Link
+              to="/northern-lights-private-tour"
+              className="font-medium text-aurora-soft hover:underline"
+            >
+              Private Northern Lights Tour
+            </Link>{' '}
+            is an exclusive departure for your group of up to eight guests.{' '}
+            <Link
               to="/family-friendly-northern-lights"
               className="font-medium text-aurora-soft hover:underline"
             >

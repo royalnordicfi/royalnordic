@@ -30,6 +30,7 @@ export default function CheckoutPage() {
   const [email, setEmail] = useState(draft?.customerEmail || '')
   const [phone, setPhone] = useState(draft?.phone || '')
   const [specialRequests, setSpecialRequests] = useState(draft?.specialRequests || '')
+  const [pickupLocation, setPickupLocation] = useState(draft?.pickupLocation || '')
   const [discountCode, setDiscountCode] = useState(draft?.discountCode || '')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -38,7 +39,10 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     const stored = readBookingDraft()
-    if (stored) setDraft(stored)
+    if (stored) {
+      setDraft(stored)
+      if (stored.pickupLocation) setPickupLocation(stored.pickupLocation)
+    }
   }, [location.search])
 
   const {
@@ -55,6 +59,7 @@ export default function CheckoutPage() {
     maxCapacity: draft?.maxCapacity,
     seasonStart: draft?.seasonStart,
     seasonEnd: draft?.seasonEnd,
+    pricingModel: draft?.pricingModel,
   })
 
   // Sync live prices into draft when availability returns.
@@ -97,7 +102,11 @@ export default function CheckoutPage() {
     : 0
   const total = Math.max(0, subtotal - discount)
   const seatsLeft = draft ? getAvailableSlots(draft.tourDateIso) : 0
-  const dateStillOpen = draft ? Boolean(findDateRow(draft.tourDateIso) && seatsLeft >= draft.adults + draft.children) : false
+  const partySize = draft ? draft.adults + draft.children : 0
+  const dateStillOpen = draft
+    ? Boolean(findDateRow(draft.tourDateIso) && seatsLeft > 0 && partySize <= seatsLeft)
+    : false
+  const needsPickup = Boolean(draft?.requiresHotelPickup)
 
   const persistContact = () => {
     if (!draft) return
@@ -107,6 +116,7 @@ export default function CheckoutPage() {
       customerEmail: email.trim(),
       phone: phone.trim(),
       specialRequests: specialRequests.trim(),
+      pickupLocation: needsPickup ? pickupLocation.trim() : draft.pickupLocation,
       discountCode: promoAllowed ? discountCode.trim().toUpperCase() : '',
       adultPrice: liveAdultPrice || draft.adultPrice,
       childPrice: liveChildPrice || draft.childPrice,
@@ -128,6 +138,10 @@ export default function CheckoutPage() {
       setError('Please enter a valid email address.')
       return false
     }
+    if (needsPickup && pickupLocation.trim().length < 5) {
+      setError('Please enter your hotel or pickup address in the supported Rovaniemi area.')
+      return false
+    }
     if (!dateStillOpen) {
       setError('This date is no longer available. Please edit your booking and choose another date.')
       return false
@@ -145,7 +159,7 @@ export default function CheckoutPage() {
       await reload()
       const row = findDateRow(draft.tourDateIso)
       const available = getAvailableSlots(draft.tourDateIso)
-      if (!row?.id || draft.adults + draft.children > available) {
+      if (!row?.id || available <= 0 || draft.adults + draft.children > available) {
         throw new Error(
           available <= 0
             ? 'This date is sold out. Please edit your booking.'
@@ -188,6 +202,9 @@ export default function CheckoutPage() {
           ...(draft.departureTime ? { tour_time: draft.departureTime } : {}),
           ...(draft.meetingPointDeparture && draft.meetingPoint
             ? { meeting_point: `Meeting point: ${draft.meetingPoint}` }
+            : {}),
+          ...(needsPickup && pickupLocation.trim()
+            ? { pickup_location: pickupLocation.trim() }
             : {}),
         },
       }
@@ -352,6 +369,23 @@ export default function CheckoutPage() {
                   onChange={(e) => setPhone(e.target.value)}
                 />
               </label>
+              {needsPickup ? (
+                <label className="rn-checkout__field">
+                  <span>Hotel / pickup address</span>
+                  <input
+                    type="text"
+                    autoComplete="street-address"
+                    value={pickupLocation}
+                    onChange={(e) => setPickupLocation(e.target.value)}
+                    placeholder="Hotel or accommodation in Rovaniemi"
+                    required
+                  />
+                  <span className="rn-checkout__field-hint">
+                    Pickup and drop-off are included within the supported Rovaniemi area. Exact pickup
+                    time is confirmed after booking and may be earlier than departure.
+                  </span>
+                </label>
+              ) : null}
               <label className="rn-checkout__field">
                 <span>Special requests (optional)</span>
                 <textarea
@@ -439,7 +473,7 @@ export default function CheckoutPage() {
                   <dd>{dateLabel}</dd>
                 </div>
                 <div>
-                  <dt>{perVehicle ? 'Passengers' : 'Guests'}</dt>
+                  <dt>{needsPickup ? 'Guests' : perVehicle ? 'Passengers' : 'Guests'}</dt>
                   <dd>
                     {draft.adults} adult{draft.adults === 1 ? '' : 's'}
                     {draft.children > 0
@@ -447,9 +481,15 @@ export default function CheckoutPage() {
                       : ''}
                   </dd>
                 </div>
+                {needsPickup && pickupLocation.trim() ? (
+                  <div>
+                    <dt>Pickup</dt>
+                    <dd>{pickupLocation.trim()}</dd>
+                  </div>
+                ) : null}
                 {perVehicle ? (
                   <div>
-                    <dt>Vehicle</dt>
+                    <dt>{needsPickup ? 'Private group' : 'Vehicle'}</dt>
                     <dd>€{formatEuroAmount(liveAdultPrice || draft.adultPrice)}</dd>
                   </div>
                 ) : (

@@ -26,6 +26,12 @@ export type BookingWidgetProps = {
   meetingPoint?: string
   pricingModel?: BookingPricingModel
   cancellationNote?: string
+  /** Collect hotel/pickup address on /checkout (private tours). */
+  requiresHotelPickup?: boolean
+  /** Override total note under the price (e.g. private group). */
+  totalNote?: string
+  /** Override guest-stepper note for flat group pricing. */
+  guestPriceNote?: string
 }
 
 export default function BookingWidget({
@@ -41,6 +47,9 @@ export default function BookingWidget({
   meetingPoint,
   pricingModel = 'per_person',
   cancellationNote = 'Free cancellation up to 24 hours before departure.',
+  requiresHotelPickup = false,
+  totalNote,
+  guestPriceNote,
 }: BookingWidgetProps) {
   const navigate = useNavigate()
   const location = useLocation()
@@ -63,6 +72,7 @@ export default function BookingWidget({
     maxCapacity,
     seasonStart,
     seasonEnd,
+    pricingModel,
   })
 
   const [preferredDate, setPreferredDate] = useState('')
@@ -114,11 +124,17 @@ export default function BookingWidget({
       return
     }
     const available = getAvailableSlots(preferredDate)
+    if (available <= 0) {
+      setLocalError(
+        perVehicle
+          ? 'This private departure is no longer available. Please choose another date.'
+          : 'This date is sold out. Please choose another date.',
+      )
+      return
+    }
     if (partySize > available) {
       setLocalError(
-        available <= 0
-          ? 'This date is sold out. Please choose another date.'
-          : `Only ${available} place${available === 1 ? '' : 's'} left on this date.`,
+        `Only ${available} place${available === 1 ? '' : 's'} left on this date.`,
       )
       return
     }
@@ -142,6 +158,7 @@ export default function BookingWidget({
       departureTime,
       meetingPointDeparture,
       meetingPoint,
+      requiresHotelPickup,
     }
     saveBookingDraft(draft)
     navigate(checkoutPathFromDraft(draft))
@@ -177,6 +194,7 @@ export default function BookingWidget({
             childPrice={liveChildPrice}
             pricingModel={pricingModel}
             formatMoney={formatEuroAmount}
+            priceNote={guestPriceNote}
             onChange={({ adults: a, children: c }) => {
               setAdults(a)
               setChildren(c)
@@ -185,7 +203,11 @@ export default function BookingWidget({
           />
           {seatsLeft > 0 ? (
             <p className="rn-book-widget__seats">
-              {seatsLeft === 1 ? '1 seat left on this departure' : `${seatsLeft} seats left on this departure`}
+              {perVehicle
+                ? `Exclusive for your group · up to ${maxGuests} guests`
+                : seatsLeft === 1
+                  ? '1 seat left on this departure'
+                  : `${seatsLeft} seats left on this departure`}
             </p>
           ) : null}
         </>
@@ -195,7 +217,7 @@ export default function BookingWidget({
         <div>
           <p className="rn-book-widget__label">Total</p>
           <p className="rn-book-widget__total-note">
-            {perVehicle ? 'Per vehicle · VAT incl.' : 'VAT included'}
+            {totalNote || (perVehicle ? 'Per vehicle · VAT incl.' : 'VAT included')}
           </p>
         </div>
         <p className="rn-book-widget__total-value">€{formatEuroAmount(subtotal)}</p>

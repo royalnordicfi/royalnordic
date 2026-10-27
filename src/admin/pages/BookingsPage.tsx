@@ -178,6 +178,10 @@ export default function BookingsPage() {
                       <div className="text-xs text-gray-600 mt-1">
                         {d ? `${d} (${weekdayForTourDate(d)})` : '—'} {b.tour_time || ''} ·{' '}
                         {b.tours?.public_name || b.tours?.name}
+                        {b.tour_id === 11 ||
+                        /private northern lights/i.test(b.tours?.public_name || b.tours?.name || '')
+                          ? ' · PRIVATE TOUR'
+                          : ''}
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         {b.adults}+{b.children} · €{Number(b.total_price).toFixed(0)} ·{' '}

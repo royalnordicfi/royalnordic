@@ -24,6 +24,9 @@ export type BookingDraft = {
   departureTime?: string
   meetingPointDeparture?: boolean
   meetingPoint?: string
+  /** When true, checkout requires a hotel/pickup address. */
+  requiresHotelPickup?: boolean
+  pickupLocation?: string
   customerName?: string
   customerEmail?: string
   phone?: string

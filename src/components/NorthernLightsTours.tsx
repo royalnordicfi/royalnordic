@@ -15,6 +15,10 @@ import {
   GUARANTEED_NL_REFERENCE_ADULT_PRICE,
 } from '../seo/guaranteedNorthernLightsTour'
 import {
+  PRIVATE_NL_GROUP_PRICE,
+  PRIVATE_NL_LISTING_TITLE,
+  PRIVATE_NL_PATH,
+  PRIVATE_NL_TOUR_ID,
   STANDARD_GROUP_ADULT_PRICE,
   STANDARD_GROUP_LISTING_TITLE,
   STANDARD_GROUP_PATH,
@@ -35,6 +39,23 @@ const ALL_TOURS = [
     badge: 'Small group',
     priceFrom: GUARANTEED_NL_CATALOG_ADULT_PRICE as number | undefined,
     referencePrice: GUARANTEED_NL_REFERENCE_ADULT_PRICE as number | undefined,
+    lockListing: true,
+  },
+  {
+    tourId: PRIVATE_NL_TOUR_ID as number | null,
+    to: PRIVATE_NL_PATH,
+    image: '/nortti11.jpg',
+    imageAlt: 'Private Northern Lights tour for an exclusive group',
+    title: PRIVATE_NL_LISTING_TITLE,
+    description:
+      'Exclusive private aurora experience for your group of up to eight guests. Hotel pickup, professional photography, €1,349 per private group.',
+    duration: 'About 5 hours',
+    groupSize: 'Private · max 8',
+    pickup: true,
+    badge: 'Private',
+    priceFrom: PRIVATE_NL_GROUP_PRICE as number | undefined,
+    pricePrefix: 'From',
+    priceUnit: '/ private group',
     lockListing: true,
   },
   {
@@ -101,7 +122,9 @@ const NorthernLightsTours: React.FC = () => {
 
   const tours = useMemo(() => {
     const base = !activeIds
-      ? ALL_TOURS.filter((t) => t.tourId !== STANDARD_GROUP_TOUR_ID)
+      ? ALL_TOURS.filter(
+          (t) => t.tourId !== STANDARD_GROUP_TOUR_ID && t.tourId !== PRIVATE_NL_TOUR_ID,
+        )
       : ALL_TOURS.filter((t) => t.tourId == null || activeIds.has(t.tourId))
     return base.map((t) => {
       const merged = mergeTourCardCms(t, cmsById)
@@ -118,7 +141,7 @@ const NorthernLightsTours: React.FC = () => {
     <div className="rn-page">
       <CategoryHero
         title="Northern Lights Tours in Rovaniemi"
-        subtitle={`Small-group hunts, a large-group bus departure, and a shorter family evening. ${GUARANTEED_NL_GUARANTEE_SHORT}`}
+        subtitle={`Small-group, private exclusive, and large-group bus departures — plus a shorter family evening. ${GUARANTEED_NL_GUARANTEE_SHORT}`}
         image="/nortti5.jpg"
         compact
       />
@@ -166,6 +189,10 @@ const NorthernLightsTours: React.FC = () => {
                 — small group, hotel pickup, professional photos, and a camera-capture refund guarantee.
               </li>
               <li>
+                <span className="font-medium text-white">Private Tour</span> — exclusive experience for
+                one group of up to eight guests, hotel pickup included, €1,349 per private group.
+              </li>
+              <li>
                 <span className="font-medium text-white">Standard Group</span> — large shared bus,
                 up to 50 guests, meeting point at Ruokasenkatu 3. Hotel pickup is not included.
               </li>
@@ -186,6 +213,7 @@ const NorthernLightsTours: React.FC = () => {
         lede="Fill your days between aurora evenings with Lapland experiences."
         links={[
           { to: '/northern-lights-tour', label: 'Small-group tour', primary: true },
+          { to: PRIVATE_NL_PATH, label: 'Private tour' },
           { to: STANDARD_GROUP_PATH, label: 'Standard Group bus' },
           { to: '/daytime-experiences', label: 'Day tours' },
         ]}

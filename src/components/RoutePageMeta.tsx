@@ -29,10 +29,16 @@ const META: Record<
       'Large-group Northern Lights bus tour from Rovaniemi, from €60 per person. Departs Ruokasenkatu 3 at 20:00, 1 November–31 March. Up to 50 guests. Hotel pickup is not included.',
     ogImage: 'https://royalnordic.fi/nortti5.jpg',
   },
+  '/northern-lights-private-tour': {
+    title: 'Private Northern Lights Tour Rovaniemi | Royal Nordic',
+    description:
+      'Book an exclusive private Northern Lights tour in Rovaniemi for up to eight guests. Hotel pickup, professional photography and Northern Lights guarantee included. €1,349 per private group.',
+    ogImage: 'https://royalnordic.fi/nortti11.jpg',
+  },
   '/northern-lights-tours': {
     title: 'Northern Lights Tours Rovaniemi | Royal Nordic',
     description:
-      'Compare small-group, standard group bus, and family-friendly Northern Lights tours from Royal Nordic in Rovaniemi.',
+      'Compare small-group, private, standard group bus, and family-friendly Northern Lights tours from Royal Nordic in Rovaniemi.',
     ogImage: 'https://royalnordic.fi/nortti5.jpg',
   },
   '/ice-fishing': {

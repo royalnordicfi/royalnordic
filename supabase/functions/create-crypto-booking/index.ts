@@ -48,7 +48,7 @@ serve(async (req) => {
     const PROMO_ENABLED = true
     const PROMO_CODE = 'WINTER20'
     const PROMO_PERCENT = 20
-    const PROMO_EXCLUDED_TOUR_IDS = new Set([1, 9, 10])
+    const PROMO_EXCLUDED_TOUR_IDS = new Set([1, 9, 10, 11])
     const promoTourId = parseInt(String(tour_id || ''), 10)
     const isPerVehicle =
       String(pricing_model || '') === 'per_vehicle' || promoTourId === 9

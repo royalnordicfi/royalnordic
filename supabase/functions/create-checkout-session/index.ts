@@ -110,10 +110,17 @@ serve(async (req) => {
             throw new Error('This date is outside the operating season')
           }
 
-          if (standardGroup) {
-            const remaining = Number(dateRow.available_slots) - Number(dateRow.total_booked || 0)
-            const requested = adults + children
-            const cap = Number(tourRow.max_capacity || 0)
+          const remaining = Number(dateRow.available_slots) - Number(dateRow.total_booked || 0)
+          const requested = adults + children
+          const cap = Number(tourRow.max_capacity || 0)
+          const isPerVehicle = pricingModel === 'per_vehicle' || tourId === 9
+
+          if (isPerVehicle) {
+            if (remaining < 1) throw new Error('This departure is sold out')
+            if (requested < 1 || (cap > 0 && requested > cap)) {
+              throw new Error(`This experience accepts 1–${cap || 8} guests`)
+            }
+          } else if (standardGroup) {
             if (requested < 1 || requested > remaining || (cap > 0 && requested > cap)) {
               throw new Error(
                 remaining > 0
@@ -146,7 +153,7 @@ serve(async (req) => {
     const PROMO_ENABLED = true
     const PROMO_CODE = 'WINTER20'
     const PROMO_PERCENT = 20
-    const PROMO_EXCLUDED_TOUR_IDS = new Set([1, 9, STANDARD_GROUP_TOUR_ID])
+    const PROMO_EXCLUDED_TOUR_IDS = new Set([1, 9, STANDARD_GROUP_TOUR_ID, 11])
     const subtotal = Number(metadata?.subtotal)
     const claimedDiscount = Number(metadata?.discount || 0)
     const code = String(metadata?.discount_code || '').trim().toUpperCase()

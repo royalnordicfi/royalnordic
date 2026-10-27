@@ -23,6 +23,8 @@ const OVERLAY_EXACT = new Set([
 const PRODUCT_EXACT = new Set([
   '/northern-lights-tour',
   '/family-friendly-northern-lights',
+  '/northern-lights-standard-group',
+  '/northern-lights-private-tour',
   '/ice-fishing',
   '/ranua-zoo',
   '/korouoma-canyon',

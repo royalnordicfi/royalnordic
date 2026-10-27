@@ -45,6 +45,11 @@ export const TOUR_PUBLIC_PAGES: Record<
     fallbackPath: '/northern-lights-tours',
     label: 'Northern Lights Standard Group – 100% Guarantee',
   },
+  11: {
+    path: '/northern-lights-private-tour',
+    fallbackPath: '/northern-lights-tours',
+    label: 'Private Northern Lights Tour – 100% Guarantee',
+  },
   9: {
     path: '/transportation-rovaniemi-saariselka',
     fallbackPath: '/transportation',

@@ -54,6 +54,19 @@ type ProductDef = {
 
 const PRODUCTS: ProductDef[] = [
   {
+    path: '/northern-lights-private-tour',
+    name: 'Private Northern Lights Tour – 100% Guarantee',
+    description:
+      'Exclusive private Northern Lights tour in Rovaniemi for up to eight guests. Hotel pickup, professional aurora photography, and Northern Lights guarantee. €1,349 per private group.',
+    image: `${SITE}/nortti11.jpg`,
+    price: 1349,
+    breadcrumbs: [
+      { name: 'Home', path: '/' },
+      { name: 'Northern Lights Tours', path: '/northern-lights-tours' },
+      { name: 'Private Northern Lights Tour – 100% Guarantee', path: '/northern-lights-private-tour' },
+    ],
+  },
+  {
     path: '/northern-lights-standard-group',
     name: 'Northern Lights Standard Group – 100% Guarantee',
     description:
@@ -160,6 +173,7 @@ function breadcrumbList(crumbs: { name: string; path: string }[]) {
 }
 
 function productOffer(product: ProductDef) {
+  const isPrivateGroup = product.path === '/northern-lights-private-tour'
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -176,6 +190,7 @@ function productOffer(product: ProductDef) {
       url: `${SITE}${product.path}`,
       priceCurrency: 'EUR',
       price: product.price.toFixed(2),
+      ...(isPrivateGroup ? { unitText: 'private group' } : {}),
       availability:
         product.path === '/northern-lights-standard-group'
           ? 'https://schema.org/LimitedAvailability'

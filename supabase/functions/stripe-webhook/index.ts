@@ -163,7 +163,11 @@ serve(async (req) => {
       }
 
       if (metadata.tour_time) insertPayload.tour_time = String(metadata.tour_time)
-      if (metadata.meeting_point) insertPayload.pickup_location = String(metadata.meeting_point)
+      if (metadata.pickup_location) {
+        insertPayload.pickup_location = String(metadata.pickup_location)
+      } else if (metadata.meeting_point) {
+        insertPayload.pickup_location = String(metadata.meeting_point)
+      }
 
       let { data: booking, error: bookingError } = await supabase
         .from('bookings')

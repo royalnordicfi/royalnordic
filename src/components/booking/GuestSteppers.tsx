@@ -7,6 +7,8 @@ type Props = {
   pricingModel: 'per_person' | 'per_vehicle'
   onChange: (next: { adults: number; children: number }) => void
   formatMoney: (n: number) => string
+  /** Overrides the default per-vehicle pricing note. */
+  priceNote?: string
 }
 
 export default function GuestSteppers({
@@ -18,6 +20,7 @@ export default function GuestSteppers({
   pricingModel,
   onChange,
   formatMoney,
+  priceNote,
 }: Props) {
   const perVehicle = pricingModel === 'per_vehicle'
   const party = adults + children
@@ -89,7 +92,9 @@ export default function GuestSteppers({
       </div>
 
       {perVehicle ? (
-        <p className="rn-guest-steppers__note">Price is per vehicle, not per person.</p>
+        <p className="rn-guest-steppers__note">
+          {priceNote || 'Price is per vehicle, not per person.'}
+        </p>
       ) : null}
     </div>
   )

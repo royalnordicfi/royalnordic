@@ -3631,6 +3631,12 @@
   font-weight: 550;
   color: var(--rn-text-muted);
 }
+.rn-checkout__field-hint {
+  font-size: 11.5px;
+  font-weight: 450;
+  line-height: 1.4;
+  color: var(--rn-text-dim, var(--rn-text-muted));
+}
 .rn-checkout__field input,
 .rn-checkout__field textarea,
 .rn-checkout__field select {

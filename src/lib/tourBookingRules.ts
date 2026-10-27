@@ -17,12 +17,28 @@ export const STANDARD_GROUP_PUBLIC_NAME = 'Northern Lights Standard Group – 10
 export const STANDARD_GROUP_LISTING_TITLE = 'Northern Lights Standard Group — Bus Tour'
 export const STANDARD_GROUP_MEETING_POINT = 'Ruokasenkatu 3, 96100 Rovaniemi, Finland'
 
+export const PRIVATE_NL_TOUR_ID = 11
+export const PRIVATE_NL_PATH = '/northern-lights-private-tour'
+export const PRIVATE_NL_SEASON_START = '11-01'
+export const PRIVATE_NL_SEASON_END = '04-15'
+export const PRIVATE_NL_DEPARTURE = '18:30'
+export const PRIVATE_NL_GROUP_PRICE = 1349
+export const PRIVATE_NL_CAPACITY = 8
+export const PRIVATE_NL_NAME = 'Private Northern Lights Tour – 100% Guarantee'
+export const PRIVATE_NL_PUBLIC_NAME = 'Private Northern Lights Tour – 100% Guarantee'
+export const PRIVATE_NL_LISTING_TITLE = 'Private Northern Lights Tour — Exclusive Group'
+
 const MONTH_DAY = /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/
 const CLOCK = /^([01]\d|2[0-3]):[0-5]\d$/
 
 export function isStandardGroupTour(tourId?: number | null, tourName?: string | null): boolean {
   if (tourId === STANDARD_GROUP_TOUR_ID) return true
   return /standard group/i.test(tourName || '')
+}
+
+export function isPrivateNlTour(tourId?: number | null, tourName?: string | null): boolean {
+  if (tourId === PRIVATE_NL_TOUR_ID) return true
+  return /private northern lights/i.test(tourName || '')
 }
 
 /** Recurring MM-DD season. A start after the end crosses the new year (1 Nov–31 Mar). */
@@ -90,6 +106,7 @@ export function departureSuffixForTour(tourName: string, departureTime?: string 
   if (explicit && isValidDepartureTime(explicit)) return ` at ${explicit}`
   if (/family-friendly northern lights/i.test(tourName)) return ' at 21:00'
   if (isStandardGroupTour(null, tourName)) return ` at ${STANDARD_GROUP_DEPARTURE}`
+  if (isPrivateNlTour(null, tourName)) return ` at ${PRIVATE_NL_DEPARTURE}`
   if (/northern lights/i.test(tourName)) return ' at 18:30'
   return ''
 }
