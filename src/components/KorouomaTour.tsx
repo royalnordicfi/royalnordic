@@ -1,4 +1,4 @@
-import BookingForm from './BookingForm'
+import BookingWidget from './booking/BookingWidget'
 import Footer from './Footer'
 import MobileBookingBar from './MobileBookingBar'
 import ProductFaq from './seo/ProductFaq'
@@ -137,14 +137,12 @@ const KorouomaTour = () => {
             {cms.loading && !cms.tour ? (
               <p className="py-10 text-center text-sm text-panel-muted">Loading availability…</p>
             ) : (
-              <BookingForm
+              <BookingWidget
                 tourId={6}
                 tourName={cms.bookingTourName}
                 adultPrice={cms.adultPrice}
                 childPrice={cms.childPrice}
                 maxCapacity={cms.maxCapacity}
-                chrome="embedded"
-                tone="light"
               />
             )}
           </BookingAside>

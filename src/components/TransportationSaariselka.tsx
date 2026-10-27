@@ -1,4 +1,4 @@
-import BookingForm from './BookingForm'
+import BookingWidget from './booking/BookingWidget'
 import Footer from './Footer'
 import MobileBookingBar from './MobileBookingBar'
 import ProductFaq from './seo/ProductFaq'
@@ -116,15 +116,13 @@ const TransportationSaariselka = () => {
             {cms.loading && !cms.tour ? (
               <p className="py-10 text-center text-sm text-panel-muted">Loading availability…</p>
             ) : (
-              <BookingForm
+              <BookingWidget
                 tourId={SAARISELKA_TOUR_ID}
                 tourName={cms.bookingTourName}
                 adultPrice={vehiclePrice}
                 childPrice={vehiclePrice}
                 maxCapacity={cms.maxCapacity}
                 pricingModel="per_vehicle"
-                chrome="embedded"
-                tone="light"
               />
             )}
           </BookingAside>
@@ -172,6 +170,7 @@ const TransportationSaariselka = () => {
         priceFrom={vehiclePrice}
         onBook={scrollToBook}
         label="Book transfer"
+        unitLabel="/ vehicle"
       />
     </div>
   )

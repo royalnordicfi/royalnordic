@@ -177,6 +177,11 @@ const META: Record<
     title: 'Terms & Conditions | Royal Nordic',
     description: 'Booking terms, cancellation policy, and Northern Lights guarantee details for Royal Nordic tours.',
   },
+  '/checkout': {
+    title: 'Checkout | Royal Nordic',
+    description: 'Complete your Royal Nordic tour booking securely.',
+    noIndex: true,
+  },
   '/payment-success': {
     title: 'Payment Successful | Royal Nordic',
     description: 'Your Royal Nordic booking payment was successful.',

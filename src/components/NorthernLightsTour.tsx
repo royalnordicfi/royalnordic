@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import BookingForm from './BookingForm'
+import BookingWidget from './booking/BookingWidget'
 import Footer from './Footer'
 import MobileBookingBar from './MobileBookingBar'
 import ProductFaq from './seo/ProductFaq'
@@ -183,7 +183,7 @@ const NorthernLightsTour = () => {
             {loading && !tour ? (
               <p className="py-8 text-center text-sm text-panel-muted">Loading availability…</p>
             ) : (
-              <BookingForm
+              <BookingWidget
                 tourId={1}
                 tourName="Guaranteed Northern Lights Tour"
                 adultPrice={adultPrice}
@@ -191,8 +191,6 @@ const NorthernLightsTour = () => {
                 maxCapacity={maxCapacity}
                 seasonStart={GUARANTEED_NL_SEASON_START}
                 seasonEnd={GUARANTEED_NL_SEASON_END}
-                chrome="embedded"
-                tone="light"
               />
             )}
           </BookingAside>

@@ -5,6 +5,8 @@ type MobileBookingBarProps = {
   referencePrice?: number
   onBook: () => void
   label?: string
+  /** Price unit shown under From (e.g. "/ adult", "/ vehicle"). */
+  unitLabel?: string
 }
 
 /** Persistent mobile CTA — sets --mobile-book-bar for WhatsApp clearance. */
@@ -13,6 +15,7 @@ const MobileBookingBar = ({
   referencePrice,
   onBook,
   label = 'Check availability',
+  unitLabel = '/ adult',
 }: MobileBookingBarProps) => {
   useEffect(() => {
     document.documentElement.style.setProperty('--mobile-book-bar', '4.75rem')
@@ -53,7 +56,7 @@ const MobileBookingBar = ({
               >
                 €{priceFrom}
                 <span className="ml-1.5 text-[11px] font-medium tracking-normal text-text-dim">
-                  / adult
+                  {unitLabel}
                 </span>
               </p>
             </>

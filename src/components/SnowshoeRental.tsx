@@ -1,4 +1,4 @@
-import BookingForm from './BookingForm'
+import BookingWidget from './booking/BookingWidget'
 import Footer from './Footer'
 import MobileBookingBar from './MobileBookingBar'
 import ProductFaq from './seo/ProductFaq'
@@ -138,7 +138,7 @@ const SnowshoeRental = () => {
             {cms.loading && !cms.tour ? (
               <p className="py-10 text-center text-sm text-panel-muted">Loading availability…</p>
             ) : (
-              <BookingForm
+              <BookingWidget
                 tourId={2}
                 tourName={cms.bookingTourName}
                 adultPrice={cms.adultPrice}
@@ -146,8 +146,6 @@ const SnowshoeRental = () => {
                 maxCapacity={cms.maxCapacity}
                 seasonStart="11-01"
                 seasonEnd="04-01"
-                chrome="embedded"
-                tone="light"
               />
             )}
           </BookingAside>

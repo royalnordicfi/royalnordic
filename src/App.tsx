@@ -45,6 +45,7 @@ import TransportationCategory from './components/TransportationCategory';
 import PaymentSuccess from './components/PaymentSuccess';
 import PaymentCancelled from './components/PaymentCancelled';
 import CryptoPaymentSuccess from './components/CryptoPaymentSuccess';
+import CheckoutPage from './components/CheckoutPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsConditions from './components/TermsConditions';
 import ScrollToTop from './components/ScrollToTop';
@@ -196,6 +197,7 @@ function App() {
           />
           <Route path="/transportation-customized" element={<TransportationCustomized />} />
           
+          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-cancelled" element={<PaymentCancelled />} />
           <Route path="/payment-test" element={<Navigate to="/" replace />} />

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import BookingForm from './BookingForm'
+import BookingWidget from './booking/BookingWidget'
 import Footer from './Footer'
 import MobileBookingBar from './MobileBookingBar'
 import ProductFaq from './seo/ProductFaq'
@@ -156,7 +156,7 @@ const NorthernLightsStandardGroup = () => {
               'Meeting point only',
             ]}
           >
-            <BookingForm
+            <BookingWidget
               tourId={STANDARD_GROUP_TOUR_ID}
               tourName={cms.bookingTourName}
               adultPrice={cms.adultPrice}
@@ -167,8 +167,6 @@ const NorthernLightsStandardGroup = () => {
               departureTime={departure}
               meetingPointDeparture
               meetingPoint={meetingPoint}
-              chrome="embedded"
-              tone="light"
             />
           </BookingAside>
         }
