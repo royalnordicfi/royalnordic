@@ -49,9 +49,10 @@ const FALLBACK: TourPageFallback = {
     'Bus transportation',
     'English-speaking guide',
     'Professional aurora photography',
+    'Warm drink and snacks',
     'Applicable Northern Lights guarantee',
   ],
-  excluded: ['Hotel pickup and drop-off', 'Thermal clothing', 'Food and drinks'],
+  excluded: ['Hotel pickup and drop-off', 'Thermal clothing', 'Meals'],
   gallery: [
     { src: '/nortti5.jpg', alt: 'Northern Lights over a snowy forest in Finnish Lapland' },
     { src: '/nortti1.jpg', alt: 'Aurora Borealis on a winter night near Rovaniemi' },
@@ -84,9 +85,14 @@ const FALLBACK: TourPageFallback = {
       answer:
         'Free cancellation up to 24 hours before departure. Cancellations within 24 hours of the start time are non-refundable.',
     },
+    {
+      question: 'Are thermal clothes or meals included?',
+      answer:
+        'Thermal clothing and meals are not included. A warm drink and snacks are provided on the tour. Bus transportation, an English-speaking guide, and professional aurora photography are included.',
+    },
   ],
   whatToBring:
-    'Bring your own thermal layers, windproof outerwear, warm boots, hat, and gloves. Thermal clothing is not included.',
+    'Bring your own thermal layers, windproof outerwear, warm boots, hat, and gloves. Thermal clothing is not included. A warm drink and snacks are provided on the tour; meals are not.',
   knowBefore:
     'Free cancellation up to 24 hours before departure. Cancellations within 24 hours of the start time are non-refundable.',
 }
