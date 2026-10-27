@@ -1,4 +1,5 @@
 import { formatTourDateForDisplay } from './tourDate.ts'
+import { departureSuffixForTour, isStandardGroupTour } from './tourBookingRules.ts'
 
 export type BookingEmailData = {
   bookingId: number
@@ -11,6 +12,8 @@ export type BookingEmailData = {
   children: number
   totalPrice: number
   specialRequests?: string
+  departureTime?: string
+  meetingPoint?: string
 }
 
 export type DetailRow = { label: string; value: string }
@@ -38,21 +41,16 @@ export function displayTourName(tourName: string): string {
   return tourName
 }
 
-export function tourTimeSuffix(tourName: string): string {
-  const name = displayTourName(tourName)
-  if (name.includes('Family-Friendly Northern Lights')) return ' at 21:00'
-  if (
-    name === 'Northern Lights Tour' ||
-    name === 'Guaranteed Northern Lights Tour' ||
-    name.includes('Northern Lights')
-  ) {
-    return ' at 18:30'
-  }
-  return ''
+export function tourTimeSuffix(tourName: string, departureTime?: string | null): string {
+  return departureSuffixForTour(displayTourName(tourName), departureTime)
 }
 
-export function formatBookingDateLabel(tourDate: string, tourName: string): string {
-  return `${formatTourDateForDisplay(tourDate, 'en-GB', 'long')}${tourTimeSuffix(tourName)}`
+export function formatBookingDateLabel(
+  tourDate: string,
+  tourName: string,
+  departureTime?: string | null,
+): string {
+  return `${formatTourDateForDisplay(tourDate, 'en-GB', 'long')}${tourTimeSuffix(tourName, departureTime)}`
 }
 
 export function formatGuestSummary(adults: number, children: number): string {
@@ -196,7 +194,7 @@ The Royal Nordic team
 
 export function buildCustomerConfirmationEmail(booking: BookingEmailData) {
   const experience = displayTourName(booking.tourName)
-  const dateLabel = formatBookingDateLabel(booking.tourDate, booking.tourName)
+  const dateLabel = formatBookingDateLabel(booking.tourDate, booking.tourName, booking.departureTime)
   const guests = formatGuestSummary(booking.adults, booking.children)
   const total = formatEuro(booking.totalPrice)
 
@@ -221,9 +219,11 @@ export function buildCustomerConfirmationEmail(booking: BookingEmailData) {
     detailsHeading: 'Booking details',
     details,
     nextSteps: [
-      'We will confirm your pickup time and meeting details before the tour.',
+      isStandardGroupTour(null, booking.tourName)
+        ? `Meet at ${booking.meetingPoint || 'Ruokasenkatu 3, 96100 Rovaniemi, Finland'}. Departure is ${booking.departureTime || '20:00'}. Hotel pickup is not included. Bring your own thermal clothing.`
+        : 'We will confirm your pickup time and meeting details before the tour.',
       'Dress for Arctic conditions: warm layers, proper winter footwear, hat and gloves.',
-      'Free cancellation up to 24 hours before departure (see Terms).',
+      'Free cancellation up to 24 hours before departure. Cancellations within 24 hours are non-refundable (see Terms).',
       `Keep this email for your records — quote booking #${booking.bookingId} if you contact us.`,
     ],
     customerEmail: booking.customerEmail,
@@ -338,7 +338,7 @@ export function buildCryptoBookingEmail(
   booking: BookingEmailData & { cryptoType: string },
 ) {
   const experience = displayTourName(booking.tourName)
-  const dateLabel = formatBookingDateLabel(booking.tourDate, booking.tourName)
+  const dateLabel = formatBookingDateLabel(booking.tourDate, booking.tourName, booking.departureTime)
   const guests = formatGuestSummary(booking.adults, booking.children)
   const total = formatEuro(booking.totalPrice)
   const crypto = booking.cryptoType.toUpperCase()
@@ -367,7 +367,9 @@ export function buildCryptoBookingEmail(
     nextSteps: [
       `You will receive ${crypto} payment instructions by email (wallet address and exact amount).`,
       'Please wait for those instructions before sending any crypto.',
-      'After payment is confirmed, we will send pickup and meeting details before the tour.',
+      isStandardGroupTour(null, booking.tourName)
+        ? `After payment is confirmed, meet at ${booking.meetingPoint || 'Ruokasenkatu 3, 96100 Rovaniemi'} at ${booking.departureTime || '20:00'}. Hotel pickup is not included.`
+        : 'After payment is confirmed, we will send pickup and meeting details before the tour.',
       `Quote booking #${booking.bookingId} if you contact us.`,
     ],
     customerEmail: booking.customerEmail,
@@ -377,7 +379,7 @@ export function buildCryptoBookingEmail(
 
 export function buildAdminBookingAlertEmail(booking: BookingEmailData) {
   const experience = displayTourName(booking.tourName)
-  const dateLabel = formatBookingDateLabel(booking.tourDate, booking.tourName)
+  const dateLabel = formatBookingDateLabel(booking.tourDate, booking.tourName, booking.departureTime)
   const total = formatEuro(booking.totalPrice)
 
   return {

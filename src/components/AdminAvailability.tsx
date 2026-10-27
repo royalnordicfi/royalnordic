@@ -9,16 +9,28 @@ import {
   todayTourDateISO,
   tourDateToLocalDate,
 } from '../lib/tourDate'
+import { isDateInTourSeason } from '../lib/tourBookingRules'
 
 interface AdminAvailabilityProps {
   tourId: number
   tourName: string
   maxCapacity: number
+  /** Recurring MM-DD window. When set, dates outside it cannot be opened. */
+  seasonStart?: string | null
+  seasonEnd?: string | null
   /** When true, omit full-page chrome for embedding in AdminApp */
   embedded?: boolean
 }
 
-function inSeasonForTour(tourId: number, dateString: string): boolean {
+function inSeasonForTour(
+  tourId: number,
+  dateString: string,
+  seasonStart?: string | null,
+  seasonEnd?: string | null,
+): boolean {
+  if ((seasonStart || '').trim() && (seasonEnd || '').trim()) {
+    return isDateInTourSeason(dateString, seasonStart, seasonEnd)
+  }
   if (tourId === 1) {
     const date = tourDateToLocalDate(dateString)
     const m = date.getMonth() + 1
@@ -48,6 +60,8 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({
   tourId,
   tourName,
   maxCapacity,
+  seasonStart,
+  seasonEnd,
   embedded = false,
 }) => {
   const [availability, setAvailability] = useState<TourDate[]>([])
@@ -120,7 +134,7 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({
         ? dateData.available_slots - (dateData.total_booked || 0)
         : 0
       const booked = dateData?.total_booked || 0
-      const inSeason = inSeasonForTour(tourId, dateString)
+      const inSeason = inSeasonForTour(tourId, dateString, seasonStart, seasonEnd)
       return {
         day,
         date: dateString,
@@ -133,7 +147,7 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({
         available: !!dateData && remaining > 0,
       }
     })
-  }, [currentMonth, dateMap, tourId, todayString])
+  }, [currentMonth, dateMap, tourId, todayString, seasonStart, seasonEnd])
 
   const monthLabel = currentMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
 
@@ -188,11 +202,16 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({
   }
 
   const persistSlots = async (date: string, availableSlots: number) => {
+    const slots = Math.max(0, Math.min(availableSlots, maxCapacity))
+    if ((seasonStart || '').trim() && (seasonEnd || '').trim() && !isDateInTourSeason(date, seasonStart, seasonEnd)) {
+      setError('That date is outside this tour’s operating season.')
+      return
+    }
     setSaving(true)
     setError('')
     try {
-      await updateTourAvailability(tourId, date, availableSlots)
-      applyLocalUpdate(date, availableSlots)
+      await updateTourAvailability(tourId, date, slots)
+      applyLocalUpdate(date, slots)
       setIsEditing(false)
       setSelectedDate(null)
     } catch (err) {
@@ -419,7 +438,7 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({
             <input
               type="number"
               min={0}
-              max={Math.max(maxCapacity, 100)}
+              max={maxCapacity}
               value={editingSlots}
               onChange={(e) => setEditingSlots(parseInt(e.target.value, 10) || 0)}
               className="w-full max-w-[12rem] rounded-md border border-zinc-300 px-3 py-1.5 text-sm"

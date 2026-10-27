@@ -56,9 +56,10 @@ const TermsConditions: React.FC = () => {
                   or reschedule.
                 </p>
                 <p className="mt-2">
-                  <strong>Northern Lights guarantee:</strong> On the Guaranteed Northern Lights Tour, if
-                  the Northern Lights cannot be captured by our professional DSLR cameras during the tour,
-                  you receive a 100% refund. If the Aurora is captured in our photographs, the tour is
+                  <strong>Northern Lights guarantee:</strong> On the Guaranteed Northern Lights Tour and
+                  the Northern Lights Standard Group tour, if the Northern Lights cannot be captured by our
+                  professional DSLR cameras during the tour, you receive a 100% refund or can reschedule to
+                  another available day. If the Aurora is captured in our photographs, the tour is
                   considered successful even if it appears faint to the naked eye (see the tour page and
                   these terms).
                 </p>
@@ -84,8 +85,9 @@ const TermsConditions: React.FC = () => {
               <section>
                 <h2>6. Photography and media</h2>
                 <p>
-                  On the Guaranteed Northern Lights Tour, your guide takes professional photos of you with
-                  the Northern Lights as part of the experience. Guides may also take photos for
+                  On the Guaranteed Northern Lights Tour and the Northern Lights Standard Group tour, your
+                  guide takes professional photos of you with the Northern Lights as part of the experience.
+                  Guides may also take photos for
                   promotional use; by joining a tour you consent to reasonable use of those images.
                   Personal photos are welcome; respect other guests’ privacy.
                 </p>

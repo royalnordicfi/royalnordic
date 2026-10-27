@@ -48,7 +48,7 @@ serve(async (req) => {
     const PROMO_ENABLED = true
     const PROMO_CODE = 'WINTER20'
     const PROMO_PERCENT = 20
-    const PROMO_EXCLUDED_TOUR_IDS = new Set([1, 9])
+    const PROMO_EXCLUDED_TOUR_IDS = new Set([1, 9, 10])
     const promoTourId = parseInt(String(tour_id || ''), 10)
     const isPerVehicle =
       String(pricing_model || '') === 'per_vehicle' || promoTourId === 9
@@ -86,11 +86,11 @@ serve(async (req) => {
     // First, check availability and update slots
     const { data: dateData, error: dateError } = await supabase
       .from('tour_dates')
-      .select('available_slots, total_booked')
+      .select('tour_id, date, available_slots, total_booked')
       .eq('id', tour_date_id)
       .single()
 
-    if (dateError) {
+    if (dateError || !dateData || Number(dateData.tour_id) !== Number(tour_id)) {
       console.error('Error fetching date data:', dateError)
       throw new Error('Date not found')
     }

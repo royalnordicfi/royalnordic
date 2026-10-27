@@ -261,6 +261,7 @@ function escapeHtml(value: string): string {
 
 function tourTimeSuffix(tourName: string): string {
   const name = displayTourName(tourName)
+  if (/standard group/i.test(name)) return ' at 20:00'
   if (name.includes('Family-Friendly Northern Lights')) return ' at 21:00'
   if (
     name === 'Northern Lights Tour' ||
@@ -323,7 +324,7 @@ function generateCustomerConfirmationHTML(booking: BookingNotificationData): str
             </table>
             <h2 style="margin:0 0 10px;font-size:16px;color:#18181b;">What happens next</h2>
             <ul style="margin:0 0 24px;padding-left:18px;font-size:14px;line-height:1.7;color:#3f3f46;">
-              <li>We will confirm your pickup time and meeting details before the tour.</li>
+              <li>${/standard group/i.test(booking.tourName) ? 'Meet at Ruokasenkatu 3, 96100 Rovaniemi at 20:00. Hotel pickup is not included. Bring your own thermal clothing.' : 'We will confirm your pickup time and meeting details before the tour.'}</li>
               <li>Dress for Arctic conditions: warm layers, proper winter footwear, hat and gloves.</li>
               <li>Free cancellation up to 24 hours before departure (see Terms).</li>
               <li>Keep this email for your records — quote booking #${booking.bookingId} if you contact us.</li>
@@ -373,7 +374,7 @@ Guests: ${guests}
 Total paid: €${total}
 ${booking.specialRequests ? `Notes: ${booking.specialRequests}\n` : ''}
 WHAT HAPPENS NEXT
-- We will confirm your pickup time and meeting details before the tour.
+- ${/standard group/i.test(booking.tourName) ? 'Meet at Ruokasenkatu 3, 96100 Rovaniemi at 20:00. Hotel pickup is not included. Bring your own thermal clothing.' : 'We will confirm your pickup time and meeting details before the tour.'}
 - Dress for Arctic conditions: warm layers, proper winter footwear, hat and gloves.
 - Free cancellation up to 24 hours before departure (see Terms).
 - Quote booking #${booking.bookingId} if you contact us.

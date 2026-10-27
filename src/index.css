@@ -1056,6 +1056,26 @@
     }
   }
 
+  /* Equal cards. auto-fit gives one column on phones, two on tablets, three on wide desktops. */
+  .rn-card-grid--balanced {
+    align-items: stretch;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17.5rem), 1fr));
+    gap: 1.25rem;
+  }
+  .rn-card-grid--balanced .rn-tour-card__title {
+    min-height: 2.55em;
+  }
+  .rn-card-grid--balanced .rn-tour-card__desc {
+    min-height: 2.8em;
+  }
+  .rn-card-grid--balanced .rn-tour-card__meta {
+    min-height: 2.2em;
+  }
+  .rn-card-grid--balanced .rn-tour-card__foot {
+    margin-top: auto;
+    padding-top: 0.7rem;
+  }
+
   /* Calendar day selection — fast, subtle */
   .rn-bf-day {
     transition:
@@ -1239,6 +1259,13 @@
   }
   .rn-tour-card__now--plain {
     color: #fff;
+  }
+  .rn-tour-card__from {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rn-text-dim);
   }
   .rn-tour-card__pct {
     position: absolute;

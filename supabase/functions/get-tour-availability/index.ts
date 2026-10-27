@@ -1,5 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import {
+  STANDARD_GROUP_SEASON_END,
+  STANDARD_GROUP_SEASON_START,
+  isDateInTourSeason,
+  isStandardGroupTour,
+} from '../_shared/tourBookingRules.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -62,13 +68,19 @@ serve(async (req) => {
     }
 
     // Format the response
+    const seasonStart = tour.season_start || (isStandardGroupTour(Number(tourId), tour.name) ? STANDARD_GROUP_SEASON_START : null)
+    const seasonEnd = tour.season_end || (isStandardGroupTour(Number(tourId), tour.name) ? STANDARD_GROUP_SEASON_END : null)
+    const bookableDates = (tourDates || []).filter((date) =>
+      isDateInTourSeason(String(date.date).slice(0, 10), seasonStart, seasonEnd),
+    )
+
     const availability = {
       tourId: tourId,
       tourName: tour.name,
       adultPrice: tour.adult_price,
       childPrice: tour.child_price,
       maxCapacity: tour.max_capacity,
-      availableDates: tourDates.map(date => ({
+      availableDates: bookableDates.map(date => ({
         id: date.id,
         date: date.date,
         availableSpots: date.available_slots - (date.total_booked || 0),

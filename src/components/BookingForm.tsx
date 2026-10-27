@@ -10,7 +10,6 @@ import {
   formatTourDateLong,
   formatTourDateShort,
   todayTourDateISO,
-  tourDateToLocalDate,
   WEEKDAY_HEADERS_MON_FIRST,
 } from '../lib/tourDate'
 import { WINTER_PROMOTION } from '../config/winterPromotion'
@@ -22,6 +21,7 @@ import {
   trackWinterPromoEvent,
 } from '../lib/winterPromotion'
 import { formatEuroAmount } from '../lib/tourPricing'
+import { departureSuffixForTour, isDateInTourSeason } from '../lib/tourBookingRules'
 import { CHECKOUT_RETURN_PATH_KEY } from './PaymentCancelled'
 
 export type BookingPricingModel = 'per_person' | 'per_vehicle'
@@ -34,6 +34,11 @@ interface BookingFormProps {
   maxCapacity?: number
   seasonStart?: string
   seasonEnd?: string
+  /** Shown on the selected date and stored on the booking. Example: 20:00 */
+  departureTime?: string
+  /** Meeting-point products must not be described as hotel pickup. */
+  meetingPointDeparture?: boolean
+  meetingPoint?: string
   /** embedded = no outer card chrome (parent provides commerce shell) */
   chrome?: 'default' | 'embedded'
   /** dark = graphite booking UI inside rn-book-panel */
@@ -92,6 +97,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
   childPrice, 
   seasonStart,
   seasonEnd,
+  departureTime,
+  meetingPointDeparture = false,
+  meetingPoint,
+  maxCapacity,
   chrome = 'default',
   tone = 'light',
   pricingModel = 'per_person',
@@ -289,31 +298,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
 
   // Helper function to check if a date is in season (works across multiple years)
-  const isDateInSeason = (dateString: string): boolean => {
-    if (!seasonStart || !seasonEnd) return true // No season restriction
-
-    const dateObj = tourDateToLocalDate(dateString)
-    const dateYear = dateObj.getFullYear()
-
-    // Parse season dates (format: "MM-DD")
-    const [startMonth, startDay] = seasonStart.split('-').map(Number)
-    const [endMonth, endDay] = seasonEnd.split('-').map(Number)
-
-    // Create season start and end dates (local calendar noon)
-    const seasonStartThisYear = new Date(dateYear, startMonth - 1, startDay, 12)
-    const seasonEndThisYear = new Date(dateYear, endMonth - 1, endDay, 12)
-    const seasonStartPrevYear = new Date(dateYear - 1, startMonth - 1, startDay, 12)
-    const seasonEndNextYear = new Date(dateYear + 1, endMonth - 1, endDay, 12)
-
-    // Check if season spans year boundary (e.g., Sep to Apr)
-    if (endMonth < startMonth) {
-      const inPrevYearSeason = dateObj >= seasonStartPrevYear && dateObj <= seasonEndThisYear
-      const inThisYearSeason = dateObj >= seasonStartThisYear && dateObj <= seasonEndNextYear
-      return inPrevYearSeason || inThisYearSeason
-    } else {
-      return dateObj >= seasonStartThisYear && dateObj <= seasonEndThisYear
-    }
-  }
+  const isDateInSeason = (dateString: string): boolean =>
+    isDateInTourSeason(dateString, seasonStart, seasonEnd)
 
   // Get calendar grid for current month (Monday-first; date-only ISO cells)
   const getCalendarGrid = () => {
@@ -467,7 +453,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
   const getAvailableSlots = (date: string) => {
     const dateData = availability.find(d => d.date === date)
-    return dateData?.remaining_slots || 0
+    const remaining = dateData?.remaining_slots || 0
+    if (maxCapacity && maxCapacity > 0) return Math.min(remaining, maxCapacity)
+    return remaining
   }
 
   const selectedSeatsLeft = formData.preferredDate ? getAvailableSlots(formData.preferredDate) : 0
@@ -541,7 +529,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
           discount_code: discountCode,
           pricing_model: pricingModel,
           phone: formData.phone,
-          special_requests: formData.specialRequests
+          special_requests: formData.specialRequests,
+          ...(departureTime ? { tour_time: departureTime } : {}),
+          ...(meetingPointDeparture && meetingPoint ? { meeting_point: `Meeting point: ${meetingPoint}` } : {}),
         }
       }
 
@@ -1012,6 +1002,18 @@ const BookingForm: React.FC<BookingFormProps> = ({
               Grey dates are outside the season or unavailable.
             </p>
           )}
+          {departureTime && (
+            <p
+              className={
+                embeddedLight
+                  ? 'rn-bf-price-note mt-2 text-[11px] leading-snug text-panel-ink'
+                  : 'mt-1.5 text-[11px] leading-snug text-gray-700'
+              }
+            >
+              Departure {departureTime}
+              {meetingPointDeparture ? ' · meeting point, not hotel pickup' : ''}
+            </p>
+          )}
         </div>
 
       {showGuestsSection && (
@@ -1208,16 +1210,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               <div className="flex justify-between text-sm mb-3 pb-2 border-b border-gray-200">
                 <span className="text-gray-600">Selected Date:</span>
                 <span className="text-gray-800 font-medium">
-                  {(() => {
-                    const dateString = formatTourDateLong(formData.preferredDate)
-                    // Add start time for Northern Lights tours
-                    if (tourName.includes('Family-Friendly Northern Lights')) {
-                      return `${dateString} at 21:00`
-                    } else if (tourName.includes('Northern Lights')) {
-                      return `${dateString} at 18:30`
-                    }
-                    return dateString
-                  })()}
+                  {`${formatTourDateLong(formData.preferredDate)}${departureSuffixForTour(tourName, departureTime)}`}
                 </span>
               </div>
             )}
@@ -1293,11 +1286,21 @@ const BookingForm: React.FC<BookingFormProps> = ({
           <h4 className={ui.heading}>Payment</h4>
 
           <div className={ui.payInfo}>
-            <p>Free cancellation up to 24 hours before departure.</p>
+            <p>Free cancellation up to 24 hours before departure. Cancellations within 24 hours are non-refundable.</p>
             {isNorthernLightsTour && (
               <p>Northern Lights guarantee: 100% refund if the aurora is not captured on our professional cameras — see Terms.</p>
             )}
-            <p>After payment you receive a confirmation email with pickup details.</p>
+            {meetingPointDeparture && (
+              <p>
+                Northern Lights guarantee: 100% refund or reschedule to another available day if the aurora
+                is not captured on our professional cameras — see Terms.
+              </p>
+            )}
+            <p>
+              {meetingPointDeparture
+                ? `After payment you receive a confirmation with the meeting point${departureTime ? ` and ${departureTime} departure` : ''}. Hotel pickup is not included.`
+                : 'After payment you receive a confirmation email with pickup details.'}
+            </p>
           </div>
           
           {!isStripeConfigured && (

@@ -60,6 +60,12 @@ export type TourCms = {
   badge: string | null
   group_size_text: string | null
   meeting_point: string | null
+  /** Recurring season start MM-DD. Null means no season window. */
+  season_start: string | null
+  /** Recurring season end MM-DD. May fall in the next calendar year. */
+  season_end: string | null
+  /** Local departure time HH:MM. */
+  departure_time: string | null
   seo_title: string | null
   seo_description: string | null
   seo_image: string | null
@@ -182,6 +188,9 @@ export function normalizeTourCms(row: Record<string, unknown>): TourCms {
     badge: (row.badge as string | null) ?? null,
     group_size_text: (row.group_size_text as string | null) ?? null,
     meeting_point: (row.meeting_point as string | null) ?? null,
+    season_start: (row.season_start as string | null) ?? null,
+    season_end: (row.season_end as string | null) ?? null,
+    departure_time: (row.departure_time as string | null) ?? null,
     seo_title: (row.seo_title as string | null) ?? null,
     seo_description: (row.seo_description as string | null) ?? null,
     seo_image: (row.seo_image as string | null) ?? null,

@@ -34,6 +34,8 @@ const BADGE_OPTIONS = [
   'SMALL GROUP',
   'SALE',
   '100% GUARANTEE',
+  'BUS TOUR',
+  'LARGE GROUP',
 ]
 
 export default function ProductEditorPage() {
@@ -125,6 +127,13 @@ export default function ProductEditorPage() {
         duration_text: product.duration_text,
         group_size_text: product.group_size_text,
         meeting_point: product.meeting_point,
+        ...(product.season_start || product.season_end || product.departure_time || product.id === 10
+          ? {
+              season_start: product.season_start || null,
+              season_end: product.season_end || null,
+              departure_time: product.departure_time || null,
+            }
+          : {}),
         badge: product.badge || null,
         highlights: reindexSort([...(product.highlights || [])].filter((i) => i.text.trim())),
         included_items: reindexSort([...(product.included_items || [])].filter((i) => i.text.trim())),
@@ -641,7 +650,36 @@ export default function ProductEditorPage() {
                   onChange={(e) => patch('meeting_point', e.target.value)}
                 />
               </Field>
+              <Field label="Season start (MM-DD)">
+                <input
+                  className="field"
+                  value={product.season_start || ''}
+                  onChange={(e) => patch('season_start', e.target.value)}
+                  placeholder="11-01"
+                />
+              </Field>
+              <Field label="Season end (MM-DD)">
+                <input
+                  className="field"
+                  value={product.season_end || ''}
+                  onChange={(e) => patch('season_end', e.target.value)}
+                  placeholder="03-31"
+                />
+              </Field>
+              <Field label="Departure time">
+                <input
+                  className="field"
+                  value={product.departure_time || ''}
+                  onChange={(e) => patch('departure_time', e.target.value)}
+                  placeholder="20:00"
+                />
+              </Field>
             </div>
+            <p className="text-xs text-zinc-500">
+              Season repeats every year. Dates outside it cannot be opened or booked. Leave both season
+              fields empty for tours with no season window. Departure time is shown at checkout and on
+              the confirmation.
+            </p>
             <Field label="Pickup information">
               <textarea
                 className="field min-h-[90px]"

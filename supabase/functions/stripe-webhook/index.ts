@@ -5,6 +5,12 @@ import {
   buildAdminBookingAlertEmail,
   buildCustomerConfirmationEmail,
 } from '../_shared/bookingEmails.ts'
+import {
+  STANDARD_GROUP_SEASON_END,
+  STANDARD_GROUP_SEASON_START,
+  isDateInTourSeason,
+  isStandardGroupTour,
+} from '../_shared/tourBookingRules.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -94,13 +100,31 @@ serve(async (req) => {
 
       const { data: dateData, error: dateError } = await supabase
         .from('tour_dates')
-        .select('available_slots, total_booked')
+        .select('tour_id, date, available_slots, total_booked')
         .eq('id', tourDateId)
         .single()
 
-      if (dateError || !dateData) {
+      if (dateError || !dateData || Number(dateData.tour_id) !== tourId) {
         console.error('Error fetching date data:', dateError)
         throw new Error('Date not found')
+      }
+
+      const dateIso = String(dateData.date).slice(0, 10)
+      let seasonStart: string | null = isStandardGroupTour(tourId) ? STANDARD_GROUP_SEASON_START : null
+      let seasonEnd: string | null = isStandardGroupTour(tourId) ? STANDARD_GROUP_SEASON_END : null
+      let maxCapacity = 0
+      const seasonLookup = await supabase
+        .from('tours')
+        .select('season_start, season_end, max_capacity')
+        .eq('id', tourId)
+        .maybeSingle()
+      if (!seasonLookup.error && seasonLookup.data) {
+        if (seasonLookup.data.season_start) seasonStart = seasonLookup.data.season_start
+        if (seasonLookup.data.season_end) seasonEnd = seasonLookup.data.season_end
+        maxCapacity = Number(seasonLookup.data.max_capacity || 0)
+      }
+      if (!isDateInTourSeason(dateIso, seasonStart, seasonEnd)) {
+        throw new Error('This date is outside the operating season')
       }
 
       const remainingSlots = dateData.available_slots - (dateData.total_booked || 0)
@@ -108,6 +132,14 @@ serve(async (req) => {
       const isPerVehicle = pricingModel === 'per_vehicle' || tourId === 9
       // Per-vehicle products consume 1 calendar slot (the vehicle), not passenger count.
       const requestedSlots = isPerVehicle ? 1 : adults + children
+      if (
+        isStandardGroupTour(tourId) &&
+        !isPerVehicle &&
+        maxCapacity > 0 &&
+        adults + children > maxCapacity
+      ) {
+        throw new Error(`Only ${maxCapacity} guests can book this departure`)
+      }
       if (requestedSlots > remainingSlots) {
         console.error('Not enough slots available', { remainingSlots, requestedSlots })
         throw new Error(`Only ${remainingSlots} slots available`)
@@ -130,6 +162,9 @@ serve(async (req) => {
         email_status: 'queued',
       }
 
+      if (metadata.tour_time) insertPayload.tour_time = String(metadata.tour_time)
+      if (metadata.meeting_point) insertPayload.pickup_location = String(metadata.meeting_point)
+
       let { data: booking, error: bookingError } = await supabase
         .from('bookings')
         .insert(insertPayload)
@@ -141,11 +176,15 @@ serve(async (req) => {
         bookingError &&
         (bookingError.message.includes('payment_status') ||
           bookingError.message.includes('source') ||
-          bookingError.message.includes('email_status'))
+          bookingError.message.includes('email_status') ||
+          bookingError.message.includes('tour_time') ||
+          bookingError.message.includes('pickup_location'))
       ) {
         delete insertPayload.payment_status
         delete insertPayload.source
         delete insertPayload.email_status
+        delete insertPayload.tour_time
+        delete insertPayload.pickup_location
         ;({ data: booking, error: bookingError } = await supabase
           .from('bookings')
           .insert(insertPayload)
@@ -209,6 +248,8 @@ serve(async (req) => {
           specialRequests,
           paymentStatus: 'confirmed' as const,
           createdAt: new Date().toISOString(),
+          departureTime: String(metadata.tour_time || ''),
+          meetingPoint: String(metadata.meeting_point || ''),
         }
         const adminOk = await sendEmailNotification(emailData, 'admin')
         const customerOk = await sendEmailNotification(emailData, 'customer')
@@ -295,6 +336,8 @@ async function sendEmailNotification(
     specialRequests?: string
     paymentStatus: 'confirmed'
     createdAt: string
+    departureTime?: string
+    meetingPoint?: string
   },
   type: 'admin' | 'customer',
 ): Promise<boolean> {

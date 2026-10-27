@@ -914,6 +914,36 @@ export async function updateProduct(id: number, patch: Partial<Product>): Promis
     next.max_capacity = cap
   }
 
+  const seasonStart = typeof next.season_start === 'string' ? next.season_start.trim() : next.season_start
+  const seasonEnd = typeof next.season_end === 'string' ? next.season_end.trim() : next.season_end
+  if (seasonStart === '') next.season_start = null
+  else if (typeof seasonStart === 'string') {
+    if (!/^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(seasonStart)) {
+      throw new Error('Season start must be MM-DD, for example 11-01')
+    }
+    next.season_start = seasonStart
+  }
+  if (seasonEnd === '') next.season_end = null
+  else if (typeof seasonEnd === 'string') {
+    if (!/^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(seasonEnd)) {
+      throw new Error('Season end must be MM-DD, for example 03-31')
+    }
+    next.season_end = seasonEnd
+  }
+  const hasSeasonStart = Boolean(next.season_start)
+  const hasSeasonEnd = Boolean(next.season_end)
+  if (hasSeasonStart !== hasSeasonEnd) {
+    throw new Error('Set both season start and season end, or leave both empty')
+  }
+
+  if (typeof next.departure_time === 'string') {
+    const time = next.departure_time.trim()
+    if (!time) next.departure_time = null
+    else if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) {
+      throw new Error('Departure time must be HH:MM, for example 20:00')
+    } else next.departure_time = time
+  }
+
   if (next.sale_enabled && next.reference_price != null && next.adult_price != null) {
     if (Number(next.reference_price) <= Number(next.adult_price)) {
       throw new Error('When sale is enabled, original price must be higher than the current adult price')

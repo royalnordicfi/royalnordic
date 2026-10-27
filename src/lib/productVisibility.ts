@@ -40,6 +40,11 @@ export const TOUR_PUBLIC_PAGES: Record<
     fallbackPath: '/northern-lights-tours',
     label: 'Family-Friendly Northern Lights Tour',
   },
+  10: {
+    path: '/northern-lights-standard-group',
+    fallbackPath: '/northern-lights-tours',
+    label: 'Northern Lights Standard Group – 100% Guarantee',
+  },
   9: {
     path: '/transportation-rovaniemi-saariselka',
     fallbackPath: '/transportation',

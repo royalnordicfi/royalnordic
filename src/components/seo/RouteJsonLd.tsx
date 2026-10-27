@@ -54,6 +54,19 @@ type ProductDef = {
 
 const PRODUCTS: ProductDef[] = [
   {
+    path: '/northern-lights-standard-group',
+    name: 'Northern Lights Standard Group – 100% Guarantee',
+    description:
+      'Large-group Northern Lights bus tour from Rovaniemi for up to 50 guests. Departs Ruokasenkatu 3 at 20:00 between 1 November and 31 March. Professional aurora photography is included. Hotel pickup is not included.',
+    image: `${SITE}/nortti5.jpg`,
+    price: 60,
+    breadcrumbs: [
+      { name: 'Home', path: '/' },
+      { name: 'Northern Lights Tours', path: '/northern-lights-tours' },
+      { name: 'Northern Lights Standard Group – 100% Guarantee', path: '/northern-lights-standard-group' },
+    ],
+  },
+  {
     path: '/family-friendly-northern-lights',
     name: 'Family-Friendly Northern Lights Tour',
     description:
@@ -163,7 +176,10 @@ function productOffer(product: ProductDef) {
       url: `${SITE}${product.path}`,
       priceCurrency: 'EUR',
       price: product.price.toFixed(2),
-      availability: 'https://schema.org/InStock',
+      availability:
+        product.path === '/northern-lights-standard-group'
+          ? 'https://schema.org/LimitedAvailability'
+          : 'https://schema.org/InStock',
       priceValidUntil: '2027-04-15',
     },
     provider: {

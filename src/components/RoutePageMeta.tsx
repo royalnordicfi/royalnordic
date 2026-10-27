@@ -23,10 +23,16 @@ const META: Record<
       '2-hour family aurora tour from Rovaniemi: hotel pickup, English & Finnish guide, hot drinks. Aurora not guaranteed. Free cancellation 24h.',
     ogImage: 'https://royalnordic.fi/family1.jpg',
   },
+  '/northern-lights-standard-group': {
+    title: 'Northern Lights Standard Group Bus Tour Rovaniemi | Royal Nordic',
+    description:
+      'Large-group Northern Lights bus tour from Rovaniemi, from €60 per person. Departs Ruokasenkatu 3 at 20:00, 1 November–31 March. Up to 50 guests. Hotel pickup is not included.',
+    ogImage: 'https://royalnordic.fi/nortti5.jpg',
+  },
   '/northern-lights-tours': {
     title: 'Northern Lights Tours Rovaniemi | Royal Nordic',
     description:
-      'Compare guaranteed and family-friendly aurora experiences from Royal Nordic in Rovaniemi, Finnish Lapland.',
+      'Compare small-group, standard group bus, and family-friendly Northern Lights tours from Royal Nordic in Rovaniemi.',
     ogImage: 'https://royalnordic.fi/nortti5.jpg',
   },
   '/ice-fishing': {

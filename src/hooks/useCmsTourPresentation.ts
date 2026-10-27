@@ -26,6 +26,9 @@ export type TourPageFallback = {
   whatToBring?: string
   knowBefore?: string
   guaranteeFact?: string
+  seasonStart?: string
+  seasonEnd?: string
+  departureTime?: string
 }
 
 /**
@@ -95,6 +98,9 @@ export function useCmsTourPresentation(tourId: number, fallback: TourPageFallbac
       importantInfo: (tour?.important_info || '').trim(),
       cancellationInfo: (tour?.cancellation_info || '').trim(),
       guaranteeInfo: (tour?.guarantee_info || '').trim(),
+      seasonStart: (tour?.season_start || '').trim() || fallback.seasonStart || '',
+      seasonEnd: (tour?.season_end || '').trim() || fallback.seasonEnd || '',
+      departureTime: (tour?.departure_time || '').trim() || fallback.departureTime || '',
       whatToExpect: (tour?.what_to_expect || '').trim(),
       badge: (tour?.badge || '').trim(),
       heroImage: tour?.hero_image_url || tour?.gallery?.[0]?.url || gallery[0]?.src || '',

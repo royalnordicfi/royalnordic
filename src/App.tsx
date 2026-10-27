@@ -24,6 +24,7 @@ import NorthernLightsTours from './components/NorthernLightsTours';
 import RentingEquipment from './components/RentingEquipment';
 import DaytimeExperiences from './components/DaytimeExperiences';
 import FamilyFriendlyNorthernLights from './components/FamilyFriendlyNorthernLights';
+import NorthernLightsStandardGroup from './components/NorthernLightsStandardGroup';
 import Blog from './components/Blog';
 import BestTimeNorthernLights from './components/blog/BestTimeNorthernLights';
 import WhatToPackLapland from './components/blog/WhatToPackLapland';
@@ -100,6 +101,14 @@ function App() {
               element={
                 <ActiveTourGate tourId={8}>
                   <FamilyFriendlyNorthernLights />
+                </ActiveTourGate>
+              }
+            />
+            <Route
+              path="/northern-lights-standard-group"
+              element={
+                <ActiveTourGate tourId={10} missingIsInactive>
+                  <NorthernLightsStandardGroup />
                 </ActiveTourGate>
               }
             />

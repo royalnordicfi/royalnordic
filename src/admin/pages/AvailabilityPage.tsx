@@ -11,9 +11,9 @@ export default function AvailabilityPage() {
   useEffect(() => {
     fetchProducts()
       .then((list) => {
-        const active = list.filter((p) => p.is_active !== false)
-        setProducts(active)
-        if (active.length > 0) setTourId(active[0].id)
+        setProducts(list)
+        const firstOpen = list.find((p) => p.is_active !== false) || list[0]
+        if (firstOpen) setTourId(firstOpen.id)
       })
       .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load tours'))
   }, [])
@@ -41,7 +41,7 @@ export default function AvailabilityPage() {
       {products.length > 0 && (
         <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-0.5 px-0.5">
           {products.map((p) => {
-            const label = p.public_name || p.name
+            const label = `${p.public_name || p.name}${p.is_active === false ? ' (hidden)' : ''}`
             const active = p.id === tourId
             return (
               <button
@@ -67,6 +67,8 @@ export default function AvailabilityPage() {
           tourId={selected.id}
           tourName={selected.public_name || selected.name}
           maxCapacity={selected.max_capacity || 8}
+          seasonStart={selected.season_start}
+          seasonEnd={selected.season_end}
           embedded
         />
       ) : (

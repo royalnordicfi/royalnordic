@@ -125,6 +125,9 @@ export type Product = {
   badge?: string | null
   group_size_text?: string | null
   meeting_point?: string | null
+  season_start?: string | null
+  season_end?: string | null
+  departure_time?: string | null
   seo_title?: string | null
   seo_description?: string | null
   seo_image?: string | null

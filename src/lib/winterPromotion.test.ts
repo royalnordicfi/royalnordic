@@ -118,6 +118,13 @@ describe('winterPromotion', () => {
     )
   })
 
+  it('rejects WINTER20 on the Standard Group tour so the €60 price is not discounted', () => {
+    assert.equal(
+      getWinterDiscountAmount(60, 'WINTER20', base, new Date(), { tourId: 10 }),
+      0,
+    )
+  })
+
   it('still applies WINTER20 on other tours', () => {
     assert.equal(
       getWinterDiscountAmount(100, 'WINTER20', base, new Date(), { tourId: 4 }),

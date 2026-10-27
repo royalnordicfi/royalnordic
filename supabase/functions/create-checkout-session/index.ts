@@ -1,5 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import {
+  STANDARD_GROUP_DEPARTURE,
+  STANDARD_GROUP_SEASON_END,
+  STANDARD_GROUP_SEASON_START,
+  STANDARD_GROUP_TOUR_ID,
+  isDateInTourSeason,
+  isStandardGroupTour,
+  perPersonSubtotal,
+} from '../_shared/tourBookingRules.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -41,16 +50,33 @@ serve(async (req) => {
     const tourId = parseInt(String(metadata?.tour_id || ''), 10)
     let pricingModel = String(metadata?.pricing_model || 'per_person')
     let dbAdultPrice: number | null = null
+    let dbChildPrice: number | null = null
     if (tourId) {
       const supabaseUrl = Deno.env.get('SUPABASE_URL')
       const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+      if (isStandardGroupTour(tourId) && (!supabaseUrl || !supabaseServiceKey)) {
+        throw new Error('Unable to verify tour')
+      }
       if (supabaseUrl && supabaseServiceKey) {
         const supabase = createClient(supabaseUrl, supabaseServiceKey)
-        const { data: tourRow, error: tourError } = await supabase
-          .from('tours')
-          .select('id, is_active, adult_price, pricing_model')
-          .eq('id', tourId)
-          .maybeSingle()
+        const fullSelect =
+          'id, name, is_active, adult_price, child_price, max_capacity, pricing_model, season_start, season_end, departure_time, meeting_point'
+        let tourResult = await supabase.from('tours').select(fullSelect).eq('id', tourId).maybeSingle()
+        if (tourResult.error && /column|schema cache/i.test(tourResult.error.message || '')) {
+          tourResult = await supabase
+            .from('tours')
+            .select('id, name, is_active, adult_price, child_price, max_capacity, pricing_model')
+            .eq('id', tourId)
+            .maybeSingle()
+        }
+        if (tourResult.error && /column|schema cache/i.test(tourResult.error.message || '')) {
+          tourResult = await supabase
+            .from('tours')
+            .select('id, name, is_active, adult_price, child_price, max_capacity')
+            .eq('id', tourId)
+            .maybeSingle()
+        }
+        const { data: tourRow, error: tourError } = tourResult
         if (tourError) {
           console.error('Tour lookup failed:', tourError)
           throw new Error('Unable to verify tour')
@@ -60,6 +86,57 @@ serve(async (req) => {
         }
         if (tourRow.pricing_model) pricingModel = String(tourRow.pricing_model)
         if (tourRow.adult_price != null) dbAdultPrice = Number(tourRow.adult_price)
+        if (tourRow.child_price != null) dbChildPrice = Number(tourRow.child_price)
+
+        const tourDateId = parseInt(String(metadata?.tour_date_id || ''), 10)
+        const adults = parseInt(String(metadata?.adults || '0'), 10)
+        const children = parseInt(String(metadata?.children || '0'), 10)
+        const standardGroup = isStandardGroupTour(tourId, tourRow.name)
+
+        if (tourDateId) {
+          const { data: dateRow, error: dateError } = await supabase
+            .from('tour_dates')
+            .select('id, tour_id, date, available_slots, total_booked')
+            .eq('id', tourDateId)
+            .maybeSingle()
+          if (dateError || !dateRow || Number(dateRow.tour_id) !== tourId) {
+            throw new Error('This date is not available for this tour')
+          }
+
+          const seasonStart = tourRow.season_start || (standardGroup ? STANDARD_GROUP_SEASON_START : null)
+          const seasonEnd = tourRow.season_end || (standardGroup ? STANDARD_GROUP_SEASON_END : null)
+          const dateIso = String(dateRow.date).slice(0, 10)
+          if (!isDateInTourSeason(dateIso, seasonStart, seasonEnd)) {
+            throw new Error('This date is outside the operating season')
+          }
+
+          if (standardGroup) {
+            const remaining = Number(dateRow.available_slots) - Number(dateRow.total_booked || 0)
+            const requested = adults + children
+            const cap = Number(tourRow.max_capacity || 0)
+            if (requested < 1 || requested > remaining || (cap > 0 && requested > cap)) {
+              throw new Error(
+                remaining > 0
+                  ? `Only ${Math.min(remaining, cap || remaining)} places left on this departure`
+                  : 'This departure is sold out',
+              )
+            }
+            if (dbAdultPrice == null || dbChildPrice == null) {
+              throw new Error('Unable to verify tour')
+            }
+            const expected = perPersonSubtotal(adults, children, dbAdultPrice, dbChildPrice)
+            if (!Number.isFinite(Number(metadata?.subtotal)) || Math.abs(Number(metadata.subtotal) - expected) > 0.02) {
+              throw new Error('Payment amount does not match pricing rules')
+            }
+          }
+        } else if (standardGroup) {
+          throw new Error('Choose an available departure date')
+        }
+
+        if (standardGroup && metadata) {
+          metadata.tour_time = tourRow.departure_time || STANDARD_GROUP_DEPARTURE
+          if (tourRow.meeting_point) metadata.meeting_point = `Meeting point: ${tourRow.meeting_point}`
+        }
       }
     }
 
@@ -69,7 +146,7 @@ serve(async (req) => {
     const PROMO_ENABLED = true
     const PROMO_CODE = 'WINTER20'
     const PROMO_PERCENT = 20
-    const PROMO_EXCLUDED_TOUR_IDS = new Set([1, 9])
+    const PROMO_EXCLUDED_TOUR_IDS = new Set([1, 9, STANDARD_GROUP_TOUR_ID])
     const subtotal = Number(metadata?.subtotal)
     const claimedDiscount = Number(metadata?.discount || 0)
     const code = String(metadata?.discount_code || '').trim().toUpperCase()

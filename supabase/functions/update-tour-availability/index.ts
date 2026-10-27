@@ -1,5 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import {
+  STANDARD_GROUP_SEASON_END,
+  STANDARD_GROUP_SEASON_START,
+  isDateInTourSeason,
+  isStandardGroupTour,
+} from '../_shared/tourBookingRules.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -26,6 +32,36 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+    const standardGroup = isStandardGroupTour(Number(tourId))
+    let seasonStart: string | null = standardGroup ? STANDARD_GROUP_SEASON_START : null
+    let seasonEnd: string | null = standardGroup ? STANDARD_GROUP_SEASON_END : null
+    let maxCapacity: number | null = null
+    const tourLookup = await supabase
+      .from('tours')
+      .select('max_capacity, season_start, season_end')
+      .eq('id', tourId)
+      .maybeSingle()
+    if (tourLookup.error && /column|schema cache/i.test(tourLookup.error.message || '')) {
+      const basic = await supabase.from('tours').select('max_capacity').eq('id', tourId).maybeSingle()
+      if (basic.data?.max_capacity != null) maxCapacity = Number(basic.data.max_capacity)
+    } else if (tourLookup.data) {
+      if (tourLookup.data.max_capacity != null) maxCapacity = Number(tourLookup.data.max_capacity)
+      if (tourLookup.data.season_start) seasonStart = tourLookup.data.season_start
+      if (tourLookup.data.season_end) seasonEnd = tourLookup.data.season_end
+    }
+    if (seasonStart && seasonEnd && !isDateInTourSeason(String(date).slice(0, 10), seasonStart, seasonEnd)) {
+      return new Response(
+        JSON.stringify({ error: 'That date is outside this tour’s operating season' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 },
+      )
+    }
+    if (standardGroup && maxCapacity != null && Number(availableSlots) > maxCapacity) {
+      return new Response(
+        JSON.stringify({ error: `Capacity cannot exceed ${maxCapacity} guests on this departure` }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 },
+      )
+    }
 
     // Check if date already exists
     const { data: existingDate, error: checkError } = await supabase

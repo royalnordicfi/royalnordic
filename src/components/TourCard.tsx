@@ -16,6 +16,10 @@ export type TourCardProps = {
   referencePrice?: number
   /** Shown after price — default "/ adult" */
   priceUnit?: string
+  /** Small label before the amount, e.g. "From" */
+  pricePrefix?: string
+  /** Shown in the meta line when hotel pickup is not included */
+  logistics?: string
   ctaLabel?: string
   className?: string
   /** @deprecated Uniform cards only — ignored for sizing */
@@ -46,11 +50,13 @@ const TourCard = ({
   priceFrom,
   referencePrice,
   priceUnit = '/ adult',
+  pricePrefix,
+  logistics,
   ctaLabel = 'Explore',
   className = '',
   imagePosition = 'center',
 }: TourCardProps) => {
-  const meta = [duration, groupSize, pickup ? 'Hotel pickup' : null].filter(Boolean).join(' · ')
+  const meta = [duration, groupSize, pickup ? 'Hotel pickup' : logistics].filter(Boolean).join(' · ')
   const showSale =
     typeof priceFrom === 'number' &&
     typeof referencePrice === 'number' &&
@@ -97,6 +103,7 @@ const TourCard = ({
                 </p>
               ) : (
                 <p className="rn-tour-card__price-row">
+                  {pricePrefix ? <span className="rn-tour-card__from">{pricePrefix}</span> : null}
                   <span className="rn-tour-card__now rn-tour-card__now--plain">€{formatMoney(priceFrom)}</span>
                 </p>
               )}
