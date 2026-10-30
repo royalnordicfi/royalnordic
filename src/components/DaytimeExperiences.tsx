@@ -28,8 +28,9 @@ const ALL_EXPERIENCES = [
     to: '/ranua-zoo',
     image: '/ranua1.jpg',
     imageAlt: 'Ranua Wildlife Park',
-    title: 'Nordic Animals of Ranua Zoo',
-    description: 'Arctic wildlife day trip with transfers and park tickets included.',
+    title: 'Ranua Wildlife Park – Entry Ticket & Round-Trip Transfer',
+    description:
+      'Round-trip transfer from Rovaniemi with park admission included. Explore independently — no guided tour.',
     duration: 'About 5 hours',
     groupSize: 'Max 16',
     pickup: true,

@@ -48,9 +48,9 @@ const META: Record<
     ogImage: 'https://royalnordic.fi/icefishing2.jpg',
   },
   '/ranua-zoo': {
-    title: 'Ranua Wildlife Park Tour from Rovaniemi | Royal Nordic',
+    title: 'Ranua Wildlife Park – Entry Ticket & Transfer | Royal Nordic',
     description:
-      'About 5-hour Ranua Wildlife Park day trip from Rovaniemi: hotel pickup, entrance tickets, polar bears and 50+ Arctic species. Free cancellation 24h.',
+      'Round-trip transfer from Rovaniemi with Ranua Wildlife Park admission included. Self-guided park visit — no guided tour. About 5 hours. Free cancellation 24h.',
     ogImage: 'https://royalnordic.fi/ranua1.jpg',
   },
   '/korouoma-canyon': {

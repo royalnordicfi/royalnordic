@@ -1,5 +1,10 @@
 import { formatTourDateForDisplay } from './tourDate.ts'
-import { departureSuffixForTour, isStandardGroupTour } from './tourBookingRules.ts'
+import {
+  departureSuffixForTour,
+  isRanuaTour,
+  isStandardGroupTour,
+  RANUA_PUBLIC_NAME,
+} from './tourBookingRules.ts'
 
 export type BookingEmailData = {
   bookingId: number
@@ -41,6 +46,7 @@ const SITE_URL = 'https://royalnordic.fi'
 /** Map DB tour names to the customer-facing product names used on the site. */
 export function displayTourName(tourName: string): string {
   if (tourName === 'Northern Lights Tour') return 'Guaranteed Northern Lights Tour'
+  if (isRanuaTour(null, tourName)) return RANUA_PUBLIC_NAME
   return tourName
 }
 
@@ -244,9 +250,11 @@ export function buildCustomerConfirmationEmail(booking: BookingEmailData) {
     nextSteps: [
       isStandardGroupTour(null, booking.tourName)
         ? `Meet at ${booking.meetingPoint || 'Ruokasenkatu 3, 96100 Rovaniemi, Finland'}. Departure is ${booking.departureTime || '20:00'}. Hotel pickup is not included. Bring your own thermal clothing.`
-        : booking.meetingPoint
-          ? 'Hotel pickup is included. Exact pickup time is confirmed before departure.'
-          : 'We will confirm your pickup time and meeting details before the tour.',
+        : isRanuaTour(null, booking.tourName)
+          ? 'Round-trip transfer from Rovaniemi and Ranua Wildlife Park admission are included. This is a self-guided park visit — your driver provides transportation, not a guided tour inside the park. Exact pickup time and return meeting point are confirmed before departure.'
+          : booking.meetingPoint
+            ? 'Hotel pickup is included. Exact pickup time is confirmed before departure.'
+            : 'We will confirm your pickup time and meeting details before the tour.',
       'Dress for Arctic conditions: warm layers, proper winter footwear, hat and gloves.',
       'Free cancellation up to 24 hours before departure. Cancellations within 24 hours are non-refundable (see Terms).',
       `Keep this email for your records — quote booking #${booking.bookingId} if you contact us.`,

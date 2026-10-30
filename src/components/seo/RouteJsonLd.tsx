@@ -107,15 +107,18 @@ const PRODUCTS: ProductDef[] = [
   },
   {
     path: '/ranua-zoo',
-    name: 'Nordic Animals of Ranua Zoo',
+    name: 'Ranua Wildlife Park – Entry Ticket & Round-Trip Transfer',
     description:
-      'Day trip from Rovaniemi to Ranua Wildlife Park with hotel pickup, entrance tickets, and Arctic wildlife.',
+      'Round-trip transportation from Rovaniemi with Ranua Wildlife Park admission included. Independent park visit — no guided tour.',
     image: `${SITE}/ranua1.jpg`,
     price: 99,
     breadcrumbs: [
       { name: 'Home', path: '/' },
       { name: 'Daytime Experiences', path: '/daytime-experiences' },
-      { name: 'Ranua Wildlife Park Tour', path: '/ranua-zoo' },
+      {
+        name: 'Ranua Wildlife Park – Entry Ticket & Round-Trip Transfer',
+        path: '/ranua-zoo',
+      },
     ],
   },
   {

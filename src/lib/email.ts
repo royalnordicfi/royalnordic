@@ -248,6 +248,9 @@ function getChildPrice(tourName: string): number {
 /** Keep in sync with supabase/functions/_shared/bookingEmails.ts */
 function displayTourName(tourName: string): string {
   if (tourName === 'Northern Lights Tour') return 'Guaranteed Northern Lights Tour'
+  if (/ranua/i.test(tourName)) {
+    return 'Ranua Wildlife Park – Entry Ticket & Round-Trip Transfer'
+  }
   return tourName
 }
 
@@ -324,7 +327,13 @@ function generateCustomerConfirmationHTML(booking: BookingNotificationData): str
             </table>
             <h2 style="margin:0 0 10px;font-size:16px;color:#18181b;">What happens next</h2>
             <ul style="margin:0 0 24px;padding-left:18px;font-size:14px;line-height:1.7;color:#3f3f46;">
-              <li>${/standard group/i.test(booking.tourName) ? 'Meet at Ruokasenkatu 3, 96100 Rovaniemi at 20:00. Hotel pickup is not included. Bring your own thermal clothing.' : 'We will confirm your pickup time and meeting details before the tour.'}</li>
+              <li>${
+                /standard group/i.test(booking.tourName)
+                  ? 'Meet at Ruokasenkatu 3, 96100 Rovaniemi at 20:00. Hotel pickup is not included. Bring your own thermal clothing.'
+                  : /ranua/i.test(booking.tourName)
+                    ? 'Round-trip transfer from Rovaniemi and Ranua Wildlife Park admission are included. This is a self-guided park visit — your driver provides transportation, not a guided tour inside the park. Exact pickup time and return meeting point are confirmed before departure.'
+                    : 'We will confirm your pickup time and meeting details before the tour.'
+              }</li>
               <li>Dress for Arctic conditions: warm layers, proper winter footwear, hat and gloves.</li>
               <li>Free cancellation up to 24 hours before departure (see Terms).</li>
               <li>Keep this email for your records — quote booking #${booking.bookingId} if you contact us.</li>
@@ -374,7 +383,13 @@ Guests: ${guests}
 Total paid: €${total}
 ${booking.specialRequests ? `Notes: ${booking.specialRequests}\n` : ''}
 WHAT HAPPENS NEXT
-- ${/standard group/i.test(booking.tourName) ? 'Meet at Ruokasenkatu 3, 96100 Rovaniemi at 20:00. Hotel pickup is not included. Bring your own thermal clothing.' : 'We will confirm your pickup time and meeting details before the tour.'}
+- ${
+  /standard group/i.test(booking.tourName)
+    ? 'Meet at Ruokasenkatu 3, 96100 Rovaniemi at 20:00. Hotel pickup is not included. Bring your own thermal clothing.'
+    : /ranua/i.test(booking.tourName)
+      ? 'Round-trip transfer from Rovaniemi and Ranua Wildlife Park admission are included. This is a self-guided park visit — your driver provides transportation, not a guided tour inside the park. Exact pickup time and return meeting point are confirmed before departure.'
+      : 'We will confirm your pickup time and meeting details before the tour.'
+}
 - Dress for Arctic conditions: warm layers, proper winter footwear, hat and gloves.
 - Free cancellation up to 24 hours before departure (see Terms).
 - Quote booking #${booking.bookingId} if you contact us.

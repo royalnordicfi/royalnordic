@@ -104,7 +104,7 @@ export function useCmsTourPresentation(tourId: number, fallback: TourPageFallbac
       whatToExpect: (tour?.what_to_expect || '').trim(),
       badge: (tour?.badge || '').trim(),
       heroImage: tour?.hero_image_url || tour?.gallery?.[0]?.url || gallery[0]?.src || '',
-      bookingTourName: tour?.name || fallback.title,
+      bookingTourName: tour ? displayName(tour) : fallback.title,
     }
   }, [tour, fallback])
 

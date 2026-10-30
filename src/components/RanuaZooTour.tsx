@@ -10,10 +10,12 @@ import ExperienceAccordion from './experience/ExperienceAccordion'
 import BookingAside from './experience/BookingAside'
 import TourSection from './tour/TourSection'
 import { useCmsTourPresentation, type TourPageFallback } from '../hooks/useCmsTourPresentation'
+import { RANUA_PUBLIC_NAME, RANUA_TOUR_ID } from '../lib/tourBookingRules'
 
 const FALLBACK: TourPageFallback = {
-  title: 'Nordic Animals of Ranua Zoo',
-  lede: 'Rovaniemi day trip to Finland’s northernmost zoo — polar bears, 50+ species, transfers and entrance included.',
+  title: RANUA_PUBLIC_NAME,
+  lede:
+    'Discover the Arctic wildlife of Ranua Wildlife Park at your own pace. Enjoy comfortable round-trip transportation from Rovaniemi with your entrance ticket included. Explore the park independently, without a guided tour.',
   adultPrice: 99,
   childPrice: 79,
   maxCapacity: 16,
@@ -21,90 +23,105 @@ const FALLBACK: TourPageFallback = {
   groupSize: 'Max 16',
   pickupFact: 'Rovaniemi',
   description:
-    'Guided day trip from Rovaniemi to Ranua Wildlife Park — over 50 Arctic and northern species, including polar bears, lynxes, wolves, moose, reindeer, and arctic foxes on forest trails. Walk spacious habitats, enjoy free time for photos, with transfers and entrance tickets included.',
+    'Round-trip transportation from Rovaniemi to Ranua Wildlife Park with park admission included. Meet polar bears and 50+ Arctic and northern species on forest trails — lynx, wolves, moose, reindeer, arctic foxes, and more. You explore the park independently at your own pace. Your driver provides transportation, not a guided tour inside the park.',
   benefits: [
-    'Day trip from Rovaniemi with transfers and park entrance included',
-    'Polar bears, lynx, wolves, and 50+ Arctic species on forest trails',
-    'Free time for photos — popular with families and animal lovers',
+    'Round-trip transportation from Rovaniemi',
+    'Wildlife park admission included',
+    'Independent park visit — no guided tour',
+    'Time to explore polar bears and 50+ Arctic species at your own pace',
   ],
   included: [
-    'Hotel pickup and drop-off from Rovaniemi',
-    'Professional guide (English & Finnish)',
-    'Comfortable transportation to Ranua',
-    'Entrance tickets to Ranua Wildlife Park',
-    'Meet polar bears and 50+ Arctic species',
-    'Guidance and tips about Arctic wildlife',
-    'Free time to explore and take photos',
-    'Small group experience (max 16 people)',
+    'Round-trip transportation from Rovaniemi',
+    'Ranua Wildlife Park admission ticket',
+    'Professional driver',
+    'Time to explore the park independently',
+    'Return transportation to Rovaniemi',
   ],
   excluded: [
-    'Meals and drinks (optional lunch available at the park)',
-    'Personal expenses and souvenirs',
-    'Winter clothing or boot rental',
+    'Guided wildlife park tour',
+    'Meals and drinks',
+    'Personal expenses',
+    'Winter clothing rental',
   ],
   gallery: [
     { src: '/ranua1.jpg', alt: 'Ranua Wildlife Park in Finnish Lapland' },
     { src: '/ranua2.jpeg', alt: 'Arctic animals at Ranua Wildlife Park' },
-    { src: '/ranua3.jpeg', alt: 'Polar bear habitat at Ranua' },
+    { src: '/ranua3.jpeg', alt: 'Polar bear habitat at Ranua Wildlife Park' },
     { src: '/ranua4.jpeg', alt: 'Forest trails at Ranua Wildlife Park' },
-    { src: '/ranua5.jpeg', alt: 'Northern species at Ranua zoo day trip' },
+    { src: '/ranua5.jpeg', alt: 'Northern species at Ranua Wildlife Park' },
   ],
   faqs: [
     {
-      question: 'What is included in the Ranua tour?',
+      question: 'Is this a guided tour of the park?',
       answer:
-        'Hotel pickup and drop-off from Rovaniemi, entrance tickets to Ranua Wildlife Park, and an English & Finnish guide. Meals and personal expenses are not included.',
+        'No. This is a self-guided park visit. Royal Nordic provides round-trip transportation and your entrance ticket. You explore Ranua Wildlife Park independently. The driver is not a park guide.',
     },
     {
-      question: 'How long is the day trip?',
+      question: 'Are entrance tickets included?',
       answer:
-        'About 5 hours overall, including transfers and time to explore polar bears and 50+ Arctic species at the park.',
+        'Yes. Ranua Wildlife Park admission is always included in this product. There is no transfer-only option on royalnordic.fi.',
+    },
+    {
+      question: 'How long is the experience?',
+      answer:
+        'About 5 hours in total, including transfers and time to explore the park. Exact pickup and return times are confirmed after booking.',
+    },
+    {
+      question: 'Is hotel pickup included?',
+      answer:
+        'Round-trip transportation from the Rovaniemi area is included. Enter your hotel or pickup address at checkout. Exact pickup time is confirmed before departure.',
     },
     {
       question: 'Is it good for families?',
       answer:
-        'Yes. The tour is a popular family daytime experience. Child pricing applies for ages 0–17, and the park has walking paths suitable for a relaxed visit.',
+        'Yes. Child pricing applies for ages 0–17. The park has walking paths suited to a relaxed, independent visit.',
     },
     {
       question: 'What should we wear?',
       answer:
-        'Warm clothing and comfortable shoes for outdoor walking. Winter clothing rental is not included.',
+        'Warm winter clothing and comfortable walking shoes are recommended. Clothing rental is not included.',
+    },
+    {
+      question: 'What is the cancellation policy?',
+      answer:
+        'Free cancellation up to 24 hours before departure. Cancellations within 24 hours of the start time are non-refundable.',
     },
   ],
   whatToBring:
-    'Wear warm clothing and comfortable shoes suitable for walking. A camera or smartphone is recommended for photography.',
-  knowBefore: 'Please tell us in advance about any mobility or dietary requirements.',
+    'Warm winter clothing and comfortable walking shoes. A camera or smartphone is recommended. Clothing rental is not included.',
+  knowBefore:
+    'This is a self-guided park visit. Your driver provides transportation, not a guided tour inside the park. Entrance tickets are included. Explore at your own pace within the scheduled visit window. Return departure time and meeting location are communicated to guests before the return drive.',
 }
 
+const itinerary = [
+  {
+    title: 'Pickup in Rovaniemi',
+    text: 'We collect you from the supported Rovaniemi area. Exact pickup time is confirmed after booking.',
+  },
+  {
+    title: 'Drive to Ranua Wildlife Park',
+    text: 'Comfortable transfer through Lapland to the park entrance.',
+  },
+  {
+    title: 'Independent wildlife park visit',
+    text: 'Explore habitats and forest trails at your own pace — polar bears, lynx, wolves, moose, reindeer, arctic foxes, and more. No guided park tour.',
+  },
+  {
+    title: 'Meet the driver',
+    text: 'Return to the agreed departure point at the communicated meeting time.',
+  },
+  {
+    title: 'Return to Rovaniemi',
+    text: 'Round-trip transfer back to your drop-off in the Rovaniemi area.',
+  },
+]
+
 const RanuaZooTour = () => {
-  const cms = useCmsTourPresentation(5, FALLBACK)
+  const cms = useCmsTourPresentation(RANUA_TOUR_ID, FALLBACK)
 
   const scrollToBook = () => {
     document.getElementById('book')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
-
-  const itinerary = [
-    {
-      time: '~09:30',
-      title: 'Pickup in Rovaniemi',
-      text: 'Hotel pickup from the Rovaniemi area. Exact time is confirmed after booking.',
-    },
-    {
-      time: '1 h',
-      title: 'Drive to Ranua',
-      text: 'Scenic drive through Lapland wilderness to Ranua Wildlife Park.',
-    },
-    {
-      time: '~3.5 h',
-      title: 'Ranua Wildlife Park',
-      text: 'Explore forest trails and habitats — polar bears, lynx, wolves, moose, reindeer, arctic foxes, and more. Free time for photos at your own pace.',
-    },
-    {
-      time: '1 h',
-      title: 'Return to Rovaniemi',
-      text: 'Drive back and drop-off at your accommodation.',
-    },
-  ]
 
   return (
     <div className="rn-page pb-24 lg:pb-0">
@@ -114,15 +131,15 @@ const RanuaZooTour = () => {
           { label: 'Day Tours', to: '/daytime-experiences' },
           { label: cms.title },
         ]}
-        eyebrow="Ranua · Wildlife day trip"
+        eyebrow="Ranua · Entry & transfer"
         title={cms.title}
         lede={cms.lede}
         images={cms.gallery}
         facts={[
           { label: 'Duration', value: cms.duration || '~5 hours' },
-          { label: 'Group', value: cms.groupSize || `Max ${cms.maxCapacity}` },
-          { label: 'Pickup', value: cms.pickupFact },
-          { label: 'Languages', value: 'English · Finnish' },
+          { label: 'Transfer', value: 'Round-trip from Rovaniemi' },
+          { label: 'Admission', value: 'Included' },
+          { label: 'Visit', value: 'Independent · no guided tour' },
         ]}
         booking={
           <BookingAside
@@ -130,28 +147,50 @@ const RanuaZooTour = () => {
             referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}
             offerLine={cms.pricing.saleActive ? undefined : 'WINTER20 · Save 20% at checkout'}
             trustLines={[
+              'Tickets included',
+              'Self-guided visit',
+              'Round-trip transfer',
               'Free cancellation',
-              'Secure payment',
-              'Hotel pickup',
-              'Park entrance',
             ]}
           >
             {cms.loading && !cms.tour ? (
               <p className="py-10 text-center text-sm text-panel-muted">Loading availability…</p>
             ) : (
               <BookingWidget
-                tourId={5}
+                tourId={RANUA_TOUR_ID}
                 tourName={cms.bookingTourName}
                 adultPrice={cms.adultPrice}
                 childPrice={cms.childPrice}
                 maxCapacity={cms.maxCapacity}
+                requiresHotelPickup
+                cancellationNote="Free cancellation up to 24 hours before departure."
               />
             )}
           </BookingAside>
         }
       >
         <TourSection eyebrow="About" title="Overview">
-          <p className="leading-relaxed text-text-muted">{cms.fullDescription || FALLBACK.description}</p>
+          <p className="leading-relaxed text-text-muted">
+            {cms.fullDescription || FALLBACK.description}
+          </p>
+          <ul className="mt-5 grid gap-2 sm:grid-cols-2">
+            {[
+              'Round-trip transportation from Rovaniemi',
+              'Wildlife park admission included',
+              'Independent park visit',
+              'No guided tour',
+            ].map((item) => (
+              <li
+                key={item}
+                className="flex items-start gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white/90"
+              >
+                <span className="mt-0.5 text-aurora-soft" aria-hidden>
+                  ✓
+                </span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
         </TourSection>
 
         <TourSection eyebrow="Highlights" title="Highlights" tone="band">
@@ -164,13 +203,18 @@ const RanuaZooTour = () => {
 
         <TourSection eyebrow="Details" title="What’s included">
           <ExperienceInclusions included={cms.included} notIncluded={cms.excluded} />
+          <p className="mt-5 text-sm leading-relaxed text-text-muted">
+            <span className="font-medium text-white">Pickup. </span>
+            {cms.pickupInfo ||
+              'Round-trip transportation from the supported Rovaniemi area is included. Enter your hotel or pickup address at checkout. Exact pickup and return meeting details are confirmed before departure.'}
+          </p>
         </TourSection>
 
-        <TourSection eyebrow="Plan ahead" title="Practical information">
+        <TourSection eyebrow="Plan ahead" title="Important information">
           <ExperienceAccordion
             items={[
               {
-                title: 'Accessibility & needs',
+                title: 'Self-guided visit',
                 content: cms.knowBefore || FALLBACK.knowBefore!,
               },
               {
@@ -181,7 +225,13 @@ const RanuaZooTour = () => {
                 title: 'Meals',
                 content:
                   cms.importantInfo ||
-                  'Lunch and drinks are not included — cafés and restaurants are available at the park.',
+                  'Meals and drinks are not included. Cafés and restaurants are available at the park.',
+              },
+              {
+                title: 'Cancellation',
+                content:
+                  cms.cancellationInfo ||
+                  'Free cancellation up to 24 hours before departure. Cancellations within 24 hours of the start time are non-refundable.',
               },
             ]}
           />

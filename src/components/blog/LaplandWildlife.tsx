@@ -183,9 +183,10 @@ const LaplandWildlife: React.FC = () => {
     heroImage: "/ranua1.jpg",
     relatedExperiences: [
       {
-        title: "Ranua Zoo day trip",
+        title: "Ranua Wildlife Park – Entry & transfer",
         href: "/ranua-zoo",
-        description: "Guided visit to Ranua Wildlife Park with transport from Rovaniemi.",
+        description:
+          "Round-trip transfer from Rovaniemi with park admission included. Self-guided visit.",
       },
     ],
   };

@@ -316,7 +316,11 @@ serve(async (req) => {
       // Inventory is updated by the bookings trigger (update_tour_date_slots).
       // Do not double-count total_booked here.
 
-      const { data: tourData } = await supabase.from('tours').select('name').eq('id', tourId).single()
+      const { data: tourData } = await supabase
+        .from('tours')
+        .select('name, public_name')
+        .eq('id', tourId)
+        .single()
       const { data: dateDataForEmail } = await supabase
         .from('tour_dates')
         .select('date')
@@ -329,7 +333,7 @@ serve(async (req) => {
           customerName,
           customerEmail,
           customerPhone: phone,
-          tourName: tourData.name,
+          tourName: tourData.public_name || tourData.name,
           tourDate: dateDataForEmail.date,
           adults,
           children,

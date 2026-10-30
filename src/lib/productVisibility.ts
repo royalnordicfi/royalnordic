@@ -28,7 +28,7 @@ export const TOUR_PUBLIC_PAGES: Record<
   5: {
     path: '/ranua-zoo',
     fallbackPath: '/daytime-experiences',
-    label: 'Nordic Animals of Ranua Zoo',
+    label: 'Ranua Wildlife Park – Entry Ticket & Round-Trip Transfer',
   },
   6: {
     path: '/korouoma-canyon',

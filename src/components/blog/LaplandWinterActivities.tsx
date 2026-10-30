@@ -29,9 +29,10 @@ const LaplandWinterActivities: React.FC = () => {
         description: "Self-guided forest routes with rental gear.",
       },
       {
-        title: "Ranua Zoo",
+        title: "Ranua Wildlife Park",
         href: "/ranua-zoo",
-        description: "Day trip to Arctic wildlife at Ranua Wildlife Park.",
+        description:
+          "Entry ticket and round-trip transfer from Rovaniemi — explore independently.",
       },
     ],
     content: `Finnish Lapland transforms into a magical winter wonderland from November through March, offering visitors an incredible array of Arctic adventures. Whether you're seeking the thrill of outdoor activities or the tranquility of nature, Lapland has something for everyone.

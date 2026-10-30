@@ -28,6 +28,12 @@ export const PRIVATE_NL_NAME = 'Private Northern Lights Tour – 100% Guarantee'
 export const PRIVATE_NL_PUBLIC_NAME = 'Private Northern Lights Tour – 100% Guarantee'
 export const PRIVATE_NL_LISTING_TITLE = 'Private Northern Lights Tour — Exclusive Group'
 
+export const RANUA_TOUR_ID = 5
+export const RANUA_PATH = '/ranua-zoo'
+export const RANUA_PUBLIC_NAME =
+  'Ranua Wildlife Park – Entry Ticket & Round-Trip Transfer'
+export const RANUA_INTERNAL_NAME = 'Nordic Animals of Ranua Zoo'
+
 const MONTH_DAY = /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/
 const CLOCK = /^([01]\d|2[0-3]):[0-5]\d$/
 
@@ -39,6 +45,11 @@ export function isStandardGroupTour(tourId?: number | null, tourName?: string | 
 export function isPrivateNlTour(tourId?: number | null, tourName?: string | null): boolean {
   if (tourId === PRIVATE_NL_TOUR_ID) return true
   return /private northern lights/i.test(tourName || '')
+}
+
+export function isRanuaTour(tourId?: number | null, tourName?: string | null): boolean {
+  if (tourId === RANUA_TOUR_ID) return true
+  return /ranua/i.test(tourName || '')
 }
 
 /** Recurring MM-DD season. A start after the end crosses the new year (1 Nov–31 Mar). */

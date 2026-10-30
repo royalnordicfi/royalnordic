@@ -230,8 +230,19 @@ export function getDisplayPricing(tour: TourCms, now = new Date()): DisplayPrici
   }
 }
 
-export function displayName(tour: Pick<TourCms, 'public_name' | 'name'>): string {
-  return (tour.public_name || tour.name || 'Tour').trim()
+export function displayName(tour: Pick<TourCms, 'id' | 'public_name' | 'name'>): string {
+  const raw = (tour.public_name || tour.name || 'Tour').trim()
+  // Ranua is entry + round-trip transfer (self-guided). Prefer the locked customer title
+  // until Admin CMS public_name is updated to the same wording.
+  if (
+    tour.id === 5 ||
+    /ranua/i.test(raw)
+  ) {
+    if (!/entry ticket/i.test(raw)) {
+      return 'Ranua Wildlife Park – Entry Ticket & Round-Trip Transfer'
+    }
+  }
+  return raw
 }
 
 export function newCmsId(prefix: string): string {
