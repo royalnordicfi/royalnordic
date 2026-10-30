@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronDown, Menu, X } from 'lucide-react'
@@ -45,22 +45,29 @@ function resolveNav(to: string, navigate: ReturnType<typeof useNavigate>, pathna
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false)
-  const [menuMounted, setMenuMounted] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [menuAnimatable, setMenuAnimatable] = useState(false)
+  /** closed → opening/open → closing → unmount */
+  const [menuPhase, setMenuPhase] = useState<'closed' | 'open' | 'closing'>('closed')
   const [experiencesOpen, setExperiencesOpen] = useState(false)
   const [dropVisible, setDropVisible] = useState(false)
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const closeRef = useRef<HTMLButtonElement>(null)
   const openRef = useRef<HTMLButtonElement>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
-  const scrollLockY = useRef(0)
   const afterClose = useRef<(() => void) | null>(null)
   const dropRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const backdropRef = useRef<HTMLButtonElement>(null)
+  const panelAnim = useRef<Animation | null>(null)
+  const backdropAnim = useRef<Animation | null>(null)
+  const menuGen = useRef(0)
   const closeTimer = useRef<number | null>(null)
-  const menuClosing = useRef(false)
   const menuId = useId()
+  const MENU_MS = 300
+  const MENU_EASE = 'cubic-bezier(0.32, 0.72, 0, 1)'
+  const menuMounted = menuPhase !== 'closed'
+  const menuOpen = menuPhase === 'open'
+  const reduceMotion =
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   const hasHero = isHeroShell(pathname)
   const transparent = hasHero && !scrolled
@@ -121,83 +128,114 @@ const Header = () => {
   }, [experiencesOpen])
 
   const lockScroll = useCallback(() => {
-    scrollLockY.current = window.scrollY
+    const sbw = window.innerWidth - document.documentElement.clientWidth
     document.documentElement.classList.add('mobile-nav-open')
-    document.body.style.position = 'fixed'
-    document.body.style.top = `-${scrollLockY.current}px`
-    document.body.style.left = '0'
-    document.body.style.right = '0'
-    document.body.style.width = '100%'
+    document.documentElement.style.overflow = 'hidden'
+    document.body.style.overflow = 'hidden'
+    if (sbw > 0) {
+      document.body.style.paddingRight = `${sbw}px`
+      document.documentElement.style.setProperty('--rn-scrollbar-comp', `${sbw}px`)
+    }
   }, [])
 
   const unlockScroll = useCallback(() => {
     document.documentElement.classList.remove('mobile-nav-open')
-    document.body.style.position = ''
-    document.body.style.top = ''
-    document.body.style.left = ''
-    document.body.style.right = ''
-    document.body.style.width = ''
-    window.scrollTo(0, scrollLockY.current)
+    document.documentElement.style.overflow = ''
+    document.body.style.overflow = ''
+    document.body.style.paddingRight = ''
+    document.documentElement.style.removeProperty('--rn-scrollbar-comp')
   }, [])
 
+  const cancelMenuAnims = () => {
+    panelAnim.current?.cancel()
+    backdropAnim.current?.cancel()
+    panelAnim.current = null
+    backdropAnim.current = null
+  }
+
+  const slidePanel = (toOpen: boolean) => {
+    const panel = panelRef.current
+    const backdrop = backdropRef.current
+    if (!panel || !backdrop) return Promise.resolve()
+
+    // Commit current animated values, then cancel — so reverse mid-slide doesn't jump.
+    const matrix = new DOMMatrix(getComputedStyle(panel).transform)
+    const fromX = matrix.m41
+    const fromOp = Number(getComputedStyle(backdrop).opacity) || 0
+    cancelMenuAnims()
+
+    const duration = reduceMotion ? 0 : MENU_MS
+    const width = panel.offsetWidth || panel.getBoundingClientRect().width
+    const toX = toOpen ? 0 : width
+    const toOp = toOpen ? 1 : 0
+
+    panel.style.transform = `translate3d(${fromX}px, 0, 0)`
+    backdrop.style.opacity = String(fromOp)
+
+    panelAnim.current = panel.animate(
+      [
+        { transform: `translate3d(${fromX}px, 0, 0)` },
+        { transform: `translate3d(${toX}px, 0, 0)` },
+      ],
+      { duration, easing: MENU_EASE, fill: 'forwards' }
+    )
+    backdropAnim.current = backdrop.animate(
+      [{ opacity: fromOp }, { opacity: toOp }],
+      { duration, easing: 'ease', fill: 'forwards' }
+    )
+
+    panelAnim.current.finished
+      .then(() => {
+        panel.style.transform = `translate3d(${toX}px, 0, 0)`
+      })
+      .catch(() => undefined)
+    backdropAnim.current.finished
+      .then(() => {
+        backdrop.style.opacity = String(toOp)
+      })
+      .catch(() => undefined)
+
+    return Promise.all([
+      panelAnim.current.finished.catch(() => undefined),
+      backdropAnim.current.finished.catch(() => undefined),
+    ]).then(() => undefined)
+  }
+
+  const finishClose = (gen: number) => {
+    if (gen !== menuGen.current) return
+    cancelMenuAnims()
+    if (panelRef.current) panelRef.current.style.transform = ''
+    if (backdropRef.current) backdropRef.current.style.opacity = ''
+    setMenuPhase('closed')
+    unlockScroll()
+    const fn = afterClose.current
+    afterClose.current = null
+    if (fn) requestAnimationFrame(fn)
+    else openRef.current?.focus()
+  }
+
   const openMenu = () => {
-    menuClosing.current = false
+    if (menuPhase === 'open') return
+    afterClose.current = null
+    menuGen.current += 1
     lockScroll()
-    if (menuMounted) {
-      // Re-open during a close animation — slide back in from the right.
-      setMenuAnimatable(true)
-      setMenuOpen(true)
-      return
-    }
-    setMenuAnimatable(false)
-    setMenuOpen(false)
-    setMenuMounted(true)
+    setMenuPhase('open')
   }
 
   const closeMenu = (next?: () => void) => {
-    if (!menuMounted) return
-    menuClosing.current = true
-    afterClose.current = next ?? null
-    setMenuAnimatable(true)
-    setMenuOpen(false)
+    if (menuPhase === 'closed') return
+    if (next) afterClose.current = next
+    else if (menuPhase !== 'closing') afterClose.current = null
+    if (menuPhase === 'closing') return
+    const gen = (menuGen.current += 1)
+    setMenuPhase('closing')
+    void slidePanel(false).then(() => finishClose(gen))
   }
 
-  // Mount off-screen with no transition, then slide in from the right.
-  useLayoutEffect(() => {
-    if (!menuMounted || menuOpen || menuClosing.current) return
-    const panel = panelRef.current
-    if (panel) {
-      panel.style.transition = 'none'
-      panel.style.transform = 'translate3d(100%, 0, 0)'
-      void panel.offsetWidth
-      panel.style.transition = ''
-      panel.style.transform = ''
-    }
-    const id = window.requestAnimationFrame(() => {
-      setMenuAnimatable(true)
-      setMenuOpen(true)
-    })
-    return () => window.cancelAnimationFrame(id)
-  }, [menuMounted, menuOpen])
-
-  // After close slide finishes, unmount.
+  // Slide in after the drawer is mounted (refs ready); always from the right edge.
   useEffect(() => {
-    if (!menuMounted || menuOpen || !menuClosing.current) return
-    const t = window.setTimeout(() => {
-      setMenuMounted(false)
-      setMenuAnimatable(false)
-      menuClosing.current = false
-      unlockScroll()
-      const fn = afterClose.current
-      afterClose.current = null
-      if (fn) requestAnimationFrame(fn)
-      else openRef.current?.focus()
-    }, 300)
-    return () => window.clearTimeout(t)
-  }, [menuMounted, menuOpen, unlockScroll])
-
-  useEffect(() => {
-    if (!menuOpen) return
+    if (menuPhase !== 'open') return
+    const id = window.requestAnimationFrame(() => void slidePanel(true))
     closeRef.current?.focus()
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -206,8 +244,12 @@ const Header = () => {
       }
     }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [menuOpen])
+    return () => {
+      window.cancelAnimationFrame(id)
+      window.removeEventListener('keydown', onKey)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuPhase])
 
   const go = (to: string) => {
     closeMenu(() => resolveNav(to, navigate, pathname))
@@ -304,11 +346,15 @@ const Header = () => {
               ref={openRef}
               type="button"
               className="rn-header-menu"
-              aria-label="Open menu"
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={menuOpen}
-              onClick={() => (menuOpen ? closeMenu() : openMenu())}
+              onClick={() => (menuPhase === 'open' ? closeMenu() : openMenu())}
             >
-              {menuOpen ? <X size={20} strokeWidth={1.75} /> : <Menu size={20} strokeWidth={1.75} />}
+              {menuPhase === 'closed' ? (
+                <Menu size={20} strokeWidth={1.75} />
+              ) : (
+                <X size={20} strokeWidth={1.75} />
+              )}
             </button>
           </div>
         </div>
@@ -318,23 +364,19 @@ const Header = () => {
         createPortal(
           <div
             className={`rn-mobile-drawer fixed inset-0 z-[70] xl:hidden${
-              menuAnimatable ? ' rn-mobile-drawer--animatable' : ''
-            }${menuOpen ? ' rn-mobile-drawer--open' : ''}`}
+              menuOpen ? ' rn-mobile-drawer--open' : ''
+            }`}
             role="dialog"
             aria-modal="true"
           >
             <button
+              ref={backdropRef}
               type="button"
               className="rn-mobile-drawer__backdrop"
               aria-label="Close menu"
               onClick={() => closeMenu()}
             />
-            <div
-              ref={panelRef}
-              className={`rn-mobile-drawer__panel${menuAnimatable ? ' is-animatable' : ''}${
-                menuOpen ? ' is-open' : ''
-              }`}
-            >
+            <div ref={panelRef} className="rn-mobile-drawer__panel">
               <div className="rn-mobile-drawer__head">
                 <span className="font-display text-lg tracking-wide text-white/95">Menu</span>
                 <button
