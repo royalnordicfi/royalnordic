@@ -48,15 +48,15 @@ const CategoryHero = ({
         {lead ? <div className="mb-4 sm:mb-5">{lead}</div> : null}
         {eyebrow ? <p className="rn-eyebrow">{eyebrow}</p> : null}
         <h1
-          className={`${eyebrow || lead ? 'mt-2' : 'mt-0'} max-w-3xl font-display font-semibold text-white ${
+          className={`${eyebrow || lead ? 'mt-2' : 'mt-0'} max-w-3xl font-display font-semibold tracking-[-0.025em] text-white ${
             compact
-              ? 'text-[1.65rem] leading-[1.13] sm:text-[2.15rem] lg:text-[2.55rem]'
-              : 'text-[1.85rem] leading-[1.1] sm:text-[2.65rem] lg:text-[3.25rem]'
+              ? 'text-[1.55rem] leading-[1.15] sm:text-[2.15rem] lg:text-[2.55rem]'
+              : 'text-[1.7rem] leading-[1.12] sm:text-[2.65rem] lg:text-[3.25rem]'
           }`}
         >
           {title}
         </h1>
-        <p className="mt-3 max-w-xl text-[13.5px] leading-relaxed text-white/74 sm:mt-3.5 sm:text-[15px]">
+        <p className="mt-2.5 max-w-xl text-[13.5px] leading-relaxed text-white/78 sm:mt-3.5 sm:text-[15px]">
           {subtitle}
         </p>
       </div>

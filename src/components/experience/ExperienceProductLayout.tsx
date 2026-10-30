@@ -53,17 +53,17 @@ export default function ExperienceProductLayout({
         <div
           className={
             booking
-              ? 'mt-5 grid gap-8 lg:mt-8 lg:grid-cols-12 lg:items-stretch lg:gap-x-10 xl:gap-x-14'
-              : 'mt-5 lg:mt-8'
+              ? 'mt-4 grid gap-7 sm:gap-8 lg:mt-8 lg:grid-cols-12 lg:items-stretch lg:gap-x-10 xl:gap-x-14'
+              : 'mt-4 lg:mt-8'
           }
         >
           <div className={booking ? 'min-w-0 lg:col-span-7' : 'min-w-0'}>
             <header className="rn-product__intro rn-reveal max-w-rn-narrow">
               <p className="rn-eyebrow">{eyebrow}</p>
-              <h1 className="rn-product__title mt-2.5 font-display font-semibold text-white">
+              <h1 className="rn-product__title mt-2 font-display font-semibold text-white sm:mt-2.5">
                 {title}
               </h1>
-              <p className="rn-product__lede mt-3.5 text-[15px] leading-relaxed text-text-muted sm:text-[16px]">
+              <p className="rn-product__lede mt-3 text-[15px] leading-relaxed text-text-muted sm:mt-3.5 sm:text-[16px]">
                 {lede}
               </p>
               {proof ? <div className="rn-product__proof mt-3.5">{proof}</div> : null}
@@ -90,15 +90,15 @@ export default function ExperienceProductLayout({
             </header>
 
             {images.length > 0 ? (
-              <div className="rn-product__gallery mt-8 sm:mt-9">
+              <div className="rn-product__gallery mt-6 sm:mt-9">
                 <ExperienceGallery images={images} />
               </div>
             ) : null}
 
-            {afterGallery ? <div className="mt-5 sm:mt-6">{afterGallery}</div> : null}
+            {afterGallery ? <div className="mt-4 sm:mt-6">{afterGallery}</div> : null}
 
             {facts.length > 0 ? (
-              <div className="mt-6 sm:mt-7">
+              <div className="mt-5 sm:mt-7">
                 <ExperienceFacts items={facts} />
               </div>
             ) : null}

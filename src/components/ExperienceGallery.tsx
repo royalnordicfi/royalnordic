@@ -47,20 +47,21 @@ const ExperienceGallery = ({ images }: ExperienceGalleryProps) => {
     <>
       {/* Mobile */}
       <div className="lg:hidden">
-        <div className="-mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto px-4 pb-1">
+        <div className="rn-gallery-mobile -mx-[var(--rn-gutter)] flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-[var(--rn-gutter)] pb-1">
           {images.map((img, i) => (
             <button
               key={img.src}
               type="button"
-              className="rn-gallery__tile relative w-[82%] shrink-0 snap-center overflow-hidden"
+              className="rn-gallery__tile relative w-[min(86%,22rem)] shrink-0 snap-center overflow-hidden rounded-[var(--rn-radius)]"
               onClick={() => setLightbox(i)}
             >
               <img
                 src={img.src}
                 alt={img.alt}
-                className="aspect-[16/9] max-h-[12rem] w-full object-cover sm:max-h-none"
+                className="aspect-[16/10] w-full object-cover"
                 style={img.position ? { objectPosition: img.position } : undefined}
                 loading={i === 0 ? 'eager' : 'lazy'}
+                decoding="async"
                 onError={onGalleryImageError}
               />
             </button>
@@ -68,7 +69,7 @@ const ExperienceGallery = ({ images }: ExperienceGalleryProps) => {
         </div>
         <button
           type="button"
-          className="mt-2.5 text-sm font-medium text-aurora-soft transition hover:text-white"
+          className="mt-3 min-h-[44px] text-sm font-medium text-aurora-soft transition hover:text-white"
           onClick={() => setLightbox(0)}
         >
           View gallery · {count} photos

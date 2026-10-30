@@ -43,15 +43,15 @@ const MobileBookingBar = ({
                   €{Number.isInteger(priceFrom) ? priceFrom : priceFrom.toFixed(2)}
                 </span>
               </p>
-              <p className="mt-0.5 text-[10px] uppercase tracking-[0.14em] text-[var(--rn-sale-soft)]">
+              <p className="mt-0.5 text-[10px] font-medium tracking-[0.04em] text-[var(--rn-sale-soft)]">
                 {unitLabel} · special offer
               </p>
             </>
           ) : (
             <>
-              <p className="text-[10px] uppercase tracking-[0.14em] text-text-dim">From</p>
+              <p className="text-[10px] font-medium tracking-[0.06em] text-text-dim">From</p>
               <p
-                className="text-[1.35rem] font-bold leading-none tracking-tight text-white"
+                className="text-[1.3rem] font-bold leading-none tracking-tight text-white"
                 style={{ fontFamily: 'var(--rn-font-body)' }}
               >
                 €{priceFrom}
@@ -65,7 +65,7 @@ const MobileBookingBar = ({
         <button
           type="button"
           onClick={onBook}
-          className="rn-btn-primary min-h-[48px] min-w-[10.5rem] shrink-0 px-5 text-[13px] tracking-wide"
+          className="rn-btn-primary min-h-[48px] min-w-[9.75rem] shrink-0 px-4 text-[13px] tracking-wide sm:min-w-[10.5rem] sm:px-5"
         >
           {label}
         </button>
