@@ -307,20 +307,19 @@ const Header = () => {
               </div>
               <nav className="rn-mobile-drawer__nav" aria-label="Mobile">
                 <p className="rn-mobile-drawer__label">Experiences</p>
-                {EXPERIENCES.map((item, i) => (
+                {EXPERIENCES.map((item) => (
                   <button
                     key={item.to}
                     type="button"
                     onClick={() => go(item.to)}
                     className={`rn-mobile-drawer__link ${isActive(item.to) ? 'rn-mobile-drawer__link--active' : ''}`}
-                    style={{ '--rn-drawer-i': i } as React.CSSProperties}
                   >
                     <span className="rn-mobile-drawer__link-title">{item.label}</span>
                     <span className="rn-mobile-drawer__link-hint">{item.hint}</span>
                   </button>
                 ))}
                 <div className="rn-mobile-drawer__rule" aria-hidden />
-                {MOBILE_EXTRA.map((item, i) => (
+                {MOBILE_EXTRA.map((item) => (
                   <button
                     key={item.to}
                     type="button"
@@ -328,7 +327,6 @@ const Header = () => {
                     className={`rn-mobile-drawer__link rn-mobile-drawer__link--solo ${
                       isActive(item.to) ? 'rn-mobile-drawer__link--active' : ''
                     }`}
-                    style={{ '--rn-drawer-i': EXPERIENCES.length + i } as React.CSSProperties}
                   >
                     <span className="rn-mobile-drawer__link-title">{item.label}</span>
                     <span className="rn-mobile-drawer__link-hint">{item.hint}</span>
