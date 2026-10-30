@@ -50,6 +50,11 @@ export const TOUR_PUBLIC_PAGES: Record<
     fallbackPath: '/northern-lights-tours',
     label: 'Private Northern Lights Tour – 100% Guarantee',
   },
+  12: {
+    path: '/private-santa-claus-experience',
+    fallbackPath: '/daytime-experiences',
+    label: 'Private Santa Claus Experience',
+  },
   9: {
     path: '/transportation-rovaniemi-saariselka',
     fallbackPath: '/transportation',

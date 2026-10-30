@@ -1,9 +1,13 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import {
+  PRIVATE_SANTA_SEASON_FIRST,
+  PRIVATE_SANTA_SEASON_LAST,
   STANDARD_GROUP_SEASON_END,
   STANDARD_GROUP_SEASON_START,
+  isDateInAbsoluteTourWindow,
   isDateInTourSeason,
+  isPrivateSantaTour,
   isStandardGroupTour,
 } from '../_shared/tourBookingRules.ts'
 
@@ -50,9 +54,21 @@ serve(async (req) => {
       if (tourLookup.data.season_start) seasonStart = tourLookup.data.season_start
       if (tourLookup.data.season_end) seasonEnd = tourLookup.data.season_end
     }
-    if (seasonStart && seasonEnd && !isDateInTourSeason(String(date).slice(0, 10), seasonStart, seasonEnd)) {
+    const dateIso = String(date).slice(0, 10)
+    if (seasonStart && seasonEnd && !isDateInTourSeason(dateIso, seasonStart, seasonEnd)) {
       return new Response(
         JSON.stringify({ error: 'That date is outside this tour’s operating season' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 },
+      )
+    }
+    if (
+      isPrivateSantaTour(Number(tourId)) &&
+      !isDateInAbsoluteTourWindow(dateIso, PRIVATE_SANTA_SEASON_FIRST, PRIVATE_SANTA_SEASON_LAST)
+    ) {
+      return new Response(
+        JSON.stringify({
+          error: 'Private Santa Claus Experience is only available 15 Nov 2026 – 31 Mar 2027',
+        }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 },
       )
     }

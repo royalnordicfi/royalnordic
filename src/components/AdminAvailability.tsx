@@ -9,7 +9,13 @@ import {
   todayTourDateISO,
   tourDateToLocalDate,
 } from '../lib/tourDate'
-import { isDateInTourSeason } from '../lib/tourBookingRules'
+import {
+  PRIVATE_SANTA_SEASON_FIRST,
+  PRIVATE_SANTA_SEASON_LAST,
+  PRIVATE_SANTA_TOUR_ID,
+  isDateInAbsoluteTourWindow,
+  isDateInTourSeason,
+} from '../lib/tourBookingRules'
 
 interface AdminAvailabilityProps {
   tourId: number
@@ -28,6 +34,13 @@ function inSeasonForTour(
   seasonStart?: string | null,
   seasonEnd?: string | null,
 ): boolean {
+  if (tourId === PRIVATE_SANTA_TOUR_ID) {
+    return isDateInAbsoluteTourWindow(
+      dateString,
+      PRIVATE_SANTA_SEASON_FIRST,
+      PRIVATE_SANTA_SEASON_LAST,
+    )
+  }
   if ((seasonStart || '').trim() && (seasonEnd || '').trim()) {
     return isDateInTourSeason(dateString, seasonStart, seasonEnd)
   }
@@ -203,8 +216,12 @@ const AdminAvailability: React.FC<AdminAvailabilityProps> = ({
 
   const persistSlots = async (date: string, availableSlots: number) => {
     const slots = Math.max(0, Math.min(availableSlots, maxCapacity))
-    if ((seasonStart || '').trim() && (seasonEnd || '').trim() && !isDateInTourSeason(date, seasonStart, seasonEnd)) {
-      setError('That date is outside this tour’s operating season.')
+    if (!inSeasonForTour(tourId, date, seasonStart, seasonEnd)) {
+      setError(
+        tourId === PRIVATE_SANTA_TOUR_ID
+          ? 'Private Santa Claus Experience is only available 15 Nov 2026 – 31 Mar 2027.'
+          : 'That date is outside this tour’s operating season.',
+      )
       return
     }
     setSaving(true)

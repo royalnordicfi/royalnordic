@@ -1,9 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import {
+  PRIVATE_SANTA_SEASON_FIRST,
+  PRIVATE_SANTA_SEASON_LAST,
+  PRIVATE_SANTA_TOUR_ID,
   STANDARD_GROUP_SEASON_END,
   STANDARD_GROUP_SEASON_START,
+  isDateInAbsoluteTourWindow,
   isDateInTourSeason,
+  isPrivateSantaTour,
   isStandardGroupTour,
 } from '../_shared/tourBookingRules.ts'
 
@@ -68,11 +73,19 @@ serve(async (req) => {
     }
 
     // Format the response
-    const seasonStart = tour.season_start || (isStandardGroupTour(Number(tourId), tour.name) ? STANDARD_GROUP_SEASON_START : null)
-    const seasonEnd = tour.season_end || (isStandardGroupTour(Number(tourId), tour.name) ? STANDARD_GROUP_SEASON_END : null)
-    const bookableDates = (tourDates || []).filter((date) =>
-      isDateInTourSeason(String(date.date).slice(0, 10), seasonStart, seasonEnd),
-    )
+    const tourIdNum = Number(tourId)
+    const seasonStart = tour.season_start || (isStandardGroupTour(tourIdNum, tour.name) ? STANDARD_GROUP_SEASON_START : null)
+    const seasonEnd = tour.season_end || (isStandardGroupTour(tourIdNum, tour.name) ? STANDARD_GROUP_SEASON_END : null)
+    const absoluteFrom = isPrivateSantaTour(tourIdNum, tour.name) ? PRIVATE_SANTA_SEASON_FIRST : null
+    const absoluteTo = isPrivateSantaTour(tourIdNum, tour.name) ? PRIVATE_SANTA_SEASON_LAST : null
+    const bookableDates = (tourDates || []).filter((date) => {
+      const iso = String(date.date).slice(0, 10)
+      if (!isDateInTourSeason(iso, seasonStart, seasonEnd)) return false
+      if (tourIdNum === PRIVATE_SANTA_TOUR_ID || absoluteFrom || absoluteTo) {
+        return isDateInAbsoluteTourWindow(iso, absoluteFrom, absoluteTo)
+      }
+      return true
+    })
 
     const availability = {
       tourId: tourId,

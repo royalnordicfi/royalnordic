@@ -39,6 +39,39 @@ export function isRanuaTour(tourId?: number | null, tourName?: string | null): b
   return /ranua/i.test(tourName || '')
 }
 
+/** Absolute one-season window (Europe/Helsinki calendar dates). Not MM-DD recurring. */
+export const PRIVATE_SANTA_TOUR_ID = 12
+export const PRIVATE_SANTA_PATH = '/private-santa-claus-experience'
+export const PRIVATE_SANTA_NAME = 'Private Santa Claus Experience'
+export const PRIVATE_SANTA_PUBLIC_NAME = 'Private Santa Claus Experience in Rovaniemi'
+export const PRIVATE_SANTA_LISTING_TITLE = 'Private Santa Claus Experience'
+export const PRIVATE_SANTA_GROUP_PRICE = 1169
+export const PRIVATE_SANTA_REFERENCE_PRICE = 1299
+export const PRIVATE_SANTA_CAPACITY = 6
+export const PRIVATE_SANTA_SEASON_FIRST = '2026-11-15'
+export const PRIVATE_SANTA_SEASON_LAST = '2027-03-31'
+
+export function isPrivateSantaTour(tourId?: number | null, tourName?: string | null): boolean {
+  if (tourId === PRIVATE_SANTA_TOUR_ID) return true
+  return /private santa/i.test(tourName || '') || /santa claus experience/i.test(tourName || '')
+}
+
+/** Inclusive absolute YYYY-MM-DD window. Empty bounds = no restriction. */
+export function isDateInAbsoluteTourWindow(
+  iso: string,
+  fromIso?: string | null,
+  toIso?: string | null,
+): boolean {
+  const date = String(iso || '').slice(0, 10)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false
+  const from = (fromIso || '').trim().slice(0, 10)
+  const to = (toIso || '').trim().slice(0, 10)
+  if (!from && !to) return true
+  if (from && date < from) return false
+  if (to && date > to) return false
+  return true
+}
+
 const MONTH_DAY = /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/
 const CLOCK = /^([01]\d|2[0-3]):[0-5]\d$/
 

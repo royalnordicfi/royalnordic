@@ -1,8 +1,10 @@
 import { formatTourDateForDisplay } from './tourDate.ts'
 import {
   departureSuffixForTour,
+  isPrivateSantaTour,
   isRanuaTour,
   isStandardGroupTour,
+  PRIVATE_SANTA_PUBLIC_NAME,
   RANUA_PUBLIC_NAME,
 } from './tourBookingRules.ts'
 
@@ -47,6 +49,7 @@ const SITE_URL = 'https://royalnordic.fi'
 export function displayTourName(tourName: string): string {
   if (tourName === 'Northern Lights Tour') return 'Guaranteed Northern Lights Tour'
   if (isRanuaTour(null, tourName)) return RANUA_PUBLIC_NAME
+  if (isPrivateSantaTour(null, tourName)) return PRIVATE_SANTA_PUBLIC_NAME
   return tourName
 }
 
@@ -252,9 +255,11 @@ export function buildCustomerConfirmationEmail(booking: BookingEmailData) {
         ? `Meet at ${booking.meetingPoint || 'Ruokasenkatu 3, 96100 Rovaniemi, Finland'}. Departure is ${booking.departureTime || '20:00'}. Hotel pickup is not included. Bring your own thermal clothing.`
         : isRanuaTour(null, booking.tourName)
           ? 'Round-trip transfer from Rovaniemi and Ranua Wildlife Park admission are included. This is a self-guided park visit — your driver provides transportation, not a guided tour inside the park. Exact pickup time and return meeting point are confirmed before departure.'
-          : booking.meetingPoint
-            ? 'Hotel pickup is included. Exact pickup time is confirmed before departure.'
-            : 'We will confirm your pickup time and meeting details before the tour.',
+          : isPrivateSantaTour(null, booking.tourName)
+            ? 'This is a private Santa Claus experience for your group only. Hotel pickup and return in the supported Rovaniemi area are included. Exact pickup time is confirmed before departure. The total is a flat group price, not per person.'
+            : booking.meetingPoint
+              ? 'Hotel pickup is included. Exact pickup time is confirmed before departure.'
+              : 'We will confirm your pickup time and meeting details before the tour.',
       'Dress for Arctic conditions: warm layers, proper winter footwear, hat and gloves.',
       'Free cancellation up to 24 hours before departure. Cancellations within 24 hours are non-refundable (see Terms).',
       `Keep this email for your records — quote booking #${booking.bookingId} if you contact us.`,

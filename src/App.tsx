@@ -25,6 +25,7 @@ import DaytimeExperiences from './components/DaytimeExperiences';
 import FamilyFriendlyNorthernLights from './components/FamilyFriendlyNorthernLights';
 import NorthernLightsStandardGroup from './components/NorthernLightsStandardGroup';
 import NorthernLightsPrivateTour from './components/NorthernLightsPrivateTour';
+import PrivateSantaClausExperience from './components/PrivateSantaClausExperience';
 import Blog from './components/Blog';
 import BestTimeNorthernLights from './components/blog/BestTimeNorthernLights';
 import WhatToPackLapland from './components/blog/WhatToPackLapland';
@@ -156,6 +157,14 @@ function App() {
             element={
               <ActiveTourGate tourId={6}>
                 <KorouomaTour />
+              </ActiveTourGate>
+            }
+          />
+          <Route
+            path="/private-santa-claus-experience"
+            element={
+              <ActiveTourGate tourId={12} missingIsInactive>
+                <PrivateSantaClausExperience />
               </ActiveTourGate>
             }
           />

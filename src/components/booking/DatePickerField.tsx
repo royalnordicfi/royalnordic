@@ -13,6 +13,7 @@ type Props = {
   error?: string
   seasonStart?: string
   seasonEnd?: string
+  absoluteFrom?: string
   departureTime?: string
   meetingPointDeparture?: boolean
   adultPrice: number
@@ -109,6 +110,7 @@ export default function DatePickerField({
   error,
   seasonStart,
   seasonEnd,
+  absoluteFrom,
   departureTime,
   meetingPointDeparture,
   adultPrice,
@@ -122,7 +124,7 @@ export default function DatePickerField({
   const [open, setOpen] = useState(false)
   const [placement, setPlacement] = useState<PanelPlacement | null>(null)
   const [currentMonth, setCurrentMonth] = useState(() =>
-    initialCalendarMonth(seasonStart, seasonEnd),
+    initialCalendarMonth(seasonStart, seasonEnd, absoluteFrom),
   )
 
   const updatePlacement = () => {

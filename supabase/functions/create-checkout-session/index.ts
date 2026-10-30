@@ -1,11 +1,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import {
+  PRIVATE_SANTA_SEASON_FIRST,
+  PRIVATE_SANTA_SEASON_LAST,
   STANDARD_GROUP_DEPARTURE,
   STANDARD_GROUP_SEASON_END,
   STANDARD_GROUP_SEASON_START,
   STANDARD_GROUP_TOUR_ID,
+  isDateInAbsoluteTourWindow,
   isDateInTourSeason,
+  isPrivateSantaTour,
   isStandardGroupTour,
   perPersonSubtotal,
 } from '../_shared/tourBookingRules.ts'
@@ -108,6 +112,12 @@ serve(async (req) => {
           const dateIso = String(dateRow.date).slice(0, 10)
           if (!isDateInTourSeason(dateIso, seasonStart, seasonEnd)) {
             throw new Error('This date is outside the operating season')
+          }
+          if (
+            isPrivateSantaTour(tourId, tourRow.name) &&
+            !isDateInAbsoluteTourWindow(dateIso, PRIVATE_SANTA_SEASON_FIRST, PRIVATE_SANTA_SEASON_LAST)
+          ) {
+            throw new Error('This date is outside the Private Santa Claus operating season')
           }
 
           const remaining = Number(dateRow.available_slots) - Number(dateRow.total_booked || 0)

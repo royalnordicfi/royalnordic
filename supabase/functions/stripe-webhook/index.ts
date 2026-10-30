@@ -6,9 +6,13 @@ import {
   buildCustomerConfirmationEmail,
 } from '../_shared/bookingEmails.ts'
 import {
+  PRIVATE_SANTA_SEASON_FIRST,
+  PRIVATE_SANTA_SEASON_LAST,
   STANDARD_GROUP_SEASON_END,
   STANDARD_GROUP_SEASON_START,
+  isDateInAbsoluteTourWindow,
   isDateInTourSeason,
+  isPrivateSantaTour,
   isStandardGroupTour,
 } from '../_shared/tourBookingRules.ts'
 
@@ -216,6 +220,12 @@ serve(async (req) => {
       }
       if (!isDateInTourSeason(dateIso, seasonStart, seasonEnd)) {
         throw new Error('This date is outside the operating season')
+      }
+      if (
+        isPrivateSantaTour(tourId) &&
+        !isDateInAbsoluteTourWindow(dateIso, PRIVATE_SANTA_SEASON_FIRST, PRIVATE_SANTA_SEASON_LAST)
+      ) {
+        throw new Error('This date is outside the Private Santa Claus operating season')
       }
 
       const remainingSlots = dateData.available_slots - (dateData.total_booked || 0)

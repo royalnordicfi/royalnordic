@@ -251,6 +251,9 @@ function displayTourName(tourName: string): string {
   if (/ranua/i.test(tourName)) {
     return 'Ranua Wildlife Park – Entry Ticket & Round-Trip Transfer'
   }
+  if (/private santa/i.test(tourName) || /santa claus experience/i.test(tourName)) {
+    return 'Private Santa Claus Experience in Rovaniemi'
+  }
   return tourName
 }
 
@@ -332,7 +335,9 @@ function generateCustomerConfirmationHTML(booking: BookingNotificationData): str
                   ? 'Meet at Ruokasenkatu 3, 96100 Rovaniemi at 20:00. Hotel pickup is not included. Bring your own thermal clothing.'
                   : /ranua/i.test(booking.tourName)
                     ? 'Round-trip transfer from Rovaniemi and Ranua Wildlife Park admission are included. This is a self-guided park visit — your driver provides transportation, not a guided tour inside the park. Exact pickup time and return meeting point are confirmed before departure.'
-                    : 'We will confirm your pickup time and meeting details before the tour.'
+                    : /private santa/i.test(booking.tourName) || /santa claus experience/i.test(booking.tourName)
+                      ? 'This is a private Santa Claus experience for your group only. Hotel pickup and return in the supported Rovaniemi area are included. Exact pickup time is confirmed before departure. The total is a flat group price, not per person.'
+                      : 'We will confirm your pickup time and meeting details before the tour.'
               }</li>
               <li>Dress for Arctic conditions: warm layers, proper winter footwear, hat and gloves.</li>
               <li>Free cancellation up to 24 hours before departure (see Terms).</li>
@@ -388,7 +393,9 @@ WHAT HAPPENS NEXT
     ? 'Meet at Ruokasenkatu 3, 96100 Rovaniemi at 20:00. Hotel pickup is not included. Bring your own thermal clothing.'
     : /ranua/i.test(booking.tourName)
       ? 'Round-trip transfer from Rovaniemi and Ranua Wildlife Park admission are included. This is a self-guided park visit — your driver provides transportation, not a guided tour inside the park. Exact pickup time and return meeting point are confirmed before departure.'
-      : 'We will confirm your pickup time and meeting details before the tour.'
+      : /private santa/i.test(booking.tourName) || /santa claus experience/i.test(booking.tourName)
+        ? 'This is a private Santa Claus experience for your group only. Hotel pickup and return in the supported Rovaniemi area are included. Exact pickup time is confirmed before departure. The total is a flat group price, not per person.'
+        : 'We will confirm your pickup time and meeting details before the tour.'
 }
 - Dress for Arctic conditions: warm layers, proper winter footwear, hat and gloves.
 - Free cancellation up to 24 hours before departure (see Terms).

@@ -70,6 +70,8 @@ export default function CheckoutPage() {
     maxCapacity: draft?.maxCapacity,
     seasonStart: draft?.seasonStart,
     seasonEnd: draft?.seasonEnd,
+    absoluteFrom: draft?.absoluteFrom,
+    absoluteTo: draft?.absoluteTo,
     pricingModel: draft?.pricingModel,
   })
 

@@ -28,6 +28,7 @@ const PRODUCT_EXACT = new Set([
   '/ice-fishing',
   '/ranua-zoo',
   '/korouoma-canyon',
+  '/private-santa-claus-experience',
   '/snowshoe-rental',
   '/snowmobile-safari',
   '/monster-truck-northern-lights',

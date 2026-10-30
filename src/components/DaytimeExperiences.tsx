@@ -24,6 +24,22 @@ const ALL_EXPERIENCES = [
     imagePosition: 'center',
   },
   {
+    tourId: 12 as number | null,
+    to: '/private-santa-claus-experience',
+    image: '/santaclaus1.jpg',
+    imageAlt: 'Private Santa Claus Experience in Rovaniemi',
+    title: 'Private Santa Claus Experience',
+    description:
+      'Exclusive private meeting with Santa Claus in Rovaniemi, including private transportation and festive treats.',
+    duration: 'Approximately 1.5 hours',
+    groupSize: 'Up to 6 guests',
+    pickup: true,
+    priceFrom: 1169 as number | undefined,
+    priceUnit: '/ private group',
+    imagePosition: 'center',
+    lockListing: true,
+  },
+  {
     tourId: 5 as number | null,
     to: '/ranua-zoo',
     image: '/ranua1.jpg',
@@ -83,14 +99,24 @@ const DaytimeExperiences: React.FC = () => {
     const base = !activeIds
       ? ALL_EXPERIENCES
       : ALL_EXPERIENCES.filter((e) => e.tourId == null || activeIds.has(e.tourId))
-    return base.map((e) => mergeTourCardCms(e, cmsById))
+    return base.map((e) => {
+      const merged = mergeTourCardCms(e, cmsById)
+      if (!('lockListing' in e) || !e.lockListing) return merged
+      return {
+        ...merged,
+        title: e.title,
+        image: e.image,
+        imageAlt: e.imageAlt,
+        priceUnit: e.priceUnit,
+      }
+    })
   }, [activeIds, cmsById])
 
   return (
     <div className="rn-page">
       <CategoryHero
         title="Daytime Experiences in Lapland"
-        subtitle="Ice fishing, wildlife, canyon hikes, and Arctic snowmobile safari — small groups from Rovaniemi."
+        subtitle="Ice fishing, wildlife, private Santa visits, canyon hikes, and Arctic snowmobile safari from Rovaniemi."
         image="/korouoma1.jpg"
         compact
       />
@@ -113,6 +139,7 @@ const DaytimeExperiences: React.FC = () => {
                 badge={'badge' in exp ? exp.badge : undefined}
                 priceFrom={exp.priceFrom}
                 referencePrice={exp.referencePrice}
+                priceUnit={'priceUnit' in exp && exp.priceUnit ? exp.priceUnit : undefined}
                 imagePosition={exp.imagePosition}
                 ctaLabel={exp.priceFrom != null ? 'Explore' : 'Request availability'}
                 className={`rn-stagger-${(i % 4) + 1}`}

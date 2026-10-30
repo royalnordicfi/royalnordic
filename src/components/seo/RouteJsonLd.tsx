@@ -122,6 +122,22 @@ const PRODUCTS: ProductDef[] = [
     ],
   },
   {
+    path: '/private-santa-claus-experience',
+    name: 'Private Santa Claus Experience in Rovaniemi',
+    description:
+      'Exclusive private Santa Claus meeting in Rovaniemi with private transfers and festive treats for up to six guests.',
+    image: `${SITE}/santaclaus1.jpg`,
+    price: 1169,
+    breadcrumbs: [
+      { name: 'Home', path: '/' },
+      { name: 'Daytime Experiences', path: '/daytime-experiences' },
+      {
+        name: 'Private Santa Claus Experience',
+        path: '/private-santa-claus-experience',
+      },
+    ],
+  },
+  {
     path: '/korouoma-canyon',
     name: 'Korouoma Canyon Winter Adventure',
     description:
@@ -176,7 +192,9 @@ function breadcrumbList(crumbs: { name: string; path: string }[]) {
 }
 
 function productOffer(product: ProductDef) {
-  const isPrivateGroup = product.path === '/northern-lights-private-tour'
+  const isPrivateGroup =
+    product.path === '/northern-lights-private-tour' ||
+    product.path === '/private-santa-claus-experience'
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',

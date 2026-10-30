@@ -21,6 +21,8 @@ export type BookingDraft = {
   maxCapacity?: number
   seasonStart?: string
   seasonEnd?: string
+  absoluteFrom?: string
+  absoluteTo?: string
   departureTime?: string
   meetingPointDeparture?: boolean
   meetingPoint?: string
@@ -149,9 +151,19 @@ export function draftFromCheckoutSearch(
 }
 
 /** Open calendar on the soonest month that intersects the tour season (UI only). */
-export function initialCalendarMonth(seasonStart?: string, seasonEnd?: string): Date {
+export function initialCalendarMonth(
+  seasonStart?: string,
+  seasonEnd?: string,
+  absoluteFrom?: string,
+): Date {
   const now = new Date()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12)
+  const abs = (absoluteFrom || '').trim().slice(0, 10)
+  if (/^\d{4}-\d{2}-\d{2}$/.test(abs)) {
+    const fromMonth = new Date(Number(abs.slice(0, 4)), Number(abs.slice(5, 7)) - 1, 1, 12)
+    if (today < fromMonth) return fromMonth
+    return new Date(today.getFullYear(), today.getMonth(), 1)
+  }
   if (!seasonStart || !seasonEnd) return new Date(today.getFullYear(), today.getMonth(), 1)
 
   const [startMonth, startDay] = seasonStart.split('-').map(Number)

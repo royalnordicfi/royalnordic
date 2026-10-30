@@ -53,6 +53,12 @@ const META: Record<
       'Round-trip transfer from Rovaniemi with Ranua Wildlife Park admission included. Self-guided park visit — no guided tour. About 5 hours. Free cancellation 24h.',
     ogImage: 'https://royalnordic.fi/ranua1.jpg',
   },
+  '/private-santa-claus-experience': {
+    title: 'Private Santa Claus Experience in Rovaniemi | Royal Nordic',
+    description:
+      'Meet Santa Claus on an exclusive private Christmas experience in Rovaniemi. Private transfers, festive treats and personal time with Santa for up to six guests.',
+    ogImage: 'https://royalnordic.fi/santaclaus1.jpg',
+  },
   '/korouoma-canyon': {
     title: 'Korouoma Canyon Tour from Rovaniemi | Frozen Waterfalls | Royal Nordic',
     description:

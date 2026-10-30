@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import type { TourDate } from '../lib/supabase'
-import { isDateInTourSeason } from '../lib/tourBookingRules'
+import { isDateInAbsoluteTourWindow, isDateInTourSeason } from '../lib/tourBookingRules'
 import { buildMondayFirstMonthGrid, todayTourDateISO } from '../lib/tourDate'
 
 export type CalendarDayCell = {
@@ -21,6 +21,9 @@ type Options = {
   maxCapacity?: number
   seasonStart?: string
   seasonEnd?: string
+  /** Inclusive absolute YYYY-MM-DD window (one-season products). */
+  absoluteFrom?: string
+  absoluteTo?: string
   /** Flat exclusive allocation (private tour / transfer) — inventory is not per guest. */
   pricingModel?: 'per_person' | 'per_vehicle'
 }
@@ -32,6 +35,8 @@ export function useTourAvailability({
   maxCapacity,
   seasonStart,
   seasonEnd,
+  absoluteFrom,
+  absoluteTo,
   pricingModel = 'per_person',
 }: Options) {
   const exclusiveSlot = pricingModel === 'per_vehicle'
@@ -89,6 +94,9 @@ export function useTourAvailability({
           remaining_slots: date.availableSpots,
         }))
         .filter((date: TourDate) => date.id && date.date)
+        .filter((date: TourDate) =>
+          isDateInAbsoluteTourWindow(date.date, absoluteFrom, absoluteTo),
+        )
 
       setAvailability(transformed)
     } catch (err) {
@@ -98,7 +106,7 @@ export function useTourAvailability({
     } finally {
       setLoading(false)
     }
-  }, [tourId])
+  }, [tourId, absoluteFrom, absoluteTo])
 
   useEffect(() => {
     void loadAvailability()
@@ -132,10 +140,15 @@ export function useTourAvailability({
       const month = currentMonth.getMonth()
       const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}-`
       const monthDates = availability.filter((date) => date.date.startsWith(monthPrefix))
-      const filteredDates =
-        seasonStart && seasonEnd
-          ? monthDates.filter((date) => isDateInTourSeason(date.date, seasonStart, seasonEnd))
-          : monthDates
+      const filteredDates = monthDates.filter((date) => {
+        if (absoluteFrom || absoluteTo) {
+          return isDateInAbsoluteTourWindow(date.date, absoluteFrom, absoluteTo)
+        }
+        if (seasonStart && seasonEnd) {
+          return isDateInTourSeason(date.date, seasonStart, seasonEnd)
+        }
+        return true
+      })
 
       const dateMap = new Map<string, TourDate>()
       filteredDates.forEach((date) => dateMap.set(date.date, date))
@@ -148,8 +161,13 @@ export function useTourAvailability({
         const { day, date: dateString } = cell
         const dateData = dateMap.get(dateString)
         const isPastDate = dateString < todayString
-        const inSeason =
+        const inAbsolute =
+          absoluteFrom || absoluteTo
+            ? isDateInAbsoluteTourWindow(dateString, absoluteFrom, absoluteTo)
+            : true
+        const inRecurringSeason =
           seasonStart && seasonEnd ? isDateInTourSeason(dateString, seasonStart, seasonEnd) : true
+        const inSeason = inAbsolute && inRecurringSeason
         const remaining = dateData?.remaining_slots ?? 0
         const isFullBooked = Boolean(dateData && remaining === 0)
         const inventoryOk = exclusiveSlot ? remaining >= 1 : remaining >= partySize
@@ -161,12 +179,12 @@ export function useTourAvailability({
           available: isAvailable,
           remainingSlots: remaining,
           isPastDate,
-          isOutOfSeason: seasonStart && seasonEnd ? !inSeason : false,
+          isOutOfSeason: !inSeason,
           isFullBooked,
         }
       })
     },
-    [availability, seasonStart, seasonEnd, exclusiveSlot],
+    [availability, seasonStart, seasonEnd, absoluteFrom, absoluteTo, exclusiveSlot],
   )
 
   return {

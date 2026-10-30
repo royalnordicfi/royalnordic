@@ -13,7 +13,10 @@ export type CatalogCardBase = {
   badge?: string
   priceFrom?: number
   referencePrice?: number
+  priceUnit?: string
   imagePosition?: string
+  /** Keep static card title/image even when CMS would override. */
+  lockListing?: boolean
 }
 
 /** Overlay Admin CMS fields onto a static catalog card (keeps route/layout defaults). */

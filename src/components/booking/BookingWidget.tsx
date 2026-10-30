@@ -21,6 +21,9 @@ export type BookingWidgetProps = {
   maxCapacity?: number
   seasonStart?: string
   seasonEnd?: string
+  /** Inclusive absolute YYYY-MM-DD season window. */
+  absoluteFrom?: string
+  absoluteTo?: string
   departureTime?: string
   meetingPointDeparture?: boolean
   meetingPoint?: string
@@ -42,6 +45,8 @@ export default function BookingWidget({
   maxCapacity,
   seasonStart,
   seasonEnd,
+  absoluteFrom,
+  absoluteTo,
   departureTime,
   meetingPointDeparture = false,
   meetingPoint,
@@ -72,6 +77,8 @@ export default function BookingWidget({
     maxCapacity,
     seasonStart,
     seasonEnd,
+    absoluteFrom,
+    absoluteTo,
     pricingModel,
   })
 
@@ -155,6 +162,8 @@ export default function BookingWidget({
       maxCapacity,
       seasonStart,
       seasonEnd,
+      absoluteFrom,
+      absoluteTo,
       departureTime,
       meetingPointDeparture,
       meetingPoint,
@@ -177,6 +186,7 @@ export default function BookingWidget({
         error={error}
         seasonStart={seasonStart}
         seasonEnd={seasonEnd}
+        absoluteFrom={absoluteFrom}
         departureTime={departureTime}
         meetingPointDeparture={meetingPointDeparture}
         adultPrice={liveAdultPrice}

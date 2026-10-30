@@ -3,6 +3,20 @@ import TourCard from './TourCard'
 
 const TOURS = [
   {
+    to: '/private-santa-claus-experience',
+    image: '/santaclaus1.jpg',
+    imageAlt: 'Private Santa Claus Experience in Rovaniemi',
+    title: 'Private Santa Claus Experience',
+    description:
+      'Exclusive private meeting with Santa Claus, private transfers and festive treats.',
+    duration: 'Approximately 1.5 hours',
+    groupSize: 'Up to 6 guests',
+    pickup: true,
+    badge: 'Private',
+    priceFrom: 1169,
+    priceUnit: '/ private group',
+  },
+  {
     to: '/family-friendly-northern-lights',
     image: '/family1.jpg',
     imageAlt: 'Family Northern Lights evening',
@@ -24,17 +38,6 @@ const TOURS = [
     groupSize: 'Small group',
     pickup: true,
     priceFrom: 129,
-  },
-  {
-    to: '/ice-fishing',
-    image: '/icefishing2.jpg',
-    imageAlt: 'Ice fishing on a frozen lake',
-    title: 'Ice Fishing Experience',
-    description: 'Traditional ice fishing with equipment and hot drinks.',
-    duration: '3–4 hours',
-    groupSize: 'Max 8',
-    pickup: true,
-    priceFrom: 119,
   },
 ]
 
