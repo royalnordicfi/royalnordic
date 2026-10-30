@@ -3350,9 +3350,8 @@
     transform: none;
     transition: none;
   }
-  .rn-mobile-drawer__link {
-    opacity: 1;
-    transform: none;
+  .rn-mobile-drawer__backdrop,
+  .rn-mobile-drawer__panel {
     transition: none;
   }
   html {
