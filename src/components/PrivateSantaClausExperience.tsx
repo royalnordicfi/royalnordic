@@ -65,7 +65,11 @@ Perfect for families, couples and anyone looking for an unforgettable Christmas 
     'Optional gratuities',
   ],
   gallery: [
-    { src: '/santaclaus1.jpg', alt: 'Private Santa Claus meeting in Rovaniemi' },
+    {
+      src: '/santaclaus1.jpg',
+      alt: 'Private Santa Claus meeting in Rovaniemi',
+      position: 'center 42%',
+    },
     { src: '/santaclaus2.jpg', alt: 'Festive Santa Claus Christmas scene' },
     { src: '/santaclaus3.jpg', alt: 'Cozy Christmas fireplace setting' },
     { src: '/santaclaus4.jpg', alt: 'Santa Claus seated indoors for a private visit' },

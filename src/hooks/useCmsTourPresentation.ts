@@ -20,7 +20,7 @@ export type TourPageFallback = {
   benefits?: string[]
   included?: string[]
   excluded?: string[]
-  gallery?: { src: string; alt: string }[]
+  gallery?: { src: string; alt: string; position?: string }[]
   faqs?: { question: string; answer: string }[]
   description?: string
   whatToBring?: string
@@ -65,10 +65,16 @@ export function useCmsTourPresentation(tourId: number, fallback: TourPageFallbac
       tour && tour.excluded_items.length > 0
         ? tour.excluded_items.map((i) => i.text)
         : fallback.excluded || []
+    const fallbackGallery = fallback.gallery || []
     const gallery =
       tour && tour.gallery.length > 0
-        ? tour.gallery.map((g) => ({ src: g.url, alt: g.alt }))
-        : fallback.gallery || []
+        ? tour.gallery.map((g, i) => ({
+            src: g.url,
+            alt: g.alt,
+            // Keep hardcoded crop anchors (e.g. portrait Santa cover) when CMS omits them.
+            position: fallbackGallery[i]?.position,
+          }))
+        : fallbackGallery
     const faqs =
       tour && tour.faq.length > 0
         ? tour.faq.map((f) => ({ question: f.question, answer: f.answer }))

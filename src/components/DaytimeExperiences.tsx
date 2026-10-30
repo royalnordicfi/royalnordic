@@ -23,7 +23,8 @@ const ALL_EXPERIENCES = [
     pickup: true,
     priceFrom: 1169 as number | undefined,
     priceUnit: '/ private group',
-    imagePosition: 'center top',
+    // Portrait cover: keep Santa (mid-frame) in the 16:9 card crop — not the cabin ceiling.
+    imagePosition: 'center 42%',
     lockListing: true,
   },
   {

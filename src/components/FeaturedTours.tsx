@@ -15,6 +15,7 @@ const TOURS = [
     badge: 'Private',
     priceFrom: 1169,
     priceUnit: '/ private group',
+    imagePosition: 'center 42%',
   },
   {
     to: '/family-friendly-northern-lights',
