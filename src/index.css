@@ -2653,6 +2653,9 @@
     background: rgba(0, 0, 0, 0.72);
     backdrop-filter: blur(4px);
     opacity: 0;
+    transition: none;
+  }
+  .rn-mobile-drawer--animatable .rn-mobile-drawer__backdrop {
     transition: opacity 0.28s ease;
   }
   .rn-mobile-drawer--open .rn-mobile-drawer__backdrop {
@@ -2672,12 +2675,14 @@
       linear-gradient(165deg, rgba(18, 155, 108, 0.07) 0%, transparent 38%),
       linear-gradient(to bottom, #040807, #020504 55%, #010302);
     box-shadow: -24px 0 64px rgba(0, 0, 0, 0.55);
-    transform: translateX(100%);
+    transform: translate3d(100%, 0, 0);
+    transition: none;
+  }
+  .rn-mobile-drawer__panel.is-animatable {
     transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-    will-change: transform;
   }
   .rn-mobile-drawer__panel.is-open {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   .rn-mobile-drawer__head {
     display: flex;
@@ -3351,8 +3356,9 @@
     transition: none;
   }
   .rn-mobile-drawer__backdrop,
-  .rn-mobile-drawer__panel {
-    transition: none;
+  .rn-mobile-drawer__panel,
+  .rn-mobile-drawer__panel.is-animatable {
+    transition: none !important;
   }
   html {
     scroll-behavior: auto;

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronDown, Menu, X } from 'lucide-react'
@@ -47,16 +47,19 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false)
   const [menuMounted, setMenuMounted] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [menuAnimatable, setMenuAnimatable] = useState(false)
   const [experiencesOpen, setExperiencesOpen] = useState(false)
   const [dropVisible, setDropVisible] = useState(false)
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const closeRef = useRef<HTMLButtonElement>(null)
   const openRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
   const scrollLockY = useRef(0)
   const afterClose = useRef<(() => void) | null>(null)
   const dropRef = useRef<HTMLDivElement>(null)
   const closeTimer = useRef<number | null>(null)
+  const menuClosing = useRef(false)
   const menuId = useId()
 
   const hasHero = isHeroShell(pathname)
@@ -138,26 +141,58 @@ const Header = () => {
   }, [])
 
   const openMenu = () => {
-    setMenuMounted(true)
+    menuClosing.current = false
     lockScroll()
-    requestAnimationFrame(() => requestAnimationFrame(() => setMenuOpen(true)))
+    if (menuMounted) {
+      // Re-open during a close animation — slide back in from the right.
+      setMenuAnimatable(true)
+      setMenuOpen(true)
+      return
+    }
+    setMenuAnimatable(false)
+    setMenuOpen(false)
+    setMenuMounted(true)
   }
 
   const closeMenu = (next?: () => void) => {
+    if (!menuMounted) return
+    menuClosing.current = true
     afterClose.current = next ?? null
+    setMenuAnimatable(true)
     setMenuOpen(false)
   }
 
+  // Mount off-screen with no transition, then slide in from the right.
+  useLayoutEffect(() => {
+    if (!menuMounted || menuOpen || menuClosing.current) return
+    const panel = panelRef.current
+    if (panel) {
+      panel.style.transition = 'none'
+      panel.style.transform = 'translate3d(100%, 0, 0)'
+      void panel.offsetWidth
+      panel.style.transition = ''
+      panel.style.transform = ''
+    }
+    const id = window.requestAnimationFrame(() => {
+      setMenuAnimatable(true)
+      setMenuOpen(true)
+    })
+    return () => window.cancelAnimationFrame(id)
+  }, [menuMounted, menuOpen])
+
+  // After close slide finishes, unmount.
   useEffect(() => {
-    if (!menuMounted || menuOpen) return
+    if (!menuMounted || menuOpen || !menuClosing.current) return
     const t = window.setTimeout(() => {
       setMenuMounted(false)
+      setMenuAnimatable(false)
+      menuClosing.current = false
       unlockScroll()
       const fn = afterClose.current
       afterClose.current = null
       if (fn) requestAnimationFrame(fn)
       else openRef.current?.focus()
-    }, 340)
+    }, 300)
     return () => window.clearTimeout(t)
   }, [menuMounted, menuOpen, unlockScroll])
 
@@ -271,7 +306,7 @@ const Header = () => {
               className="rn-header-menu"
               aria-label="Open menu"
               aria-expanded={menuOpen}
-              onClick={() => (menuOpen || menuMounted ? closeMenu() : openMenu())}
+              onClick={() => (menuOpen ? closeMenu() : openMenu())}
             >
               {menuOpen ? <X size={20} strokeWidth={1.75} /> : <Menu size={20} strokeWidth={1.75} />}
             </button>
@@ -282,7 +317,9 @@ const Header = () => {
       {menuMounted &&
         createPortal(
           <div
-            className={`rn-mobile-drawer fixed inset-0 z-[70] xl:hidden ${menuOpen ? 'rn-mobile-drawer--open' : ''}`}
+            className={`rn-mobile-drawer fixed inset-0 z-[70] xl:hidden${
+              menuAnimatable ? ' rn-mobile-drawer--animatable' : ''
+            }${menuOpen ? ' rn-mobile-drawer--open' : ''}`}
             role="dialog"
             aria-modal="true"
           >
@@ -292,7 +329,12 @@ const Header = () => {
               aria-label="Close menu"
               onClick={() => closeMenu()}
             />
-            <div className={`rn-mobile-drawer__panel ${menuOpen ? 'is-open' : ''}`}>
+            <div
+              ref={panelRef}
+              className={`rn-mobile-drawer__panel${menuAnimatable ? ' is-animatable' : ''}${
+                menuOpen ? ' is-open' : ''
+              }`}
+            >
               <div className="rn-mobile-drawer__head">
                 <span className="font-display text-lg tracking-wide text-white/95">Menu</span>
                 <button
