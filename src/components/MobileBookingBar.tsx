@@ -44,7 +44,7 @@ const MobileBookingBar = ({
                 </span>
               </p>
               <p className="mt-0.5 text-[10px] uppercase tracking-[0.14em] text-[var(--rn-sale-soft)]">
-                / adult · special offer
+                {unitLabel} · special offer
               </p>
             </>
           ) : (

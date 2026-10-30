@@ -11,19 +11,6 @@ import { mergeTourCardCms, tourCmsMap } from '../lib/mergeTourCardCms'
 
 const ALL_EXPERIENCES = [
   {
-    tourId: 4 as number | null,
-    to: '/ice-fishing',
-    image: '/icefishing2.jpg',
-    imageAlt: 'Ice fishing on a frozen Lapland lake',
-    title: 'Ice Fishing Experience',
-    description: 'Traditional ice fishing on frozen lakes with guide, equipment, and hot drinks by the fire.',
-    duration: '3–4 hours',
-    groupSize: 'Max 8',
-    pickup: true,
-    priceFrom: 119 as number | undefined,
-    imagePosition: 'center',
-  },
-  {
     tourId: 12 as number | null,
     to: '/private-santa-claus-experience',
     image: '/santaclaus1.jpg',
@@ -36,8 +23,21 @@ const ALL_EXPERIENCES = [
     pickup: true,
     priceFrom: 1169 as number | undefined,
     priceUnit: '/ private group',
-    imagePosition: 'center',
+    imagePosition: 'center top',
     lockListing: true,
+  },
+  {
+    tourId: 4 as number | null,
+    to: '/ice-fishing',
+    image: '/icefishing2.jpg',
+    imageAlt: 'Ice fishing on a frozen Lapland lake',
+    title: 'Ice Fishing Experience',
+    description: 'Traditional ice fishing on frozen lakes with guide, equipment, and hot drinks by the fire.',
+    duration: '3–4 hours',
+    groupSize: 'Max 8',
+    pickup: true,
+    priceFrom: 119 as number | undefined,
+    imagePosition: 'center',
   },
   {
     tourId: 5 as number | null,
