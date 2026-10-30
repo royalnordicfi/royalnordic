@@ -334,7 +334,7 @@ function generateCustomerConfirmationHTML(booking: BookingNotificationData): str
                 /standard group/i.test(booking.tourName)
                   ? 'Meet at Ruokasenkatu 3, 96100 Rovaniemi at 20:00. Hotel pickup is not included. Bring your own thermal clothing.'
                   : /ranua/i.test(booking.tourName)
-                    ? 'Round-trip transfer from Rovaniemi and Ranua Wildlife Park admission are included. This is a self-guided park visit — your driver provides transportation, not a guided tour inside the park. Exact pickup time and return meeting point are confirmed before departure.'
+                    ? 'Round-trip transfer from Rovaniemi and Ranua Wildlife Park admission are included. This is a self-guided park visit — your driver provides transportation, not a guided tour inside the park. The experience starts at 10:00. Exact hotel pickup time is sent after booking, and the return meeting point is confirmed before departure.'
                     : /private santa/i.test(booking.tourName) || /santa claus experience/i.test(booking.tourName)
                       ? 'This is a private Santa Claus experience for your group only. Hotel pickup and return in the supported Rovaniemi area are included. Exact pickup time is confirmed before departure. The total is a flat group price, not per person.'
                       : 'We will confirm your pickup time and meeting details before the tour.'
@@ -392,7 +392,7 @@ WHAT HAPPENS NEXT
   /standard group/i.test(booking.tourName)
     ? 'Meet at Ruokasenkatu 3, 96100 Rovaniemi at 20:00. Hotel pickup is not included. Bring your own thermal clothing.'
     : /ranua/i.test(booking.tourName)
-      ? 'Round-trip transfer from Rovaniemi and Ranua Wildlife Park admission are included. This is a self-guided park visit — your driver provides transportation, not a guided tour inside the park. Exact pickup time and return meeting point are confirmed before departure.'
+      ? 'Round-trip transfer from Rovaniemi and Ranua Wildlife Park admission are included. This is a self-guided park visit — your driver provides transportation, not a guided tour inside the park. The experience starts at 10:00. Exact hotel pickup time is sent after booking, and the return meeting point is confirmed before departure.'
       : /private santa/i.test(booking.tourName) || /santa claus experience/i.test(booking.tourName)
         ? 'This is a private Santa Claus experience for your group only. Hotel pickup and return in the supported Rovaniemi area are included. Exact pickup time is confirmed before departure. The total is a flat group price, not per person.'
         : 'We will confirm your pickup time and meeting details before the tour.'

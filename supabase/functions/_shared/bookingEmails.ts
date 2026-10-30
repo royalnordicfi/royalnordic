@@ -254,7 +254,7 @@ export function buildCustomerConfirmationEmail(booking: BookingEmailData) {
       isStandardGroupTour(null, booking.tourName)
         ? `Meet at ${booking.meetingPoint || 'Ruokasenkatu 3, 96100 Rovaniemi, Finland'}. Departure is ${booking.departureTime || '20:00'}. Hotel pickup is not included. Bring your own thermal clothing.`
         : isRanuaTour(null, booking.tourName)
-          ? 'Round-trip transfer from Rovaniemi and Ranua Wildlife Park admission are included. This is a self-guided park visit — your driver provides transportation, not a guided tour inside the park. Exact pickup time and return meeting point are confirmed before departure.'
+          ? 'Round-trip transfer from Rovaniemi and Ranua Wildlife Park admission are included. This is a self-guided park visit — your driver provides transportation, not a guided tour inside the park. The experience starts at 10:00. Exact hotel pickup time is sent after booking, and the return meeting point is confirmed before departure.'
           : isPrivateSantaTour(null, booking.tourName)
             ? 'This is a private Santa Claus experience for your group only. Hotel pickup and return in the supported Rovaniemi area are included. Exact pickup time is confirmed before departure. The total is a flat group price, not per person.'
             : booking.meetingPoint

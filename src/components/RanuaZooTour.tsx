@@ -10,7 +10,7 @@ import ExperienceAccordion from './experience/ExperienceAccordion'
 import BookingAside from './experience/BookingAside'
 import TourSection from './tour/TourSection'
 import { useCmsTourPresentation, type TourPageFallback } from '../hooks/useCmsTourPresentation'
-import { RANUA_PUBLIC_NAME, RANUA_TOUR_ID } from '../lib/tourBookingRules'
+import { RANUA_DEPARTURE, RANUA_PUBLIC_NAME, RANUA_TOUR_ID } from '../lib/tourBookingRules'
 
 const FALLBACK: TourPageFallback = {
   title: RANUA_PUBLIC_NAME,
@@ -21,7 +21,8 @@ const FALLBACK: TourPageFallback = {
   maxCapacity: 16,
   duration: '~5 hours',
   groupSize: 'Max 16',
-  pickupFact: 'Rovaniemi',
+  pickupFact: 'Hotel pickup included',
+  departureTime: RANUA_DEPARTURE,
   description:
     'Round-trip transportation from Rovaniemi to Ranua Wildlife Park with park admission included. Meet polar bears and 50+ Arctic and northern species on forest trails — lynx, wolves, moose, reindeer, arctic foxes, and more. You explore the park independently at your own pace. Your driver provides transportation, not a guided tour inside the park.',
   benefits: [
@@ -62,14 +63,19 @@ const FALLBACK: TourPageFallback = {
         'Yes. Ranua Wildlife Park admission is always included in this product. There is no transfer-only option on royalnordic.fi.',
     },
     {
+      question: 'What time does the experience start?',
+      answer:
+        'The experience starts at 10:00. Exact hotel pickup time is sent after booking — please be ready at your confirmed pickup location.',
+    },
+    {
       question: 'How long is the experience?',
       answer:
-        'About 5 hours in total, including transfers and time to explore the park. Exact pickup and return times are confirmed after booking.',
+        'About 5 hours in total, including transfers and time to explore the park. Start time is 10:00; exact pickup time is confirmed after booking.',
     },
     {
       question: 'Is hotel pickup included?',
       answer:
-        'Round-trip transportation from the Rovaniemi area is included. Enter your hotel or pickup address at checkout. Exact pickup time is confirmed before departure.',
+        'Round-trip transportation from the Rovaniemi area is included. Enter your hotel or pickup address at checkout. Exact pickup time is sent after booking.',
     },
     {
       question: 'Is it good for families?',
@@ -90,13 +96,14 @@ const FALLBACK: TourPageFallback = {
   whatToBring:
     'Warm winter clothing and comfortable walking shoes. A camera or smartphone is recommended. Clothing rental is not included.',
   knowBefore:
-    'This is a self-guided park visit. Your driver provides transportation, not a guided tour inside the park. Entrance tickets are included. Explore at your own pace within the scheduled visit window. Return departure time and meeting location are communicated to guests before the return drive.',
+    'This is a self-guided park visit. Your driver provides transportation, not a guided tour inside the park. Entrance tickets are included. The experience starts at 10:00; exact pickup time is sent after booking. Explore at your own pace within the scheduled visit window. Return departure time and meeting location are communicated to guests before the return drive.',
 }
 
 const itinerary = [
   {
+    time: '10:00',
     title: 'Pickup in Rovaniemi',
-    text: 'We collect you from the supported Rovaniemi area. Exact pickup time is confirmed after booking.',
+    text: 'We collect you from the supported Rovaniemi area. Exact pickup time is sent after booking.',
   },
   {
     title: 'Drive to Ranua Wildlife Park',
@@ -118,6 +125,7 @@ const itinerary = [
 
 const RanuaZooTour = () => {
   const cms = useCmsTourPresentation(RANUA_TOUR_ID, FALLBACK)
+  const departure = cms.departureTime || RANUA_DEPARTURE
 
   const scrollToBook = () => {
     document.getElementById('book')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -137,8 +145,8 @@ const RanuaZooTour = () => {
         images={cms.gallery}
         facts={[
           { label: 'Duration', value: cms.duration || '~5 hours' },
-          { label: 'Transfer', value: 'Round-trip from Rovaniemi' },
-          { label: 'Admission', value: 'Included' },
+          { label: 'Start', value: departure },
+          { label: 'Pickup', value: cms.pickupFact || 'Hotel pickup included' },
           { label: 'Visit', value: 'Independent · no guided tour' },
         ]}
         booking={
@@ -147,9 +155,9 @@ const RanuaZooTour = () => {
             referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}
             offerLine={cms.pricing.saleActive ? undefined : 'WINTER20 · Save 20% at checkout'}
             trustLines={[
+              `Starts ${departure}`,
               'Tickets included',
               'Self-guided visit',
-              'Round-trip transfer',
               'Free cancellation',
             ]}
           >
@@ -162,6 +170,7 @@ const RanuaZooTour = () => {
                 adultPrice={cms.adultPrice}
                 childPrice={cms.childPrice}
                 maxCapacity={cms.maxCapacity}
+                departureTime={departure}
                 requiresHotelPickup
                 cancellationNote="Free cancellation up to 24 hours before departure."
               />
@@ -199,6 +208,9 @@ const RanuaZooTour = () => {
 
         <TourSection eyebrow="Itinerary" title="Itinerary">
           <ExperienceItinerary steps={itinerary} />
+          <p className="mt-5 text-sm leading-relaxed text-text-muted">
+            Start time is {departure}. Exact hotel pickup time is sent after booking.
+          </p>
         </TourSection>
 
         <TourSection eyebrow="Details" title="What’s included">
@@ -206,13 +218,18 @@ const RanuaZooTour = () => {
           <p className="mt-5 text-sm leading-relaxed text-text-muted">
             <span className="font-medium text-white">Pickup. </span>
             {cms.pickupInfo ||
-              'Round-trip transportation from the supported Rovaniemi area is included. Enter your hotel or pickup address at checkout. Exact pickup and return meeting details are confirmed before departure.'}
+              'Round-trip transportation from the supported Rovaniemi area is included. Enter your hotel or pickup address at checkout. The experience starts at 10:00; exact pickup time is sent after booking.'}
           </p>
         </TourSection>
 
         <TourSection eyebrow="Plan ahead" title="Important information">
           <ExperienceAccordion
             items={[
+              {
+                title: 'Start time & pickup',
+                content:
+                  'The experience starts at 10:00. Exact hotel pickup time is sent after booking. Please be ready at your confirmed pickup location.',
+              },
               {
                 title: 'Self-guided visit',
                 content: cms.knowBefore || FALLBACK.knowBefore!,

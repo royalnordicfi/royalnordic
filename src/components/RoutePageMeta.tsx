@@ -50,7 +50,7 @@ const META: Record<
   '/ranua-zoo': {
     title: 'Ranua Wildlife Park – Entry Ticket & Transfer | Royal Nordic',
     description:
-      'Round-trip transfer from Rovaniemi with Ranua Wildlife Park admission included. Self-guided park visit — no guided tour. About 5 hours. Free cancellation 24h.',
+      'Round-trip transfer from Rovaniemi with Ranua Wildlife Park admission included. Self-guided park visit — no guided tour. Starts 10:00; exact pickup time sent after booking. About 5 hours. Free cancellation 24h.',
     ogImage: 'https://royalnordic.fi/ranua1.jpg',
   },
   '/private-santa-claus-experience': {

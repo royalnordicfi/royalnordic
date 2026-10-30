@@ -33,6 +33,7 @@ export const RANUA_PATH = '/ranua-zoo'
 export const RANUA_PUBLIC_NAME =
   'Ranua Wildlife Park – Entry Ticket & Round-Trip Transfer'
 export const RANUA_INTERNAL_NAME = 'Nordic Animals of Ranua Zoo'
+export const RANUA_DEPARTURE = '10:00'
 
 /** Absolute one-season window (Europe/Helsinki calendar dates). Not MM-DD recurring. */
 export const PRIVATE_SANTA_TOUR_ID = 12
@@ -152,6 +153,7 @@ export function departureSuffixForTour(tourName: string, departureTime?: string 
   if (/family-friendly northern lights/i.test(tourName)) return ' at 21:00'
   if (isStandardGroupTour(null, tourName)) return ` at ${STANDARD_GROUP_DEPARTURE}`
   if (isPrivateNlTour(null, tourName)) return ` at ${PRIVATE_NL_DEPARTURE}`
+  if (isRanuaTour(null, tourName)) return ` at ${RANUA_DEPARTURE}`
   if (/northern lights/i.test(tourName)) return ' at 18:30'
   return ''
 }

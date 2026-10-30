@@ -48,7 +48,7 @@ const ALL_EXPERIENCES = [
     title: 'Ranua Wildlife Park – Entry Ticket & Round-Trip Transfer',
     description:
       'Round-trip transfer from Rovaniemi with park admission included. Explore independently — no guided tour.',
-    duration: 'About 5 hours',
+    duration: 'About 5 hours · Starts 10:00',
     groupSize: 'Max 16',
     pickup: true,
     priceFrom: 99 as number | undefined,

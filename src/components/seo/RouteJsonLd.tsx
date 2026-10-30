@@ -109,7 +109,7 @@ const PRODUCTS: ProductDef[] = [
     path: '/ranua-zoo',
     name: 'Ranua Wildlife Park – Entry Ticket & Round-Trip Transfer',
     description:
-      'Round-trip transportation from Rovaniemi with Ranua Wildlife Park admission included. Independent park visit — no guided tour.',
+      'Round-trip transportation from Rovaniemi with Ranua Wildlife Park admission included. Independent park visit — no guided tour. Starts 10:00; exact pickup time sent after booking.',
     image: `${SITE}/ranua1.jpg`,
     price: 99,
     breadcrumbs: [
