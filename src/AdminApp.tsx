@@ -8,11 +8,9 @@ import ManualBookingPage from './admin/pages/ManualBookingPage'
 import CalendarPage from './admin/pages/CalendarPage'
 import ProductsPage from './admin/pages/ProductsPage'
 import ProductEditorPage from './admin/pages/ProductEditorPage'
-import FleetPage from './admin/pages/FleetPage'
 import CustomersPage from './admin/pages/CustomersPage'
 import RevenuePage from './admin/pages/RevenuePage'
 import ImportPage from './admin/pages/ImportPage'
-import NotesPage from './admin/pages/NotesPage'
 import AvailabilityPage from './admin/pages/AvailabilityPage'
 import RequestsPage from './admin/pages/RequestsPage'
 import IntegrationsPage from './admin/pages/IntegrationsPage'
@@ -48,11 +46,9 @@ function AdminApp() {
           <Route path="requests" element={<RequestsPage />} />
           <Route path="products" element={<ProductsPage />} />
           <Route path="products/:id" element={<ProductEditorPage />} />
-          <Route path="fleet" element={<FleetPage />} />
           <Route path="customers" element={<CustomersPage />} />
           <Route path="revenue" element={<RevenuePage />} />
           <Route path="import" element={<ImportPage />} />
-          <Route path="notes" element={<NotesPage />} />
           <Route path="integrations" element={<IntegrationsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

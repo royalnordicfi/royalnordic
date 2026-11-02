@@ -58,12 +58,10 @@ const bookingSelectFull = `
   adults, children, total_price, status, payment_status, payment_type, crypto_type,
   source, pickup_location, tour_time, special_requests, internal_notes,
   stripe_payment_intent_id, stripe_checkout_session_id, payment_link_url, payment_link_expires_at,
-  guide_id, vehicle_id, tour_id, tour_date_id,
+  tour_id, tour_date_id,
   created_at, updated_at, deleted_at, email_status, email_last_sent_at, email_last_error,
   tours ( id, name, public_name, max_capacity, pricing_model ),
-  tour_dates ( id, date ),
-  guides ( id, name, phone ),
-  vehicles ( id, name, passenger_capacity, registration_number )
+  tour_dates ( id, date )
 `
 
 const bookingSelectLegacy = `
@@ -90,10 +88,10 @@ function normalizeBooking(row: Record<string, unknown>): OpsBooking {
     pickup_location: b.pickup_location ?? null,
     tour_time: b.tour_time ?? null,
     internal_notes: b.internal_notes ?? null,
-    guide_id: b.guide_id ?? null,
-    vehicle_id: b.vehicle_id ?? null,
-    guides: b.guides ?? null,
-    vehicles: b.vehicles ?? null,
+    guide_id: null,
+    vehicle_id: null,
+    guides: null,
+    vehicles: null,
     deleted_at: b.deleted_at ?? null,
     email_status: b.email_status || 'not_sent',
     email_last_sent_at: b.email_last_sent_at ?? null,
@@ -119,8 +117,10 @@ export async function fetchOpsBookings(filters?: {
   search?: string
   fromDate?: string
   toDate?: string
+  /** Soft-removed (deleted_at) bookings only */
+  onlyRemoved?: boolean
   includeDeleted?: boolean
-  attention?: 'payment' | 'guide' | 'vehicle' | 'email' | 'pending'
+  attention?: 'payment' | 'email' | 'pending'
 }): Promise<OpsBooking[]> {
   await requireAdmin()
   let query = supabase
@@ -129,7 +129,9 @@ export async function fetchOpsBookings(filters?: {
     .order('created_at', { ascending: false })
     .limit(2000)
 
-  if (!filters?.includeDeleted) {
+  if (filters?.onlyRemoved) {
+    query = query.not('deleted_at', 'is', null)
+  } else if (!filters?.includeDeleted) {
     query = query.is('deleted_at', null)
   }
 
@@ -150,12 +152,10 @@ export async function fetchOpsBookings(filters?: {
         id, booking_ref, customer_name, customer_email, customer_phone,
         adults, children, total_price, status, payment_status, payment_type, crypto_type,
         source, pickup_location, tour_time, special_requests, internal_notes,
-        stripe_payment_intent_id, guide_id, vehicle_id, tour_id, tour_date_id,
+        stripe_payment_intent_id, tour_id, tour_date_id,
         created_at, updated_at,
         tours ( id, name, public_name, max_capacity ),
-        tour_dates ( id, date ),
-        guides ( id, name, phone ),
-        vehicles ( id, name, passenger_capacity, registration_number )
+        tour_dates ( id, date )
       `,
       )
       .order('created_at', { ascending: false })
@@ -206,40 +206,27 @@ export async function fetchOpsBookings(filters?: {
     rows = rows.filter((b) => (b.tour_dates?.date || '') <= filters.toDate!)
   }
 
-  const today = todayTourDateISO()
   if (filters?.attention === 'payment') {
     rows = rows.filter(
       (b) =>
         b.status !== 'cancelled' &&
+        !b.deleted_at &&
         (b.payment_status === 'unpaid' ||
           b.payment_status === 'pending_crypto' ||
           b.status === 'pending_crypto_payment'),
-    )
-  } else if (filters?.attention === 'guide') {
-    rows = rows.filter(
-      (b) =>
-        b.status !== 'cancelled' &&
-        b.status !== 'completed' &&
-        (b.tour_dates?.date || '') >= today &&
-        !b.guide_id,
-    )
-  } else if (filters?.attention === 'vehicle') {
-    rows = rows.filter(
-      (b) =>
-        b.status !== 'cancelled' &&
-        b.status !== 'completed' &&
-        (b.tour_dates?.date || '') >= today &&
-        !b.vehicle_id,
     )
   } else if (filters?.attention === 'email') {
     rows = rows.filter(
       (b) =>
         b.status !== 'cancelled' &&
+        !b.deleted_at &&
         (b.email_status === 'failed' || b.email_status === 'not_sent'),
     )
   } else if (filters?.attention === 'pending') {
     rows = rows.filter(
-      (b) => b.status === 'pending' || b.status === 'pending_crypto_payment',
+      (b) =>
+        !b.deleted_at &&
+        (b.status === 'pending' || b.status === 'pending_crypto_payment'),
     )
   }
 
@@ -261,12 +248,10 @@ export async function fetchBooking(id: number): Promise<OpsBooking> {
         id, booking_ref, customer_name, customer_email, customer_phone,
         adults, children, total_price, status, payment_status, payment_type, crypto_type,
         source, pickup_location, tour_time, special_requests, internal_notes,
-        stripe_payment_intent_id, guide_id, vehicle_id, tour_id, tour_date_id,
+        stripe_payment_intent_id, tour_id, tour_date_id,
         created_at, updated_at,
         tours ( id, name, public_name, max_capacity ),
-        tour_dates ( id, date ),
-        guides ( id, name, phone ),
-        vehicles ( id, name, passenger_capacity, registration_number )
+        tour_dates ( id, date )
       `,
       )
       .eq('id', id)
@@ -316,31 +301,6 @@ export async function fetchBookingEmails(bookingId: number): Promise<BookingEmai
   return (data || []) as BookingEmail[]
 }
 
-async function assertNoAssignmentConflict(
-  kind: 'guide' | 'vehicle',
-  resourceId: number,
-  tourDateId: number,
-  excludeBookingId: number,
-) {
-  const col = kind === 'guide' ? 'guide_id' : 'vehicle_id'
-  let q = supabase
-    .from('bookings')
-    .select('id, booking_ref, status, deleted_at')
-    .eq(col, resourceId)
-    .eq('tour_date_id', tourDateId)
-    .neq('id', excludeBookingId)
-    .neq('status', 'cancelled')
-  const { data, error } = await q
-  if (error) throw new Error(error.message)
-  const conflicts = (data || []).filter((b: { deleted_at?: string | null }) => !b.deleted_at)
-  if (conflicts.length) {
-    const refs = conflicts.map((b: { booking_ref?: string; id: number }) => b.booking_ref || `#${b.id}`).join(', ')
-    throw new Error(
-      `${kind === 'guide' ? 'Guide' : 'Vehicle'} already assigned on this date to ${refs}`,
-    )
-  }
-}
-
 export async function updateBookingOps(
   id: number,
   patch: Partial<{
@@ -350,8 +310,6 @@ export async function updateBookingOps(
     tour_time: string | null
     internal_notes: string | null
     special_requests: string | null
-    guide_id: number | null
-    vehicle_id: number | null
     source: BookingSource
     customer_name: string
     customer_email: string
@@ -363,30 +321,7 @@ export async function updateBookingOps(
 ): Promise<OpsBooking> {
   await requireAdmin()
   const current = await fetchBooking(id)
-  if (current.deleted_at) throw new Error('Booking is deleted — restore it before editing')
-
-  if (patch.vehicle_id) {
-    const passengers = (patch.adults ?? current.adults) + (patch.children ?? current.children)
-    const { data: vehicle, error: vErr } = await supabase
-      .from('vehicles')
-      .select('passenger_capacity, name, status')
-      .eq('id', patch.vehicle_id)
-      .single()
-    if (vErr) throw new Error(vErr.message)
-    if (vehicle?.status === 'maintenance') {
-      throw new Error(`Vehicle "${vehicle.name}" is in maintenance`)
-    }
-    if (vehicle && passengers > vehicle.passenger_capacity) {
-      throw new Error(
-        `Vehicle "${vehicle.name}" capacity is ${vehicle.passenger_capacity}; booking has ${passengers} passengers`,
-      )
-    }
-    await assertNoAssignmentConflict('vehicle', patch.vehicle_id, current.tour_date_id, id)
-  }
-
-  if (patch.guide_id) {
-    await assertNoAssignmentConflict('guide', patch.guide_id, current.tour_date_id, id)
-  }
+  if (current.deleted_at) throw new Error('Booking is removed — restore it before editing')
 
   const { data, error } = await supabase
     .from('bookings')
@@ -406,12 +341,10 @@ export async function updateBookingOps(
           id, booking_ref, customer_name, customer_email, customer_phone,
           adults, children, total_price, status, payment_status, payment_type, crypto_type,
           source, pickup_location, tour_time, special_requests, internal_notes,
-          stripe_payment_intent_id, guide_id, vehicle_id, tour_id, tour_date_id,
+          stripe_payment_intent_id, tour_id, tour_date_id,
           created_at, updated_at,
           tours ( id, name, public_name, max_capacity ),
-          tour_dates ( id, date ),
-          guides ( id, name, phone ),
-          vehicles ( id, name, passenger_capacity, registration_number )
+          tour_dates ( id, date )
         `,
         )
         .single()
@@ -436,12 +369,6 @@ async function finishUpdate(
     }
     if (patch.payment_status && patch.payment_status !== current.payment_status) {
       await logEvent(id, 'payment_status_change', current.payment_status, patch.payment_status)
-    }
-    if (patch.guide_id !== undefined && patch.guide_id !== current.guide_id) {
-      await logEvent(id, 'guide_assigned', String(current.guide_id), String(patch.guide_id))
-    }
-    if (patch.vehicle_id !== undefined && patch.vehicle_id !== current.vehicle_id) {
-      await logEvent(id, 'vehicle_assigned', String(current.vehicle_id), String(patch.vehicle_id))
     }
     if (patch.internal_notes !== undefined && patch.internal_notes !== current.internal_notes) {
       await logEvent(id, 'note_updated', null, null, 'Internal notes updated')
@@ -470,16 +397,32 @@ async function finishUpdate(
   return normalizeBooking(data)
 }
 
-export async function softDeleteBooking(id: number): Promise<void> {
+/**
+ * Soft-remove booking from operational lists (uses deleted_at).
+ * Cancels first so capacity triggers free seats. Never refunds Stripe.
+ * Paid bookings require acknowledgePaidResolved=true (payment handled outside admin).
+ */
+export async function removeBooking(
+  id: number,
+  opts?: { acknowledgePaidResolved?: boolean },
+): Promise<void> {
   await requireAdmin()
   const current = await fetchBooking(id)
   if (current.deleted_at) return
 
-  // Cancel first so capacity trigger frees slots, then soft-delete
+  const isPaidLive = current.payment_status === 'paid'
+  if (isPaidLive && !opts?.acknowledgePaidResolved) {
+    throw new Error(
+      'This booking is marked paid. Mark payment as refunded first, or confirm that payment was resolved outside admin. Removal never refunds Stripe.',
+    )
+  }
+
+  // Cancel first so capacity trigger frees slots, then archive
   if (current.status !== 'cancelled') {
     await updateBookingOps(id, { status: 'cancelled' })
   }
 
+  const by = await actorEmail()
   const { error } = await supabase
     .from('bookings')
     .update({
@@ -491,20 +434,34 @@ export async function softDeleteBooking(id: number): Promise<void> {
   if (error) {
     if (isMissingColumnError(error.message)) {
       throw new Error(
-        'Soft delete requires migration 018. Until then use Cancel, or apply 018_ops_hub_winter.sql.',
+        'Remove booking requires migration 018 (deleted_at). Apply 018_ops_hub_winter.sql.',
       )
     }
     throw new Error(error.message)
   }
   try {
-    await logEvent(id, 'soft_deleted', null, 'deleted', 'Booking soft-deleted')
+    await logEvent(
+      id,
+      'removed',
+      null,
+      'removed',
+      isPaidLive
+        ? `Removed by ${by} with paid-resolved acknowledgement (no Stripe refund)`
+        : `Removed by ${by}`,
+    )
   } catch {
     /* optional */
   }
 }
 
+/** @deprecated Use removeBooking */
+export async function softDeleteBooking(id: number): Promise<void> {
+  return removeBooking(id, { acknowledgePaidResolved: true })
+}
+
 export async function restoreBooking(id: number): Promise<OpsBooking> {
   await requireAdmin()
+  const current = await fetchBooking(id)
   const { error } = await supabase
     .from('bookings')
     .update({ deleted_at: null, updated_at: new Date().toISOString() })
@@ -516,7 +473,13 @@ export async function restoreBooking(id: number): Promise<OpsBooking> {
     throw new Error(error.message)
   }
   try {
-    await logEvent(id, 'restored', 'deleted', null, 'Booking restored from soft-delete')
+    await logEvent(
+      id,
+      'restored',
+      'removed',
+      current.status,
+      'Booking restored to active lists (still cancelled until status changed)',
+    )
   } catch {
     /* optional */
   }
@@ -593,8 +556,6 @@ export async function createManualBooking(input: {
   pickup_location?: string
   source: BookingSource
   notes?: string
-  guide_id?: number | null
-  vehicle_id?: number | null
   send_confirmation?: boolean
 }): Promise<OpsBooking> {
   await requireAdmin()
@@ -635,13 +596,6 @@ export async function createManualBooking(input: {
     )
   }
 
-  if (input.guide_id) {
-    await assertNoAssignmentConflict('guide', input.guide_id, tourDate.id, 0)
-  }
-  if (input.vehicle_id) {
-    await assertNoAssignmentConflict('vehicle', input.vehicle_id, tourDate.id, 0)
-  }
-
   const status: BookingStatus =
     input.booking_status ||
     (input.payment_status === 'paid' ? 'confirmed' : 'pending')
@@ -663,16 +617,14 @@ export async function createManualBooking(input: {
     tour_time: input.tour_time || null,
     special_requests: input.notes || null,
     internal_notes: input.notes || null,
-    guide_id: input.guide_id ?? null,
-    vehicle_id: input.vehicle_id ?? null,
     email_status: 'not_sent' as EmailStatus,
   }
 
   let { data, error } = await supabase.from('bookings').insert([payload]).select('id').single()
 
   if (error && isMissingColumnError(error.message)) {
-    const { email_status: _e, guide_id, vehicle_id, ...rest } = payload
-    const slim = { ...rest, guide_id, vehicle_id }
+    const { email_status: _emailStatus, ...slim } = payload
+    void _emailStatus
     const mid = await supabase.from('bookings').insert([slim]).select('id').single()
     if (mid.error && isMissingColumnError(mid.error.message)) {
       const legacy = await supabase
@@ -1182,13 +1134,14 @@ export async function fetchCustomers(): Promise<Customer[]> {
   const byEmail = new Map<string, { count: number; value: number; latest: string; upcoming: string[] }>()
 
   for (const b of bookings) {
+    if (b.deleted_at || b.status === 'cancelled') continue
     const email = (b.customer_email || '').toLowerCase()
     if (!email) continue
     const cur = byEmail.get(email) || { count: 0, value: 0, latest: '', upcoming: [] }
     cur.count += 1
-    cur.value += Number(b.total_price) || 0
+    if (b.payment_status === 'paid') cur.value += Number(b.total_price) || 0
     if (b.created_at > cur.latest) cur.latest = b.created_at
-    if (b.tour_dates?.date && b.tour_dates.date >= today && b.status !== 'cancelled') {
+    if (b.tour_dates?.date && b.tour_dates.date >= today) {
       cur.upcoming.push(b.tour_dates.date)
     }
     byEmail.set(email, cur)
@@ -1213,10 +1166,12 @@ export async function fetchCustomersDerived(): Promise<Customer[]> {
   const byEmail = new Map<string, Customer & { _dates: string[] }>()
 
   for (const b of bookings) {
+    if (b.deleted_at || b.status === 'cancelled') continue
     const email = (b.customer_email || '').toLowerCase()
     if (!email) continue
     const existing = byEmail.get(email)
     const tourDate = b.tour_dates?.date || null
+    const paidValue = b.payment_status === 'paid' ? Number(b.total_price) || 0 : 0
     if (!existing) {
       byEmail.set(email, {
         id: 0,
@@ -1225,14 +1180,14 @@ export async function fetchCustomersDerived(): Promise<Customer[]> {
         phone: b.customer_phone,
         internal_notes: null,
         booking_count: 1,
-        total_value: Number(b.total_price) || 0,
+        total_value: paidValue,
         latest_booking: b.created_at,
         upcoming_booking: tourDate,
         _dates: tourDate ? [tourDate] : [],
       })
     } else {
       existing.booking_count = (existing.booking_count || 0) + 1
-      existing.total_value = (existing.total_value || 0) + (Number(b.total_price) || 0)
+      existing.total_value = (existing.total_value || 0) + paidValue
       if (b.created_at > (existing.latest_booking || '')) {
         existing.latest_booking = b.created_at
         existing.name = b.customer_name
@@ -1366,17 +1321,20 @@ export function detectCapacityConflicts(bookings: OpsBooking[]): CapacityConflic
     if (b.status === 'cancelled' || b.deleted_at) continue
     const key = b.tour_date_id
     if (!key) continue
+    const perVehicle = b.tours?.pricing_model === 'per_vehicle'
     const cur = map.get(key) || {
       date: b.tour_dates?.date || '',
       tour_name: b.tours?.public_name || b.tours?.name || 'Tour',
       tour_id: b.tour_id,
       guests: 0,
-      capacity: b.tours?.max_capacity || 0,
+      capacity: perVehicle ? 1 : b.tours?.max_capacity || 0,
       booking_ids: [] as number[],
     }
-    cur.guests += b.adults + b.children
+    // Exclusive / per-vehicle products consume 1 slot per booking
+    cur.guests += perVehicle ? 1 : b.adults + b.children
     cur.booking_ids.push(b.id)
-    if (b.tours?.max_capacity) cur.capacity = b.tours.max_capacity
+    if (perVehicle) cur.capacity = 1
+    else if (b.tours?.max_capacity) cur.capacity = b.tours.max_capacity
     map.set(key, cur)
   }
   return Array.from(map.entries())
@@ -1384,55 +1342,10 @@ export function detectCapacityConflicts(bookings: OpsBooking[]): CapacityConflic
     .map(([tour_date_id, v]) => ({ tour_date_id, ...v }))
 }
 
+/** Guide/vehicle assignment removed from admin — always empty. */
 export function detectAssignmentConflicts(bookings: OpsBooking[]): AssignmentConflict[] {
-  const guides = new Map<string, { name: string; ids: number[] }>()
-  const vehicles = new Map<string, { name: string; ids: number[] }>()
-
-  for (const b of bookings) {
-    if (b.status === 'cancelled' || b.deleted_at) continue
-    const date = b.tour_dates?.date
-    if (!date) continue
-    if (b.guide_id) {
-      const key = `${b.guide_id}|${date}`
-      const cur = guides.get(key) || { name: b.guides?.name || `Guide #${b.guide_id}`, ids: [] }
-      cur.ids.push(b.id)
-      guides.set(key, cur)
-    }
-    if (b.vehicle_id) {
-      const key = `${b.vehicle_id}|${date}`
-      const cur = vehicles.get(key) || {
-        name: b.vehicles?.name || `Vehicle #${b.vehicle_id}`,
-        ids: [],
-      }
-      cur.ids.push(b.id)
-      vehicles.set(key, cur)
-    }
-  }
-
-  const out: AssignmentConflict[] = []
-  for (const [key, v] of guides) {
-    if (v.ids.length < 2) continue
-    const [id, date] = key.split('|')
-    out.push({
-      kind: 'guide',
-      resource_id: Number(id),
-      resource_name: v.name,
-      date,
-      booking_ids: v.ids,
-    })
-  }
-  for (const [key, v] of vehicles) {
-    if (v.ids.length < 2) continue
-    const [id, date] = key.split('|')
-    out.push({
-      kind: 'vehicle',
-      resource_id: Number(id),
-      resource_name: v.name,
-      date,
-      booking_ids: v.ids,
-    })
-  }
-  return out
+  void bookings
+  return []
 }
 
 export async function fetchOpsNotes(status: OpsNoteStatus | 'active' = 'active'): Promise<OpsNote[]> {

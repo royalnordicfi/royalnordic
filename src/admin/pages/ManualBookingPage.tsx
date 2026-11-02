@@ -3,11 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import {
   createAdminPaymentLink,
   createManualBooking,
-  fetchGuides,
   fetchProducts,
-  fetchVehicles,
 } from '../adminApi'
-import type { BookingSource, Guide, PaymentStatus, Product, Vehicle } from '../types'
+import type { BookingSource, PaymentStatus, Product } from '../types'
 import { SOURCE_LABELS } from '../types'
 import {
   Card,
@@ -37,8 +35,6 @@ const PAYMENT_METHODS: { id: PaymentMethod; label: string; hint: string }[] = [
 export default function ManualBookingPage() {
   const navigate = useNavigate()
   const [products, setProducts] = useState<Product[]>([])
-  const [guides, setGuides] = useState<Guide[]>([])
-  const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const [paymentLinkUrl, setPaymentLinkUrl] = useState('')
@@ -58,14 +54,12 @@ export default function ManualBookingPage() {
   const [destination, setDestination] = useState('')
   const [source, setSource] = useState<BookingSource>('manual')
   const [notes, setNotes] = useState('')
-  const [guideId, setGuideId] = useState('')
-  const [vehicleId, setVehicleId] = useState('')
   const [sendConfirmation, setSendConfirmation] = useState(true)
   const [sendPaymentEmail, setSendPaymentEmail] = useState(false)
 
   useEffect(() => {
-    Promise.all([fetchProducts(), fetchGuides(), fetchVehicles()])
-      .then(([p, g, v]) => {
+    fetchProducts()
+      .then((p) => {
         const active = p
           .filter((x) => x.is_active !== false)
           .sort((a, b) =>
@@ -76,8 +70,6 @@ export default function ManualBookingPage() {
           setTourId(String(active[0].id))
           if (active[0].departure_time) setTourTime(active[0].departure_time.slice(0, 5))
         }
-        setGuides(g.filter((x) => x.is_active))
-        setVehicles(v.filter((x) => x.is_active && x.status !== 'maintenance'))
       })
       .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load'))
   }, [])
@@ -189,8 +181,6 @@ export default function ManualBookingPage() {
         pickup_location: pickup.trim() || undefined,
         source,
         notes: noteParts.join('\n') || undefined,
-        guide_id: guideId ? Number(guideId) : null,
-        vehicle_id: vehicleId ? Number(vehicleId) : null,
         send_confirmation: shouldEmail,
       })
 
@@ -423,32 +413,6 @@ export default function ManualBookingPage() {
               disabled={paymentMethod === 'complimentary'}
             />
           </Field>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Field label="Guide">
-              <select className={selectClass} value={guideId} onChange={(e) => setGuideId(e.target.value)}>
-                <option value="">Assign later</option>
-                {guides.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.name}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Field label="Vehicle">
-              <select
-                className={selectClass}
-                value={vehicleId}
-                onChange={(e) => setVehicleId(e.target.value)}
-              >
-                <option value="">Assign later</option>
-                {vehicles.map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.name} (cap {v.passenger_capacity})
-                  </option>
-                ))}
-              </select>
-            </Field>
-          </div>
           <Field label="Source">
             <select
               className={selectClass}

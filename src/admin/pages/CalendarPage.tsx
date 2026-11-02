@@ -1,10 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import {
-  detectAssignmentConflicts,
-  detectCapacityConflicts,
-  fetchOpsBookings,
-} from '../adminApi'
+import { detectCapacityConflicts, fetchOpsBookings } from '../adminApi'
 import type { OpsBooking } from '../types'
 import { Badge, statusTone } from '../components/Badge'
 import { STATUS_LABELS, weekdayForTourDate } from '../types'
@@ -112,48 +108,39 @@ export default function CalendarPage() {
           (b) => b.payment_status === 'unpaid' || b.payment_status === 'pending_crypto',
         ).length
         const dayConflicts = detectCapacityConflicts(rows)
-        const assignConflicts = detectAssignmentConflicts(rows)
-        const guides = [...new Set(rows.map((b) => b.guides?.name).filter(Boolean))]
-        const vehicles = [...new Set(rows.map((b) => b.vehicles?.name).filter(Boolean))]
 
         return (
           <section key={day} className="space-y-2">
             <button type="button" className="text-left w-full" onClick={() => { setMode('day'); setDay(day) }}>
-              <h2 className="text-sm font-semibold text-gray-700">
+              <h2 className="text-sm font-semibold text-zinc-700">
                 {weekdayForTourDate(day)} {day}
               </h2>
-              <p className="text-xs text-gray-500 mt-0.5">
-                {rows.length} tours · {guests} guests · {guides.length} guides · {vehicles.length} vehicles
-                {unpaid ? ` · ${unpaid} payment issues` : ''}
+              <p className="text-xs text-zinc-500 mt-0.5">
+                {rows.length} bookings · {guests} guests
+                {unpaid ? ` · ${unpaid} unpaid` : ''}
                 {dayConflicts.length ? ` · ${dayConflicts.length} capacity conflict` : ''}
-                {assignConflicts.length ? ` · ${assignConflicts.length} double-assign` : ''}
               </p>
             </button>
 
-            {(dayConflicts.length > 0 || assignConflicts.length > 0) && (
+            {dayConflicts.length > 0 && (
               <div className="text-xs bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-2 space-y-1">
                 {dayConflicts.map((c) => (
                   <div key={c.tour_date_id}>
                     Over capacity: {c.tour_name} · {c.guests}/{c.capacity}
                   </div>
                 ))}
-                {assignConflicts.map((c) => (
-                  <div key={`${c.kind}-${c.resource_id}-${c.date}`}>
-                    {c.kind} double-booked: {c.resource_name}
-                  </div>
-                ))}
               </div>
             )}
 
             {rows.length === 0 ? (
-              <p className="text-sm text-gray-400 bg-white border rounded-xl p-3">No tours</p>
+              <p className="text-sm text-zinc-400 bg-white border rounded-xl p-3">No bookings</p>
             ) : (
               <ul className="space-y-2">
                 {rows.map((b) => (
                   <li key={b.id}>
                     <Link
                       to={`/bookings/${b.id}`}
-                      className="block bg-white border border-gray-200 rounded-xl p-3 hover:border-emerald-300"
+                      className="block bg-white border border-zinc-200 rounded-xl p-3 hover:border-emerald-300"
                     >
                       <div className="flex justify-between gap-2">
                         <span className="font-semibold text-sm">
@@ -161,13 +148,12 @@ export default function CalendarPage() {
                         </span>
                         <Badge tone={statusTone(b.status)}>{STATUS_LABELS[b.status]}</Badge>
                       </div>
-                      <div className="text-xs text-gray-600 mt-1">
-                        {b.adults + b.children} pax · Pickup: {b.pickup_location || '—'}
-                        {b.internal_notes ? ` · Note: ${b.internal_notes.slice(0, 60)}` : ''}
+                      <div className="text-xs text-zinc-600 mt-1">
+                        {b.customer_name} · {b.adults + b.children} pax ·{' '}
+                        {b.booking_ref || `RN-${b.id}`}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        Guide: {b.guides?.name || 'Unassigned'} · Vehicle:{' '}
-                        {b.vehicles?.name || 'Unassigned'} · Cap {b.tours?.max_capacity || '—'}
+                      <div className="text-xs text-zinc-500 mt-1">
+                        Pickup: {b.pickup_location || '—'}
                       </div>
                     </Link>
                   </li>

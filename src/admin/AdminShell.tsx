@@ -16,28 +16,25 @@ const navGroups: { title: string; items: NavItem[] }[] = [
   {
     title: 'Operations',
     items: [
-      { to: '/', label: 'Home', end: true },
+      { to: '/', label: 'Overview', end: true },
       { to: '/bookings', label: 'Bookings' },
       { to: '/manual', label: 'New booking' },
       { to: '/calendar', label: 'Calendar' },
-      { to: '/availability', label: 'Availability' },
       { to: '/requests', label: 'Requests', badgeKey: 'requests' },
-      { to: '/notes', label: 'Notes' },
     ],
   },
   {
     title: 'Catalog',
     items: [
       { to: '/products', label: 'Tours' },
-      { to: '/fleet', label: 'Guides & vehicles' },
       { to: '/customers', label: 'Customers' },
     ],
   },
   {
-    title: 'Finance',
+    title: 'Business',
     items: [
       { to: '/revenue', label: 'Revenue' },
-      { to: '/import', label: 'Import' },
+      { to: '/availability', label: 'Availability' },
       { to: '/integrations', label: 'Integrations' },
     ],
   },
@@ -91,7 +88,7 @@ export default function AdminShell() {
 
   if (!ready) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50">
+      <div className="flex min-h-screen items-center justify-center bg-white">
         <RefreshCw className="h-5 w-5 animate-spin text-emerald-700" />
       </div>
     )
@@ -102,11 +99,11 @@ export default function AdminShell() {
   }
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-zinc-50 text-zinc-900">
+    <div className="min-h-screen overflow-x-clip bg-white text-zinc-900">
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-zinc-800/90 bg-zinc-950 px-4 py-2.5 text-white sm:px-5">
         <div className="min-w-0">
           <Link to="/" className="text-[13px] font-semibold tracking-tight">
-            Royal Nordic Ops
+            Royal Nordic Admin
           </Link>
           <p className="truncate text-[11px] text-zinc-400">{auth.user?.email}</p>
         </div>
@@ -142,7 +139,7 @@ export default function AdminShell() {
         <nav
           className={`${
             open ? 'block' : 'hidden'
-          } border-b border-zinc-200 bg-white md:block md:w-56 md:shrink-0 md:sticky md:top-[49px] md:max-h-[calc(100vh-49px)] md:self-start md:overflow-y-auto md:border-b-0 md:border-r`}
+          } border-b border-zinc-200 bg-white md:block md:w-52 md:shrink-0 md:sticky md:top-[49px] md:max-h-[calc(100vh-49px)] md:self-start md:overflow-y-auto md:border-b-0 md:border-r`}
         >
           <div className="space-y-4 p-3">
             {navGroups.map((group) => (
@@ -180,7 +177,7 @@ export default function AdminShell() {
           </div>
         </nav>
 
-        <main className="mx-auto w-full min-w-0 max-w-6xl flex-1 px-3 pb-16 pt-4 sm:px-5 sm:pt-5 md:px-6 md:pt-6">
+        <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 px-3 pb-16 pt-4 sm:px-5 sm:pt-5 md:px-6 md:pt-6">
           <Outlet />
         </main>
       </div>

@@ -3,6 +3,8 @@ import { fetchOpsBookings, fetchProducts } from '../adminApi'
 import type { OpsBooking, Product } from '../types'
 import { SOURCE_LABELS, type BookingSource } from '../types'
 import { todayTourDateISO } from '../../lib/tourDate'
+import { computeRevenueReport } from '../stats'
+import { ErrorBanner } from '../components/ui'
 
 export default function RevenuePage() {
   const [bookings, setBookings] = useState<OpsBooking[]>([])
@@ -10,7 +12,8 @@ export default function RevenuePage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    Promise.all([fetchOpsBookings(), fetchProducts()])
+    // includeDeleted so refunded/cancelled history still available, but report excludes removed
+    Promise.all([fetchOpsBookings({ includeDeleted: true }), fetchProducts()])
       .then(([b, p]) => {
         setBookings(b)
         setProducts(p)
@@ -25,89 +28,53 @@ export default function RevenuePage() {
     return m
   }, [products])
 
-  const report = useMemo(() => {
-    const active = bookings.filter((b) => b.status !== 'cancelled')
-    const bySource = new Map<
-      BookingSource,
-      { count: number; gross: number; commission: number; netKnown: boolean }
-    >()
-
-    for (const src of Object.keys(SOURCE_LABELS) as BookingSource[]) {
-      bySource.set(src, { count: 0, gross: 0, commission: 0, netKnown: true })
-    }
-
-    let passengers = 0
-    let upcomingGross = 0
-    const byProduct = new Map<string, { count: number; gross: number; pax: number }>()
-
-    for (const b of active) {
-      const src = (b.source || 'direct_website') as BookingSource
-      const bucket = bySource.get(src) || {
-        count: 0,
-        gross: 0,
-        commission: 0,
-        netKnown: true,
-      }
-      const gross = Number(b.total_price) || 0
-      bucket.count += 1
-      bucket.gross += gross
-      const pct = commissionByTour.get(b.tour_id)
-      if (pct == null) {
-        bucket.netKnown = false
-      } else {
-        bucket.commission += (gross * Number(pct)) / 100
-      }
-      bySource.set(src, bucket)
-
-      passengers += b.adults + b.children
-      if ((b.tour_dates?.date || '') >= today) upcomingGross += gross
-
-      const pname = b.tours?.public_name || b.tours?.name || `Tour ${b.tour_id}`
-      const pb = byProduct.get(pname) || { count: 0, gross: 0, pax: 0 }
-      pb.count += 1
-      pb.gross += gross
-      pb.pax += b.adults + b.children
-      byProduct.set(pname, pb)
-    }
-
-    return { bySource, passengers, upcomingGross, byProduct }
-  }, [bookings, commissionByTour, today])
+  const report = useMemo(
+    () => computeRevenueReport(bookings, commissionByTour, { today }),
+    [bookings, commissionByTour, today],
+  )
 
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-bold">Revenue & sources</h1>
-        <p className="text-sm text-gray-600">
-          Real bookings only. Commission calculated only when product has a configured %.
+        <h1 className="text-xl font-semibold tracking-tight">Revenue</h1>
+        <p className="mt-0.5 text-sm text-zinc-500">
+          Paid bookings only · Europe/Helsinki departure calendar · removed and unpaid excluded
         </p>
       </div>
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 text-sm p-3 rounded">{error}</div>
-      )}
+      {error ? <ErrorBanner>{error}</ErrorBanner> : null}
 
-      <div className="grid grid-cols-2 gap-3">
-        <Stat label="Passenger volume" value={String(report.passengers)} />
-        <Stat label="Upcoming booked" value={`€${report.upcomingGross.toFixed(0)}`} />
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+        <Stat label="Paid bookings" value={String(report.paidBookingCount)} />
+        <Stat label="Paid gross" value={`€${report.paidGross.toFixed(0)}`} />
+        <Stat label="Refunded (marked)" value={`€${report.refundedGross.toFixed(0)}`} />
+        <Stat label="Upcoming paid" value={`€${report.upcomingPaidGross.toFixed(0)}`} />
       </div>
 
+      <p className="text-xs text-zinc-500">
+        Operational passengers (active, non-expired): {report.operationalPassengers}. Refunds are
+        status labels only — Stripe refunds are not automated from admin.
+      </p>
+
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">By source</h2>
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
+          By source
+        </h2>
         {(Object.keys(SOURCE_LABELS) as BookingSource[]).map((src) => {
-          const row = report.bySource.get(src)!
-          if (row.count === 0) return null
+          const row = report.bySource.get(src)
+          if (!row || row.count === 0) return null
           return (
-            <div key={src} className="bg-white border rounded-lg p-3 text-sm">
-              <div className="font-semibold">{SOURCE_LABELS[src]}</div>
-              <div className="text-xs text-gray-600 mt-1">
-                {row.count} bookings · Gross €{row.gross.toFixed(0)}
+            <div key={src} className="rounded-xl border border-zinc-200 bg-white p-3 text-sm">
+              <div className="font-semibold text-zinc-900">{SOURCE_LABELS[src]}</div>
+              <div className="mt-1 text-xs text-zinc-600">
+                {row.count} paid · Gross €{row.gross.toFixed(0)}
               </div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="mt-1 text-xs text-zinc-500">
                 {row.netKnown
                   ? `Commission est. €${row.commission.toFixed(0)} · Net est. €${(
                       row.gross - row.commission
                     ).toFixed(0)}`
-                  : 'Commission: not configured on product(s) — net not assumed'}
+                  : 'Commission not configured on product(s)'}
               </div>
             </div>
           )
@@ -115,19 +82,19 @@ export default function RevenuePage() {
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
-          Product performance
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
+          By product
         </h2>
         {Array.from(report.byProduct.entries()).map(([name, row]) => (
-          <div key={name} className="bg-white border rounded-lg p-3 text-sm">
-            <div className="font-semibold">{name}</div>
-            <div className="text-xs text-gray-600 mt-1">
-              {row.count} bookings · {row.pax} pax · €{row.gross.toFixed(0)}
+          <div key={name} className="rounded-xl border border-zinc-200 bg-white p-3 text-sm">
+            <div className="font-semibold text-zinc-900">{name}</div>
+            <div className="mt-1 text-xs text-zinc-600">
+              {row.count} paid · {row.pax} pax · €{row.gross.toFixed(0)}
             </div>
           </div>
         ))}
         {report.byProduct.size === 0 && (
-          <p className="text-sm text-gray-500">No booking data yet.</p>
+          <p className="text-sm text-zinc-500">No paid booking data yet.</p>
         )}
       </section>
     </div>
@@ -136,9 +103,9 @@ export default function RevenuePage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-white border rounded-lg p-3">
-      <div className="text-xs text-gray-500">{label}</div>
-      <div className="text-2xl font-bold mt-1">{value}</div>
+    <div className="rounded-xl border border-zinc-200 bg-white px-3 py-2.5">
+      <div className="text-[10px] font-semibold uppercase tracking-wide text-zinc-400">{label}</div>
+      <div className="mt-0.5 text-lg font-semibold tabular-nums text-zinc-900">{value}</div>
     </div>
   )
 }

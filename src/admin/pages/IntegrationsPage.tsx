@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const rows: Array<{
   name: string
@@ -22,8 +23,8 @@ const rows: Array<{
   },
   {
     name: 'Confirmation email',
-    status: 'partial',
-    note: 'Existing email resend path in legacy panel; Admin OS V1 does not auto-send.',
+    status: 'connected',
+    note: 'Sent automatically after Stripe payment; resend available on booking detail.',
   },
   {
     name: 'GetYourGuide',
@@ -94,6 +95,19 @@ export default function IntegrationsPage() {
           </li>
         ))}
       </ul>
+
+      <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3.5">
+        <div className="text-sm font-medium text-zinc-900">CSV import</div>
+        <p className="mt-1 text-xs text-zinc-500">
+          Import marketplace bookings with source tags. Prefer manual booking for single entries.
+        </p>
+        <Link
+          to="/import"
+          className="mt-2 inline-flex text-sm font-medium text-emerald-800 hover:underline"
+        >
+          Open CSV import →
+        </Link>
+      </div>
     </div>
   )
 }
