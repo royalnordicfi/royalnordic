@@ -4047,3 +4047,62 @@ html[data-rn-shell='checkout'] .App {
   flex-direction: column;
   gap: 0.35rem;
 }
+
+/* ——— Royal Nordic Rewards ——— */
+.rn-rewards-skel {
+  border-radius: var(--rn-radius-sm);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.09) 45%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  background-size: 200% 100%;
+  animation: rn-rewards-shimmer 1.35s ease-in-out infinite;
+}
+@keyframes rn-rewards-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+.rn-rewards-step {
+  padding-top: 0.25rem;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) {
+  .rn-rewards-step:hover {
+    transform: translateY(-2px);
+  }
+}
+.rn-rewards-stat {
+  border: 1px solid var(--rn-border);
+  border-radius: var(--rn-radius);
+  background: rgba(255, 255, 255, 0.025);
+  padding: 1rem 1.1rem;
+  transition:
+    border-color 0.28s ease,
+    background 0.28s ease;
+}
+.rn-rewards-stat:hover {
+  border-color: var(--rn-border-strong);
+  background: rgba(255, 255, 255, 0.04);
+}
+.rn-rewards-code-panel {
+  border: 1px solid var(--rn-border-strong);
+  border-radius: var(--rn-radius);
+  background:
+    radial-gradient(ellipse 70% 80% at 100% 0%, rgba(15, 143, 99, 0.12), transparent 55%),
+    rgba(255, 255, 255, 0.03);
+  padding: 1.25rem 1.35rem;
+}
+@media (min-width: 640px) {
+  .rn-rewards-code-panel {
+    padding: 1.5rem 1.75rem;
+  }
+}
+.rn-rewards-auth .rn-form-input {
+  background: rgba(255, 255, 255, 0.04);
+}

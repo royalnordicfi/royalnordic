@@ -90,6 +90,12 @@ const META: Record<
     description:
       'Travel agency and B2B partnerships for premium Rovaniemi tours — Northern Lights, daytime experiences, private itineraries, and transfers.',
   },
+  '/referralprogram': {
+    title: 'Royal Nordic Rewards | Give 10% Off, Earn 10%',
+    description:
+      'Join Royal Nordic Rewards — create your referral code, share Lapland experiences, and prepare to earn when booking rewards go live.',
+    ogImage: 'https://royalnordic.fi/nortti1.jpg',
+  },
   '/contact': {
     title: 'Contact Royal Nordic | Rovaniemi Lapland',
     description:
@@ -216,7 +222,14 @@ const META: Record<
  */
 export default function RoutePageMeta() {
   const { pathname } = useLocation()
-  const entry = META[pathname]
+  const entry =
+    META[pathname] ??
+    (pathname.startsWith('/referralprogram')
+      ? {
+          ...META['/referralprogram'],
+          noIndex: pathname !== '/referralprogram',
+        }
+      : undefined)
   const title = entry?.title ?? 'Royal Nordic | Lavish Experiences in Lapland'
   const description =
     entry?.description ??

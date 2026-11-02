@@ -60,6 +60,15 @@ import NotFound from './components/NotFound';
 import ShellProvider from './layout/ShellProvider';
 import SiteChrome from './layout/SiteChrome';
 import RevealObserver from './components/RevealObserver';
+import RewardsLayout from './rewards/RewardsLayout';
+import RewardsLanding from './rewards/RewardsLanding';
+import RewardsSignUp from './rewards/RewardsSignUp';
+import RewardsSignIn from './rewards/RewardsSignIn';
+import RewardsForgotPassword from './rewards/RewardsForgotPassword';
+import RewardsResetPassword from './rewards/RewardsResetPassword';
+import RewardsVerify from './rewards/RewardsVerify';
+import RewardsClaimCode from './rewards/RewardsClaimCode';
+import RewardsDashboard from './rewards/RewardsDashboard';
 
 function App() {
   return (
@@ -170,6 +179,16 @@ function App() {
           />
           <Route path="/customized-tour" element={<CustomizedTour />} />
           <Route path="/travel-trade" element={<TravelTrade />} />
+          <Route path="/referralprogram" element={<RewardsLayout />}>
+            <Route index element={<RewardsLanding />} />
+            <Route path="signup" element={<RewardsSignUp />} />
+            <Route path="signin" element={<RewardsSignIn />} />
+            <Route path="forgot-password" element={<RewardsForgotPassword />} />
+            <Route path="reset-password" element={<RewardsResetPassword />} />
+            <Route path="verify" element={<RewardsVerify />} />
+            <Route path="claim-code" element={<RewardsClaimCode />} />
+            <Route path="dashboard" element={<RewardsDashboard />} />
+          </Route>
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/snowmobile-safari" element={<SnowmobileSafari />} />
           <Route path="/reindeer-rides" element={<ReindeerRides />} />
