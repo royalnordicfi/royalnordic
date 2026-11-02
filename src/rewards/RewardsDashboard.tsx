@@ -7,30 +7,57 @@ import {
   ensureLocalProfile,
   fetchActiveCode,
   fetchActivity,
+  fetchAttributions,
   fetchEarnings,
   formatEuroFromCents,
 } from './api'
 import { referralLinkForCode } from './codes'
-import type { DashboardStats, ReferralActivity, ReferralCode, ReferralProfile } from './types'
+import { privacySafeBookingRef } from '../lib/referralDiscount'
+import type {
+  DashboardStats,
+  ReferralActivity,
+  ReferralAttribution,
+  ReferralCode,
+  ReferralProfile,
+} from './types'
 import CopyButton from './components/CopyButton'
 
 function activityLabel(event: ReferralActivity): string {
+  const bookingRef = event.metadata?.booking_ref
+    ? String(event.metadata.booking_ref)
+    : null
+  const status = event.metadata?.status ? String(event.metadata.status) : null
   switch (event.event_type) {
     case 'code_claimed':
       return `Code claimed: ${String(event.metadata?.code ?? '')}`
     case 'signup':
       return 'Account created'
     case 'booking_attributed':
-      return 'Referral booking attributed'
+      if (status === 'refunded') {
+        return `Refunded referral${bookingRef ? ` · ${bookingRef}` : ''}`
+      }
+      if (status === 'cancelled') {
+        return `Cancelled referral${bookingRef ? ` · ${bookingRef}` : ''}`
+      }
+      return `Confirmed booking${bookingRef ? ` · ${bookingRef}` : ''}`
     case 'commission_pending':
-      return 'Commission pending'
+      return 'Commission pending (not payable yet)'
     case 'commission_available':
-      return 'Commission available'
+      return 'Commission available (not payable yet)'
     case 'payout':
       return 'Payout processed'
     default:
       return event.event_type.replace(/_/g, ' ')
   }
+}
+
+function attributionLabel(row: ReferralAttribution): string {
+  const ref = privacySafeBookingRef(row.booking_id)
+  if (row.status === 'confirmed') return `Confirmed paid booking · ${ref}`
+  if (row.status === 'pending') return `Pending referral · ${ref}`
+  if (row.status === 'refunded') return `Refunded · ${ref}`
+  if (row.status === 'cancelled') return `Cancelled · ${ref}`
+  return `${row.status} · ${ref}`
 }
 
 function formatWhen(iso: string): string {
@@ -56,6 +83,7 @@ function DashboardInner() {
     successfulReferrals: 0,
   })
   const [activity, setActivity] = useState<ReferralActivity[]>([])
+  const [attributions, setAttributions] = useState<ReferralAttribution[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [schemaMissing, setSchemaMissing] = useState(false)
@@ -68,7 +96,7 @@ function DashboardInner() {
       setLoading(true)
       setError(null)
       try {
-        const [prof, active, earnings, acts] = await Promise.all([
+        const [prof, active, earnings, acts, attrs] = await Promise.all([
           ensureLocalProfile(
             user!.id,
             user!.email || '',
@@ -77,11 +105,13 @@ function DashboardInner() {
           fetchActiveCode(user!.id),
           fetchEarnings(user!.id),
           fetchActivity(user!.id),
+          fetchAttributions(user!.id),
         ])
         if (!alive) return
         setProfile(prof)
         setCode(active)
-        setStats(computeStats(earnings, acts))
+        setAttributions(attrs)
+        setStats(computeStats(earnings, acts, attrs))
         setActivity(acts)
       } catch (err) {
         if (!alive) return
@@ -124,6 +154,7 @@ function DashboardInner() {
   const isEmpty =
     stats.totalEarnedCents === 0 &&
     stats.successfulReferrals === 0 &&
+    attributions.length === 0 &&
     activity.filter((a) => a.event_type !== 'code_claimed' && a.event_type !== 'signup').length === 0
 
   return (
@@ -213,6 +244,30 @@ function DashboardInner() {
           <Link to="/" className="rn-btn-secondary mt-6 inline-flex">
             Browse experiences
           </Link>
+        </section>
+      ) : null}
+
+      {attributions.length > 0 ? (
+        <section className="mt-8">
+          <h2 className="font-display text-lg font-semibold text-white">Referral bookings</h2>
+          <p className="mt-1 text-xs text-[var(--rn-text-dim)]">
+            Guest details stay private. Payable commissions are not active yet.
+          </p>
+          <ul className="mt-4 divide-y divide-[var(--rn-border)] border-t border-[var(--rn-border)]">
+            {attributions.map((row) => (
+              <li key={row.id} className="flex items-baseline justify-between gap-4 py-3.5 text-sm">
+                <span className="text-[var(--rn-text-muted)]">
+                  {attributionLabel(row)}
+                  {row.discount_cents > 0
+                    ? ` · guest saved ${formatEuroFromCents(row.discount_cents)}`
+                    : ''}
+                </span>
+                <time className="shrink-0 text-xs text-[var(--rn-text-dim)]" dateTime={row.created_at}>
+                  {formatWhen(row.created_at)}
+                </time>
+              </li>
+            ))}
+          </ul>
         </section>
       ) : null}
 

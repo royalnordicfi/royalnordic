@@ -38,6 +38,18 @@ export type DashboardStats = {
   successfulReferrals: number
 }
 
+export type ReferralAttribution = {
+  id: string
+  referral_code: string
+  booking_id: number | null
+  tour_id: number | null
+  guest_subtotal_cents: number
+  discount_cents: number
+  charged_cents: number
+  status: 'pending' | 'confirmed' | 'cancelled' | 'refunded' | 'void'
+  created_at: string
+}
+
 export type ClaimCodeResult =
   | { ok: true; code: string; id?: string }
   | { ok: false; error: string; code?: string; normalized?: string }

@@ -13,6 +13,12 @@ import {
   isStandardGroupTour,
   perPersonSubtotal,
 } from '../_shared/tourBookingRules.ts'
+import {
+  computeReferralDiscount,
+  normalizeReferralCode,
+  rewardsDiscountsEnabledFromEnv,
+  roundMoney,
+} from '../_shared/referralDiscount.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -157,35 +163,105 @@ serve(async (req) => {
       }
     }
 
-    // Server-side promo validation (must match src/config/winterPromotion.ts)
+    // Server-side discount validation (WINTER20 XOR referral — never stack).
     // Tour id 1 (Guaranteed NL) already has a catalogue sale — never stack WINTER20.
-    // Per-vehicle transfers never take WINTER20.
+    // Per-vehicle products never take guest discounts.
     const PROMO_ENABLED = true
     const PROMO_CODE = 'WINTER20'
     const PROMO_PERCENT = 20
     const PROMO_EXCLUDED_TOUR_IDS = new Set([1, 9, STANDARD_GROUP_TOUR_ID, 11])
     const subtotal = Number(metadata?.subtotal)
     const claimedDiscount = Number(metadata?.discount || 0)
-    const code = String(metadata?.discount_code || '').trim().toUpperCase()
+    const promoCode = String(metadata?.discount_code || '').trim().toUpperCase()
+    const referralCodeRaw = normalizeReferralCode(String(metadata?.referral_code || ''))
+    const discountType = String(metadata?.discount_type || '').trim().toLowerCase()
     const charged = Number(amount)
     const promoTourId = parseInt(String(metadata?.tour_id || ''), 10)
     const promoAllowed =
       pricingModel !== 'per_vehicle' && !PROMO_EXCLUDED_TOUR_IDS.has(promoTourId)
+    const rewardsEnabled = rewardsDiscountsEnabledFromEnv()
 
     if (pricingModel === 'per_vehicle' && dbAdultPrice != null) {
       const expected = Math.round(dbAdultPrice * 100) / 100
       if (Math.abs(charged - expected) > 0.02 || Math.abs(subtotal - expected) > 0.02) {
         throw new Error('Payment amount does not match per-vehicle pricing')
       }
-      if (claimedDiscount > 0.02) {
+      if (claimedDiscount > 0.02 || discountType === 'referral') {
         throw new Error('Invalid discount code or discount amount')
       }
     } else if (Number.isFinite(subtotal) && subtotal >= 0) {
-      const expectedDiscount =
-        PROMO_ENABLED && promoAllowed && code === PROMO_CODE
-          ? Math.round(subtotal * (PROMO_PERCENT / 100) * 100) / 100
-          : 0
-      const expectedTotal = Math.round((subtotal - expectedDiscount) * 100) / 100
+      let expectedDiscount = 0
+      let resolvedReferralCode = ''
+      let resolvedReferrerId = ''
+
+      const referralIntent =
+        Boolean(referralCodeRaw) &&
+        (discountType === 'referral' || (!promoCode && (claimedDiscount > 0.02 || rewardsEnabled)))
+
+      if (referralIntent) {
+        if (!rewardsEnabled) {
+          throw new Error('Referral discounts are not active yet')
+        } else {
+          const supabaseUrl = Deno.env.get('SUPABASE_URL')
+          const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+          if (!supabaseUrl || !supabaseServiceKey) {
+            throw new Error('Unable to verify referral code')
+          }
+          const supabase = createClient(supabaseUrl, supabaseServiceKey)
+          const { data: resolved, error: resolveError } = await supabase.rpc(
+            'resolve_referral_code_for_checkout',
+            {
+              p_code: referralCodeRaw,
+              p_tour_id: promoTourId || null,
+              p_customer_email: String(metadata?.customer_email || ''),
+            },
+          )
+          if (resolveError) {
+            console.error('Referral resolve failed:', resolveError)
+            throw new Error('Unable to verify referral code')
+          }
+          const ok = Boolean(resolved?.ok)
+          if (!ok) {
+            const err = String(resolved?.error || 'invalid')
+            if (err === 'self_referral') throw new Error('You cannot use your own referral code')
+            throw new Error('Invalid referral code')
+          }
+          const tourEligible = Boolean(resolved?.eligible)
+          const priced = computeReferralDiscount({
+            subtotal,
+            tourId: promoTourId,
+            pricingModel,
+            referralCode: referralCodeRaw,
+            promoCode,
+            discountsEnabled: true,
+            codeValid: true,
+            tourEligible,
+            percent: Number(resolved?.discount_percent) || 10,
+          })
+          if (priced.error) throw new Error(priced.error)
+          expectedDiscount = priced.discount
+          resolvedReferralCode = String(resolved?.normalized || referralCodeRaw)
+          resolvedReferrerId = String(resolved?.referrer_user_id || '')
+          if (metadata) {
+            metadata.referral_code = resolvedReferralCode
+            metadata.referrer_user_id = resolvedReferrerId
+            metadata.discount_type = 'referral'
+            metadata.discount_code = ''
+          }
+        }
+      } else if (PROMO_ENABLED && promoAllowed && promoCode === PROMO_CODE) {
+        if (referralCodeRaw) {
+          throw new Error('Referral and promotional discounts cannot be combined')
+        }
+        expectedDiscount = roundMoney(subtotal * (PROMO_PERCENT / 100))
+        if (metadata) metadata.discount_type = 'winter_promo'
+      } else if (promoCode && claimedDiscount > 0.02) {
+        throw new Error('Invalid discount code or discount amount')
+      } else if (referralCodeRaw && claimedDiscount > 0.02) {
+        throw new Error('Referral discounts are not active yet')
+      }
+
+      const expectedTotal = roundMoney(subtotal - expectedDiscount)
       if (Math.abs(claimedDiscount - expectedDiscount) > 0.02) {
         throw new Error('Invalid discount code or discount amount')
       }

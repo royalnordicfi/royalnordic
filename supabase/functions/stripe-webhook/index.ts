@@ -326,6 +326,14 @@ serve(async (req) => {
       // Inventory is updated by the bookings trigger (update_tour_date_slots).
       // Do not double-count total_booked here.
 
+      await confirmReferralFromCheckoutMetadata(supabase, {
+        bookingId: booking.id,
+        sessionId: session.id,
+        paymentIntentId,
+        metadata,
+        totalPrice,
+      })
+
       const { data: tourData } = await supabase
         .from('tours')
         .select('name, public_name')
@@ -362,6 +370,52 @@ serve(async (req) => {
       return json({ success: true, booking_id: booking.id, booking_ref: bookingRef })
     }
 
+    // Referral status updates — never create attributions from client redirects.
+    if (
+      event.type === 'charge.refunded' ||
+      event.type === 'charge.dispute.created' ||
+      event.type === 'refund.created'
+    ) {
+      const obj = event.data.object as { payment_intent?: string | { id?: string }; id?: string }
+      const pi =
+        typeof obj.payment_intent === 'string'
+          ? obj.payment_intent
+          : obj.payment_intent?.id || null
+      if (pi) {
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+        const supabase = createClient(supabaseUrl, supabaseServiceKey)
+        const { data: booking } = await supabase
+          .from('bookings')
+          .select('id')
+          .eq('stripe_payment_intent_id', pi)
+          .maybeSingle()
+        await supabase.rpc('mark_referral_attribution_status', {
+          p_stripe_payment_intent_id: pi,
+          p_booking_id: booking?.id ?? null,
+          p_status: 'refunded',
+        })
+      }
+      return json({ received: true, referral: 'refunded' })
+    }
+
+    if (event.type === 'checkout.session.expired') {
+      const session = event.data.object as Stripe.Checkout.Session
+      const metadata = session.metadata || {}
+      if (metadata.referral_code || metadata.referrer_user_id) {
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+        const supabase = createClient(supabaseUrl, supabaseServiceKey)
+        await supabase.rpc('mark_referral_attribution_status', {
+          p_stripe_payment_intent_id: null,
+          p_booking_id: null,
+          p_status: 'cancelled',
+        })
+        // No row may exist yet (attribution is created only after paid booking) — safe no-op.
+      }
+      return json({ received: true, referral: 'expired' })
+    }
+
     return json({ received: true })
   } catch (error) {
     console.error('Webhook error:', error)
@@ -377,6 +431,50 @@ function json(payload: Record<string, unknown>, status = 200) {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     status,
   })
+}
+
+async function confirmReferralFromCheckoutMetadata(
+  supabase: SupabaseClient,
+  args: {
+    bookingId: number
+    sessionId: string
+    paymentIntentId: string | null
+    metadata: Record<string, string>
+    totalPrice: number
+  },
+) {
+  const code = String(args.metadata.referral_code || '').trim().toUpperCase()
+  const referrer = String(args.metadata.referrer_user_id || '').trim()
+  const discountType = String(args.metadata.discount_type || '').trim()
+  if (!code || !referrer || discountType !== 'referral') return
+
+  const subtotal = Number(args.metadata.subtotal)
+  const discount = Number(args.metadata.discount || 0)
+  const tourId = parseInt(String(args.metadata.tour_id || ''), 10)
+  const guestEmail = String(args.metadata.customer_email || '')
+
+  const subtotalCents = Math.round((Number.isFinite(subtotal) ? subtotal : args.totalPrice) * 100)
+  const discountCents = Math.round((Number.isFinite(discount) ? discount : 0) * 100)
+  const chargedCents = Math.round(args.totalPrice * 100)
+
+  const { data, error } = await supabase.rpc('confirm_referral_attribution', {
+    p_booking_id: args.bookingId,
+    p_stripe_checkout_session_id: args.sessionId,
+    p_stripe_payment_intent_id: args.paymentIntentId,
+    p_referral_code: code,
+    p_referrer_user_id: referrer,
+    p_tour_id: Number.isFinite(tourId) ? tourId : null,
+    p_guest_subtotal_cents: subtotalCents,
+    p_discount_cents: discountCents,
+    p_charged_cents: chargedCents,
+    p_guest_email: guestEmail,
+  })
+
+  if (error) {
+    console.error('confirm_referral_attribution failed:', error)
+    return
+  }
+  console.log('Referral attribution result:', data)
 }
 
 async function markEmailStatus(

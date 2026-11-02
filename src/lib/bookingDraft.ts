@@ -34,6 +34,8 @@ export type BookingDraft = {
   phone?: string
   specialRequests?: string
   discountCode?: string
+  /** Personal Rewards referral code (separate from winter promo). */
+  referralCode?: string
 }
 
 export function computeBookingSubtotal(

@@ -4,6 +4,7 @@ import type {
   ClaimCodeResult,
   DashboardStats,
   ReferralActivity,
+  ReferralAttribution,
   ReferralCode,
   ReferralEarning,
   ReferralProfile,
@@ -104,7 +105,28 @@ export async function fetchActivity(userId: string, limit = 12): Promise<Referra
   }))
 }
 
-export function computeStats(earnings: ReferralEarning[], activity: ReferralActivity[]): DashboardStats {
+export async function fetchAttributions(userId: string, limit = 20): Promise<ReferralAttribution[]> {
+  const { data, error } = await supabase
+    .from('referral_attributions')
+    .select(
+      'id, referral_code, booking_id, tour_id, guest_subtotal_cents, discount_cents, charged_cents, status, created_at',
+    )
+    .eq('referrer_user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (error) {
+    if (error.code === '42P01' || error.message?.includes('does not exist')) return []
+    throw error
+  }
+  return data ?? []
+}
+
+export function computeStats(
+  earnings: ReferralEarning[],
+  activity: ReferralActivity[],
+  attributions: ReferralAttribution[] = [],
+): DashboardStats {
   let totalEarnedCents = 0
   let availableCents = 0
   let pendingCents = 0
@@ -118,9 +140,15 @@ export function computeStats(earnings: ReferralEarning[], activity: ReferralActi
     if (e.status === 'pending') pendingCents += e.amount_cents
   }
 
-  const successfulReferrals = activity.filter((a) =>
-    a.event_type === 'booking_attributed' || a.event_type === 'commission_pending' || a.event_type === 'commission_available',
-  ).length
+  // Commissions not payable yet — show confirmed booking discounts as activity only.
+  const successfulReferrals = attributions.filter((a) => a.status === 'confirmed').length
+  if (successfulReferrals === 0) {
+    const fromActivity = activity.filter((a) => {
+      if (a.event_type !== 'booking_attributed') return false
+      return String(a.metadata?.status || 'confirmed') === 'confirmed'
+    }).length
+    return { totalEarnedCents, availableCents, pendingCents, successfulReferrals: fromActivity }
+  }
 
   return { totalEarnedCents, availableCents, pendingCents, successfulReferrals }
 }

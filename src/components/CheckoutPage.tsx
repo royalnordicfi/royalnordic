@@ -13,11 +13,21 @@ import { departureSuffixForTour } from '../lib/tourBookingRules'
 import {
   getWinterDiscountAmount,
   isTourExcludedFromWinterPromo,
-  isValidWinterPromoCode,
   markCodeAppliedThisSession,
   trackWinterPromoEvent,
 } from '../lib/winterPromotion'
 import { WINTER_PROMOTION } from '../config/winterPromotion'
+import { isRewardsDiscountUiEnabled } from '../config/rewardsBooking'
+import {
+  computeReferralAwareTotal,
+  isTourEligibleForReferralDiscount,
+} from '../lib/referralDiscount'
+import { normalizeReferralCode } from '../rewards/codes'
+import {
+  persistReferralCode,
+  readPersistedReferralCode,
+} from '../rewards/attribution'
+import { supabase } from '../lib/supabase'
 import { CHECKOUT_RETURN_PATH_KEY } from './PaymentCancelled'
 import { useTourAvailability } from '../hooks/useTourAvailability'
 import { useTourCms } from '../hooks/useTourCms'
@@ -43,18 +53,79 @@ export default function CheckoutPage() {
   const [specialRequests, setSpecialRequests] = useState(draft?.specialRequests || '')
   const [pickupLocation, setPickupLocation] = useState(draft?.pickupLocation || '')
   const [discountCode, setDiscountCode] = useState(draft?.discountCode || '')
+  const [referralCode, setReferralCode] = useState(
+    () => draft?.referralCode || readPersistedReferralCode() || '',
+  )
+  const [referralResolved, setReferralResolved] = useState<{
+    ok: boolean
+    eligible?: boolean
+    error?: string
+    normalized?: string
+  } | null>(null)
+  const [referralChecking, setReferralChecking] = useState(false)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [showCrypto, setShowCrypto] = useState(false)
   const [cryptoType, setCryptoType] = useState('bitcoin')
+  const rewardsDiscountsOn = isRewardsDiscountUiEnabled()
 
   useEffect(() => {
     const stored = readBookingDraft()
     if (stored) {
       setDraft(stored)
       if (stored.pickupLocation) setPickupLocation(stored.pickupLocation)
+      if (stored.referralCode) setReferralCode(stored.referralCode)
+      else if (!referralCode) {
+        const persisted = readPersistedReferralCode()
+        if (persisted) setReferralCode(persisted)
+      }
     }
   }, [location.search])
+
+  useEffect(() => {
+    if (!rewardsDiscountsOn || !draft) {
+      setReferralResolved(null)
+      return
+    }
+    const normalized = normalizeReferralCode(referralCode)
+    if (normalized.length < 4) {
+      setReferralResolved(null)
+      return
+    }
+    let alive = true
+    setReferralChecking(true)
+    const handle = window.setTimeout(() => {
+      void supabase
+        .rpc('resolve_referral_code_for_checkout', {
+          p_code: normalized,
+          p_tour_id: draft.tourId,
+          p_customer_email: email.trim() || null,
+        })
+        .then(({ data, error: rpcError }) => {
+          if (!alive) return
+          if (rpcError) {
+            setReferralResolved({ ok: false, error: 'unavailable' })
+            return
+          }
+          setReferralResolved((data || { ok: false }) as {
+            ok: boolean
+            eligible?: boolean
+            error?: string
+            normalized?: string
+          })
+          if (data?.ok && data?.normalized) {
+            persistReferralCode(String(data.normalized))
+          }
+        })
+        .finally(() => {
+          if (alive) setReferralChecking(false)
+        })
+    }, 350)
+    return () => {
+      alive = false
+      window.clearTimeout(handle)
+    }
+  }, [referralCode, draft?.tourId, email, rewardsDiscountsOn, draft])
 
   const {
     loading: availabilityLoading,
@@ -102,6 +173,11 @@ export default function CheckoutPage() {
   const perVehicle = draft?.pricingModel === 'per_vehicle'
   const promoAllowed =
     !!draft && !perVehicle && !isTourExcludedFromWinterPromo(draft.tourId, draft.tourName)
+  const referralUiEligible =
+    rewardsDiscountsOn &&
+    !!draft &&
+    !perVehicle &&
+    isTourEligibleForReferralDiscount(draft.tourId)
 
   const subtotal = useMemo(() => {
     if (!draft) return 0
@@ -114,13 +190,31 @@ export default function CheckoutPage() {
     )
   }, [draft, liveAdultPrice, liveChildPrice])
 
-  const discount = promoAllowed
+  const winterDiscount = promoAllowed
     ? getWinterDiscountAmount(subtotal, discountCode, undefined, undefined, {
         tourId: draft!.tourId,
         tourName: draft!.tourName,
       })
     : 0
+
+  const referralPricing = computeReferralAwareTotal({
+    subtotal,
+    tourId: draft?.tourId || 0,
+    pricingModel: draft?.pricingModel || 'per_person',
+    promoCode: winterDiscount > 0 ? discountCode : '',
+    referralCode,
+    discountsEnabled: rewardsDiscountsOn,
+    referralCodeValid: referralResolved?.ok === true,
+    tourEligible:
+      referralResolved?.eligible != null
+        ? Boolean(referralResolved.eligible)
+        : referralUiEligible,
+  })
+
+  const usingReferral = referralPricing.referralApplied && winterDiscount <= 0
+  const discount = usingReferral ? referralPricing.referralDiscount : winterDiscount
   const total = Math.max(0, subtotal - discount)
+  const discountType = usingReferral ? 'referral' : winterDiscount > 0 ? 'winter_promo' : 'none'
   const seatsLeft = draft ? getAvailableSlots(draft.tourDateIso) : 0
   const partySize = draft ? draft.adults + draft.children : 0
   const dateStillOpen = draft
@@ -138,6 +232,7 @@ export default function CheckoutPage() {
       specialRequests: specialRequests.trim(),
       pickupLocation: needsPickup ? pickupLocation.trim() : draft.pickupLocation,
       discountCode: promoAllowed ? discountCode.trim().toUpperCase() : '',
+      referralCode: normalizeReferralCode(referralCode) || undefined,
       adultPrice: liveAdultPrice || draft.adultPrice,
       childPrice: liveChildPrice || draft.childPrice,
     }
@@ -187,12 +282,35 @@ export default function CheckoutPage() {
         )
       }
 
-      const code = promoAllowed ? discountCode.trim().toUpperCase() : ''
-      if (discount > 0) {
+      const code = promoAllowed && !usingReferral ? discountCode.trim().toUpperCase() : ''
+      const refCode = usingReferral
+        ? normalizeReferralCode(referralResolved?.normalized || referralCode)
+        : ''
+      if (winterDiscount > 0) {
         markCodeAppliedThisSession()
         trackWinterPromoEvent('winter20_code_applied', { tour_name: draft.tourName, discount })
       }
       trackWinterPromoEvent('winter20_booking_started', { tour_name: draft.tourName })
+
+      if (usingReferral && referralResolved?.error === 'self_referral') {
+        throw new Error('You cannot use your own referral code')
+      }
+      if (normalizeReferralCode(referralCode) && rewardsDiscountsOn && !usingReferral && winterDiscount <= 0) {
+        const reason = referralPricing.referralBlockedReason
+        if (reason === 'cannot_stack_with_promo') {
+          throw new Error('Referral and promotional discounts cannot be combined')
+        }
+        if (reason === 'not_eligible_product') {
+          throw new Error('This experience is not eligible for referral discounts')
+        }
+        if (referralResolved && !referralResolved.ok) {
+          throw new Error(
+            referralResolved.error === 'self_referral'
+              ? 'You cannot use your own referral code'
+              : 'Invalid referral code',
+          )
+        }
+      }
 
       const returnPath = draft.returnPath || '/'
       sessionStorage.setItem(CHECKOUT_RETURN_PATH_KEY, returnPath)
@@ -216,6 +334,8 @@ export default function CheckoutPage() {
           subtotal: String(subtotal),
           discount: String(discount),
           discount_code: code,
+          discount_type: discountType,
+          referral_code: refCode,
           pricing_model: draft.pricingModel,
           phone: phone.trim(),
           special_requests: specialRequests.trim(),
@@ -421,24 +541,76 @@ export default function CheckoutPage() {
               <section className="rn-checkout__card">
                 <h2 className="rn-checkout__section-title">Promo code</h2>
                 <label className="rn-checkout__field">
-                  <span>{WINTER_PROMOTION.code}</span>
+                  <span>{WINTER_PROMOTION.discountCode}</span>
                   <input
                     type="text"
                     value={discountCode}
                     onChange={(e) => setDiscountCode(e.target.value)}
                     placeholder="Enter code"
                     autoCapitalize="characters"
+                    disabled={usingReferral}
                   />
                 </label>
-                {discountCode &&
-                isValidWinterPromoCode(discountCode, undefined, undefined, {
-                  tourId: draft.tourId,
-                  tourName: draft.tourName,
-                }) ? (
-                  <p className="rn-checkout__promo-ok">Code applied − €{formatEuroAmount(discount)}</p>
+                {winterDiscount > 0 ? (
+                  <p className="rn-checkout__promo-ok">
+                    Code applied − €{formatEuroAmount(winterDiscount)}
+                  </p>
+                ) : null}
+                {usingReferral ? (
+                  <p className="rn-checkout__field-hint">Clear the referral code to use a promo instead.</p>
                 ) : null}
               </section>
             ) : null}
+
+            {rewardsDiscountsOn ? (
+              <section className="rn-checkout__card">
+                <h2 className="rn-checkout__section-title">Referral code</h2>
+                <label className="rn-checkout__field">
+                  <span>Friend&apos;s Rewards code</span>
+                  <input
+                    type="text"
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(e.target.value)}
+                    placeholder="e.g. ALEX10"
+                    autoCapitalize="characters"
+                    autoComplete="off"
+                    spellCheck={false}
+                    disabled={winterDiscount > 0}
+                  />
+                </label>
+                {!referralUiEligible ? (
+                  <p className="rn-checkout__field-hint">
+                    Referral discounts apply to selected Northern Lights tours only.
+                  </p>
+                ) : null}
+                {referralChecking ? (
+                  <p className="rn-checkout__field-hint">Checking code…</p>
+                ) : null}
+                {usingReferral ? (
+                  <p className="rn-checkout__promo-ok">
+                    Referral applied − €{formatEuroAmount(referralPricing.referralDiscount)}
+                  </p>
+                ) : null}
+                {referralResolved && !referralResolved.ok && normalizeReferralCode(referralCode).length >= 4 ? (
+                  <p className="rn-checkout__error" role="status">
+                    {referralResolved.error === 'self_referral'
+                      ? 'You cannot use your own referral code.'
+                      : 'This referral code is not valid.'}
+                  </p>
+                ) : null}
+                {winterDiscount > 0 ? (
+                  <p className="rn-checkout__field-hint">Promo codes cannot be combined with referrals.</p>
+                ) : null}
+              </section>
+            ) : (
+              <section className="rn-checkout__card">
+                <h2 className="rn-checkout__section-title">Referral code</h2>
+                <p className="rn-checkout__terms">
+                  Rewards referral discounts are prepared but not active on live checkout yet.
+                  Codes and dashboards work — guest discounts activate after approval.
+                </p>
+              </section>
+            )}
 
             <section className="rn-checkout__card">
               <h2 className="rn-checkout__section-title">Cancellation</h2>
@@ -536,9 +708,13 @@ export default function CheckoutPage() {
                     ) : null}
                   </>
                 )}
+                <div>
+                  <dt>Subtotal</dt>
+                  <dd>€{formatEuroAmount(subtotal)}</dd>
+                </div>
                 {discount > 0 ? (
                   <div>
-                    <dt>Discount</dt>
+                    <dt>{usingReferral ? 'Referral (10% off)' : 'Discount'}</dt>
                     <dd>− €{formatEuroAmount(discount)}</dd>
                   </div>
                 ) : null}

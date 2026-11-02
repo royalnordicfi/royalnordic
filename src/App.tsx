@@ -69,6 +69,7 @@ import RewardsResetPassword from './rewards/RewardsResetPassword';
 import RewardsVerify from './rewards/RewardsVerify';
 import RewardsClaimCode from './rewards/RewardsClaimCode';
 import RewardsDashboard from './rewards/RewardsDashboard';
+import ReferralCapture from './rewards/ReferralCapture';
 
 function App() {
   return (
@@ -79,6 +80,7 @@ function App() {
         <RevealObserver />
         <RoutePageMeta />
         <RouteJsonLd />
+        <ReferralCapture />
         <SiteChrome />
         
         <Routes>
