@@ -288,11 +288,20 @@ BEGIN
 END;
 $$;
 
+-- Lock down function execute grants (revoke broad defaults first)
+REVOKE ALL ON FUNCTION public.normalize_referral_code(TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.is_reserved_referral_code(TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.check_referral_code_available(TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.claim_referral_code(TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.ensure_referral_profile() FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.sync_referral_profile_email() FROM PUBLIC;
+
 GRANT EXECUTE ON FUNCTION public.normalize_referral_code(TEXT) TO authenticated, anon;
 GRANT EXECUTE ON FUNCTION public.check_referral_code_available(TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.claim_referral_code(TEXT) TO authenticated;
+-- Trigger functions: no client EXECUTE needed (owned by migration role)
 
-GRANT SELECT, UPDATE ON public.referral_profiles TO authenticated;
+GRANT SELECT ON public.referral_profiles TO authenticated;
 GRANT SELECT ON public.referral_codes TO authenticated;
 GRANT SELECT ON public.referral_earnings TO authenticated;
 GRANT SELECT ON public.referral_activity TO authenticated;
@@ -308,13 +317,7 @@ CREATE POLICY referral_profiles_select_own
   ON public.referral_profiles FOR SELECT TO authenticated
   USING (id = auth.uid());
 
-DROP POLICY IF EXISTS referral_profiles_update_own ON public.referral_profiles;
-CREATE POLICY referral_profiles_update_own
-  ON public.referral_profiles FOR UPDATE TO authenticated
-  USING (id = auth.uid())
-  WITH CHECK (id = auth.uid());
-
--- No direct INSERT/DELETE on profiles from clients (trigger + service role only)
+-- No client INSERT/UPDATE/DELETE on profiles (trigger + security definer sync only)
 
 DROP POLICY IF EXISTS referral_codes_select_own ON public.referral_codes;
 CREATE POLICY referral_codes_select_own

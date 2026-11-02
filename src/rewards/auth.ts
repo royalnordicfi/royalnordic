@@ -8,12 +8,18 @@ export type RewardsSessionState = {
   loading: boolean
 }
 
-const SITE_ORIGIN =
-  typeof window !== 'undefined' ? window.location.origin : 'https://royalnordic.fi'
+/** Production email redirects always use the live domain (never preview/localhost). */
+const PRODUCTION_ORIGIN = 'https://royalnordic.fi'
+
+function rewardsSiteOrigin(): string {
+  if (import.meta.env.PROD) return PRODUCTION_ORIGIN
+  if (typeof window !== 'undefined' && window.location.origin) return window.location.origin
+  return PRODUCTION_ORIGIN
+}
 
 export function rewardsAuthRedirect(path: string): string {
   const clean = path.startsWith('/') ? path : `/${path}`
-  return `${SITE_ORIGIN}${clean}`
+  return `${rewardsSiteOrigin()}${clean}`
 }
 
 export async function getRewardsSession(): Promise<Omit<RewardsSessionState, 'loading'>> {

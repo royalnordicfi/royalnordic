@@ -1,3 +1,18 @@
+# Production Auth settings for Royal Nordic Rewards (pushed with `supabase config push`)
+[auth]
+site_url = "https://royalnordic.fi"
+additional_redirect_urls = [
+  "https://royalnordic.fi/referralprogram/verify",
+  "https://royalnordic.fi/referralprogram/reset-password",
+  "https://royalnordic.fi/**",
+  "http://localhost:5173/**",
+  "http://127.0.0.1:5173/**",
+  "http://localhost:3000/**",
+  "http://127.0.0.1:3000/**"
+]
+
+[auth.email]
+enable_confirmations = true
 
 [functions.contact-form]
 enabled = true
