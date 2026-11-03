@@ -20,6 +20,29 @@ export function rewardsCreditRedemptionEnabledFromEnv(): boolean {
   return raw === '1' || raw === 'true' || raw === 'yes'
 }
 
+/**
+ * Scoped LIVE certification bypass — never enables public customers.
+ * Requires ALL of:
+ * - user id listed in REWARDS_CREDIT_CERT_USER_IDS (comma-separated UUIDs)
+ * - tour badge INTERNAL_CERT (or special_requests containing CERTIFICATION)
+ * Global REWARDS_CREDIT_REDEMPTION_ENABLED remains the only public switch.
+ */
+export function rewardsCreditCertRedemptionAllowed(opts: {
+  userId: string
+  tourBadge?: string | null
+  specialRequests?: string | null
+}): boolean {
+  if (rewardsCreditRedemptionEnabledFromEnv()) return true
+  const allow = String(Deno.env.get('REWARDS_CREDIT_CERT_USER_IDS') || '')
+    .split(/[\s,]+/)
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+  if (!opts.userId || !allow.includes(String(opts.userId).toLowerCase())) return false
+  const badge = String(opts.tourBadge || '').trim()
+  const reqs = String(opts.specialRequests || '')
+  return badge === 'INTERNAL_CERT' || /CERTIFICATION/i.test(reqs)
+}
+
 export function normalizeReferralCode(raw: string): string {
   return String(raw || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase()
 }

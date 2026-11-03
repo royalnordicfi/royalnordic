@@ -23,6 +23,8 @@ export function isRewardsDiscountUiEnabled(): boolean {
 /**
  * Royal Nordic Credit at checkout. Defaults false until explicitly approved.
  * Requires matching edge secret REWARDS_CREDIT_REDEMPTION_ENABLED=true.
+ * LIVE certification must NOT flip this on globally — use edge
+ * REWARDS_CREDIT_CERT_USER_IDS + INTERNAL_CERT tours instead (see docs/rewards-production-flags.md).
  */
 export function isRewardsCreditRedemptionUiEnabled(): boolean {
   const raw = String(import.meta.env.VITE_REWARDS_CREDIT_REDEMPTION_ENABLED || '')

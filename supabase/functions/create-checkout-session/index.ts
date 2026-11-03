@@ -16,7 +16,7 @@ import {
 import {
   computeReferralDiscount,
   normalizeReferralCode,
-  rewardsCreditRedemptionEnabledFromEnv,
+  rewardsCreditCertRedemptionAllowed,
   rewardsDiscountsEnabledFromEnv,
   roundMoney,
 } from '../_shared/referralDiscount.ts'
@@ -62,6 +62,7 @@ serve(async (req) => {
     let pricingModel = String(metadata?.pricing_model || 'per_person')
     let dbAdultPrice: number | null = null
     let dbChildPrice: number | null = null
+    let tourBadge: string | null = null
     if (tourId) {
       const supabaseUrl = Deno.env.get('SUPABASE_URL')
       const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
@@ -71,12 +72,12 @@ serve(async (req) => {
       if (supabaseUrl && supabaseServiceKey) {
         const supabase = createClient(supabaseUrl, supabaseServiceKey)
         const fullSelect =
-          'id, name, is_active, adult_price, child_price, max_capacity, pricing_model, season_start, season_end, departure_time, meeting_point'
+          'id, name, is_active, adult_price, child_price, max_capacity, pricing_model, season_start, season_end, departure_time, meeting_point, badge'
         let tourResult = await supabase.from('tours').select(fullSelect).eq('id', tourId).maybeSingle()
         if (tourResult.error && /column|schema cache/i.test(tourResult.error.message || '')) {
           tourResult = await supabase
             .from('tours')
-            .select('id, name, is_active, adult_price, child_price, max_capacity, pricing_model')
+            .select('id, name, is_active, adult_price, child_price, max_capacity, pricing_model, badge')
             .eq('id', tourId)
             .maybeSingle()
         }
@@ -98,6 +99,7 @@ serve(async (req) => {
         if (tourRow.pricing_model) pricingModel = String(tourRow.pricing_model)
         if (tourRow.adult_price != null) dbAdultPrice = Number(tourRow.adult_price)
         if (tourRow.child_price != null) dbChildPrice = Number(tourRow.child_price)
+        if ('badge' in tourRow && tourRow.badge != null) tourBadge = String(tourRow.badge)
 
         const tourDateId = parseInt(String(metadata?.tour_date_id || ''), 10)
         const adults = parseInt(String(metadata?.adults || '0'), 10)
@@ -267,7 +269,6 @@ serve(async (req) => {
         throw new Error('Invalid discount code or discount amount')
       }
 
-      const creditEnabled = rewardsCreditRedemptionEnabledFromEnv()
       const creditRequestedCents = Math.max(
         0,
         Math.round(Number(metadata?.credit_cents || metadata?.reward_credit_cents || 0)),
@@ -277,9 +278,6 @@ serve(async (req) => {
       let cashCharge = expectedTotal
 
       if (creditRequestedCents > 0) {
-        if (!creditEnabled) {
-          throw new Error('Royal Nordic Credit redemption is not active yet')
-        }
         const authHeader = req.headers.get('Authorization') || ''
         const supabaseUrl = Deno.env.get('SUPABASE_URL')
         const supabaseAnon = Deno.env.get('SUPABASE_ANON_KEY')
@@ -299,6 +297,16 @@ serve(async (req) => {
           throw new Error('Sign in to use Royal Nordic Credit')
         }
         const userId = userData.user.id
+        const specialRequests = String(metadata?.special_requests || metadata?.notes || '')
+        const creditAllowed = rewardsCreditCertRedemptionAllowed({
+          userId,
+          tourBadge,
+          specialRequests,
+        })
+        if (!creditAllowed) {
+          throw new Error('Royal Nordic Credit redemption is not active yet')
+        }
+        // Public flag stays OFF for normal customers; cert path is allowlisted + INTERNAL_CERT only.
         const payableCents = Math.round(expectedTotal * 100)
         const idemRaw =
           String(metadata?.credit_idempotency_key || '').trim() ||

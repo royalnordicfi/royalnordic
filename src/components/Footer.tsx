@@ -38,6 +38,7 @@ const Footer = () => {
               Company
             </h3>
             <ul className="space-y-2 text-[13px]">
+              <li><Link className="rn-footer-link" to="/referralprogram">Rewards</Link></li>
               <li><Link className="rn-footer-link" to="/contact">Contact</Link></li>
               <li><Link className="rn-footer-link" to="/travel-trade">Partner With Us</Link></li>
               <li>
