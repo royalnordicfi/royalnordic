@@ -62,3 +62,8 @@ verify_jwt = false
 enabled = true
 verify_jwt = false
 entrypoint = "./functions/get-checkout-confirmation/index.ts"
+
+[functions.mature-referral-credits]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/mature-referral-credits/index.ts"

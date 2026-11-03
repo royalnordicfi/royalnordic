@@ -386,7 +386,7 @@ serve(async (req) => {
       return json({ success: true, booking_id: booking.id, booking_ref: bookingRef })
     }
 
-    // Referral status updates — never create attributions from client redirects.
+    // Referral credit + attribution updates — never create attributions from client redirects.
     if (
       event.type === 'charge.refunded' ||
       event.type === 'charge.dispute.created' ||
@@ -395,6 +395,9 @@ serve(async (req) => {
       const obj = event.data.object as {
         payment_intent?: string | { id?: string } | null
         id?: string
+        amount?: number
+        amount_refunded?: number
+        charge?: string | { id?: string; amount?: number; amount_refunded?: number } | null
       }
       const pi =
         typeof obj.payment_intent === 'string'
@@ -407,26 +410,50 @@ serve(async (req) => {
       const supabaseUrl = Deno.env.get('SUPABASE_URL')!
       const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
       const supabase = createClient(supabaseUrl, supabaseServiceKey)
-      const { data: booking } = await supabase
-        .from('bookings')
-        .select('id')
-        .eq('stripe_payment_intent_id', pi)
-        .maybeSingle()
-      const { data: markResult, error: markError } = await supabase.rpc(
-        'mark_referral_attribution_status',
+
+      // charge.refunded carries amount / amount_refunded; disputes/refund.created → full reverse.
+      let chargeAmount = typeof obj.amount === 'number' ? obj.amount : null
+      let amountRefunded = typeof obj.amount_refunded === 'number' ? obj.amount_refunded : null
+      if (event.type !== 'charge.refunded' || chargeAmount == null || amountRefunded == null) {
+        chargeAmount = chargeAmount ?? 0
+        amountRefunded = amountRefunded ?? chargeAmount
+      }
+
+      const { data: adjustResult, error: adjustError } = await supabase.rpc(
+        'adjust_referral_credit_for_charge_refund',
         {
           p_stripe_payment_intent_id: pi,
-          p_booking_id: booking?.id ?? null,
-          p_status: 'refunded',
-          p_stripe_checkout_session_id: null,
+          p_charge_amount_cents: chargeAmount,
+          p_amount_refunded_cents: amountRefunded,
         },
       )
-      if (markError) {
-        console.error('mark_referral_attribution_status (refund) failed:', markError)
-      } else {
-        console.log('Referral refund mark result:', markResult)
+      if (adjustError) {
+        console.error('adjust_referral_credit_for_charge_refund failed:', adjustError)
+        // Fallback: mark attribution refunded (also zeros credit when possible)
+        const { data: booking } = await supabase
+          .from('bookings')
+          .select('id')
+          .eq('stripe_payment_intent_id', pi)
+          .maybeSingle()
+        const { data: markResult, error: markError } = await supabase.rpc(
+          'mark_referral_attribution_status',
+          {
+            p_stripe_payment_intent_id: pi,
+            p_booking_id: booking?.id ?? null,
+            p_status: event.type === 'charge.dispute.created' ? 'void' : 'refunded',
+            p_stripe_checkout_session_id: null,
+          },
+        )
+        if (markError) console.error('mark_referral_attribution_status (refund) failed:', markError)
+        return json({
+          received: true,
+          referral: 'refunded_fallback',
+          adjust_error: adjustError.message,
+          result: markResult ?? null,
+        })
       }
-      return json({ received: true, referral: 'refunded', result: markResult ?? null })
+      console.log('Referral credit refund adjust:', adjustResult)
+      return json({ received: true, referral: 'credit_adjusted', result: adjustResult ?? null })
     }
 
     if (event.type === 'checkout.session.expired') {

@@ -2,13 +2,16 @@ import { supabase } from '../lib/supabase'
 import type {
   AvailabilityResult,
   ClaimCodeResult,
-  DashboardStats,
   ReferralActivity,
   ReferralAttribution,
   ReferralCode,
+  ReferralCreditBalance,
+  ReferralCreditRedemption,
   ReferralEarning,
   ReferralProfile,
 } from './types'
+
+export { computeStats } from './creditStats'
 
 export async function fetchReferralProfile(userId: string): Promise<ReferralProfile | null> {
   const { data, error } = await supabase
@@ -18,7 +21,6 @@ export async function fetchReferralProfile(userId: string): Promise<ReferralProf
     .maybeSingle()
 
   if (error) {
-    // Table may not exist until migration is applied
     if (error.code === '42P01' || error.message?.includes('does not exist')) {
       return null
     }
@@ -31,12 +33,10 @@ export async function ensureLocalProfile(userId: string, email: string, displayN
   const existing = await fetchReferralProfile(userId)
   if (existing) return existing
 
-  // Profile is created by DB trigger; brief retry for race after signup
   await new Promise((r) => setTimeout(r, 400))
   const again = await fetchReferralProfile(userId)
   if (again) return again
 
-  // Soft fallback display only — never invent earnings
   return {
     id: userId,
     email,
@@ -72,13 +72,48 @@ export async function claimReferralCode(code: string): Promise<ClaimCodeResult> 
   return (data ?? { ok: false, error: 'unknown' }) as ClaimCodeResult
 }
 
+export async function fetchCreditBalance(userId: string): Promise<ReferralCreditBalance | null> {
+  const { data, error } = await supabase.rpc('get_referral_credit_balance', {
+    p_user_id: userId,
+  })
+  if (error) {
+    if (error.code === 'PGRST202' || error.message?.includes('does not exist')) return null
+    throw error
+  }
+  const row = data as Record<string, unknown> | null
+  if (!row || row.ok === false) return null
+  return {
+    pending_cents: Number(row.pending_cents) || 0,
+    available_cents: Number(row.available_cents) || 0,
+    lifetime_earned_cents: Number(row.lifetime_earned_cents) || 0,
+    lifetime_redeemed_cents: Number(row.lifetime_redeemed_cents) || 0,
+    updated_at: row.updated_at ? String(row.updated_at) : undefined,
+  }
+}
+
 export async function fetchEarnings(userId: string): Promise<ReferralEarning[]> {
   const { data, error } = await supabase
     .from('referral_earnings')
-    .select('id, user_id, amount_cents, currency, status, created_at')
+    .select(
+      'id, user_id, amount_cents, currency, status, created_at, remaining_cents, original_cents, source_booking_id, attribution_id, mature_at, available_at',
+    )
     .eq('user_id', userId)
-    .neq('status', 'void')
     .order('created_at', { ascending: false })
+
+  if (error) {
+    if (error.code === '42P01' || error.message?.includes('does not exist')) return []
+    throw error
+  }
+  return data ?? []
+}
+
+export async function fetchRedemptions(userId: string, limit = 20): Promise<ReferralCreditRedemption[]> {
+  const { data, error } = await supabase
+    .from('referral_credit_redemptions')
+    .select('id, user_id, amount_cents, status, booking_id, created_at, note')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(limit)
 
   if (error) {
     if (error.code === '42P01' || error.message?.includes('does not exist')) return []
@@ -120,39 +155,6 @@ export async function fetchAttributions(userId: string, limit = 20): Promise<Ref
     throw error
   }
   return data ?? []
-}
-
-export function computeStats(
-  earnings: ReferralEarning[],
-  activity: ReferralActivity[],
-  attributions: ReferralAttribution[] = [],
-): DashboardStats {
-  let totalEarnedCents = 0
-  let availableCents = 0
-  let pendingCents = 0
-
-  for (const e of earnings) {
-    if (e.status === 'void') continue
-    if (e.status === 'paid' || e.status === 'available' || e.status === 'pending') {
-      totalEarnedCents += e.amount_cents
-    }
-    if (e.status === 'available') availableCents += e.amount_cents
-    if (e.status === 'pending') pendingCents += e.amount_cents
-  }
-
-  // Prefer attribution rows (includes refunded/cancelled). Activity fallback is only for
-  // older environments that lack attribution history — never re-count a refunded referral
-  // via a leftover confirmed activity event.
-  const successfulReferrals = attributions.filter((a) => a.status === 'confirmed').length
-  if (attributions.length > 0) {
-    return { totalEarnedCents, availableCents, pendingCents, successfulReferrals }
-  }
-
-  const fromActivity = activity.filter((a) => {
-    if (a.event_type !== 'booking_attributed') return false
-    return String(a.metadata?.status || 'confirmed') === 'confirmed'
-  }).length
-  return { totalEarnedCents, availableCents, pendingCents, successfulReferrals: fromActivity }
 }
 
 export function formatEuroFromCents(cents: number): string {

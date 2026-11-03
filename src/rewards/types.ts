@@ -13,13 +13,38 @@ export type ReferralCode = {
   created_at: string
 }
 
+/** Royal Nordic Credit reward row (server ledger; not cash). */
 export type ReferralEarning = {
   id: string
   user_id: string
   amount_cents: number
   currency: string
-  status: 'pending' | 'available' | 'paid' | 'void'
+  status: 'pending' | 'available' | 'redeemed' | 'reversed' | 'void' | 'paid'
   created_at: string
+  remaining_cents?: number | null
+  original_cents?: number | null
+  source_booking_id?: number | null
+  attribution_id?: string | null
+  mature_at?: string | null
+  available_at?: string | null
+}
+
+export type ReferralCreditBalance = {
+  pending_cents: number
+  available_cents: number
+  lifetime_earned_cents: number
+  lifetime_redeemed_cents: number
+  updated_at?: string
+}
+
+export type ReferralCreditRedemption = {
+  id: string
+  user_id: string
+  amount_cents: number
+  status: 'reserved' | 'applied' | 'released' | 'void'
+  booking_id: number | null
+  created_at: string
+  note?: string | null
 }
 
 export type ReferralActivity = {
@@ -35,6 +60,7 @@ export type DashboardStats = {
   totalEarnedCents: number
   availableCents: number
   pendingCents: number
+  redeemedCents: number
   successfulReferrals: number
 }
 

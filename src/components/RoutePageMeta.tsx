@@ -91,9 +91,9 @@ const META: Record<
       'Travel agency and B2B partnerships for premium Rovaniemi tours — Northern Lights, daytime experiences, private itineraries, and transfers.',
   },
   '/referralprogram': {
-    title: 'Royal Nordic Rewards | Give 10% Off, Earn 10%',
+    title: 'Royal Nordic Rewards | Give 10% Off, Earn 10% Credit',
     description:
-      'Join Royal Nordic Rewards — create your referral code, share Lapland experiences, and prepare to earn when booking rewards go live.',
+      'Join Royal Nordic Rewards — create your referral code, share Lapland experiences, and earn Royal Nordic Credit toward future bookings.',
     ogImage: 'https://royalnordic.fi/nortti1.jpg',
   },
   '/contact': {

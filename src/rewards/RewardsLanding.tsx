@@ -11,8 +11,8 @@ const STEPS = [
     text: 'Your guest receives 10% off eligible tours when Rewards goes live.',
   },
   {
-    title: 'You earn 10%',
-    text: 'You earn 10% of what they paid — tracked in your dashboard.',
+    title: 'You earn 10% credit',
+    text: 'You earn 10% of what they paid as Royal Nordic Credit — available after their tour.',
   },
 ]
 
@@ -33,11 +33,12 @@ export default function RewardsLanding() {
         <div className="rn-container relative py-14 sm:py-20 lg:py-24">
           <p className="rn-eyebrow text-aurora-soft">Royal Nordic Rewards</p>
           <h1 className="mt-3 max-w-2xl font-display text-[2.1rem] font-semibold leading-[1.08] tracking-[-0.03em] text-white sm:text-[2.85rem] lg:text-[3.25rem]">
-            Give 10% off. Earn 10%.
+            Give 10% off. Earn 10% credit.
           </h1>
           <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-[var(--rn-text-muted)] sm:text-base">
-            Share Lapland with friends. Create your code now; guest discounts and
-            your earnings unlock when Rewards goes live publicly.
+            Share Lapland with friends. Create your code now; guest discounts and Royal Nordic Credit
+            unlock when Rewards goes live publicly — credit toward future Royal Nordic bookings, not
+            cash.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -59,7 +60,7 @@ export default function RewardsLanding() {
 
           <p className="mt-6 inline-flex items-center gap-2 rounded-[var(--rn-radius-sm)] border border-[var(--rn-border)] bg-white/[0.03] px-3 py-2 text-xs text-[var(--rn-text-dim)] sm:text-[13px]">
             <span className="h-1.5 w-1.5 rounded-full bg-amber-400/90" aria-hidden />
-            Discounts and earnings are not active yet — accounts and codes are ready now.
+            Discounts and credit redemption are not active on checkout yet — accounts and codes are ready now.
           </p>
         </div>
       </section>
