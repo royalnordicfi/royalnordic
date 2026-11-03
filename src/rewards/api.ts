@@ -140,17 +140,19 @@ export function computeStats(
     if (e.status === 'pending') pendingCents += e.amount_cents
   }
 
-  // Commissions not payable yet — show confirmed booking discounts as activity only.
+  // Prefer attribution rows (includes refunded/cancelled). Activity fallback is only for
+  // older environments that lack attribution history — never re-count a refunded referral
+  // via a leftover confirmed activity event.
   const successfulReferrals = attributions.filter((a) => a.status === 'confirmed').length
-  if (successfulReferrals === 0) {
-    const fromActivity = activity.filter((a) => {
-      if (a.event_type !== 'booking_attributed') return false
-      return String(a.metadata?.status || 'confirmed') === 'confirmed'
-    }).length
-    return { totalEarnedCents, availableCents, pendingCents, successfulReferrals: fromActivity }
+  if (attributions.length > 0) {
+    return { totalEarnedCents, availableCents, pendingCents, successfulReferrals }
   }
 
-  return { totalEarnedCents, availableCents, pendingCents, successfulReferrals }
+  const fromActivity = activity.filter((a) => {
+    if (a.event_type !== 'booking_attributed') return false
+    return String(a.metadata?.status || 'confirmed') === 'confirmed'
+  }).length
+  return { totalEarnedCents, availableCents, pendingCents, successfulReferrals: fromActivity }
 }
 
 export function formatEuroFromCents(cents: number): string {
