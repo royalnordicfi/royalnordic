@@ -67,9 +67,20 @@ export function tourIdForPublicPath(pathname: string): number | null {
   return entry ? Number(entry[0]) : null
 }
 
+/** Internal certification products — bookable via checkout API, never marketed publicly. */
+export const INTERNAL_CERT_TOUR_BADGE = 'INTERNAL_CERT'
+
+export function isInternalCertTour(row: {
+  badge?: string | null
+  name?: string | null
+}): boolean {
+  if (String(row.badge || '') === INTERNAL_CERT_TOUR_BADGE) return true
+  return String(row.name || '').toUpperCase().startsWith('INTERNAL CERT')
+}
+
 /** Active bookable tours visible on the public site (is_active !== false). */
 export async function fetchActiveTourIds(): Promise<Set<number>> {
-  const { data, error } = await supabase.from('tours').select('id, is_active')
+  const { data, error } = await supabase.from('tours').select('id, is_active, badge, name')
   if (error) {
     console.error('fetchActiveTourIds:', error)
     // Fail open for transient errors so the site does not blank all products
@@ -77,7 +88,10 @@ export async function fetchActiveTourIds(): Promise<Set<number>> {
   }
   return new Set(
     (data || [])
-      .filter((t: { is_active?: boolean | null }) => t.is_active !== false)
+      .filter(
+        (t: { is_active?: boolean | null; badge?: string | null; name?: string | null }) =>
+          t.is_active !== false && !isInternalCertTour(t),
+      )
       .map((t: { id: number }) => t.id),
   )
 }

@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { isInternalCertTour } from './productVisibility'
 
 /** Ordered list item stored in JSONB columns */
 export type CmsListItem = {
@@ -310,5 +311,7 @@ export async function fetchPublicTourCards(): Promise<TourCms[]> {
     console.error('fetchPublicTourCards:', error)
     return []
   }
-  return (data || []).map((row) => normalizeTourCms(row as Record<string, unknown>))
+  return (data || [])
+    .map((row) => normalizeTourCms(row as Record<string, unknown>))
+    .filter((t) => !isInternalCertTour(t))
 }

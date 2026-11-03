@@ -57,3 +57,8 @@ verify_jwt = false
 [functions.stripe-webhook]
 enabled = true
 verify_jwt = false
+
+[functions.get-checkout-confirmation]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/get-checkout-confirmation/index.ts"
