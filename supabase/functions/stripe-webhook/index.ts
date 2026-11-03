@@ -97,6 +97,14 @@ serve(async (req) => {
 
         if (existing?.id) {
           console.log('Booking already exists for payment intent', paymentIntentId, existing.id)
+          // Retry-safe: booking may exist if a prior delivery crashed before attribution.
+          await confirmReferralFromCheckoutMetadata(supabase, {
+            bookingId: existing.id,
+            sessionId: session.id,
+            paymentIntentId,
+            metadata,
+            totalPrice,
+          })
           return json({ success: true, booking_id: existing.id, duplicate: true })
         }
       }
@@ -258,6 +266,7 @@ serve(async (req) => {
         status: 'confirmed',
         special_requests: specialRequests,
         stripe_payment_intent_id: paymentIntentId,
+        stripe_checkout_session_id: session.id,
         payment_status: 'paid',
         source: 'direct_website',
         email_status: 'queued',
@@ -309,6 +318,13 @@ serve(async (req) => {
             .eq('stripe_payment_intent_id', paymentIntentId)
             .maybeSingle()
           if (raced?.id) {
+            await confirmReferralFromCheckoutMetadata(supabase, {
+              bookingId: raced.id,
+              sessionId: session.id,
+              paymentIntentId,
+              metadata,
+              totalPrice,
+            })
             return json({ success: true, booking_id: raced.id, duplicate: true })
           }
         }
@@ -376,44 +392,70 @@ serve(async (req) => {
       event.type === 'charge.dispute.created' ||
       event.type === 'refund.created'
     ) {
-      const obj = event.data.object as { payment_intent?: string | { id?: string }; id?: string }
+      const obj = event.data.object as {
+        payment_intent?: string | { id?: string } | null
+        id?: string
+      }
       const pi =
         typeof obj.payment_intent === 'string'
           ? obj.payment_intent
           : obj.payment_intent?.id || null
-      if (pi) {
-        const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-        const supabase = createClient(supabaseUrl, supabaseServiceKey)
-        const { data: booking } = await supabase
-          .from('bookings')
-          .select('id')
-          .eq('stripe_payment_intent_id', pi)
-          .maybeSingle()
-        await supabase.rpc('mark_referral_attribution_status', {
+      if (!pi) {
+        return json({ received: true, referral: 'skipped', reason: 'no_payment_intent' })
+      }
+
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      const supabase = createClient(supabaseUrl, supabaseServiceKey)
+      const { data: booking } = await supabase
+        .from('bookings')
+        .select('id')
+        .eq('stripe_payment_intent_id', pi)
+        .maybeSingle()
+      const { data: markResult, error: markError } = await supabase.rpc(
+        'mark_referral_attribution_status',
+        {
           p_stripe_payment_intent_id: pi,
           p_booking_id: booking?.id ?? null,
           p_status: 'refunded',
-        })
+          p_stripe_checkout_session_id: null,
+        },
+      )
+      if (markError) {
+        console.error('mark_referral_attribution_status (refund) failed:', markError)
+      } else {
+        console.log('Referral refund mark result:', markResult)
       }
-      return json({ received: true, referral: 'refunded' })
+      return json({ received: true, referral: 'refunded', result: markResult ?? null })
     }
 
     if (event.type === 'checkout.session.expired') {
       const session = event.data.object as Stripe.Checkout.Session
-      const metadata = session.metadata || {}
-      if (metadata.referral_code || metadata.referrer_user_id) {
-        const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-        const supabase = createClient(supabaseUrl, supabaseServiceKey)
-        await supabase.rpc('mark_referral_attribution_status', {
+      // Attribution is created only after paid checkout — usually a no-op.
+      // Still look up by session id so any future/pending row is cancelled safely.
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      const supabase = createClient(supabaseUrl, supabaseServiceKey)
+      const { data: booking } = await supabase
+        .from('bookings')
+        .select('id')
+        .eq('stripe_checkout_session_id', session.id)
+        .maybeSingle()
+      const { data: markResult, error: markError } = await supabase.rpc(
+        'mark_referral_attribution_status',
+        {
           p_stripe_payment_intent_id: null,
-          p_booking_id: null,
+          p_booking_id: booking?.id ?? null,
           p_status: 'cancelled',
-        })
-        // No row may exist yet (attribution is created only after paid booking) — safe no-op.
+          p_stripe_checkout_session_id: session.id,
+        },
+      )
+      if (markError) {
+        console.error('mark_referral_attribution_status (expired) failed:', markError)
+      } else {
+        console.log('Referral expired mark result:', markResult)
       }
-      return json({ received: true, referral: 'expired' })
+      return json({ received: true, referral: 'expired', result: markResult ?? null })
     }
 
     return json({ received: true })
