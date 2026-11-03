@@ -43,6 +43,10 @@ export async function signUpRewards(email: string, password: string, displayName
     },
   })
   if (error) throw new Error(error.message || 'Could not create account')
+  // Supabase may return 200 with an empty identities array for an existing email.
+  if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+    throw new Error('An account with this email already exists. Sign in instead.')
+  }
   return data
 }
 

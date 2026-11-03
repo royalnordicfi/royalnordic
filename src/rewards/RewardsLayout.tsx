@@ -18,14 +18,33 @@ function RewardsChrome() {
     <div className="rn-rewards min-h-[60vh]">
       {isApp ? (
         <div className="border-b border-[var(--rn-border)] bg-[var(--rn-surface)]/80 backdrop-blur-sm">
-          <div className="rn-container flex items-center justify-between gap-4 py-3.5">
-            <Link
-              to="/referralprogram/dashboard"
-              className="font-display text-lg font-semibold tracking-tight text-white transition hover:text-aurora-soft"
-            >
-              Rewards
-            </Link>
-            <div className="flex items-center gap-3 text-sm">
+          <div className="rn-container flex items-center justify-between gap-3 py-3.5">
+            <div className="flex min-w-0 items-center gap-4 sm:gap-6">
+              <Link
+                to="/referralprogram/dashboard"
+                className="font-display text-lg font-semibold tracking-tight text-white transition hover:text-aurora-soft"
+              >
+                Rewards
+              </Link>
+              <nav className="flex items-center gap-3 text-xs sm:gap-4 sm:text-sm" aria-label="Rewards">
+                <Link
+                  to="/referralprogram/dashboard"
+                  className="text-[var(--rn-text-muted)] transition hover:text-white"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/referralprogram"
+                  className="hidden text-[var(--rn-text-muted)] transition hover:text-white sm:inline"
+                >
+                  Program
+                </Link>
+                <Link to="/" className="text-[var(--rn-text-muted)] transition hover:text-white">
+                  Tours
+                </Link>
+              </nav>
+            </div>
+            <div className="flex shrink-0 items-center gap-3 text-sm">
               {!loading && isSignedIn ? (
                 <button
                   type="button"

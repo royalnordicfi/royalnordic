@@ -53,11 +53,37 @@ function activityLabel(event: ReferralActivity): string {
 
 function attributionLabel(row: ReferralAttribution): string {
   const ref = privacySafeBookingRef(row.booking_id)
-  if (row.status === 'confirmed') return `Confirmed paid booking · ${ref}`
-  if (row.status === 'pending') return `Pending referral · ${ref}`
+  if (row.status === 'confirmed') return `Paid booking · ${ref}`
+  if (row.status === 'pending') return `Pending · ${ref}`
   if (row.status === 'refunded') return `Refunded · ${ref}`
   if (row.status === 'cancelled') return `Cancelled · ${ref}`
   return `${row.status} · ${ref}`
+}
+
+function StatusPill({ status }: { status: string }) {
+  const map: Record<string, string> = {
+    confirmed: 'border-aurora/35 bg-aurora/15 text-aurora-soft',
+    pending: 'border-amber-400/30 bg-amber-500/10 text-amber-100/90',
+    refunded: 'border-white/15 bg-white/[0.04] text-[var(--rn-text-muted)]',
+    cancelled: 'border-white/15 bg-white/[0.04] text-[var(--rn-text-dim)]',
+  }
+  const label =
+    status === 'confirmed'
+      ? 'Confirmed'
+      : status === 'pending'
+        ? 'Pending'
+        : status === 'refunded'
+          ? 'Refunded'
+          : status === 'cancelled'
+            ? 'Cancelled'
+            : status
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${map[status] || map.cancelled}`}
+    >
+      {label}
+    </span>
+  )
 }
 
 function formatWhen(iso: string): string {
@@ -166,9 +192,9 @@ function DashboardInner() {
             {profile?.display_name ? `Hello, ${profile.display_name}` : 'Your Rewards'}
           </h1>
         </div>
-        <p className="inline-flex items-center gap-2 rounded-[var(--rn-radius-sm)] border border-amber-500/25 bg-amber-500/10 px-3 py-1.5 text-xs text-amber-100/90">
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
-          Earnings &amp; discounts activate in the next phase
+        <p className="inline-flex max-w-sm items-center gap-2 rounded-[var(--rn-radius-sm)] border border-amber-500/25 bg-amber-500/10 px-3 py-1.5 text-xs leading-snug text-amber-100/90">
+          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" aria-hidden />
+          Guest discounts &amp; payouts unlock when Rewards goes live publicly
         </p>
       </header>
 
@@ -229,17 +255,39 @@ function DashboardInner() {
         </section>
       ) : null}
 
+      <section className="mt-8 rounded-[var(--rn-radius)] border border-[var(--rn-border)] bg-[var(--rn-surface)]/40 px-5 py-5 sm:px-6">
+        <h2 className="font-display text-lg font-semibold text-white">How rewards work</h2>
+        <ul className="mt-3 grid gap-2 text-sm text-[var(--rn-text-muted)] sm:grid-cols-3 sm:gap-4">
+          <li>
+            <span className="font-medium text-white/90">Share</span>
+            <p className="mt-0.5 text-[13px] leading-relaxed">Friends book with your code or link.</p>
+          </li>
+          <li>
+            <span className="font-medium text-white/90">Confirmed</span>
+            <p className="mt-0.5 text-[13px] leading-relaxed">
+              Paid bookings appear here. Guest names and emails stay private.
+            </p>
+          </li>
+          <li>
+            <span className="font-medium text-white/90">Refunded</span>
+            <p className="mt-0.5 text-[13px] leading-relaxed">
+              If a booking is refunded, that referral is marked refunded and is not payable.
+            </p>
+          </li>
+        </ul>
+      </section>
+
       {isEmpty ? (
-        <section className="mt-8 rounded-[var(--rn-radius)] border border-[var(--rn-border)] bg-[var(--rn-surface)]/50 px-5 py-6 sm:px-7 sm:py-8">
+        <section className="mt-6 rounded-[var(--rn-radius)] border border-[var(--rn-border)] bg-[var(--rn-surface)]/50 px-5 py-6 sm:px-7 sm:py-8">
           <h2 className="font-display text-xl font-semibold text-white">You&apos;re set up</h2>
           <p className="mt-2 max-w-lg text-sm leading-relaxed text-[var(--rn-text-muted)]">
-            Share your code with friends planning a Lapland trip. When Rewards connects to bookings,
-            successful referrals and earnings will appear here — never fabricated.
+            Share your code with friends planning Lapland. Referral bookings show here after a paid
+            checkout that uses your code — never fabricated.
           </p>
           <ol className="mt-5 space-y-2 text-sm text-[var(--rn-text-muted)]">
             <li>1. Copy your code or link above</li>
             <li>2. Share it with someone booking Royal Nordic</li>
-            <li>3. Check back once booking rewards go live</li>
+            <li>3. Watch confirmed and refunded referrals update automatically</li>
           </ol>
           <Link to="/" className="rn-btn-secondary mt-6 inline-flex">
             Browse experiences
@@ -251,17 +299,22 @@ function DashboardInner() {
         <section className="mt-8">
           <h2 className="font-display text-lg font-semibold text-white">Referral bookings</h2>
           <p className="mt-1 text-xs text-[var(--rn-text-dim)]">
-            Guest details stay private. Payable commissions are not active yet.
+            Only booking references and status — no guest contact details. Payouts are not active yet.
           </p>
           <ul className="mt-4 divide-y divide-[var(--rn-border)] border-t border-[var(--rn-border)]">
             {attributions.map((row) => (
-              <li key={row.id} className="flex items-baseline justify-between gap-4 py-3.5 text-sm">
-                <span className="text-[var(--rn-text-muted)]">
-                  {attributionLabel(row)}
-                  {row.discount_cents > 0
-                    ? ` · guest saved ${formatEuroFromCents(row.discount_cents)}`
-                    : ''}
-                </span>
+              <li key={row.id} className="flex items-start justify-between gap-3 py-3.5 text-sm sm:items-center">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusPill status={row.status} />
+                    <span className="text-[var(--rn-text-muted)]">{attributionLabel(row)}</span>
+                  </div>
+                  {row.discount_cents > 0 ? (
+                    <p className="mt-1 text-xs text-[var(--rn-text-dim)]">
+                      Guest discount {formatEuroFromCents(row.discount_cents)}
+                    </p>
+                  ) : null}
+                </div>
                 <time className="shrink-0 text-xs text-[var(--rn-text-dim)]" dateTime={row.created_at}>
                   {formatWhen(row.created_at)}
                 </time>

@@ -36,8 +36,8 @@ export default function RewardsLanding() {
             Give 10% off. Earn 10%.
           </h1>
           <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-[var(--rn-text-muted)] sm:text-base">
-            Share Lapland with friends. When Rewards activates, they save on
-            their booking — and you earn for every successful referral.
+            Share Lapland with friends. Create your code now; guest discounts and
+            your earnings unlock when Rewards goes live publicly.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
