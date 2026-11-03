@@ -73,8 +73,11 @@ serve(async (req) => {
           ? session.payment_intent
           : session.payment_intent?.id || null
 
-      const totalPrice =
-        typeof session.amount_total === 'number'
+      // Prefer payable total (cash + credit). Fall back to Stripe cash charge / metadata.
+      const payableMeta = parseFloat(String(metadata.payable_total || metadata.total_price || ''))
+      const totalPrice = Number.isFinite(payableMeta)
+        ? payableMeta
+        : typeof session.amount_total === 'number'
           ? session.amount_total / 100
           : parseFloat(String(metadata.total_price || '0'))
 
@@ -361,6 +364,24 @@ serve(async (req) => {
         .eq('id', tourDateId)
         .single()
 
+      // Apply reserved Royal Nordic Credit exactly once after verified payment.
+      const redemptionId = String(metadata.credit_redemption_id || '').trim()
+      if (redemptionId || session.id) {
+        const { data: applyCredit, error: applyCreditError } = await supabase.rpc(
+          'apply_referral_credit_for_checkout',
+          {
+            p_redemption_id: redemptionId || null,
+            p_stripe_checkout_session_id: session.id,
+            p_booking_id: booking.id,
+          },
+        )
+        if (applyCreditError) {
+          console.error('apply_referral_credit_for_checkout failed:', applyCreditError)
+        } else {
+          console.log('Credit apply result:', applyCredit)
+        }
+      }
+
       if (tourData && dateDataForEmail) {
         const emailData = {
           bookingId: booking.id,
@@ -453,6 +474,34 @@ serve(async (req) => {
         })
       }
       console.log('Referral credit refund adjust:', adjustResult)
+
+      // Restore redeemed booking credit proportionally with the cash refund.
+      const { data: bookingForRestore } = await supabase
+        .from('bookings')
+        .select('id, stripe_checkout_session_id')
+        .eq('stripe_payment_intent_id', pi)
+        .maybeSingle()
+      if (bookingForRestore?.id) {
+        const full =
+          event.type === 'charge.dispute.created' ||
+          (typeof amountRefunded === 'number' &&
+            typeof chargeAmount === 'number' &&
+            amountRefunded >= chargeAmount &&
+            chargeAmount > 0)
+        const { data: restoreResult, error: restoreError } = await supabase.rpc(
+          'restore_referral_credit_after_refund',
+          {
+            p_booking_id: bookingForRestore.id,
+            p_stripe_checkout_session_id: bookingForRestore.stripe_checkout_session_id,
+            p_original_cash_cents: chargeAmount,
+            p_amount_refunded_cents: amountRefunded,
+            p_full_restore: full,
+          },
+        )
+        if (restoreError) console.error('restore_referral_credit_after_refund failed:', restoreError)
+        else console.log('Credit restore result:', restoreResult)
+      }
+
       return json({ received: true, referral: 'credit_adjusted', result: adjustResult ?? null })
     }
 
@@ -463,6 +512,22 @@ serve(async (req) => {
       const supabaseUrl = Deno.env.get('SUPABASE_URL')!
       const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
       const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+      // Release any reserved Royal Nordic Credit for this abandoned session.
+      const { data: releaseResult, error: releaseError } = await supabase.rpc(
+        'release_referral_credit_for_checkout',
+        {
+          p_redemption_id: null,
+          p_stripe_checkout_session_id: session.id,
+          p_reason: 'checkout_expired',
+        },
+      )
+      if (releaseError) console.error('release_referral_credit_for_checkout failed:', releaseError)
+      else console.log('Credit release on expire:', releaseResult)
+
+      // Opportunistic sweep of other expired holds.
+      await supabase.rpc('release_expired_referral_credit_reservations', { p_limit: 50 })
+
       const { data: booking } = await supabase
         .from('bookings')
         .select('id')
@@ -524,7 +589,11 @@ async function confirmReferralFromCheckoutMetadata(
 
   const subtotalCents = Math.round((Number.isFinite(subtotal) ? subtotal : args.totalPrice) * 100)
   const discountCents = Math.round((Number.isFinite(discount) ? discount : 0) * 100)
-  const chargedCents = Math.round(args.totalPrice * 100)
+  // Earn referral credit only on cash paid (exclude Royal Nordic Credit portion).
+  const cashPaidMeta = Number(args.metadata.cash_paid_cents)
+  const chargedCents = Number.isFinite(cashPaidMeta)
+    ? Math.max(0, Math.round(cashPaidMeta))
+    : Math.round(args.totalPrice * 100)
 
   const { data, error } = await supabase.rpc('confirm_referral_attribution', {
     p_booking_id: args.bookingId,

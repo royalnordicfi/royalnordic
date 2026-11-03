@@ -21,6 +21,17 @@ export function isRewardsDiscountUiEnabled(): boolean {
 }
 
 /**
+ * Royal Nordic Credit at checkout. Defaults false until explicitly approved.
+ * Requires matching edge secret REWARDS_CREDIT_REDEMPTION_ENABLED=true.
+ */
+export function isRewardsCreditRedemptionUiEnabled(): boolean {
+  const raw = String(import.meta.env.VITE_REWARDS_CREDIT_REDEMPTION_ENABLED || '')
+    .trim()
+    .toLowerCase()
+  return raw === '1' || raw === 'true' || raw === 'yes'
+}
+
+/**
  * Northern Lights products eligible for referral discounts when the flag is on.
  * Configurable seed — mirrored in migration 035 / edge shared module.
  * Excludes: catalogue-sale Guaranteed NL (1), private NL (11), transfers, custom.

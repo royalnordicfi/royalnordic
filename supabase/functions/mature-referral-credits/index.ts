@@ -34,7 +34,13 @@ serve(async (req) => {
     })
     if (error) throw error
 
-    return new Response(JSON.stringify({ ok: true, result: data }), {
+    const { data: released, error: releaseError } = await supabase.rpc(
+      'release_expired_referral_credit_reservations',
+      { p_limit: limit },
+    )
+    if (releaseError) console.error('release_expired_referral_credit_reservations', releaseError)
+
+    return new Response(JSON.stringify({ ok: true, matured: data, released }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (error) {

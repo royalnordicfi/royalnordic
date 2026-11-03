@@ -26,15 +26,21 @@ export interface CheckoutSessionData {
   }
 }
 
-// Create Stripe Checkout Session using Supabase Edge Function
-export async function createCheckoutSession(checkoutData: CheckoutSessionData) {
+// Create Stripe Checkout Session using Supabase Edge Function.
+// Pass accessToken when redeeming Royal Nordic Credit (authenticated user JWT).
+export async function createCheckoutSession(
+  checkoutData: CheckoutSessionData,
+  options?: { accessToken?: string | null },
+) {
   try {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+    const bearer = options?.accessToken || import.meta.env.VITE_SUPABASE_ANON_KEY
     const response = await fetch(`${supabaseUrl}/functions/v1/create-checkout-session`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        Authorization: `Bearer ${bearer}`,
+        apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
       },
       body: JSON.stringify(checkoutData),
     })

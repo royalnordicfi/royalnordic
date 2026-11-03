@@ -17,7 +17,11 @@ import {
   trackWinterPromoEvent,
 } from '../lib/winterPromotion'
 import { WINTER_PROMOTION } from '../config/winterPromotion'
-import { isRewardsDiscountUiEnabled } from '../config/rewardsBooking'
+import {
+  isRewardsCreditRedemptionUiEnabled,
+  isRewardsDiscountUiEnabled,
+} from '../config/rewardsBooking'
+import { fetchCreditBalance, formatEuroFromCents } from '../rewards/api'
 import {
   computeReferralAwareTotal,
   isTourEligibleForReferralDiscount,
@@ -68,6 +72,10 @@ export default function CheckoutPage() {
   const [showCrypto, setShowCrypto] = useState(false)
   const [cryptoType, setCryptoType] = useState('bitcoin')
   const rewardsDiscountsOn = isRewardsDiscountUiEnabled()
+  const creditRedemptionOn = isRewardsCreditRedemptionUiEnabled()
+  const [creditAvailableCents, setCreditAvailableCents] = useState(0)
+  const [creditApplyCents, setCreditApplyCents] = useState(0)
+  const [creditUserId, setCreditUserId] = useState<string | null>(null)
 
   useEffect(() => {
     const stored = readBookingDraft()
@@ -81,6 +89,38 @@ export default function CheckoutPage() {
       }
     }
   }, [location.search])
+
+  useEffect(() => {
+    if (!creditRedemptionOn) {
+      setCreditAvailableCents(0)
+      setCreditApplyCents(0)
+      setCreditUserId(null)
+      return
+    }
+    let alive = true
+    void supabase.auth.getSession().then(async ({ data }) => {
+      const user = data.session?.user
+      if (!alive) return
+      if (!user) {
+        setCreditAvailableCents(0)
+        setCreditApplyCents(0)
+        setCreditUserId(null)
+        return
+      }
+      setCreditUserId(user.id)
+      try {
+        const bal = await fetchCreditBalance(user.id)
+        if (!alive) return
+        setCreditAvailableCents(bal?.available_cents || 0)
+      } catch {
+        if (!alive) return
+        setCreditAvailableCents(0)
+      }
+    })
+    return () => {
+      alive = false
+    }
+  }, [creditRedemptionOn])
 
   useEffect(() => {
     if (!rewardsDiscountsOn || !draft) {
@@ -213,7 +253,16 @@ export default function CheckoutPage() {
 
   const usingReferral = referralPricing.referralApplied && winterDiscount <= 0
   const discount = usingReferral ? referralPricing.referralDiscount : winterDiscount
-  const total = Math.max(0, subtotal - discount)
+  const payableAfterDiscount = Math.max(0, subtotal - discount)
+  const payableCents = Math.round(payableAfterDiscount * 100)
+  const maxCreditCents =
+    creditRedemptionOn && creditUserId
+      ? Math.min(creditAvailableCents, payableCents)
+      : 0
+  const appliedCreditCents = Math.min(Math.max(0, creditApplyCents), maxCreditCents)
+  const creditEuros = appliedCreditCents / 100
+  const cashDue = Math.max(0, Math.round((payableAfterDiscount - creditEuros) * 100) / 100)
+  const total = payableAfterDiscount
   const discountType = usingReferral ? 'referral' : winterDiscount > 0 ? 'winter_promo' : 'none'
   const seatsLeft = draft ? getAvailableSlots(draft.tourDateIso) : 0
   const partySize = draft ? draft.adults + draft.children : 0
@@ -316,8 +365,9 @@ export default function CheckoutPage() {
       sessionStorage.setItem(CHECKOUT_RETURN_PATH_KEY, returnPath)
 
       const tourDate = formatTourDateLong(draft.tourDateIso)
+      const creditIdem = `ui:${creditUserId || 'anon'}:${row.id}:${payableCents}:${appliedCreditCents}:${Date.now()}`
       const checkoutData = {
-        amount: total,
+        amount: cashDue,
         currency: 'eur',
         tour_name: draft.tourName,
         tour_date: tourDate,
@@ -330,12 +380,15 @@ export default function CheckoutPage() {
           customer_email: email.trim(),
           adults: String(draft.adults),
           children: String(draft.children),
-          total_price: String(total),
+          total_price: String(payableAfterDiscount),
+          payable_total: String(payableAfterDiscount),
           subtotal: String(subtotal),
           discount: String(discount),
           discount_code: code,
           discount_type: discountType,
           referral_code: refCode,
+          credit_cents: String(appliedCreditCents),
+          credit_idempotency_key: creditIdem.slice(0, 160),
           pricing_model: draft.pricingModel,
           phone: phone.trim(),
           special_requests: specialRequests.trim(),
@@ -349,7 +402,13 @@ export default function CheckoutPage() {
         },
       }
 
-      const { sessionId } = await createCheckoutSession(checkoutData)
+      const { data: sessionData } = await supabase.auth.getSession()
+      const accessToken = sessionData.session?.access_token
+      const result = await createCheckoutSession(
+        checkoutData,
+        appliedCreditCents > 0 ? { accessToken } : undefined,
+      )
+
       sessionStorage.setItem(
         'pendingBooking',
         JSON.stringify({
@@ -357,15 +416,40 @@ export default function CheckoutPage() {
           customer_email: email.trim(),
           adults: String(draft.adults),
           children: String(draft.children),
-          total_price: String(total),
+          total_price: String(payableAfterDiscount),
           tour_date: tourDate,
           tour_date_iso: draft.tourDateIso,
           tour_name: draft.tourName,
           phone: phone.trim(),
           special_requests: specialRequests.trim(),
+          booking_ref: result.bookingRef,
         }),
       )
-      await redirectToCheckout(sessionId)
+
+      if (result.creditOnly && result.bookingRef) {
+        sessionStorage.setItem(
+          'confirmedBooking',
+          JSON.stringify({
+            customer_name: fullName.trim(),
+            customer_email: email.trim(),
+            adults: String(draft.adults),
+            children: String(draft.children),
+            total_price: String(payableAfterDiscount),
+            tour_date: tourDate,
+            tour_date_iso: draft.tourDateIso,
+            tour_name: draft.tourName,
+            booking_ref: result.bookingRef,
+          }),
+        )
+        sessionStorage.removeItem('pendingBooking')
+        navigate('/payment-success', { replace: true })
+        return
+      }
+
+      if (!result.sessionId) {
+        throw new Error('Payment could not be started. Please try again.')
+      }
+      await redirectToCheckout(result.sessionId)
     } catch (err) {
       console.error(err)
       setError(err instanceof Error ? err.message : 'Payment could not be started. Please try again.')
@@ -612,6 +696,65 @@ export default function CheckoutPage() {
               </section>
             )}
 
+            {creditRedemptionOn ? (
+              <section className="rn-checkout__card">
+                <h2 className="rn-checkout__section-title">Royal Nordic Credit</h2>
+                {!creditUserId ? (
+                  <p className="rn-checkout__terms">
+                    Sign in to your Rewards account to apply available Royal Nordic Credit. This is
+                    separate from a friend&apos;s referral code.
+                  </p>
+                ) : maxCreditCents <= 0 ? (
+                  <p className="rn-checkout__terms">
+                    No available Royal Nordic Credit on this account yet.
+                  </p>
+                ) : (
+                  <>
+                    <p className="rn-checkout__field-hint">
+                      Available: {formatEuroFromCents(creditAvailableCents)}. Apply up to{' '}
+                      {formatEuroFromCents(maxCreditCents)} on this booking.
+                    </p>
+                    <label className="rn-checkout__field">
+                      <span>Credit to apply (€)</span>
+                      <input
+                        type="number"
+                        min={0}
+                        max={maxCreditCents / 100}
+                        step={0.01}
+                        value={(appliedCreditCents / 100).toFixed(2)}
+                        onChange={(e) => {
+                          const euros = Number(e.target.value)
+                          if (!Number.isFinite(euros) || euros <= 0) {
+                            setCreditApplyCents(0)
+                            return
+                          }
+                          setCreditApplyCents(
+                            Math.min(maxCreditCents, Math.max(0, Math.round(euros * 100))),
+                          )
+                        }}
+                      />
+                    </label>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        className="rn-btn-secondary"
+                        onClick={() => setCreditApplyCents(maxCreditCents)}
+                      >
+                        Apply max
+                      </button>
+                      <button
+                        type="button"
+                        className="rn-btn-secondary"
+                        onClick={() => setCreditApplyCents(0)}
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  </>
+                )}
+              </section>
+            ) : null}
+
             <section className="rn-checkout__card">
               <h2 className="rn-checkout__section-title">Cancellation</h2>
               <p className="rn-checkout__terms">
@@ -643,13 +786,17 @@ export default function CheckoutPage() {
               className="rn-btn-primary rn-checkout__pay"
               disabled={submitting || availabilityLoading || !dateStillOpen}
             >
-              {submitting ? 'Starting secure payment…' : `Pay €${formatEuroAmount(total)} securely`}
+              {submitting
+                ? 'Confirming…'
+                : cashDue <= 0.009 && appliedCreditCents > 0
+                  ? 'Confirm with Royal Nordic Credit'
+                  : `Pay €${formatEuroAmount(cashDue)} securely`}
             </button>
             <button
               type="button"
               className="rn-checkout__crypto"
               onClick={() => setShowCrypto(true)}
-              disabled={submitting || !dateStillOpen}
+              disabled={submitting || !dateStillOpen || appliedCreditCents > 0}
             >
               Prefer crypto? Request a crypto booking
             </button>
@@ -718,11 +865,22 @@ export default function CheckoutPage() {
                     <dd>− €{formatEuroAmount(discount)}</dd>
                   </div>
                 ) : null}
+                {appliedCreditCents > 0 ? (
+                  <div>
+                    <dt>Royal Nordic Credit</dt>
+                    <dd>− €{formatEuroAmount(creditEuros)}</dd>
+                  </div>
+                ) : null}
               </dl>
               <div className="rn-checkout__summary-total">
-                <span>Total</span>
-                <strong>€{formatEuroAmount(total)}</strong>
+                <span>{appliedCreditCents > 0 ? 'Amount due' : 'Total'}</span>
+                <strong>€{formatEuroAmount(cashDue)}</strong>
               </div>
+              {appliedCreditCents > 0 ? (
+                <p className="mt-2 text-xs text-[var(--rn-text-dim)]">
+                  Booking total €{formatEuroAmount(payableAfterDiscount)} after discounts
+                </p>
+              ) : null}
               <Link to={editHref} className="rn-checkout__summary-edit">
                 Change date or guests
               </Link>

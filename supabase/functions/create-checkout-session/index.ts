@@ -16,6 +16,7 @@ import {
 import {
   computeReferralDiscount,
   normalizeReferralCode,
+  rewardsCreditRedemptionEnabledFromEnv,
   rewardsDiscountsEnabledFromEnv,
   roundMoney,
 } from '../_shared/referralDiscount.ts'
@@ -265,12 +266,204 @@ serve(async (req) => {
       if (Math.abs(claimedDiscount - expectedDiscount) > 0.02) {
         throw new Error('Invalid discount code or discount amount')
       }
-      if (Math.abs(charged - expectedTotal) > 0.02) {
+
+      const creditEnabled = rewardsCreditRedemptionEnabledFromEnv()
+      const creditRequestedCents = Math.max(
+        0,
+        Math.round(Number(metadata?.credit_cents || metadata?.reward_credit_cents || 0)),
+      )
+      let creditAppliedCents = 0
+      let redemptionId: string | null = null
+      let cashCharge = expectedTotal
+
+      if (creditRequestedCents > 0) {
+        if (!creditEnabled) {
+          throw new Error('Royal Nordic Credit redemption is not active yet')
+        }
+        const authHeader = req.headers.get('Authorization') || ''
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')
+        const supabaseAnon = Deno.env.get('SUPABASE_ANON_KEY')
+        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+        if (!supabaseUrl || !supabaseServiceKey) {
+          throw new Error('Unable to verify Royal Nordic Credit')
+        }
+        if (!authHeader.toLowerCase().startsWith('bearer ')) {
+          throw new Error('Sign in to use Royal Nordic Credit')
+        }
+
+        const userClient = createClient(supabaseUrl, supabaseAnon || supabaseServiceKey, {
+          global: { headers: { Authorization: authHeader } },
+        })
+        const { data: userData, error: userError } = await userClient.auth.getUser()
+        if (userError || !userData?.user?.id) {
+          throw new Error('Sign in to use Royal Nordic Credit')
+        }
+        const userId = userData.user.id
+        const payableCents = Math.round(expectedTotal * 100)
+        const idemRaw =
+          String(metadata?.credit_idempotency_key || '').trim() ||
+          `checkout:${userId}:${metadata?.tour_date_id || ''}:${payableCents}:${creditRequestedCents}`
+        const admin = createClient(supabaseUrl, supabaseServiceKey)
+        await admin.rpc('release_expired_referral_credit_reservations', { p_limit: 50 })
+
+        const { data: reserved, error: reserveError } = await admin.rpc(
+          'reserve_referral_credit_for_checkout',
+          {
+            p_user_id: userId,
+            p_amount_cents: creditRequestedCents,
+            p_payable_cents: payableCents,
+            p_idempotency_key: idemRaw.slice(0, 160),
+            p_booking_id: null,
+            p_ttl_minutes: 120,
+          },
+        )
+        if (reserveError) {
+          console.error('credit reserve failed', reserveError)
+          throw new Error('Unable to reserve Royal Nordic Credit')
+        }
+        if (!reserved?.ok) {
+          if (String(reserved?.error || '') === 'insufficient_credit') {
+            throw new Error('Insufficient Royal Nordic Credit')
+          }
+          throw new Error('Unable to reserve Royal Nordic Credit')
+        }
+        creditAppliedCents = Number(reserved.amount_cents) || 0
+        redemptionId = String(reserved.id)
+        cashCharge = roundMoney(expectedTotal - creditAppliedCents / 100)
+        if (metadata) {
+          metadata.credit_cents = String(creditAppliedCents)
+          metadata.credit_redemption_id = redemptionId
+          metadata.credit_user_id = userId
+          metadata.payable_total = String(expectedTotal)
+          metadata.cash_paid = String(cashCharge)
+          metadata.cash_paid_cents = String(Math.round(cashCharge * 100))
+          metadata.total_price = String(expectedTotal)
+        }
+      } else if (metadata) {
+        metadata.credit_cents = '0'
+        metadata.cash_paid = String(expectedTotal)
+        metadata.cash_paid_cents = String(Math.round(expectedTotal * 100))
+        metadata.payable_total = String(expectedTotal)
+      }
+
+      if (Math.abs(charged - cashCharge) > 0.02) {
+        if (redemptionId) {
+          const admin = createClient(
+            Deno.env.get('SUPABASE_URL')!,
+            Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+          )
+          await admin.rpc('release_referral_credit_for_checkout', {
+            p_redemption_id: redemptionId,
+            p_stripe_checkout_session_id: null,
+            p_reason: 'amount_mismatch',
+          })
+        }
         throw new Error('Payment amount does not match pricing rules')
       }
+
+      if (cashCharge <= 0.009 && creditAppliedCents > 0 && redemptionId) {
+        const admin = createClient(
+          Deno.env.get('SUPABASE_URL')!,
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+        )
+        const { data: confirmed, error: confirmError } = await admin.rpc(
+          'confirm_fully_credit_funded_booking',
+          {
+            p_user_id: String(metadata.credit_user_id),
+            p_redemption_id: redemptionId,
+            p_tour_id: parseInt(String(metadata.tour_id || ''), 10),
+            p_tour_date_id: parseInt(String(metadata.tour_date_id || ''), 10),
+            p_customer_name: String(metadata.customer_name || ''),
+            p_customer_email: String(metadata.customer_email || ''),
+            p_customer_phone: String(metadata.phone || ''),
+            p_adults: parseInt(String(metadata.adults || '0'), 10),
+            p_children: parseInt(String(metadata.children || '0'), 10),
+            p_total_price_cents: Math.round(expectedTotal * 100),
+            p_special_requests: String(metadata.special_requests || ''),
+            p_tour_time: metadata.tour_time ? String(metadata.tour_time) : null,
+            p_pickup_location: metadata.pickup_location
+              ? String(metadata.pickup_location)
+              : metadata.meeting_point
+                ? String(metadata.meeting_point)
+                : null,
+            p_referral_code: String(metadata.referral_code || '') || null,
+            p_referrer_user_id: metadata.referrer_user_id || null,
+            p_referral_discount_cents: Math.round(Number(metadata.discount || 0) * 100),
+            p_guest_subtotal_cents: Math.round(Number(metadata.subtotal || expectedTotal) * 100),
+            p_cash_paid_cents: 0,
+          },
+        )
+        if (confirmError || !confirmed?.ok) {
+          console.error('credit-only booking failed', confirmError, confirmed)
+          await admin.rpc('release_referral_credit_for_checkout', {
+            p_redemption_id: redemptionId,
+            p_stripe_checkout_session_id: null,
+            p_reason: 'credit_only_failed',
+          })
+          throw new Error(
+            String(confirmed?.error || confirmError?.message || 'Could not complete credit booking'),
+          )
+        }
+        return new Response(
+          JSON.stringify({
+            creditOnly: true,
+            bookingId: confirmed.booking_id,
+            bookingRef: confirmed.booking_ref,
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 },
+        )
+      }
+
+      const stripe = new Stripe(stripeSecretKey, { apiVersion: '2023-10-16' })
+      const cancelPath = safeReturnPath(cancel_path, '/')
+      const cancelUrl = `${SITE_ORIGIN}${cancelPath}`
+      if (cashCharge <= 0) {
+        throw new Error('Payment amount does not match pricing rules')
+      }
+
+      const session = await stripe.createCheckoutSession({
+        payment_method_types: ['card', 'klarna', 'bancontact', 'eps'],
+        line_items: [
+          {
+            price_data: {
+              currency: currency.toLowerCase(),
+              product_data: {
+                name: tour_name,
+                description: `Tour on ${tour_date}`,
+              },
+              unit_amount: Math.round(cashCharge * 100),
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${SITE_ORIGIN}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: cancelUrl,
+        metadata: metadata,
+        customer_email: metadata.customer_email,
+        billing_address_collection: 'required',
+        phone_number_collection: { enabled: true },
+      })
+
+      if (redemptionId) {
+        const admin = createClient(
+          Deno.env.get('SUPABASE_URL')!,
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+        )
+        await admin.rpc('attach_referral_credit_checkout_session', {
+          p_redemption_id: redemptionId,
+          p_stripe_checkout_session_id: session.id,
+          p_cash_charge_cents: Math.round(cashCharge * 100),
+        })
+      }
+
+      return new Response(JSON.stringify({ sessionId: session.id }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      })
     }
 
-    // Create Stripe Checkout Session
+    // Per-vehicle / paths without subtotal-based discounting — no credit apply.
     const stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2023-10-16',
     })
@@ -279,7 +472,6 @@ serve(async (req) => {
     const cancelUrl = `${SITE_ORIGIN}${cancelPath}`
 
     const session = await stripe.createCheckoutSession({
-      // Methods active on the current Stripe account (acct_1Sx7hXCFu64j1T1g).
       payment_method_types: [
         'card',
         'klarna',
@@ -294,7 +486,7 @@ serve(async (req) => {
               name: tour_name,
               description: `Tour on ${tour_date}`,
             },
-            unit_amount: Math.round(charged * 100), // Convert to cents
+            unit_amount: Math.round(charged * 100),
           },
           quantity: 1,
         },

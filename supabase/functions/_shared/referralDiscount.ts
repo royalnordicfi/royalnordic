@@ -12,6 +12,14 @@ export function rewardsDiscountsEnabledFromEnv(): boolean {
   return raw === '1' || raw === 'true' || raw === 'yes'
 }
 
+/** Royal Nordic Credit redemption at checkout — default OFF. */
+export function rewardsCreditRedemptionEnabledFromEnv(): boolean {
+  const raw = String(Deno.env.get('REWARDS_CREDIT_REDEMPTION_ENABLED') || '')
+    .trim()
+    .toLowerCase()
+  return raw === '1' || raw === 'true' || raw === 'yes'
+}
+
 export function normalizeReferralCode(raw: string): string {
   return String(raw || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase()
 }
