@@ -28,11 +28,22 @@ type HookUser = {
   email_new?: string
 }
 
+function normalizeRedirect(redirect: string | undefined, action: string): string {
+  const r = String(redirect || '').trim().replace(/\/$/, '')
+  // GoTrue often passes bare site_url — map to the Rewards deep links.
+  if (!r || r === SITE) {
+    if (action === 'recovery') return `${SITE}/referralprogram/reset-password`
+    return `${SITE}/referralprogram/verify`
+  }
+  return r
+}
+
 function confirmationUrl(emailData: EmailData, tokenHash: string, type?: string): string {
+  const action = type || emailData.email_action_type
   const params = new URLSearchParams({
     token: tokenHash,
-    type: type || emailData.email_action_type,
-    redirect_to: emailData.redirect_to || `${SITE}/referralprogram/verify`,
+    type: action,
+    redirect_to: normalizeRedirect(emailData.redirect_to, action),
   })
   return `https://${PROJECT_REF}.supabase.co/auth/v1/verify?${params.toString()}`
 }
