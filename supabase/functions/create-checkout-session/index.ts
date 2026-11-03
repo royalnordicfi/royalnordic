@@ -53,9 +53,12 @@ serve(async (req) => {
     // Parse request body
     const { amount, currency, tour_name, tour_date, metadata, cancel_path } = await req.json()
 
-    // Validate required fields
-    if (!amount || !currency || !tour_name || !tour_date) {
+    // Validate required fields (amount may be 0 for 100% Royal Nordic Credit).
+    if (amount === undefined || amount === null || amount === '' || !currency || !tour_name || !tour_date) {
       throw new Error('Missing required fields')
+    }
+    if (Number(amount) < 0 || !Number.isFinite(Number(amount))) {
+      throw new Error('Invalid payment amount')
     }
 
     const tourId = parseInt(String(metadata?.tour_id || ''), 10)

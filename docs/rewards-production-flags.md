@@ -17,7 +17,7 @@ Do not enable global credit redemption without an additional protective restrict
 1. **Guest discount live path** requires both edge + Vite discount flags `true`, plus eligible tour (ids 8/10), valid code, XOR vs WINTER20.
 2. **Credit redemption live path** requires both credit flags `true`, signed-in user, available credit balance, and successful reserve before Stripe / zero-pay confirm.
 3. **Credit maturity** does **not** depend on these flags. Cron `mature-referral-credits` (pg_cron → `run_referral_credit_maintenance`) runs regardless so pending credit can become available after tour end.
-4. **Scoped LIVE certification** (Phase 3.3): optional edge secret `REWARDS_CREDIT_CERT_USER_IDS` (comma-separated UUIDs). Allows credit **only** for listed users on `INTERNAL_CERT` tours (or bookings tagged `CERTIFICATION`). Does **not** enable public redemption. Keep public credit flags OFF while using this.
+4. **Scoped LIVE certification** (Phase 3.3): optional edge secret `REWARDS_CREDIT_CERT_USER_IDS` (comma-separated UUIDs). Allows credit **only** for listed users on tours with badge exactly `INTERNAL_CERT`. Special-request tags alone never unlock credit on public tours. Does **not** enable public redemption. Keep public credit flags OFF while using this.
 
 ### Enable (launch only — separate approval)
 

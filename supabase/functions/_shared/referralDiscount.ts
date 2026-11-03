@@ -24,8 +24,9 @@ export function rewardsCreditRedemptionEnabledFromEnv(): boolean {
  * Scoped LIVE certification bypass — never enables public customers.
  * Requires ALL of:
  * - user id listed in REWARDS_CREDIT_CERT_USER_IDS (comma-separated UUIDs)
- * - tour badge INTERNAL_CERT (or special_requests containing CERTIFICATION)
+ * - tour badge exactly INTERNAL_CERT
  * Global REWARDS_CREDIT_REDEMPTION_ENABLED remains the only public switch.
+ * special_requests alone must never unlock credit on public tours.
  */
 export function rewardsCreditCertRedemptionAllowed(opts: {
   userId: string
@@ -38,9 +39,8 @@ export function rewardsCreditCertRedemptionAllowed(opts: {
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean)
   if (!opts.userId || !allow.includes(String(opts.userId).toLowerCase())) return false
-  const badge = String(opts.tourBadge || '').trim()
-  const reqs = String(opts.specialRequests || '')
-  return badge === 'INTERNAL_CERT' || /CERTIFICATION/i.test(reqs)
+  void opts.specialRequests
+  return String(opts.tourBadge || '').trim() === 'INTERNAL_CERT'
 }
 
 export function normalizeReferralCode(raw: string): string {
