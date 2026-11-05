@@ -1722,7 +1722,7 @@ export async function reviewPartnerBookingRequestAdmin(input: {
   action: 'approve' | 'decline'
   admin_note?: string | null
 }): Promise<Record<string, unknown>> {
-  await requireAdmin()
+  const session = await requireAdmin()
   const { data, error } = await supabase.rpc('admin_review_partner_booking_request', {
     p_request_id: input.request_id,
     p_action: input.action,
@@ -1730,7 +1730,61 @@ export async function reviewPartnerBookingRequestAdmin(input: {
   })
   if (error) throw new Error(error.message)
   if (!data?.ok) throw new Error(String(data?.error || 'review_failed'))
+  // Flush outbox so partner receives confirmation/decline promptly.
+  void fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/process-notification-outbox`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({ limit: 25, source: 'admin_review_flush' }),
+  }).catch(() => undefined)
   return data as Record<string, unknown>
+}
+
+export type NotificationOutboxAdminRow = {
+  id: string
+  template_key: string
+  recipient_email: string
+  recipient_role: string
+  status: string
+  attempt_count: number
+  last_error: string | null
+  sent_at: string | null
+  created_at: string
+  partner_booking_request_id: string
+}
+
+export async function fetchNotificationsForPartnerRequest(
+  requestId: string,
+): Promise<NotificationOutboxAdminRow[]> {
+  await requireAdmin()
+  const { data, error } = await supabase
+    .from('notification_outbox')
+    .select(
+      'id, template_key, recipient_email, recipient_role, status, attempt_count, last_error, sent_at, created_at, partner_booking_request_id',
+    )
+    .eq('partner_booking_request_id', requestId)
+    .order('created_at', { ascending: true })
+  if (error) throw new Error(error.message)
+  return (data || []) as NotificationOutboxAdminRow[]
+}
+
+export async function retryPartnerBookingNotification(id: string): Promise<void> {
+  const session = await requireAdmin()
+  const { data, error } = await supabase.rpc('admin_retry_notification_outbox', { p_id: id })
+  if (error) throw new Error(error.message)
+  if (!data?.ok) throw new Error(String(data?.error || 'retry_failed'))
+  await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/process-notification-outbox`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({ limit: 25, source: 'admin_retry' }),
+  })
 }
 
 export async function reviewPartnerApplication(input: {

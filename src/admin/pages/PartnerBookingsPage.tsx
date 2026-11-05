@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import {
+  fetchNotificationsForPartnerRequest,
   fetchPartnerBookingRequestsAdmin,
+  retryPartnerBookingNotification,
   reviewPartnerBookingRequestAdmin,
+  type NotificationOutboxAdminRow,
   type PartnerBookingRequestAdminRow,
 } from '../adminApi'
 import { Badge } from '../components/Badge'
@@ -13,6 +16,13 @@ function tourTitle(r: PartnerBookingRequestAdminRow) {
   return r.tours?.public_name || r.tours?.name || `Tour #${r.tour_id}`
 }
 
+function templateLabel(key: string) {
+  if (key === 'partner_booking_submitted_admin') return 'Admin alert'
+  if (key === 'partner_booking_confirmed_partner') return 'Partner confirmation'
+  if (key === 'partner_booking_declined_partner') return 'Partner decline'
+  return key
+}
+
 export default function PartnerBookingsPage() {
   const [tab, setTab] = useState<Tab>('pending')
   const [rows, setRows] = useState<PartnerBookingRequestAdminRow[]>([])
@@ -21,6 +31,7 @@ export default function PartnerBookingsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
+  const [notes, setNotes] = useState<NotificationOutboxAdminRow[]>([])
 
   const load = async () => {
     try {
@@ -44,6 +55,24 @@ export default function PartnerBookingsPage() {
     () => rows.find((r) => r.id === selectedId) || null,
     [rows, selectedId],
   )
+
+  useEffect(() => {
+    if (!selectedId) {
+      setNotes([])
+      return
+    }
+    let cancelled = false
+    void fetchNotificationsForPartnerRequest(selectedId)
+      .then((list) => {
+        if (!cancelled) setNotes(list)
+      })
+      .catch(() => {
+        if (!cancelled) setNotes([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [selectedId, rows])
 
   const run = async (action: 'approve' | 'decline') => {
     if (!selected) return
@@ -253,10 +282,63 @@ export default function PartnerBookingsPage() {
                   <p className="text-[11px] text-zinc-400">
                     Approve locks the tour date, checks remaining capacity, creates one confirmed
                     unpaid booking at the snapshotted net total, and links it here. If capacity is
-                    insufficient the request stays pending.
+                    insufficient the request stays pending. Partner email is sent only after a
+                    successful approval or decline.
                   </p>
                 </>
               ) : null}
+
+              <div className="border-t border-zinc-100 pt-3">
+                <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+                  Notifications
+                </p>
+                {notes.length === 0 ? (
+                  <p className="mt-1 text-xs text-zinc-500">No notification rows yet.</p>
+                ) : (
+                  <ul className="mt-2 space-y-2">
+                    {notes.map((n) => (
+                      <li
+                        key={n.id}
+                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-zinc-100 px-2.5 py-2 text-xs"
+                      >
+                        <div className="min-w-0">
+                          <p className="font-medium text-zinc-800">
+                            {templateLabel(n.template_key)} → {n.recipient_email}
+                          </p>
+                          <p className="text-zinc-500">
+                            {n.status}
+                            {n.attempt_count ? ` · attempts ${n.attempt_count}` : ''}
+                            {n.last_error ? ` · ${n.last_error}` : ''}
+                          </p>
+                        </div>
+                        {n.status === 'failed' || n.status === 'dead' || n.status === 'pending' ? (
+                          <button
+                            type="button"
+                            disabled={busy}
+                            className="rounded border border-zinc-300 px-2 py-1 font-medium disabled:opacity-50"
+                            onClick={() => {
+                              void (async () => {
+                                try {
+                                  setBusy(true)
+                                  await retryPartnerBookingNotification(n.id)
+                                  const list = await fetchNotificationsForPartnerRequest(selected.id)
+                                  setNotes(list)
+                                } catch (e) {
+                                  setError(e instanceof Error ? e.message : 'Retry failed')
+                                } finally {
+                                  setBusy(false)
+                                }
+                              })()
+                            }}
+                          >
+                            Retry
+                          </button>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
           )}
         </Card>

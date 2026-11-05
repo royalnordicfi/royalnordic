@@ -77,3 +77,8 @@ entrypoint = "./functions/submit-partner-application/index.ts"
 enabled = true
 verify_jwt = true
 entrypoint = "./functions/admin-partner-application/index.ts"
+
+[functions.process-notification-outbox]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/process-notification-outbox/index.ts"

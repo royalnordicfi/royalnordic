@@ -104,13 +104,128 @@ function escapeHtml(s: string): string {
     .replace(/"/g, '&quot;')
 }
 
+export type PartnerBookingNotifyPayload = {
+  reference?: string
+  company_name?: string
+  tour_title?: string
+  tour_date?: string
+  adults?: number
+  children?: number
+  passenger_count?: number
+  guest_name?: string
+  guest_email?: string
+  guest_phone?: string | null
+  pickup_location?: string | null
+  meeting_point?: string | null
+  unit_net_eur?: number
+  total_net_eur?: number
+  currency?: string
+  booking_ref?: string | null
+  admin_note?: string | null
+  admin_url?: string
+  partner_bookings_url?: string
+}
+
+function money(n: unknown, currency = 'EUR'): string {
+  const v = Number(n)
+  if (!Number.isFinite(v)) return '—'
+  return new Intl.NumberFormat('en-FI', { style: 'currency', currency }).format(v)
+}
+
+function paxLine(p: PartnerBookingNotifyPayload): string {
+  const adults = Number(p.adults || 0)
+  const children = Number(p.children || 0)
+  const parts = [`${adults} adult${adults === 1 ? '' : 's'}`]
+  if (children > 0) parts.push(`${children} child${children === 1 ? '' : 'ren'}`)
+  return parts.join(', ')
+}
+
+export function partnerBookingSubmittedAdminEmail(
+  p: PartnerBookingNotifyPayload,
+): { from: string; subject: string; html: string; text: string; to: string[] } {
+  const adminUrl = p.admin_url || `${ADMIN}/partner-bookings`
+  const { html, text } = shell(
+    'Partner booking request',
+    `<p style="margin:0 0 12px;"><strong style="color:#fff;">${escapeHtml(p.company_name || 'Partner')}</strong> submitted request <strong style="color:#fff;">${escapeHtml(p.reference || '')}</strong>.</p>
+     <p style="margin:0 0 8px;">Tour: ${escapeHtml(p.tour_title || 'Tour')} · ${escapeHtml(String(p.tour_date || ''))}</p>
+     <p style="margin:0 0 8px;">Guests: ${escapeHtml(paxLine(p))} · Lead: ${escapeHtml(p.guest_name || '')}</p>
+     <p style="margin:0 0 8px;">Agreed net total: <strong style="color:#fff;">${escapeHtml(money(p.total_net_eur, p.currency || 'EUR'))}</strong></p>
+     <p style="margin:0;">Review in Admin. Capacity is not reserved until you approve.</p>`,
+    'Open Partner bookings',
+    adminUrl,
+  )
+  return {
+    from: FROM,
+    to: ['royalnordicfi@gmail.com', 'contact@royalnordic.fi'],
+    subject: `Partner booking request: ${p.reference || ''} — ${p.company_name || 'Partner'}`,
+    html,
+    text: `Partner booking request ${p.reference}\n${p.company_name}\n${p.tour_title} on ${p.tour_date}\nNet ${money(p.total_net_eur, p.currency || 'EUR')}\n${adminUrl}\n\nRoyal Nordic — ${SITE}`,
+  }
+}
+
+export function partnerBookingConfirmedEmail(
+  p: PartnerBookingNotifyPayload,
+): { from: string; subject: string; html: string; text: string } {
+  const bookingsUrl = p.partner_bookings_url || `${SITE}/partners/dashboard/bookings`
+  const pickup =
+    p.pickup_location || p.meeting_point
+      ? `<p style="margin:0 0 8px;">Pickup / meeting: ${escapeHtml(p.pickup_location || p.meeting_point || '')}</p>`
+      : ''
+  const { html, text } = shell(
+    'Booking confirmed',
+    `<p style="margin:0 0 12px;">Hi ${escapeHtml(p.company_name || 'partner')},</p>
+     <p style="margin:0 0 12px;">Your booking request <strong style="color:#fff;">${escapeHtml(p.reference || '')}</strong> is confirmed.</p>
+     <p style="margin:0 0 8px;">Booking reference: <strong style="color:#fff;">${escapeHtml(p.booking_ref || p.reference || '')}</strong></p>
+     <p style="margin:0 0 8px;">Tour: ${escapeHtml(p.tour_title || 'Tour')}</p>
+     <p style="margin:0 0 8px;">Date: ${escapeHtml(String(p.tour_date || ''))}</p>
+     <p style="margin:0 0 8px;">Guests: ${escapeHtml(paxLine(p))} · Lead guest: ${escapeHtml(p.guest_name || '')}</p>
+     ${pickup}
+     <p style="margin:0 0 12px;">Agreed net total: <strong style="color:#fff;">${escapeHtml(money(p.total_net_eur, p.currency || 'EUR'))}</strong> (no payment collected in this email).</p>
+     <p style="margin:0;">You can review status anytime in your Partner bookings list.</p>`,
+    'View bookings',
+    bookingsUrl,
+  )
+  return {
+    from: FROM,
+    subject: `Booking confirmed — ${p.tour_title || 'Tour'} | ${p.booking_ref || p.reference || ''}`,
+    html,
+    text: `Booking confirmed\nReference: ${p.booking_ref || p.reference}\n${p.tour_title} on ${p.tour_date}\nGuests: ${paxLine(p)}\nNet ${money(p.total_net_eur, p.currency || 'EUR')}\n${bookingsUrl}\n\nRoyal Nordic — ${SITE}`,
+  }
+}
+
+export function partnerBookingDeclinedEmail(
+  p: PartnerBookingNotifyPayload,
+): { from: string; subject: string; html: string; text: string } {
+  const bookingsUrl = p.partner_bookings_url || `${SITE}/partners/dashboard/bookings`
+  const note = p.admin_note
+    ? `<p style="margin:12px 0 0;">Note from Royal Nordic: ${escapeHtml(p.admin_note)}</p>`
+    : ''
+  const { html, text } = shell(
+    'Booking request declined',
+    `<p style="margin:0 0 12px;">Hi ${escapeHtml(p.company_name || 'partner')},</p>
+     <p style="margin:0 0 12px;">Your booking request <strong style="color:#fff;">${escapeHtml(p.reference || '')}</strong> was <strong style="color:#fff;">declined</strong> and is not confirmed.</p>
+     <p style="margin:0 0 8px;">Tour: ${escapeHtml(p.tour_title || 'Tour')} · ${escapeHtml(String(p.tour_date || ''))}</p>
+     <p style="margin:0 0 8px;">Guests: ${escapeHtml(paxLine(p))}</p>
+     <p style="margin:0;">No capacity was reserved and no booking was created. You may submit a new request for another date if needed.</p>
+     ${note}`,
+    'Open bookings',
+    bookingsUrl,
+  )
+  return {
+    from: FROM,
+    subject: `Booking request declined — ${p.reference || ''}`,
+    html,
+    text: `Booking request declined (not confirmed)\nReference: ${p.reference}\n${p.tour_title} on ${p.tour_date}\n${bookingsUrl}\n\nRoyal Nordic — ${SITE}`,
+  }
+}
+
 export async function sendViaResend(payload: {
   from: string
   to: string | string[]
   subject: string
   html: string
   text: string
-}): Promise<void> {
+}): Promise<{ id?: string }> {
   const key = Deno.env.get('RESEND_API_KEY')
   if (!key) throw new Error('RESEND_API_KEY not configured')
   const res = await fetch('https://api.resend.com/emails', {
@@ -127,8 +242,9 @@ export async function sendViaResend(payload: {
       text: payload.text,
     }),
   })
+  const body = await res.json().catch(() => ({}))
   if (!res.ok) {
-    const err = await res.text()
-    throw new Error(`Resend failed: ${res.status} ${err}`)
+    throw new Error(`Resend failed: ${res.status} ${JSON.stringify(body)}`)
   }
+  return { id: typeof body?.id === 'string' ? body.id : undefined }
 }
