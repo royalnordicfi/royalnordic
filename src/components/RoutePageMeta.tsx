@@ -100,6 +100,11 @@ const META: Record<
     description:
       'Apply to partner with Royal Nordic for travel trade and B2B Lapland experiences. Applications are reviewed before any partner access.',
   },
+  '/partners/dashboard': {
+    title: 'Partner Dashboard | Royal Nordic',
+    description:
+      'Approved partner workspace for company details and account access. Partner bookings and rates are not enabled yet.',
+  },
   '/referralprogram': {
     title: 'Royal Nordic Rewards | Give 10% Off, Earn 10% Credit',
     description:
@@ -244,12 +249,17 @@ export default function RoutePageMeta() {
             ...META['/account'],
             noIndex: pathname !== '/account',
           }
-        : pathname.startsWith('/partners')
+        : pathname.startsWith('/partners/dashboard')
           ? {
-              ...META['/partners/apply'],
-              noIndex: pathname !== '/partners/apply',
+              ...META['/partners/dashboard'],
+              noIndex: true,
             }
-          : undefined)
+          : pathname.startsWith('/partners')
+            ? {
+                ...META['/partners/apply'],
+                noIndex: pathname !== '/partners/apply',
+              }
+            : undefined)
   const title = entry?.title ?? 'Royal Nordic | Lavish Experiences in Lapland'
   const description =
     entry?.description ??

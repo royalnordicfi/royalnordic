@@ -1497,6 +1497,65 @@ export async function fetchPartnerApplications(
   return (data || []) as PartnerApplicationRow[]
 }
 
+export type PartnerCompanyAdminRow = {
+  id: string
+  name: string
+  business_id: string | null
+  vat_id: string | null
+  country: string
+  business_type: string
+  website: string | null
+  description: string | null
+  address_line1: string | null
+  address_line2: string | null
+  city: string | null
+  postal_code: string | null
+  contact_name: string | null
+  contact_email: string | null
+  contact_phone: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type PartnerMemberAdminRow = {
+  id: string
+  user_id: string
+  partner_company_id: string
+  application_id: string | null
+  member_role: string
+  status: string
+  created_at: string
+  revoked_at: string | null
+}
+
+export async function fetchPartnerCompanyAdmin(
+  companyId: string,
+): Promise<{ company: PartnerCompanyAdminRow | null; members: PartnerMemberAdminRow[] }> {
+  await requireAdmin()
+  const [{ data: company, error: cErr }, { data: members, error: mErr }] = await Promise.all([
+    supabase
+      .from('partner_companies')
+      .select(
+        'id, name, business_id, vat_id, country, business_type, website, description, address_line1, address_line2, city, postal_code, contact_name, contact_email, contact_phone, created_at, updated_at',
+      )
+      .eq('id', companyId)
+      .maybeSingle(),
+    supabase
+      .from('partner_members')
+      .select(
+        'id, user_id, partner_company_id, application_id, member_role, status, created_at, revoked_at',
+      )
+      .eq('partner_company_id', companyId)
+      .order('created_at', { ascending: false }),
+  ])
+  if (cErr) throw new Error(cErr.message)
+  if (mErr) throw new Error(mErr.message)
+  return {
+    company: (company as PartnerCompanyAdminRow | null) || null,
+    members: (members || []) as PartnerMemberAdminRow[],
+  }
+}
+
 export async function reviewPartnerApplication(input: {
   application_id: string
   action: 'approve' | 'decline' | 'revoke'

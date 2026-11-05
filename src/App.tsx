@@ -75,7 +75,11 @@ import AccountEntry from './account/AccountEntry';
 import AccountSignIn from './account/AccountSignIn';
 import PartnersApply from './account/partners/PartnersApply';
 import PartnersStatus from './account/partners/PartnersStatus';
-import PartnersDashboard from './account/partners/PartnersDashboard';
+import PartnersShell from './account/partners/PartnersShell';
+import PartnersOverview from './account/partners/PartnersOverview';
+import PartnersBookings from './account/partners/PartnersBookings';
+import PartnersCompany from './account/partners/PartnersCompany';
+import PartnersAccount from './account/partners/PartnersAccount';
 
 function App() {
   return (
@@ -195,7 +199,12 @@ function App() {
             <Route index element={<Navigate to="/partners/apply" replace />} />
             <Route path="apply" element={<PartnersApply />} />
             <Route path="status" element={<PartnersStatus />} />
-            <Route path="dashboard" element={<PartnersDashboard />} />
+            <Route path="dashboard" element={<PartnersShell />}>
+              <Route index element={<PartnersOverview />} />
+              <Route path="bookings" element={<PartnersBookings />} />
+              <Route path="company" element={<PartnersCompany />} />
+              <Route path="account" element={<PartnersAccount />} />
+            </Route>
           </Route>
           <Route path="/referralprogram" element={<RewardsLayout />}>
             <Route index element={<RewardsLanding />} />

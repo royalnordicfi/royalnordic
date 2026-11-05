@@ -125,6 +125,9 @@ serve(async (req) => {
         business_type: app.business_type,
         website: app.website,
         description: app.description,
+        contact_name: app.contact_name,
+        contact_email: app.business_email,
+        contact_phone: app.phone,
       })
       .select('*')
       .single()

@@ -2,8 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import {
   fetchPartnerApplications,
+  fetchPartnerCompanyAdmin,
   reviewPartnerApplication,
   type PartnerApplicationRow,
+  type PartnerCompanyAdminRow,
+  type PartnerMemberAdminRow,
 } from '../adminApi'
 import { Badge } from '../components/Badge'
 import { Card, ErrorBanner, Field, PageHeader, textareaClass } from '../components/ui'
@@ -27,6 +30,9 @@ export default function PartnersPage() {
   const [selectedId, setSelectedId] = useState<string | null>(params.get('id'))
   const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
+  const [company, setCompany] = useState<PartnerCompanyAdminRow | null>(null)
+  const [members, setMembers] = useState<PartnerMemberAdminRow[]>([])
+  const [companyLoading, setCompanyLoading] = useState(false)
 
   const load = async () => {
     try {
@@ -55,6 +61,31 @@ export default function PartnersPage() {
     () => rows.find((r) => r.id === selectedId) || null,
     [rows, selectedId],
   )
+
+  useEffect(() => {
+    if (!selected?.partner_company_id) {
+      setCompany(null)
+      setMembers([])
+      return
+    }
+    let cancelled = false
+    setCompanyLoading(true)
+    void fetchPartnerCompanyAdmin(selected.partner_company_id)
+      .then((res) => {
+        if (cancelled) return
+        setCompany(res.company)
+        setMembers(res.members)
+      })
+      .catch((e) => {
+        if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load company')
+      })
+      .finally(() => {
+        if (!cancelled) setCompanyLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [selected?.id, selected?.partner_company_id])
 
   const openDetail = (id: string) => {
     setSelectedId(id)
@@ -87,7 +118,7 @@ export default function PartnersPage() {
     <div className="space-y-4">
       <PageHeader
         title="Partners"
-        subtitle="Review travel-trade applications. Approval sets server partner_status only."
+        subtitle="Review travel-trade applications and inspect company membership. Approval sets server partner_status only."
         actions={
           <button
             type="button"
@@ -123,7 +154,7 @@ export default function PartnersPage() {
 
       {error ? <ErrorBanner>{error}</ErrorBanner> : null}
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)]">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,420px)]">
         <Card padded={false}>
           {loading ? (
             <p className="p-4 text-sm text-zinc-500">Loading…</p>
@@ -173,7 +204,7 @@ export default function PartnersPage() {
           {!selected ? (
             <p className="text-sm text-zinc-500">Select an application.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
                 <h2 className="text-base font-semibold text-zinc-900">{selected.company_name}</h2>
                 <p className="text-xs text-zinc-500">
@@ -216,6 +247,61 @@ export default function PartnersPage() {
                   </div>
                 ) : null}
               </dl>
+
+              {selected.partner_company_id ? (
+                <div className="rounded-lg border border-zinc-200 bg-zinc-50/80 p-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+                    Company profile
+                  </p>
+                  {companyLoading ? (
+                    <p className="mt-2 text-xs text-zinc-500">Loading company…</p>
+                  ) : company ? (
+                    <dl className="mt-2 space-y-1.5 text-xs text-zinc-700">
+                      <div>
+                        <span className="text-zinc-400">VAT:</span> {company.vat_id || '—'}
+                      </div>
+                      <div>
+                        <span className="text-zinc-400">Address:</span>{' '}
+                        {[company.address_line1, company.address_line2, company.postal_code, company.city]
+                          .filter(Boolean)
+                          .join(', ') || '—'}
+                      </div>
+                      <div>
+                        <span className="text-zinc-400">Profile contact:</span>{' '}
+                        {company.contact_name || '—'} · {company.contact_email || '—'}
+                        {company.contact_phone ? ` · ${company.contact_phone}` : ''}
+                      </div>
+                      <div>
+                        <span className="text-zinc-400">Updated:</span>{' '}
+                        {new Date(company.updated_at).toLocaleString()}
+                      </div>
+                    </dl>
+                  ) : (
+                    <p className="mt-2 text-xs text-zinc-500">Company row not found.</p>
+                  )}
+
+                  <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+                    Membership
+                  </p>
+                  {members.length === 0 ? (
+                    <p className="mt-1 text-xs text-zinc-500">No members linked.</p>
+                  ) : (
+                    <ul className="mt-1 space-y-1">
+                      {members.map((m) => (
+                        <li
+                          key={m.id}
+                          className="flex items-center justify-between gap-2 text-xs text-zinc-700"
+                        >
+                          <span className="truncate font-mono text-[11px]">{m.user_id}</span>
+                          <span className="shrink-0">
+                            {m.member_role} · {m.status}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ) : null}
 
               <Field label="Internal note (optional)">
                 <textarea
@@ -261,7 +347,7 @@ export default function PartnersPage() {
               <p className="text-[11px] leading-snug text-zinc-400">
                 Approve links/creates the auth user, sets app_metadata.partner_status=approved, and
                 emails a magic link (no password). Revoke clears membership and signs the user out
-                globally.
+                globally. No partner pricing in this view.
               </p>
             </div>
           )}
