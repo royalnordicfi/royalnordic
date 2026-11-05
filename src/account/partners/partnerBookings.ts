@@ -14,23 +14,88 @@ export type PartnerAvailabilityDate = {
 export type PartnerBookingRequest = {
   id: string
   reference: string
+  booking_ref?: string | null
   tour_id: number
   tour_title?: string
   tour_date: string
+  departure_time?: string | null
   adults: number
   children: number
   passenger_count: number
+  guest_name?: string | null
+  pickup_location?: string | null
   unit_net_eur: number
   total_net_eur: number
   currency: string
   status: 'pending' | 'confirmed' | 'declined' | 'cancelled' | string
   booking_id?: number | null
-  guest_name?: string
   created_at: string
   reviewed_at?: string | null
 }
 
 export { formatPartnerNet }
+
+/** Fields that must never appear on partner booking list payloads. */
+export const PARTNER_BOOKING_FORBIDDEN_KEYS = [
+  'adult_price',
+  'child_price',
+  'retail_price',
+  'percent_off',
+  'fixed_net_eur',
+  'commission',
+  'admin_note',
+  'decline_reason',
+  'internal_notes',
+  'pricing_snapshot',
+  'partner_price_id',
+] as const
+
+export function partnerBookingListHasForbiddenFields(raw: Record<string, unknown>): string[] {
+  return PARTNER_BOOKING_FORBIDDEN_KEYS.filter((key) => key in raw)
+}
+
+/** Map list RPC rows to the partner-safe shape (drops unknown/sensitive keys). */
+export function mapPartnerBookingListItem(raw: Record<string, unknown>): PartnerBookingRequest {
+  return {
+    id: String(raw.id),
+    reference: String(raw.reference || ''),
+    booking_ref: raw.booking_ref != null ? String(raw.booking_ref) : null,
+    tour_id: Number(raw.tour_id),
+    tour_title: raw.tour_title != null ? String(raw.tour_title) : undefined,
+    tour_date: String(raw.tour_date || ''),
+    departure_time: raw.departure_time != null ? String(raw.departure_time) : null,
+    adults: Number(raw.adults || 0),
+    children: Number(raw.children || 0),
+    passenger_count: Number(raw.passenger_count || 0),
+    guest_name: raw.guest_name != null ? String(raw.guest_name) : null,
+    pickup_location: raw.pickup_location != null ? String(raw.pickup_location) : null,
+    unit_net_eur: Number(raw.unit_net_eur || 0),
+    total_net_eur: Number(raw.total_net_eur || 0),
+    currency: String(raw.currency || 'EUR'),
+    status: String(raw.status || ''),
+    booking_id: raw.booking_id != null ? Number(raw.booking_id) : null,
+    created_at: String(raw.created_at || ''),
+    reviewed_at: raw.reviewed_at != null ? String(raw.reviewed_at) : null,
+  }
+}
+
+export function filterPartnerBookings(
+  requests: PartnerBookingRequest[],
+  filter: 'all' | 'pending' | 'confirmed' | 'declined' | 'cancelled',
+): PartnerBookingRequest[] {
+  if (filter === 'all') return requests
+  return requests.filter((r) => r.status === filter)
+}
+
+export function formatPartnerBookingWhen(r: PartnerBookingRequest): string {
+  const time = (r.departure_time || '').trim()
+  return time ? `${r.tour_date} · ${time}` : r.tour_date
+}
+
+export function formatPartnerGuestCount(r: PartnerBookingRequest): string {
+  const n = r.passenger_count
+  return `${n} guest${n === 1 ? '' : 's'}`
+}
 
 export async function fetchPartnerTourAvailability(
   tourId: number,
@@ -84,11 +149,12 @@ export async function submitPartnerBookingRequest(input: {
   })
   if (error) return { ok: false, error: error.message }
   if (!data?.ok) return { ok: false, error: String(data?.error || 'submit_failed') }
-  // Delivery is autonomous (pg_cron → process-notification-outbox). No browser flush.
   return {
     ok: true,
     duplicate: Boolean(data.duplicate),
-    request: data.request as PartnerBookingRequest,
+    request: data.request
+      ? mapPartnerBookingListItem(data.request as Record<string, unknown>)
+      : undefined,
   }
 }
 
@@ -96,11 +162,24 @@ export async function fetchMyPartnerBookingRequests(): Promise<{
   ok: boolean
   error?: string
   requests: PartnerBookingRequest[]
+  forbidden_fields?: string[]
 }> {
   const { data, error } = await supabase.rpc('list_my_partner_booking_requests')
   if (error) return { ok: false, error: error.message, requests: [] }
   if (!data?.ok) return { ok: false, error: String(data?.error || 'failed'), requests: [] }
-  return { ok: true, requests: (data.requests || []) as PartnerBookingRequest[] }
+  const rawRows = (data.requests || []) as Record<string, unknown>[]
+  const forbidden = Array.from(
+    new Set(rawRows.flatMap((row) => partnerBookingListHasForbiddenFields(row))),
+  )
+  if (forbidden.length > 0) {
+    return {
+      ok: false,
+      error: `forbidden_partner_booking_field:${forbidden.join(',')}`,
+      requests: [],
+      forbidden_fields: forbidden,
+    }
+  }
+  return { ok: true, requests: rawRows.map(mapPartnerBookingListItem) }
 }
 
 export const BOOKING_ERROR_COPY: Record<string, string> = {
@@ -124,4 +203,12 @@ export function statusLabel(status: string): string {
   if (status === 'declined') return 'Declined'
   if (status === 'cancelled') return 'Cancelled'
   return status
+}
+
+export function statusBadgeClass(status: string): string {
+  if (status === 'confirmed') return 'bg-aurora/15 text-aurora-soft'
+  if (status === 'pending') return 'bg-amber-500/15 text-amber-100'
+  if (status === 'declined') return 'bg-red-500/15 text-red-200'
+  if (status === 'cancelled') return 'bg-white/5 text-[var(--rn-text-dim)]'
+  return 'bg-white/5 text-[var(--rn-text-dim)]'
 }
