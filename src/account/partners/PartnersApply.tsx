@@ -53,10 +53,19 @@ export default function PartnersApply() {
     if (user?.email && !email) setEmail(user.email)
   }, [user, email])
 
-  if (!loading && access === 'approved') {
+  if (loading || (isSignedIn && access === null)) {
+    return (
+      <div className="rn-container py-14">
+        <div className="rn-rewards-skel h-8 w-48" />
+        <div className="mt-6 rn-rewards-skel h-48 w-full max-w-md" />
+      </div>
+    )
+  }
+
+  if (access === 'approved') {
     return <Navigate to="/partners/dashboard" replace />
   }
-  if (!loading && access === 'pending') {
+  if (access === 'pending') {
     return <Navigate to="/partners/status" replace />
   }
 

@@ -38,4 +38,17 @@ describe('partnerAccess', () => {
       resolvePostLoginPath(user({ app: { partner_status: 'approved' } }), 'rewards'),
     ).toBe('/referralprogram/dashboard')
   })
+
+  it('maps declined and revoked-like metadata without granting dashboard', () => {
+    expect(getPartnerAccessFromUser(user({ app: { partner_status: 'declined' } }))).toBe('declined')
+    expect(getPartnerAccessFromUser(user({ app: { partner_status: 'revoked' } }))).toBe('none')
+    expect(resolvePostLoginPath(user({}), 'partners', 'declined')).toBe('/partners/apply')
+    expect(resolvePostLoginPath(user({}), 'partners', 'none')).toBe('/partners/apply')
+  })
+
+  it('prefers DB access over stale JWT approved hint', () => {
+    const staleApproved = user({ app: { partner_status: 'approved' } })
+    expect(resolvePostLoginPath(staleApproved, 'partners', 'none')).toBe('/partners/apply')
+    expect(resolvePostLoginPath(staleApproved, 'partners', 'pending')).toBe('/partners/status')
+  })
 })

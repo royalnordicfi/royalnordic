@@ -4105,4 +4105,28 @@ html[data-rn-shell='checkout'] .App {
 }
 .rn-rewards-auth .rn-form-input {
   background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: var(--rn-text);
+  box-shadow: none;
+}
+.rn-rewards-auth .rn-form-input::placeholder {
+  color: var(--rn-text-dim);
+}
+.rn-rewards-auth .rn-form-input:hover:not(:focus) {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.rn-rewards-auth .rn-form-input:focus {
+  border-color: rgba(125, 236, 192, 0.45);
+  --tw-ring-color: rgba(125, 236, 192, 0.18);
+  box-shadow: 0 0 0 3px rgba(15, 143, 99, 0.12);
+}
+.rn-rewards-auth .rn-form-input:disabled {
+  background: rgba(255, 255, 255, 0.03);
+}
+.rn-rewards-auth select.rn-form-input {
+  color-scheme: dark;
+}
+.rn-rewards-auth select.rn-form-input option {
+  color: #0c1410;
+  background: #fff;
 }

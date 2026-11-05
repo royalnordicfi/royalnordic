@@ -60,38 +60,47 @@ export default function PartnersDashboard() {
         phase — nothing on this screen changes public or partner pricing yet.
       </p>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-[var(--rn-radius)] border border-[var(--rn-border)] bg-white/[0.03] p-5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--rn-text-dim)]">
             Account status
           </p>
           <p className="mt-2 font-display text-xl font-semibold text-aurora-soft">Approved</p>
-          <p className="mt-1 text-xs text-[var(--rn-text-muted)]">Server-verified partner membership</p>
+          <p className="mt-1 text-xs leading-relaxed text-[var(--rn-text-muted)]">
+            Server-verified partner membership
+          </p>
         </div>
         <div className="rounded-[var(--rn-radius)] border border-[var(--rn-border)] bg-white/[0.03] p-5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--rn-text-dim)]">
             Bookings
           </p>
           <p className="mt-2 font-display text-xl font-semibold text-white/90">Coming soon</p>
-          <p className="mt-1 text-xs text-[var(--rn-text-muted)]">Partner booking tools placeholder</p>
+          <p className="mt-1 text-xs leading-relaxed text-[var(--rn-text-muted)]">
+            Partner booking tools placeholder
+          </p>
         </div>
-        <div className="rounded-[var(--rn-radius)] border border-[var(--rn-border)] bg-white/[0.03] p-5">
+        <div className="rounded-[var(--rn-radius)] border border-[var(--rn-border)] bg-white/[0.03] p-5 sm:col-span-2 lg:col-span-1">
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--rn-text-dim)]">
             Partner rates
           </p>
           <p className="mt-2 font-display text-xl font-semibold text-white/90">Not enabled</p>
-          <p className="mt-1 text-xs text-[var(--rn-text-muted)]">No discounted prices exposed yet</p>
+          <p className="mt-1 text-xs leading-relaxed text-[var(--rn-text-muted)]">
+            No discounted prices exposed yet
+          </p>
         </div>
       </div>
 
-      <div className="mt-8 flex flex-col gap-2.5 sm:flex-row">
-        <Link to="/travel-trade" className="rn-btn-primary min-h-[44px] justify-center">
+      <div className="mt-8 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
+        <Link to="/travel-trade" className="rn-btn-primary min-h-[44px] w-full justify-center sm:w-auto">
           Travel trade overview
         </Link>
-        <Link to="/referralprogram/dashboard" className="rn-btn-secondary min-h-[44px] justify-center">
+        <Link
+          to="/referralprogram/dashboard"
+          className="rn-btn-secondary min-h-[44px] w-full justify-center sm:w-auto"
+        >
           Rewards dashboard
         </Link>
-        <Link to="/account" className="rn-btn-secondary min-h-[44px] justify-center">
+        <Link to="/account" className="rn-btn-secondary min-h-[44px] w-full justify-center sm:w-auto">
           Account home
         </Link>
       </div>
