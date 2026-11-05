@@ -90,6 +90,16 @@ const META: Record<
     description:
       'Travel agency and B2B partnerships for premium Rovaniemi tours — Northern Lights, daytime experiences, private itineraries, and transfers.',
   },
+  '/account': {
+    title: 'Account | Royal Nordic Rewards & Partners',
+    description:
+      'Sign in to Royal Nordic Rewards or apply for a travel-trade partnership. Partner approval is reviewed by our team.',
+  },
+  '/partners/apply': {
+    title: 'Partner Application | Royal Nordic',
+    description:
+      'Apply to partner with Royal Nordic for travel trade and B2B Lapland experiences. Applications are reviewed before any partner access.',
+  },
   '/referralprogram': {
     title: 'Royal Nordic Rewards | Give 10% Off, Earn 10% Credit',
     description:
@@ -229,7 +239,17 @@ export default function RoutePageMeta() {
           ...META['/referralprogram'],
           noIndex: pathname !== '/referralprogram',
         }
-      : undefined)
+      : pathname.startsWith('/account')
+        ? {
+            ...META['/account'],
+            noIndex: pathname !== '/account',
+          }
+        : pathname.startsWith('/partners')
+          ? {
+              ...META['/partners/apply'],
+              noIndex: pathname !== '/partners/apply',
+            }
+          : undefined)
   const title = entry?.title ?? 'Royal Nordic | Lavish Experiences in Lapland'
   const description =
     entry?.description ??

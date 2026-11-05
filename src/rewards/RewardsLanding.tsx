@@ -54,6 +54,9 @@ export default function RewardsLanding() {
                 <Link to="/referralprogram/signin" className="rn-btn-secondary">
                   Sign in
                 </Link>
+                <Link to="/account" className="rn-btn-secondary">
+                  Account hub
+                </Link>
               </>
             )}
           </div>

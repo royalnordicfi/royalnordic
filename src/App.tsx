@@ -70,6 +70,12 @@ import RewardsVerify from './rewards/RewardsVerify';
 import RewardsClaimCode from './rewards/RewardsClaimCode';
 import RewardsDashboard from './rewards/RewardsDashboard';
 import ReferralCapture from './rewards/ReferralCapture';
+import AccountLayout from './account/AccountLayout';
+import AccountEntry from './account/AccountEntry';
+import AccountSignIn from './account/AccountSignIn';
+import PartnersApply from './account/partners/PartnersApply';
+import PartnersStatus from './account/partners/PartnersStatus';
+import PartnersDashboard from './account/partners/PartnersDashboard';
 
 function App() {
   return (
@@ -181,6 +187,16 @@ function App() {
           />
           <Route path="/customized-tour" element={<CustomizedTour />} />
           <Route path="/travel-trade" element={<TravelTrade />} />
+          <Route path="/account" element={<AccountLayout />}>
+            <Route index element={<AccountEntry />} />
+            <Route path="signin" element={<AccountSignIn />} />
+          </Route>
+          <Route path="/partners" element={<AccountLayout />}>
+            <Route index element={<Navigate to="/partners/apply" replace />} />
+            <Route path="apply" element={<PartnersApply />} />
+            <Route path="status" element={<PartnersStatus />} />
+            <Route path="dashboard" element={<PartnersDashboard />} />
+          </Route>
           <Route path="/referralprogram" element={<RewardsLayout />}>
             <Route index element={<RewardsLanding />} />
             <Route path="signup" element={<RewardsSignUp />} />

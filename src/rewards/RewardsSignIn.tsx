@@ -1,14 +1,19 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { resolvePostLoginPath } from '../account/partnerAccess'
 import AuthFormShell, { FieldLabel, FormError } from './components/AuthFormShell'
 import { useRewardsAuth } from './RewardsAuthContext'
 import { authErrorMessage, signInRewards } from './auth'
 
 export default function RewardsSignIn() {
-  const { isSignedIn, loading } = useRewardsAuth()
+  const { isSignedIn, loading, user } = useRewardsAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const from = (location.state as { from?: string } | null)?.from || '/referralprogram/dashboard'
+  const fromState = (location.state as { from?: string } | null)?.from
+  const from =
+    fromState && fromState.startsWith('/referralprogram')
+      ? fromState
+      : resolvePostLoginPath(user, 'rewards')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -24,8 +29,12 @@ export default function RewardsSignIn() {
     setError(null)
     setSubmitting(true)
     try {
-      await signInRewards(email, password)
-      navigate(from, { replace: true })
+      const data = await signInRewards(email, password)
+      const dest =
+        fromState && fromState.startsWith('/referralprogram')
+          ? fromState
+          : resolvePostLoginPath(data.user, 'rewards')
+      navigate(dest, { replace: true })
     } catch (err) {
       setError(authErrorMessage(err))
     } finally {

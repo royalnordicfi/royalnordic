@@ -30,7 +30,7 @@ export default function RewardsVerify() {
       params.get('error_description') ||
       params.get('error') ||
       (hash.includes('error_description')
-        ? decodeURIComponent(hash.split('error_description='FAKESECRET_s1t2u3v4w5x6y7z8a9b0'&')[0] || '')
+        ? decodeURIComponent(hash.split('error_description=')[1]?.split('&')[0] || '')
         : null)
     if (err) {
       const lower = err.toLowerCase()

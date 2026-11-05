@@ -6,12 +6,21 @@ type Props = {
   subtitle?: string
   children: ReactNode
   footer?: ReactNode
+  eyebrow?: string
+  backTo?: { href: string; label: string }
 }
 
-export default function AuthFormShell({ title, subtitle, children, footer }: Props) {
+export default function AuthFormShell({
+  title,
+  subtitle,
+  children,
+  footer,
+  eyebrow = 'Royal Nordic Rewards',
+  backTo = { href: '/referralprogram', label: '← Back to Rewards' },
+}: Props) {
   return (
     <div className="rn-rewards-auth mx-auto w-full max-w-md">
-      <p className="rn-eyebrow text-aurora-soft">Royal Nordic Rewards</p>
+      <p className="rn-eyebrow text-aurora-soft">{eyebrow}</p>
       <h1 className="mt-2 font-display text-[1.75rem] font-semibold leading-tight tracking-[-0.02em] text-white sm:text-[2rem]">
         {title}
       </h1>
@@ -21,8 +30,8 @@ export default function AuthFormShell({ title, subtitle, children, footer }: Pro
       <div className="mt-8 space-y-4">{children}</div>
       {footer ? <div className="mt-8 text-sm text-[var(--rn-text-muted)]">{footer}</div> : null}
       <p className="mt-6 text-center text-xs text-[var(--rn-text-dim)]">
-        <Link to="/referralprogram" className="underline-offset-2 hover:text-white hover:underline">
-          ← Back to Rewards
+        <Link to={backTo.href} className="underline-offset-2 hover:text-white hover:underline">
+          {backTo.label}
         </Link>
       </p>
     </div>

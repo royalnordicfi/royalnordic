@@ -1,0 +1,81 @@
+import { Link, Outlet, useLocation } from 'react-router-dom'
+import Footer from '../components/Footer'
+import { RewardsAuthProvider, useRewardsAuth } from '../rewards/RewardsAuthContext'
+import { signOutRewards } from '../rewards/auth'
+import { getPartnerAccess } from './partnerAccess'
+
+function AccountChrome() {
+  const { isSignedIn, loading, user } = useRewardsAuth()
+  const location = useLocation()
+  const partner = getPartnerAccess(user)
+  const isPartnerApp =
+    location.pathname.startsWith('/partners/dashboard') ||
+    location.pathname.startsWith('/partners/status')
+
+  async function logout() {
+    await signOutRewards()
+  }
+
+  return (
+    <div className="rn-rewards min-h-[60vh]">
+      {isPartnerApp ? (
+        <div className="border-b border-[var(--rn-border)] bg-[var(--rn-surface)]/80 backdrop-blur-sm">
+          <div className="rn-container flex items-center justify-between gap-3 py-3.5">
+            <div className="flex min-w-0 items-center gap-4 sm:gap-6">
+              <Link
+                to={partner === 'approved' ? '/partners/dashboard' : '/partners/status'}
+                className="font-display text-lg font-semibold tracking-tight text-white transition hover:text-aurora-soft"
+              >
+                Partners
+              </Link>
+              <nav className="flex items-center gap-3 text-xs sm:gap-4 sm:text-sm" aria-label="Partners">
+                {partner === 'approved' ? (
+                  <Link
+                    to="/partners/dashboard"
+                    className="text-[var(--rn-text-muted)] transition hover:text-white"
+                  >
+                    Dashboard
+                  </Link>
+                ) : (
+                  <Link
+                    to="/partners/status"
+                    className="text-[var(--rn-text-muted)] transition hover:text-white"
+                  >
+                    Application
+                  </Link>
+                )}
+                <Link to="/account" className="text-[var(--rn-text-muted)] transition hover:text-white">
+                  Account
+                </Link>
+                <Link to="/" className="text-[var(--rn-text-muted)] transition hover:text-white">
+                  Tours
+                </Link>
+              </nav>
+            </div>
+            <div className="flex shrink-0 items-center gap-3 text-sm">
+              {!loading && isSignedIn ? (
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="text-[var(--rn-text-muted)] transition hover:text-white"
+                >
+                  Sign out
+                </button>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      ) : null}
+      <Outlet />
+      <Footer />
+    </div>
+  )
+}
+
+export default function AccountLayout() {
+  return (
+    <RewardsAuthProvider>
+      <AccountChrome />
+    </RewardsAuthProvider>
+  )
+}
