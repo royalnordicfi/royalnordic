@@ -2,12 +2,21 @@ import { Link, Outlet, useLocation } from 'react-router-dom'
 import Footer from '../components/Footer'
 import { RewardsAuthProvider, useRewardsAuth } from '../rewards/RewardsAuthContext'
 import { signOutRewards } from '../rewards/auth'
-import { getPartnerAccess } from './partnerAccess'
+import { useEffect, useState } from 'react'
+import { fetchPartnerAccess, type PartnerAccess } from './partnerAccess'
 
 function AccountChrome() {
   const { isSignedIn, loading, user } = useRewardsAuth()
   const location = useLocation()
-  const partner = getPartnerAccess(user)
+  const [partner, setPartner] = useState<PartnerAccess>('none')
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      setPartner('none')
+      return
+    }
+    void fetchPartnerAccess().then((r) => setPartner(r.access))
+  }, [isSignedIn, user?.id])
   const isPartnerApp =
     location.pathname.startsWith('/partners/dashboard') ||
     location.pathname.startsWith('/partners/status')

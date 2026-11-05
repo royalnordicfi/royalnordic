@@ -67,3 +67,13 @@ entrypoint = "./functions/get-checkout-confirmation/index.ts"
 enabled = true
 verify_jwt = false
 entrypoint = "./functions/mature-referral-credits/index.ts"
+
+[functions.submit-partner-application]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/submit-partner-application/index.ts"
+
+[functions.admin-partner-application]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/admin-partner-application/index.ts"

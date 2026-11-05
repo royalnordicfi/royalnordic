@@ -1,28 +1,67 @@
+import { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import AuthFormShell from '../../rewards/components/AuthFormShell'
 import { useRewardsAuth } from '../../rewards/RewardsAuthContext'
-import { getPartnerAccess, isApprovedPartner } from '../partnerAccess'
+import { fetchPartnerAccess, type PartnerAccessResult } from '../partnerAccess'
 
 export default function PartnersStatus() {
-  const { isSignedIn, loading, user } = useRewardsAuth()
-  const access = getPartnerAccess(user)
+  const { isSignedIn, loading } = useRewardsAuth()
+  const [info, setInfo] = useState<PartnerAccessResult | null>(null)
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    if (loading) return
+    if (!isSignedIn) {
+      setReady(true)
+      return
+    }
+    void fetchPartnerAccess().then((r) => {
+      setInfo(r)
+      setReady(true)
+    })
+  }, [loading, isSignedIn])
 
   if (!loading && !isSignedIn) {
-    return <Navigate to="/account/signin?intent=partners" replace state={{ from: '/partners/status' }} />
+    return <Navigate to="/account/signin?intent=partners" replace />
   }
 
-  if (!loading && isApprovedPartner(user)) {
+  if (!ready) {
+    return (
+      <div className="rn-container py-14">
+        <div className="rn-rewards-skel h-8 w-48" />
+        <div className="mt-6 rn-rewards-skel h-32 w-full max-w-md" />
+      </div>
+    )
+  }
+
+  if (info?.access === 'approved') {
     return <Navigate to="/partners/dashboard" replace />
   }
 
-  if (!loading && access === 'none') {
-    return <Navigate to="/partners/apply" replace />
+  if (info?.access === 'declined') {
+    return (
+      <div className="rn-container py-12 sm:py-16">
+        <AuthFormShell
+          eyebrow="Royal Nordic Partners"
+          title="Application declined"
+          subtitle="This application was not approved. You do not have partner access or trade rates."
+          backTo={{ href: '/account', label: '← Back to account' }}
+        >
+          <p className="text-sm text-[var(--rn-text-muted)]">
+            Questions?{' '}
+            <Link to="/contact" className="text-aurora-soft underline-offset-2 hover:underline">
+              Contact Royal Nordic
+            </Link>
+            .
+          </p>
+        </AuthFormShell>
+      </div>
+    )
   }
 
-  const company =
-    typeof user?.user_metadata?.partner_application_company === 'string'
-      ? user.user_metadata.partner_application_company
-      : null
+  if (info?.access !== 'pending') {
+    return <Navigate to="/partners/apply" replace />
+  }
 
   return (
     <div className="rn-container py-12 sm:py-16">
@@ -36,9 +75,14 @@ export default function PartnersStatus() {
           <p>
             Status: <span className="font-medium text-white">Pending review</span>
           </p>
-          {company ? (
+          {info.company_name ? (
             <p>
-              Company: <span className="text-white">{company}</span>
+              Company: <span className="text-white">{info.company_name}</span>
+            </p>
+          ) : null}
+          {info.submitted_at ? (
+            <p className="text-[var(--rn-text-dim)]">
+              Submitted {new Date(info.submitted_at).toLocaleString()}
             </p>
           ) : null}
           <p className="text-[var(--rn-text-dim)]">

@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useRewardsAuth } from '../rewards/RewardsAuthContext'
-import { getPartnerAccess, resolvePostLoginPath } from './partnerAccess'
+import { fetchPartnerAccess, resolvePostLoginPath, type PartnerAccess } from './partnerAccess'
 
 const CHOICES = [
   {
@@ -9,7 +10,6 @@ const CHOICES = [
     text: 'Referral codes, Royal Nordic Credit, and your Rewards dashboard.',
     primary: { to: '/referralprogram/signup', label: 'Join Rewards' },
     secondary: { to: '/account/signin?intent=rewards', label: 'Sign in' },
-    signedInTo: '/referralprogram/dashboard',
   },
   {
     intent: 'partners' as const,
@@ -17,13 +17,20 @@ const CHOICES = [
     text: 'Travel trade and B2B — apply for partnership. Approval is reviewed by Royal Nordic.',
     primary: { to: '/partners/apply', label: 'Apply to partner' },
     secondary: { to: '/account/signin?intent=partners', label: 'Sign in' },
-    signedInTo: null as string | null,
   },
 ]
 
 export default function AccountEntry() {
   const { isSignedIn, loading, user } = useRewardsAuth()
-  const partner = getPartnerAccess(user)
+  const [partner, setPartner] = useState<PartnerAccess>('none')
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      setPartner('none')
+      return
+    }
+    void fetchPartnerAccess().then((r) => setPartner(r.access))
+  }, [isSignedIn, user?.id])
 
   return (
     <section className="relative overflow-hidden border-b border-[var(--rn-border)]">
@@ -47,10 +54,7 @@ export default function AccountEntry() {
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-5">
           {CHOICES.map((choice) => {
-            const signedInTarget =
-              choice.intent === 'partners'
-                ? resolvePostLoginPath(user, 'partners')
-                : choice.signedInTo!
+            const signedInTarget = resolvePostLoginPath(user, choice.intent, partner)
             return (
               <div
                 key={choice.intent}
@@ -100,15 +104,10 @@ export default function AccountEntry() {
           <Link to="/" className="text-aurora-soft underline-offset-2 hover:underline">
             Browse experiences
           </Link>
-          {partner === 'none' && !loading ? (
-            <>
-              {' '}
-              ·{' '}
-              <Link to="/travel-trade" className="text-aurora-soft underline-offset-2 hover:underline">
-                Travel trade overview
-              </Link>
-            </>
-          ) : null}
+          {' · '}
+          <Link to="/travel-trade" className="text-aurora-soft underline-offset-2 hover:underline">
+            Travel trade overview
+          </Link>
         </p>
       </div>
     </section>

@@ -1459,3 +1459,65 @@ export async function importBookingsCsv(
 
   return { created, errors }
 }
+
+export type PartnerApplicationRow = {
+  id: string
+  company_name: string
+  business_id: string
+  country: string
+  business_type: string
+  contact_name: string
+  business_email: string
+  phone: string | null
+  website: string | null
+  description: string
+  status: 'pending' | 'approved' | 'declined'
+  applicant_user_id: string | null
+  partner_company_id: string | null
+  admin_note: string | null
+  reviewed_at: string | null
+  invitation_sent_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export async function fetchPartnerApplications(
+  status?: string,
+): Promise<PartnerApplicationRow[]> {
+  await requireAdmin()
+  let q = supabase
+    .from('partner_applications')
+    .select(
+      'id, company_name, business_id, country, business_type, contact_name, business_email, phone, website, description, status, applicant_user_id, partner_company_id, admin_note, reviewed_at, invitation_sent_at, created_at, updated_at',
+    )
+    .order('created_at', { ascending: false })
+  if (status && status !== 'all') q = q.eq('status', status)
+  const { data, error } = await q
+  if (error) throw new Error(error.message)
+  return (data || []) as PartnerApplicationRow[]
+}
+
+export async function reviewPartnerApplication(input: {
+  application_id: string
+  action: 'approve' | 'decline' | 'revoke'
+  admin_note?: string | null
+}): Promise<Record<string, unknown>> {
+  const session = await requireAdmin()
+  const res = await fetch(
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-partner-application`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify(input),
+    },
+  )
+  const body = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    throw new Error(body.error || `Partner review failed (${res.status})`)
+  }
+  return body
+}

@@ -33,6 +33,7 @@ const navGroups: { title: string; items: NavItem[] }[] = [
   {
     title: 'Business',
     items: [
+      { to: '/partners', label: 'Partners' },
       { to: '/revenue', label: 'Revenue' },
       { to: '/availability', label: 'Availability' },
       { to: '/integrations', label: 'Integrations' },

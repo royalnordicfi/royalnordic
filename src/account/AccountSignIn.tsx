@@ -1,9 +1,9 @@
-import { useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import AuthFormShell, { FieldLabel, FormError } from '../rewards/components/AuthFormShell'
 import { useRewardsAuth } from '../rewards/RewardsAuthContext'
 import { authErrorMessage, signInRewards } from '../rewards/auth'
-import { parseAccountIntent, resolvePostLoginPath } from './partnerAccess'
+import { fetchPartnerAccess, parseAccountIntent, resolvePostLoginPath } from './partnerAccess'
 
 export default function AccountSignIn() {
   const { isSignedIn, loading, user } = useRewardsAuth()
@@ -15,11 +15,17 @@ export default function AccountSignIn() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [dest, setDest] = useState<string | null>(null)
 
-  const destination = resolvePostLoginPath(user, intent)
+  useEffect(() => {
+    if (loading || !isSignedIn) return
+    void fetchPartnerAccess().then((r) => {
+      setDest(resolvePostLoginPath(user, intent, r.access))
+    })
+  }, [loading, isSignedIn, user, intent])
 
-  if (!loading && isSignedIn) {
-    return <Navigate to={destination} replace />
+  if (!loading && isSignedIn && dest) {
+    return <Navigate to={dest} replace />
   }
 
   async function onSubmit(e: FormEvent) {
@@ -28,7 +34,8 @@ export default function AccountSignIn() {
     setSubmitting(true)
     try {
       const data = await signInRewards(email, password)
-      navigate(resolvePostLoginPath(data.user, intent), { replace: true })
+      const access = await fetchPartnerAccess()
+      navigate(resolvePostLoginPath(data.user, intent, access.access), { replace: true })
     } catch (err) {
       setError(authErrorMessage(err))
     } finally {

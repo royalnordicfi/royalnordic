@@ -1,23 +1,57 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import AuthFormShell, { FieldLabel, FormError, FormSuccess } from '../../rewards/components/AuthFormShell'
 import { useRewardsAuth } from '../../rewards/RewardsAuthContext'
 import { supabase } from '../../lib/supabase'
-import { getPartnerAccess } from '../partnerAccess'
+import {
+  PARTNER_BUSINESS_TYPES,
+  fetchPartnerAccess,
+  type PartnerAccess,
+} from '../partnerAccess'
+
+const ERROR_COPY: Record<string, string> = {
+  company_name_required: 'Enter your company name.',
+  business_id_required: 'Enter a business ID / registration number.',
+  country_required: 'Enter the country.',
+  business_type_invalid: 'Select a valid business type.',
+  contact_name_required: 'Enter a contact name.',
+  email_invalid: 'Enter a valid business email.',
+  description_required: 'Add a short business description (at least a sentence).',
+  website_invalid: 'Website must start with http:// or https://.',
+  duplicate_pending: 'A pending application already exists for this email.',
+  already_partner: 'This account is already an approved partner.',
+}
 
 export default function PartnersApply() {
   const { isSignedIn, loading, user } = useRewardsAuth()
   const navigate = useNavigate()
-  const access = getPartnerAccess(user)
+  const [access, setAccess] = useState<PartnerAccess | null>(null)
 
   const [company, setCompany] = useState('')
+  const [businessId, setBusinessId] = useState('')
+  const [country, setCountry] = useState('')
+  const [businessType, setBusinessType] = useState('travel_agency')
   const [contactName, setContactName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
-  const [message, setMessage] = useState('')
+  const [website, setWebsite] = useState('')
+  const [description, setDescription] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    if (loading) return
+    if (!isSignedIn) {
+      setAccess('none')
+      return
+    }
+    void fetchPartnerAccess().then((r) => setAccess(r.access))
+  }, [loading, isSignedIn, user?.id])
+
+  useEffect(() => {
+    if (user?.email && !email) setEmail(user.email)
+  }, [user, email])
 
   if (!loading && access === 'approved') {
     return <Navigate to="/partners/dashboard" replace />
@@ -32,59 +66,45 @@ export default function PartnersApply() {
     setSuccess(null)
     setSubmitting(true)
     try {
-      const workEmail = (email || user?.email || '').trim().toLowerCase()
-      if (!workEmail) {
-        throw new Error('Please enter a work email.')
-      }
-      if (!company.trim()) {
-        throw new Error('Please enter your company name.')
-      }
-
+      const session = await supabase.auth.getSession()
+      const token = session.data.session?.access_token || import.meta.env.VITE_SUPABASE_ANON_KEY
       const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-customized-tour-request`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-partner-application`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            type: 'partner',
-            name: contactName.trim() || 'Partner applicant',
-            email: workEmail,
-            phone: phone.trim(),
-            message: [
-              'PARTNER_APPLICATION',
-              `Company: ${company.trim()}`,
-              message.trim() || 'No additional notes',
-              isSignedIn && user?.id ? `Auth user: ${user.id}` : 'Guest application (not signed in)',
-            ].join('\n\n'),
-            to: ['royalnordicfi@gmail.com', 'contact@royalnordic.fi'],
-            subject: 'Travel Trade Partnership Enquiry - ROYAL NORDIC',
+            company_name: company,
+            business_id: businessId,
+            country,
+            business_type: businessType,
+            contact_name: contactName,
+            business_email: email,
+            phone,
+            website: website || null,
+            description,
+            // Intentionally omit status / partner_status — server rejects client roles.
           }),
         },
       )
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error(body.error || 'Could not send application. Please try again.')
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok || body.error) {
+        const code = String(body.error || 'submit_failed')
+        throw new Error(ERROR_COPY[code] || code)
       }
 
-      // Display-only marker. Never writes app_metadata / partner approval.
       if (isSignedIn) {
-        await supabase.auth.updateUser({
-          data: {
-            partner_application_submitted: true,
-            partner_application_submitted_at: new Date().toISOString(),
-            partner_application_company: company.trim(),
-          },
-        })
-        setSuccess('Application received. You can track status on the next screen.')
+        setSuccess('Application received. Tracking status…')
         navigate('/partners/status', { replace: true })
         return
       }
 
       setSuccess(
-        'Application received. Create or sign in to a Royal Nordic account to track status — this does not approve partnership.',
+        'Application received. Sign in with this business email to track status — submitting never approves partnership.',
       )
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not send application.')
@@ -98,7 +118,7 @@ export default function PartnersApply() {
       <AuthFormShell
         eyebrow="Royal Nordic Partners"
         title="Partner application"
-        subtitle="Tell us about your agency or company. Applications are reviewed by our team — choosing Partners never unlocks pricing by itself."
+        subtitle="Apply for travel-trade partnership. Applications are reviewed by Royal Nordic — this form cannot grant partner pricing or roles."
         backTo={{ href: '/account', label: '← Back to account' }}
         footer={
           <>
@@ -120,7 +140,7 @@ export default function PartnersApply() {
           <FormError message={error} />
           <FormSuccess message={success} />
           <div>
-            <FieldLabel htmlFor="partner-company">Company</FieldLabel>
+            <FieldLabel htmlFor="partner-company">Company name</FieldLabel>
             <input
               id="partner-company"
               required
@@ -131,9 +151,49 @@ export default function PartnersApply() {
             />
           </div>
           <div>
+            <FieldLabel htmlFor="partner-business-id">Business ID / registration</FieldLabel>
+            <input
+              id="partner-business-id"
+              required
+              className="rn-form-input"
+              value={businessId}
+              onChange={(e) => setBusinessId(e.target.value)}
+            />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <FieldLabel htmlFor="partner-country">Country</FieldLabel>
+              <input
+                id="partner-country"
+                required
+                className="rn-form-input"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                autoComplete="country-name"
+              />
+            </div>
+            <div>
+              <FieldLabel htmlFor="partner-type">Business type</FieldLabel>
+              <select
+                id="partner-type"
+                required
+                className="rn-form-input"
+                value={businessType}
+                onChange={(e) => setBusinessType(e.target.value)}
+              >
+                {PARTNER_BUSINESS_TYPES.map((t) => (
+                  <option key={t.value} value={t.value}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div>
             <FieldLabel htmlFor="partner-name">Contact name</FieldLabel>
             <input
               id="partner-name"
+              required
               className="rn-form-input"
               value={contactName}
               onChange={(e) => setContactName(e.target.value)}
@@ -141,7 +201,7 @@ export default function PartnersApply() {
             />
           </div>
           <div>
-            <FieldLabel htmlFor="partner-email">Work email</FieldLabel>
+            <FieldLabel htmlFor="partner-email">Business email</FieldLabel>
             <input
               id="partner-email"
               type="email"
@@ -149,12 +209,11 @@ export default function PartnersApply() {
               className="rn-form-input"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={user?.email || ''}
               autoComplete="email"
             />
           </div>
           <div>
-            <FieldLabel htmlFor="partner-phone">Phone</FieldLabel>
+            <FieldLabel htmlFor="partner-phone">Phone (optional)</FieldLabel>
             <input
               id="partner-phone"
               type="tel"
@@ -165,19 +224,35 @@ export default function PartnersApply() {
             />
           </div>
           <div>
-            <FieldLabel htmlFor="partner-message">How can we work together?</FieldLabel>
+            <FieldLabel htmlFor="partner-website">Website (optional)</FieldLabel>
+            <input
+              id="partner-website"
+              type="url"
+              className="rn-form-input"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              placeholder="https://"
+              autoComplete="url"
+            />
+          </div>
+          <div>
+            <FieldLabel htmlFor="partner-description">Short business description</FieldLabel>
             <textarea
-              id="partner-message"
+              id="partner-description"
+              required
               className="rn-form-input min-h-[110px] resize-y"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               placeholder="Markets you serve, expected volume, products of interest…"
             />
           </div>
           {!isSignedIn && !loading ? (
             <p className="text-xs leading-relaxed text-[var(--rn-text-dim)]">
               Tip:{' '}
-              <Link to="/account/signin?intent=partners" className="text-aurora-soft underline-offset-2 hover:underline">
+              <Link
+                to="/account/signin?intent=partners"
+                className="text-aurora-soft underline-offset-2 hover:underline"
+              >
                 sign in
               </Link>{' '}
               first if you already have a Rewards account — same login, separate partner review.
