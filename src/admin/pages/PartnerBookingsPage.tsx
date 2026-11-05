@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import {
+  fetchNotificationOutboxProblems,
   fetchNotificationsForPartnerRequest,
   fetchPartnerBookingRequestsAdmin,
   retryPartnerBookingNotification,
   reviewPartnerBookingRequestAdmin,
   type NotificationOutboxAdminRow,
+  type NotificationOutboxHealth,
   type PartnerBookingRequestAdminRow,
 } from '../adminApi'
 import { Badge } from '../components/Badge'
@@ -32,6 +34,16 @@ export default function PartnerBookingsPage() {
   const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
   const [notes, setNotes] = useState<NotificationOutboxAdminRow[]>([])
+  const [health, setHealth] = useState<NotificationOutboxHealth | null>(null)
+
+  const loadHealth = async () => {
+    try {
+      const h = await fetchNotificationOutboxProblems(30)
+      setHealth(h)
+    } catch {
+      setHealth(null)
+    }
+  }
 
   const load = async () => {
     try {
@@ -39,6 +51,7 @@ export default function PartnerBookingsPage() {
       setLoading(true)
       const data = await fetchPartnerBookingRequestsAdmin(tab === 'all' ? undefined : tab)
       setRows(data)
+      await loadHealth()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load partner bookings')
     } finally {
@@ -142,6 +155,95 @@ export default function PartnerBookingsPage() {
       </div>
 
       {error ? <ErrorBanner>{error}</ErrorBanner> : null}
+
+      {health ? (
+        <Card>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-zinc-900">Notification delivery</p>
+              <p className="mt-1 text-xs text-zinc-500">
+                Autonomous cron {health.cron_configured ? 'active' : 'missing'} · Vault URL{' '}
+                {health.vault_project_url_present ? 'ok' : 'missing'} · Vault key{' '}
+                {health.vault_service_role_present ? 'ok' : 'missing'}
+                {health.count > 0
+                  ? ` · ${health.count} failed/stuck`
+                  : ' · no failed or stuck notifications'}
+              </p>
+              {!health.cron_configured ||
+              !health.vault_project_url_present ||
+              !health.vault_service_role_present ? (
+                <p className="mt-1 text-xs text-amber-700">
+                  Scheduled delivery is incomplete until cron and Vault secrets are configured.
+                </p>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              onClick={() => void loadHealth()}
+              className="rounded-lg border border-zinc-300 bg-white px-2.5 py-1 text-xs font-medium"
+            >
+              Refresh status
+            </button>
+          </div>
+          {health.count > 0 ? (
+            <ul className="mt-3 divide-y divide-zinc-100 rounded-lg border border-zinc-100">
+              {health.items.slice(0, 8).map((item) => (
+                <li
+                  key={item.id}
+                  className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-xs"
+                >
+                  <div className="min-w-0">
+                    <p className="font-medium text-zinc-800">
+                      {item.problem} · {templateLabel(item.template_key)} ·{' '}
+                      {item.request_reference || item.partner_booking_request_id}
+                    </p>
+                    <p className="truncate text-zinc-500">
+                      {item.company_name || '—'} → {item.recipient_email}
+                      {item.last_error ? ` · ${item.last_error}` : ''}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      tone={
+                        item.problem === 'dead' || item.problem === 'failed' ? 'red' : 'yellow'
+                      }
+                    >
+                      {item.status}
+                    </Badge>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      className="rounded border border-zinc-300 px-2 py-1 font-medium disabled:opacity-50"
+                      onClick={() => {
+                        void (async () => {
+                          try {
+                            setBusy(true)
+                            await retryPartnerBookingNotification(item.id)
+                            await loadHealth()
+                            if (selectedId === item.partner_booking_request_id) {
+                              setNotes(
+                                await fetchNotificationsForPartnerRequest(
+                                  item.partner_booking_request_id,
+                                ),
+                              )
+                            }
+                          } catch (e) {
+                            setError(e instanceof Error ? e.message : 'Retry failed')
+                          } finally {
+                            setBusy(false)
+                          }
+                        })()
+                      }}
+                    >
+                      Re-queue
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </Card>
+      ) : null}
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,400px)]">
         <Card padded={false}>

@@ -1722,7 +1722,7 @@ export async function reviewPartnerBookingRequestAdmin(input: {
   action: 'approve' | 'decline'
   admin_note?: string | null
 }): Promise<Record<string, unknown>> {
-  const session = await requireAdmin()
+  await requireAdmin()
   const { data, error } = await supabase.rpc('admin_review_partner_booking_request', {
     p_request_id: input.request_id,
     p_action: input.action,
@@ -1730,16 +1730,7 @@ export async function reviewPartnerBookingRequestAdmin(input: {
   })
   if (error) throw new Error(error.message)
   if (!data?.ok) throw new Error(String(data?.error || 'review_failed'))
-  // Flush outbox so partner receives confirmation/decline promptly.
-  void fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/process-notification-outbox`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${session.access_token}`,
-    },
-    body: JSON.stringify({ limit: 25, source: 'admin_review_flush' }),
-  }).catch(() => undefined)
+  // Outbox is processed autonomously by pg_cron → Vault-authenticated edge invoke.
   return data as Record<string, unknown>
 }
 
@@ -1754,6 +1745,8 @@ export type NotificationOutboxAdminRow = {
   sent_at: string | null
   created_at: string
   partner_booking_request_id: string
+  updated_at?: string | null
+  next_attempt_at?: string | null
 }
 
 export async function fetchNotificationsForPartnerRequest(
@@ -1763,7 +1756,7 @@ export async function fetchNotificationsForPartnerRequest(
   const { data, error } = await supabase
     .from('notification_outbox')
     .select(
-      'id, template_key, recipient_email, recipient_role, status, attempt_count, last_error, sent_at, created_at, partner_booking_request_id',
+      'id, template_key, recipient_email, recipient_role, status, attempt_count, last_error, sent_at, created_at, partner_booking_request_id, updated_at, next_attempt_at',
     )
     .eq('partner_booking_request_id', requestId)
     .order('created_at', { ascending: true })
@@ -1771,20 +1764,52 @@ export async function fetchNotificationsForPartnerRequest(
   return (data || []) as NotificationOutboxAdminRow[]
 }
 
+export type NotificationOutboxProblem = NotificationOutboxAdminRow & {
+  problem: string
+  request_reference?: string | null
+  request_status?: string | null
+  company_name?: string | null
+  max_attempts?: number
+  next_attempt_at?: string | null
+  updated_at?: string | null
+}
+
+export type NotificationOutboxHealth = {
+  ok: boolean
+  count: number
+  items: NotificationOutboxProblem[]
+  cron_configured: boolean
+  vault_project_url_present: boolean
+  vault_service_role_present: boolean
+  error?: string
+}
+
+export async function fetchNotificationOutboxProblems(
+  limit = 50,
+): Promise<NotificationOutboxHealth> {
+  await requireAdmin()
+  const { data, error } = await supabase.rpc('admin_list_notification_outbox_problems', {
+    p_limit: limit,
+  })
+  if (error) throw new Error(error.message)
+  if (!data?.ok) throw new Error(String(data?.error || 'failed'))
+  return {
+    ok: true,
+    count: Number(data.count || 0),
+    items: (data.items || []) as NotificationOutboxProblem[],
+    cron_configured: Boolean(data.cron_configured),
+    vault_project_url_present: Boolean(data.vault_project_url_present),
+    vault_service_role_present: Boolean(data.vault_service_role_present),
+  }
+}
+
 export async function retryPartnerBookingNotification(id: string): Promise<void> {
-  const session = await requireAdmin()
+  await requireAdmin()
   const { data, error } = await supabase.rpc('admin_retry_notification_outbox', { p_id: id })
   if (error) throw new Error(error.message)
   if (!data?.ok) throw new Error(String(data?.error || 'retry_failed'))
-  await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/process-notification-outbox`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${session.access_token}`,
-    },
-    body: JSON.stringify({ limit: 25, source: 'admin_retry' }),
-  })
+  // Delivery is autonomous via cron; retry only re-queues. Optional flush omitted
+  // so delivery does not depend on this browser call remaining open.
 }
 
 export async function reviewPartnerApplication(input: {

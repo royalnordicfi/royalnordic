@@ -84,34 +84,11 @@ export async function submitPartnerBookingRequest(input: {
   })
   if (error) return { ok: false, error: error.message }
   if (!data?.ok) return { ok: false, error: String(data?.error || 'submit_failed') }
-  if (!data.duplicate) {
-    void flushPartnerBookingNotifications()
-  }
+  // Delivery is autonomous (pg_cron → process-notification-outbox). No browser flush.
   return {
     ok: true,
     duplicate: Boolean(data.duplicate),
     request: data.request as PartnerBookingRequest,
-  }
-}
-
-/** Fire-and-forget outbox flush (Resend). Safe to call repeatedly. */
-export async function flushPartnerBookingNotifications(limit = 20): Promise<void> {
-  try {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
-    if (!session?.access_token) return
-    await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/process-notification-outbox`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({ limit, source: 'client_flush' }),
-    })
-  } catch {
-    // Cron / later retry will pick up pending rows.
   }
 }
 
