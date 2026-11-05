@@ -14,8 +14,8 @@ export default function PartnersOverview() {
           Welcome, {company}
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--rn-text-muted)]">
-          Manage your travel-trade partnership with Royal Nordic. Partner bookings and rates are not
-          enabled yet — this workspace is for company details and account access only.
+          Manage your travel-trade partnership with Royal Nordic. Browse assigned net rates, submit
+          booking requests, and track confirmation status for your company.
         </p>
       </section>
 
@@ -33,38 +33,37 @@ export default function PartnersOverview() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--rn-text-dim)]">
             Bookings
           </p>
-          <p className="mt-2 font-display text-xl font-semibold text-white/90">Coming soon</p>
+          <p className="mt-2 font-display text-xl font-semibold text-white/90">Requests</p>
           <p className="mt-1 text-xs leading-relaxed text-[var(--rn-text-muted)]">
-            No bookings to show yet. Tools will appear here when enabled.
+            Submit booking requests at negotiated net rates for Royal Nordic confirmation.
           </p>
         </div>
         <div className="rounded-[var(--rn-radius)] border border-[var(--rn-border)] bg-white/[0.03] p-5 sm:col-span-2 lg:col-span-1">
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--rn-text-dim)]">
             Partner rates
           </p>
-          <p className="mt-2 font-display text-xl font-semibold text-white/90">Not enabled</p>
+          <p className="mt-2 font-display text-xl font-semibold text-white/90">Assigned nets</p>
           <p className="mt-1 text-xs leading-relaxed text-[var(--rn-text-muted)]">
-            Discounted trade pricing is not available in this release.
+            Company-specific net rates appear on tours when Royal Nordic assigns them.
           </p>
         </div>
       </div>
 
       <section className="rounded-[var(--rn-radius)] border border-dashed border-[var(--rn-border)] bg-white/[0.02] px-5 py-8 text-center sm:px-8">
         <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--rn-text-dim)]">
-          Upcoming bookings
+          Booking requests
         </p>
-        <p className="mt-3 font-display text-lg font-semibold text-white/90">No bookings yet</p>
+        <p className="mt-3 font-display text-lg font-semibold text-white/90">Request travel at net rates</p>
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-[var(--rn-text-muted)]">
-          When partner booking opens, confirmed travel will appear here. Nothing is invented or
-          estimated on this screen.
+          Browse tours with assigned partner pricing, submit a request, and track confirmation
+          status. Public retail checkout is unchanged.
         </p>
-        <span
-          className="mt-5 inline-flex min-h-[44px] cursor-not-allowed items-center justify-center rounded-[var(--rn-radius-sm)] border border-[var(--rn-border)] px-4 text-sm text-[var(--rn-text-dim)] opacity-70"
-          aria-disabled="true"
-          title="Partner bookings are not available yet"
+        <Link
+          to="/partners/dashboard/bookings"
+          className="rn-btn-secondary mt-5 inline-flex min-h-[44px]"
         >
-          Book a tour — coming soon
-        </span>
+          Open bookings
+        </Link>
       </section>
 
       <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">

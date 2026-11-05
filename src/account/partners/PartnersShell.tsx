@@ -6,7 +6,7 @@ import { fetchPartnerAccess, type PartnerAccessResult } from '../partnerAccess'
 const NAV = [
   { to: '/partners/dashboard', label: 'Overview', end: true },
   { to: '/partners/dashboard/tours', label: 'Tours' },
-  { to: '/partners/dashboard/bookings', label: 'Bookings', soon: true },
+  { to: '/partners/dashboard/bookings', label: 'Bookings' },
   { to: '/partners/dashboard/company', label: 'Company' },
   { to: '/partners/dashboard/account', label: 'Account' },
 ] as const

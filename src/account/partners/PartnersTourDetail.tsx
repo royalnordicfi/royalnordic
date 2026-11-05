@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import PartnersBookingRequestForm from './PartnersBookingRequestForm'
 import {
   fetchPartnerTourDetail,
   formatPartnerNet,
@@ -168,20 +169,23 @@ export default function PartnersTourDetailPage() {
         </section>
       )}
 
-      <section className="rounded-[var(--rn-radius)] border border-dashed border-[var(--rn-border)] px-5 py-8 text-center">
-        <p className="font-display text-lg font-semibold text-white/90">Bookings coming soon</p>
-        <p className="mx-auto mt-2 max-w-md text-sm text-[var(--rn-text-muted)]">
-          Partner booking and checkout are not enabled in this phase. Pricing shown here does not
-          change public rates or create a reservation.
-        </p>
-        <button
-          type="button"
-          disabled
-          className="mt-5 inline-flex min-h-[44px] cursor-not-allowed items-center justify-center rounded-[var(--rn-radius-sm)] border border-[var(--rn-border)] px-4 text-sm text-[var(--rn-text-dim)] opacity-60"
-        >
-          Request booking — coming soon
-        </button>
-      </section>
+      {pricing?.has_partner_price && pricing.partner_net_eur != null ? (
+        <section className="rounded-[var(--rn-radius)] border border-[var(--rn-border)] bg-white/[0.02] p-5 sm:p-6">
+          <PartnersBookingRequestForm
+            tourId={tour.id}
+            unitNetEur={Number(pricing.partner_net_eur)}
+            pickupHint={tour.pickup_info || tour.meeting_point}
+          />
+        </section>
+      ) : (
+        <section className="rounded-[var(--rn-radius)] border border-dashed border-[var(--rn-border)] px-5 py-8 text-center">
+          <p className="font-display text-lg font-semibold text-white/90">Booking unavailable</p>
+          <p className="mx-auto mt-2 max-w-md text-sm text-[var(--rn-text-muted)]">
+            Request booking requires an active partner net rate for this tour. Contact Royal Nordic
+            for pricing.
+          </p>
+        </section>
+      )}
     </div>
   )
 }

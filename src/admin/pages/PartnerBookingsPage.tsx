@@ -1,0 +1,266 @@
+import React, { useEffect, useMemo, useState } from 'react'
+import {
+  fetchPartnerBookingRequestsAdmin,
+  reviewPartnerBookingRequestAdmin,
+  type PartnerBookingRequestAdminRow,
+} from '../adminApi'
+import { Badge } from '../components/Badge'
+import { Card, ErrorBanner, Field, PageHeader, textareaClass } from '../components/ui'
+
+type Tab = 'pending' | 'confirmed' | 'declined' | 'all'
+
+function tourTitle(r: PartnerBookingRequestAdminRow) {
+  return r.tours?.public_name || r.tours?.name || `Tour #${r.tour_id}`
+}
+
+export default function PartnerBookingsPage() {
+  const [tab, setTab] = useState<Tab>('pending')
+  const [rows, setRows] = useState<PartnerBookingRequestAdminRow[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [note, setNote] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const load = async () => {
+    try {
+      setError('')
+      setLoading(true)
+      const data = await fetchPartnerBookingRequestsAdmin(tab === 'all' ? undefined : tab)
+      setRows(data)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load partner bookings')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab])
+
+  const selected = useMemo(
+    () => rows.find((r) => r.id === selectedId) || null,
+    [rows, selectedId],
+  )
+
+  const run = async (action: 'approve' | 'decline') => {
+    if (!selected) return
+    const label = action === 'approve' ? 'Approve and reserve capacity' : 'Decline'
+    if (!window.confirm(`${label} for ${selected.reference}?`)) return
+    try {
+      setBusy(true)
+      setError('')
+      await reviewPartnerBookingRequestAdmin({
+        request_id: selected.id,
+        action,
+        admin_note: note || null,
+      })
+      await load()
+    } catch (e) {
+      const raw = e instanceof Error ? e.message : 'Action failed'
+      setError(
+        raw === 'insufficient_capacity'
+          ? 'Not enough remaining capacity on that date. Request left pending — no booking created.'
+          : raw === 'not_pending'
+            ? 'This request is no longer pending.'
+            : raw === 'tour_unavailable'
+              ? 'Tour is unavailable. Request left pending.'
+              : raw,
+      )
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <PageHeader
+        title="Partner bookings"
+        subtitle="Review partner booking requests. Approval revalidates capacity and creates one canonical booking."
+        actions={
+          <button
+            type="button"
+            onClick={() => void load()}
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium"
+          >
+            Refresh
+          </button>
+        }
+      />
+
+      <div className="flex flex-wrap gap-2">
+        {(
+          [
+            { id: 'pending', label: 'Pending' },
+            { id: 'confirmed', label: 'Confirmed' },
+            { id: 'declined', label: 'Declined' },
+            { id: 'all', label: 'All' },
+          ] as const
+        ).map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            onClick={() => setTab(f.id)}
+            className={`rounded-md px-2.5 py-1 text-xs font-medium ${
+              tab === f.id ? 'bg-zinc-900 text-white' : 'border border-zinc-300 bg-white text-zinc-700'
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {error ? <ErrorBanner>{error}</ErrorBanner> : null}
+
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,400px)]">
+        <Card padded={false}>
+          {loading ? (
+            <p className="p-4 text-sm text-zinc-500">Loading…</p>
+          ) : rows.length === 0 ? (
+            <p className="p-4 text-sm text-zinc-500">No partner booking requests.</p>
+          ) : (
+            <ul className="divide-y divide-zinc-100">
+              {rows.map((r) => (
+                <li key={r.id}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedId(r.id)
+                      setNote('')
+                    }}
+                    className={`flex w-full flex-col gap-1 px-4 py-3 text-left hover:bg-zinc-50 ${
+                      selectedId === r.id ? 'bg-emerald-50/60' : ''
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="truncate text-sm font-semibold text-zinc-900">
+                        {r.reference} · {tourTitle(r)}
+                      </span>
+                      <Badge
+                        tone={
+                          r.status === 'confirmed'
+                            ? 'green'
+                            : r.status === 'pending'
+                              ? 'yellow'
+                              : 'gray'
+                        }
+                      >
+                        {r.status}
+                      </Badge>
+                    </div>
+                    <p className="truncate text-xs text-zinc-500">
+                      {r.partner_companies?.name || r.partner_company_id} · {r.tour_date} ·{' '}
+                      {r.passenger_count} pax · €{Number(r.total_net_eur).toFixed(2)}
+                    </p>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+
+        <Card>
+          {!selected ? (
+            <p className="text-sm text-zinc-500">Select a request.</p>
+          ) : (
+            <div className="space-y-3">
+              <div>
+                <h2 className="text-base font-semibold text-zinc-900">{selected.reference}</h2>
+                <p className="text-xs text-zinc-500">
+                  {selected.partner_companies?.name} · {tourTitle(selected)}
+                </p>
+              </div>
+              <dl className="space-y-2 text-sm">
+                <div>
+                  <dt className="text-[11px] uppercase tracking-wide text-zinc-400">Date / pax</dt>
+                  <dd>
+                    {selected.tour_date} · {selected.adults} adults
+                    {selected.children ? `, ${selected.children} children` : ''}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] uppercase tracking-wide text-zinc-400">Guest</dt>
+                  <dd>
+                    {selected.guest_name}
+                    <br />
+                    {selected.guest_email}
+                    {selected.guest_phone ? (
+                      <>
+                        <br />
+                        {selected.guest_phone}
+                      </>
+                    ) : null}
+                  </dd>
+                </div>
+                {selected.pickup_location ? (
+                  <div>
+                    <dt className="text-[11px] uppercase tracking-wide text-zinc-400">Pickup</dt>
+                    <dd>{selected.pickup_location}</dd>
+                  </div>
+                ) : null}
+                <div>
+                  <dt className="text-[11px] uppercase tracking-wide text-zinc-400">Net total</dt>
+                  <dd className="font-semibold">
+                    €{Number(selected.total_net_eur).toFixed(2)}{' '}
+                    <span className="font-normal text-zinc-500">
+                      ({Number(selected.unit_net_eur).toFixed(2)} unit)
+                    </span>
+                  </dd>
+                </div>
+                {selected.booking_id ? (
+                  <div>
+                    <dt className="text-[11px] uppercase tracking-wide text-zinc-400">Booking</dt>
+                    <dd>#{selected.booking_id}</dd>
+                  </div>
+                ) : null}
+                {selected.special_requests ? (
+                  <div>
+                    <dt className="text-[11px] uppercase tracking-wide text-zinc-400">Notes</dt>
+                    <dd className="whitespace-pre-wrap">{selected.special_requests}</dd>
+                  </div>
+                ) : null}
+              </dl>
+
+              {selected.status === 'pending' ? (
+                <>
+                  <Field label="Admin note (optional)">
+                    <textarea
+                      className={textareaClass}
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                    />
+                  </Field>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void run('approve')}
+                      className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                    >
+                      Approve
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void run('decline')}
+                      className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium disabled:opacity-50"
+                    >
+                      Decline
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-zinc-400">
+                    Approve locks the tour date, checks remaining capacity, creates one confirmed
+                    unpaid booking at the snapshotted net total, and links it here. If capacity is
+                    insufficient the request stays pending.
+                  </p>
+                </>
+              ) : null}
+            </div>
+          )}
+        </Card>
+      </div>
+    </div>
+  )
+}

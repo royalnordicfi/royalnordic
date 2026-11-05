@@ -1671,6 +1671,68 @@ export function resolvePartnerNetPreview(
   return Math.round(Math.max(retail * (1 - percentOff / 100), 0) * 100) / 100
 }
 
+export type PartnerBookingRequestAdminRow = {
+  id: string
+  reference: string
+  partner_company_id: string
+  tour_id: number
+  tour_date: string
+  adults: number
+  children: number
+  passenger_count: number
+  guest_name: string
+  guest_email: string
+  guest_phone: string | null
+  pickup_location: string | null
+  special_requests: string | null
+  unit_net_eur: number
+  total_net_eur: number
+  currency: string
+  status: string
+  booking_id: number | null
+  admin_note: string | null
+  created_at: string
+  reviewed_at: string | null
+  partner_companies?: { name: string } | null
+  tours?: { name: string; public_name: string | null } | null
+}
+
+export async function fetchPartnerBookingRequestsAdmin(
+  status?: string,
+): Promise<PartnerBookingRequestAdminRow[]> {
+  await requireAdmin()
+  let q = supabase
+    .from('partner_booking_requests')
+    .select(
+      `id, reference, partner_company_id, tour_id, tour_date, adults, children, passenger_count,
+       guest_name, guest_email, guest_phone, pickup_location, special_requests,
+       unit_net_eur, total_net_eur, currency, status, booking_id, admin_note, created_at, reviewed_at,
+       partner_companies ( name ),
+       tours ( name, public_name )`,
+    )
+    .order('created_at', { ascending: false })
+  if (status && status !== 'all') q = q.eq('status', status)
+  const { data, error } = await q
+  if (error) throw new Error(error.message)
+  return (data || []) as PartnerBookingRequestAdminRow[]
+}
+
+export async function reviewPartnerBookingRequestAdmin(input: {
+  request_id: string
+  action: 'approve' | 'decline'
+  admin_note?: string | null
+}): Promise<Record<string, unknown>> {
+  await requireAdmin()
+  const { data, error } = await supabase.rpc('admin_review_partner_booking_request', {
+    p_request_id: input.request_id,
+    p_action: input.action,
+    p_admin_note: input.admin_note ?? null,
+  })
+  if (error) throw new Error(error.message)
+  if (!data?.ok) throw new Error(String(data?.error || 'review_failed'))
+  return data as Record<string, unknown>
+}
+
 export async function reviewPartnerApplication(input: {
   application_id: string
   action: 'approve' | 'decline' | 'revoke'
