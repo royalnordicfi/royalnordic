@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
   PARTNER_BOOKING_FORBIDDEN_KEYS,
+  computePartnerDashboardStats,
   filterPartnerBookings,
   formatPartnerBookingWhen,
   formatPartnerGuestCount,
   mapPartnerBookingListItem,
+  partnerBookingDisplayRef,
   partnerBookingListHasForbiddenFields,
+  selectUpcomingConfirmedBookings,
   statusBadgeClass,
   statusLabel,
   type PartnerBookingRequest,
@@ -101,5 +104,73 @@ describe('partnerBookings list helpers', () => {
     for (const key of PARTNER_BOOKING_FORBIDDEN_KEYS) {
       expect(partnerBookingListHasForbiddenFields({ [key]: 1 })).toContain(key)
     }
+  })
+
+  it('computes overview stats excluding declined and cancelled from confirmed totals', () => {
+    const today = '2026-11-05'
+    const rows = [
+      row({ id: 'p', status: 'pending', total_net_eur: 10 }),
+      row({ id: 'p2', status: 'pending', total_net_eur: 10 }),
+      row({
+        id: 'cu',
+        status: 'confirmed',
+        tour_date: '2026-12-01',
+        total_net_eur: 100,
+        booking_ref: 'RN-1',
+      }),
+      row({
+        id: 'cp',
+        status: 'confirmed',
+        tour_date: '2026-10-01',
+        total_net_eur: 40,
+        booking_ref: 'RN-2',
+      }),
+      row({ id: 'd', status: 'declined', total_net_eur: 999 }),
+      row({ id: 'c', status: 'cancelled', total_net_eur: 888 }),
+    ]
+    expect(computePartnerDashboardStats(rows, today)).toEqual({
+      pending_count: 2,
+      confirmed_upcoming_count: 1,
+      confirmed_total_net_eur: 140,
+    })
+  })
+
+  it('selects next five upcoming confirmed bookings soonest first', () => {
+    const today = '2026-11-05'
+    const rows = [
+      row({ id: 'past', status: 'confirmed', tour_date: '2026-10-01', booking_ref: 'RN-0' }),
+      row({
+        id: 'b',
+        status: 'confirmed',
+        tour_date: '2026-12-10',
+        departure_time: '09:00',
+        booking_ref: 'RN-B',
+      }),
+      row({
+        id: 'a',
+        status: 'confirmed',
+        tour_date: '2026-12-01',
+        departure_time: '20:00',
+        booking_ref: 'RN-A',
+      }),
+      row({ id: 'pend', status: 'pending', tour_date: '2026-12-01' }),
+      row({
+        id: 'c',
+        status: 'confirmed',
+        tour_date: '2026-12-01',
+        departure_time: '18:00',
+        booking_ref: 'RN-C',
+      }),
+      row({ id: 'd', status: 'declined', tour_date: '2026-12-02' }),
+    ]
+    expect(selectUpcomingConfirmedBookings(rows, 5, today).map((r) => r.id)).toEqual([
+      'c',
+      'a',
+      'b',
+    ])
+    expect(partnerBookingDisplayRef(rows[2])).toBe('RN-A')
+    expect(partnerBookingDisplayRef(row({ id: 'x', status: 'pending', reference: 'PB-X' }))).toBe(
+      'PB-X',
+    )
   })
 })

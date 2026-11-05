@@ -97,6 +97,67 @@ export function formatPartnerGuestCount(r: PartnerBookingRequest): string {
   return `${n} guest${n === 1 ? '' : 's'}`
 }
 
+export function partnerBookingDisplayRef(r: PartnerBookingRequest): string {
+  if (r.status === 'confirmed' && r.booking_ref) return r.booking_ref
+  return r.reference
+}
+
+export type PartnerDashboardStats = {
+  pending_count: number
+  confirmed_upcoming_count: number
+  confirmed_total_net_eur: number
+}
+
+/** Today as YYYY-MM-DD in local calendar (for upcoming comparisons). */
+export function partnerTodayISO(now = new Date()): string {
+  const y = now.getFullYear()
+  const m = String(now.getMonth() + 1).padStart(2, '0')
+  const d = String(now.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+/**
+ * Overview stats from company-scoped list rows.
+ * Confirmed totals exclude declined/cancelled; upcoming = confirmed with tour_date >= today.
+ */
+export function computePartnerDashboardStats(
+  requests: PartnerBookingRequest[],
+  todayISO = partnerTodayISO(),
+): PartnerDashboardStats {
+  let pending_count = 0
+  let confirmed_upcoming_count = 0
+  let confirmed_total_net_eur = 0
+  for (const r of requests) {
+    if (r.status === 'pending') pending_count += 1
+    if (r.status === 'confirmed') {
+      confirmed_total_net_eur += Number(r.total_net_eur) || 0
+      if (r.tour_date >= todayISO) confirmed_upcoming_count += 1
+    }
+  }
+  return {
+    pending_count,
+    confirmed_upcoming_count,
+    confirmed_total_net_eur: Math.round(confirmed_total_net_eur * 100) / 100,
+  }
+}
+
+/** Next N confirmed upcoming bookings, soonest first. */
+export function selectUpcomingConfirmedBookings(
+  requests: PartnerBookingRequest[],
+  limit = 5,
+  todayISO = partnerTodayISO(),
+): PartnerBookingRequest[] {
+  return requests
+    .filter((r) => r.status === 'confirmed' && r.tour_date >= todayISO)
+    .slice()
+    .sort((a, b) => {
+      const byDate = a.tour_date.localeCompare(b.tour_date)
+      if (byDate !== 0) return byDate
+      return (a.departure_time || '').localeCompare(b.departure_time || '')
+    })
+    .slice(0, Math.max(limit, 0))
+}
+
 export async function fetchPartnerTourAvailability(
   tourId: number,
   from?: string,
