@@ -10,8 +10,10 @@ import {
 } from '../adminApi'
 import { Badge } from '../components/Badge'
 import { Card, ErrorBanner, Field, PageHeader, textareaClass } from '../components/ui'
+import PartnerPricingPanel from './PartnerPricingPanel'
 
 type Tab = 'pending' | 'approved' | 'declined' | 'all'
+type Section = 'applications' | 'pricing'
 
 const TYPE_LABEL: Record<string, string> = {
   dmc: 'DMC',
@@ -23,6 +25,9 @@ const TYPE_LABEL: Record<string, string> = {
 
 export default function PartnersPage() {
   const [params, setParams] = useSearchParams()
+  const [section, setSection] = useState<Section>(
+    params.get('section') === 'pricing' ? 'pricing' : 'applications',
+  )
   const [tab, setTab] = useState<Tab>('pending')
   const [rows, setRows] = useState<PartnerApplicationRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -118,18 +123,49 @@ export default function PartnersPage() {
     <div className="space-y-4">
       <PageHeader
         title="Partners"
-        subtitle="Review travel-trade applications and inspect company membership. Approval sets server partner_status only."
+        subtitle="Review applications, inspect membership, and assign company-specific partner net rates. No default discounts."
         actions={
-          <button
-            type="button"
-            onClick={() => void load()}
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium"
-          >
-            Refresh
-          </button>
+          section === 'applications' ? (
+            <button
+              type="button"
+              onClick={() => void load()}
+              className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium"
+            >
+              Refresh
+            </button>
+          ) : null
         }
       />
 
+      <div className="flex flex-wrap gap-2">
+        {(
+          [
+            { id: 'applications', label: 'Applications' },
+            { id: 'pricing', label: 'Pricing' },
+          ] as const
+        ).map((s) => (
+          <button
+            key={s.id}
+            type="button"
+            onClick={() => {
+              setSection(s.id)
+              setParams(s.id === 'pricing' ? { section: 'pricing' } : selectedId ? { id: selectedId } : {})
+            }}
+            className={`rounded-md px-2.5 py-1 text-xs font-medium ${
+              section === s.id
+                ? 'bg-zinc-900 text-white'
+                : 'border border-zinc-300 bg-white text-zinc-700'
+            }`}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+
+      {section === 'pricing' ? <PartnerPricingPanel /> : null}
+
+      {section === 'applications' ? (
+        <>
       <div className="flex flex-wrap gap-2">
         {(
           [
@@ -353,6 +389,8 @@ export default function PartnersPage() {
           )}
         </Card>
       </div>
+        </>
+      ) : null}
     </div>
   )
 }

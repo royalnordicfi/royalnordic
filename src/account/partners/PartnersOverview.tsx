@@ -69,8 +69,14 @@ export default function PartnersOverview() {
 
       <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
         <Link
-          to="/partners/dashboard/company"
+          to="/partners/dashboard/tours"
           className="rn-btn-primary min-h-[44px] w-full justify-center sm:w-auto"
+        >
+          Browse tours
+        </Link>
+        <Link
+          to="/partners/dashboard/company"
+          className="rn-btn-secondary min-h-[44px] w-full justify-center sm:w-auto"
         >
           Company profile
         </Link>
@@ -79,12 +85,6 @@ export default function PartnersOverview() {
           className="rn-btn-secondary min-h-[44px] w-full justify-center sm:w-auto"
         >
           Partner account
-        </Link>
-        <Link
-          to="/travel-trade"
-          className="rn-btn-secondary min-h-[44px] w-full justify-center sm:w-auto"
-        >
-          Travel trade overview
         </Link>
       </div>
     </div>

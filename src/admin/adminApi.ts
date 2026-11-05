@@ -1556,6 +1556,121 @@ export async function fetchPartnerCompanyAdmin(
   }
 }
 
+export type PartnerTourPriceRow = {
+  id: string
+  partner_company_id: string
+  tour_id: number
+  pricing_type: 'fixed_net' | 'percent_off_retail'
+  fixed_net_eur: number | null
+  percent_off: number | null
+  currency: string
+  is_active: boolean
+  effective_from: string
+  effective_to: string | null
+  admin_note: string | null
+  updated_at: string
+}
+
+export type PartnerPriceAuditRow = {
+  id: string
+  partner_tour_price_id: string | null
+  partner_company_id: string
+  tour_id: number
+  action: string
+  before_row: Record<string, unknown> | null
+  after_row: Record<string, unknown> | null
+  changed_by: string | null
+  created_at: string
+}
+
+export async function fetchPartnerCompaniesList(): Promise<
+  Array<{ id: string; name: string; country: string; business_type: string }>
+> {
+  await requireAdmin()
+  const { data, error } = await supabase
+    .from('partner_companies')
+    .select('id, name, country, business_type')
+    .order('name')
+  if (error) throw new Error(error.message)
+  return data || []
+}
+
+export async function fetchPartnerTourPricesAdmin(
+  companyId: string,
+): Promise<PartnerTourPriceRow[]> {
+  await requireAdmin()
+  const { data, error } = await supabase
+    .from('partner_tour_prices')
+    .select(
+      'id, partner_company_id, tour_id, pricing_type, fixed_net_eur, percent_off, currency, is_active, effective_from, effective_to, admin_note, updated_at',
+    )
+    .eq('partner_company_id', companyId)
+    .order('tour_id')
+  if (error) throw new Error(error.message)
+  return (data || []) as PartnerTourPriceRow[]
+}
+
+export async function fetchPartnerPriceAudit(
+  companyId: string,
+  limit = 30,
+): Promise<PartnerPriceAuditRow[]> {
+  await requireAdmin()
+  const { data, error } = await supabase
+    .from('partner_tour_price_audit')
+    .select(
+      'id, partner_tour_price_id, partner_company_id, tour_id, action, before_row, after_row, changed_by, created_at',
+    )
+    .eq('partner_company_id', companyId)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  if (error) throw new Error(error.message)
+  return (data || []) as PartnerPriceAuditRow[]
+}
+
+export async function upsertPartnerTourPriceAdmin(input: {
+  partner_company_id: string
+  tour_id: number
+  pricing_type: 'fixed_net' | 'percent_off_retail'
+  fixed_net_eur?: number | null
+  percent_off?: number | null
+  is_active?: boolean
+  effective_from?: string
+  effective_to?: string | null
+  admin_note?: string | null
+  price_id?: string | null
+}): Promise<Record<string, unknown>> {
+  await requireAdmin()
+  const { data, error } = await supabase.rpc('admin_upsert_partner_tour_price', {
+    p_partner_company_id: input.partner_company_id,
+    p_tour_id: input.tour_id,
+    p_pricing_type: input.pricing_type,
+    p_fixed_net_eur: input.fixed_net_eur ?? null,
+    p_percent_off: input.percent_off ?? null,
+    p_is_active: input.is_active ?? true,
+    p_effective_from: input.effective_from || undefined,
+    p_effective_to: input.effective_to ?? null,
+    p_admin_note: input.admin_note ?? null,
+    p_price_id: input.price_id ?? null,
+  })
+  if (error) throw new Error(error.message)
+  if (!data?.ok) throw new Error(String(data?.error || 'upsert_failed'))
+  return data as Record<string, unknown>
+}
+
+export function resolvePartnerNetPreview(
+  retail: number,
+  pricingType: 'fixed_net' | 'percent_off_retail',
+  fixedNet: number | null,
+  percentOff: number | null,
+): number | null {
+  if (pricingType === 'fixed_net') {
+    if (fixedNet == null || Number.isNaN(fixedNet)) return null
+    return Math.round(fixedNet * 100) / 100
+  }
+  if (percentOff == null || Number.isNaN(percentOff)) return null
+  return Math.round(Math.max(retail * (1 - percentOff / 100), 0) * 100) / 100
+}
+
 export async function reviewPartnerApplication(input: {
   application_id: string
   action: 'approve' | 'decline' | 'revoke'

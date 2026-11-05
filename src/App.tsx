@@ -80,6 +80,8 @@ import PartnersOverview from './account/partners/PartnersOverview';
 import PartnersBookings from './account/partners/PartnersBookings';
 import PartnersCompany from './account/partners/PartnersCompany';
 import PartnersAccount from './account/partners/PartnersAccount';
+import PartnersTours from './account/partners/PartnersTours';
+import PartnersTourDetailPage from './account/partners/PartnersTourDetail';
 
 function App() {
   return (
@@ -201,6 +203,8 @@ function App() {
             <Route path="status" element={<PartnersStatus />} />
             <Route path="dashboard" element={<PartnersShell />}>
               <Route index element={<PartnersOverview />} />
+              <Route path="tours" element={<PartnersTours />} />
+              <Route path="tours/:tourId" element={<PartnersTourDetailPage />} />
               <Route path="bookings" element={<PartnersBookings />} />
               <Route path="company" element={<PartnersCompany />} />
               <Route path="account" element={<PartnersAccount />} />
