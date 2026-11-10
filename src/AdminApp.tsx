@@ -16,6 +16,8 @@ import RequestsPage from './admin/pages/RequestsPage'
 import IntegrationsPage from './admin/pages/IntegrationsPage'
 import PartnersPage from './admin/pages/PartnersPage'
 import PartnerBookingsPage from './admin/pages/PartnerBookingsPage'
+import SharedBookingsPage from './admin/pages/SharedBookingsPage'
+import SharedDepartureDetailPage from './admin/pages/SharedDepartureDetailPage'
 
 /**
  * Operator console — only mounted when hostname is admin.royalnordic.fi
@@ -51,6 +53,8 @@ function AdminApp() {
           <Route path="customers" element={<CustomersPage />} />
           <Route path="partners" element={<PartnersPage />} />
           <Route path="partner-bookings" element={<PartnerBookingsPage />} />
+          <Route path="sharedbookings" element={<SharedBookingsPage />} />
+          <Route path="sharedbookings/:id" element={<SharedDepartureDetailPage />} />
           <Route path="revenue" element={<RevenuePage />} />
           <Route path="import" element={<ImportPage />} />
           <Route path="integrations" element={<IntegrationsPage />} />

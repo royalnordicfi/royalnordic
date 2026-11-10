@@ -21,6 +21,13 @@ import type {
   Product,
   Vehicle,
 } from './types'
+import type {
+  SharedBoard,
+  SharedBookingsAccess,
+  SharedDepartureSummary,
+  SharedPassenger,
+} from './sharedBookings'
+import { payloadHasForbiddenFields } from './sharedBookings'
 
 async function requireAdmin() {
   const { data, error } = await supabase.auth.getSession()
@@ -1835,4 +1842,117 @@ export async function reviewPartnerApplication(input: {
     throw new Error(body.error || `Partner review failed (${res.status})`)
   }
   return body
+}
+
+// ---------------------------------------------------------------------------
+// Shared Bookings foundation
+// ---------------------------------------------------------------------------
+
+async function requireSharedBookingsSession() {
+  const { data, error } = await supabase.auth.getSession()
+  if (error || !data.session) throw new Error('Authentication required')
+  return data.session
+}
+
+export async function fetchSharedBookingsAccess(): Promise<SharedBookingsAccess> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('get_shared_bookings_access')
+  if (error) throw new Error(error.message)
+  return data as SharedBookingsAccess
+}
+
+export async function listSharedDepartures(
+  board: SharedBoard,
+  from?: string,
+  to?: string,
+): Promise<{
+  ok: boolean
+  error?: string
+  departures: SharedDepartureSummary[]
+  channels_synced?: boolean
+}> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('list_shared_departures', {
+    p_board: board,
+    p_from: from || undefined,
+    p_to: to || undefined,
+  })
+  if (error) throw new Error(error.message)
+  const payload = data as {
+    ok: boolean
+    error?: string
+    departures?: SharedDepartureSummary[]
+    channels_synced?: boolean
+  }
+  if (payload?.ok) {
+    const leaks = payloadHasForbiddenFields(payload)
+    if (leaks.length) {
+      throw new Error(`forbidden_shared_bookings_field:${leaks.join(',')}`)
+    }
+  }
+  return {
+    ok: Boolean(payload?.ok),
+    error: payload?.error,
+    departures: Array.isArray(payload?.departures) ? payload.departures : [],
+    channels_synced: Boolean(payload?.channels_synced),
+  }
+}
+
+export async function fetchSharedDepartureDetail(id: string): Promise<{
+  ok: boolean
+  error?: string
+  departure: SharedDepartureSummary
+  passengers: SharedPassenger[]
+  cancelled: SharedPassenger[]
+  channels_synced: boolean
+}> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('get_shared_departure_detail', {
+    p_departure_id: id,
+  })
+  if (error) throw new Error(error.message)
+  const payload = data as {
+    ok: boolean
+    error?: string
+    departure?: SharedDepartureSummary
+    passengers?: SharedPassenger[]
+    cancelled?: SharedPassenger[]
+    channels_synced?: boolean
+  }
+  if (payload?.ok) {
+    const leaks = payloadHasForbiddenFields(payload)
+    if (leaks.length) {
+      throw new Error(`forbidden_shared_bookings_field:${leaks.join(',')}`)
+    }
+  }
+  if (!payload?.ok || !payload.departure) {
+    return {
+      ok: false,
+      error: payload?.error || 'not_found',
+      departure: {
+        id,
+        board: 'shared_bus',
+        departure_date: '',
+        tour_code: '',
+        tour_title: '',
+        departure_time: null,
+        meeting_point: null,
+        capacity: 0,
+        confirmed_passengers: 0,
+        available_seats: 0,
+        supplier_breakdown: [],
+        channels_synced: false,
+      },
+      passengers: [],
+      cancelled: [],
+      channels_synced: false,
+    }
+  }
+  return {
+    ok: true,
+    departure: payload.departure,
+    passengers: Array.isArray(payload.passengers) ? payload.passengers : [],
+    cancelled: Array.isArray(payload.cancelled) ? payload.cancelled : [],
+    channels_synced: Boolean(payload.channels_synced),
+  }
 }

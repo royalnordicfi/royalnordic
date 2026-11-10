@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, RefreshCw, X } from 'lucide-react'
 import {
   getAdminSession,
@@ -8,11 +8,12 @@ import {
   type AdminSessionState,
 } from '../lib/adminAuth'
 import AdminLogin from '../components/AdminLogin'
-import { countOpenTransportationRequests } from './adminApi'
+import { countOpenTransportationRequests, fetchSharedBookingsAccess } from './adminApi'
+import type { SharedBookingsAccess } from './sharedBookings'
 
 type NavItem = { to: string; label: string; end?: boolean; badgeKey?: 'requests' }
 
-const navGroups: { title: string; items: NavItem[] }[] = [
+const fullNavGroups: { title: string; items: NavItem[] }[] = [
   {
     title: 'Operations',
     items: [
@@ -20,6 +21,7 @@ const navGroups: { title: string; items: NavItem[] }[] = [
       { to: '/bookings', label: 'Bookings' },
       { to: '/manual', label: 'New booking' },
       { to: '/calendar', label: 'Calendar' },
+      { to: '/sharedbookings', label: 'Shared Bookings' },
       { to: '/requests', label: 'Requests', badgeKey: 'requests' },
     ],
   },
@@ -42,12 +44,21 @@ const navGroups: { title: string; items: NavItem[] }[] = [
   },
 ]
 
+const sharedOnlyNavGroups: { title: string; items: NavItem[] }[] = [
+  {
+    title: 'Operations',
+    items: [{ to: '/sharedbookings', label: 'Shared Bookings' }],
+  },
+]
+
 export default function AdminShell() {
   const [auth, setAuth] = useState<AdminSessionState | null>(null)
   const [ready, setReady] = useState(false)
   const [open, setOpen] = useState(false)
   const [requestCount, setRequestCount] = useState(0)
+  const [sharedAccess, setSharedAccess] = useState<SharedBookingsAccess | null>(null)
   const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     let mounted = true
@@ -72,7 +83,27 @@ export default function AdminShell() {
   }, [])
 
   useEffect(() => {
+    if (!auth?.isSignedIn) {
+      setSharedAccess(null)
+      return
+    }
+    let cancelled = false
+    void fetchSharedBookingsAccess()
+      .then((a) => {
+        if (!cancelled) setSharedAccess(a)
+      })
+      .catch(() => {
+        if (!cancelled) setSharedAccess(null)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [auth?.isSignedIn, auth?.user?.id])
+
+  useEffect(() => {
     if (!auth?.isSignedIn) return
+    // Supplier-only operators do not use transportation request badges.
+    if (sharedAccess && sharedAccess.ok && sharedAccess.access === 'supplier') return
     let cancelled = false
     const load = () =>
       countOpenTransportationRequests()
@@ -86,7 +117,7 @@ export default function AdminShell() {
       cancelled = true
       window.clearInterval(t)
     }
-  }, [auth?.isSignedIn])
+  }, [auth?.isSignedIn, sharedAccess])
 
   if (!ready) {
     return (
@@ -100,22 +131,39 @@ export default function AdminShell() {
     return <AdminLogin onSuccess={() => getAdminSession().then(setAuth)} />
   }
 
+  const isSupplierOnly =
+    Boolean(sharedAccess && sharedAccess.ok && sharedAccess.access === 'supplier')
+  const navGroups = isSupplierOnly ? sharedOnlyNavGroups : fullNavGroups
+  const brandLabel = isSupplierOnly ? 'Shared Bookings' : 'Royal Nordic Admin'
+
+  if (
+    isSupplierOnly &&
+    !location.pathname.startsWith('/sharedbookings')
+  ) {
+    return <Navigate to="/sharedbookings" replace />
+  }
+
   return (
     <div className="min-h-screen overflow-x-clip bg-white text-zinc-900">
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-zinc-800/90 bg-zinc-950 px-4 py-2.5 text-white sm:px-5">
         <div className="min-w-0">
-          <Link to="/" className="text-[13px] font-semibold tracking-tight">
-            Royal Nordic Admin
+          <Link
+            to={isSupplierOnly ? '/sharedbookings' : '/'}
+            className="text-[13px] font-semibold tracking-tight"
+          >
+            {brandLabel}
           </Link>
           <p className="truncate text-[11px] text-zinc-400">{auth.user?.email}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            to="/manual"
-            className="hidden rounded-md bg-emerald-600 px-2.5 py-1.5 text-xs font-medium hover:bg-emerald-500 sm:inline-flex"
-          >
-            + Booking
-          </Link>
+          {!isSupplierOnly ? (
+            <Link
+              to="/manual"
+              className="hidden rounded-md bg-emerald-600 px-2.5 py-1.5 text-xs font-medium hover:bg-emerald-500 sm:inline-flex"
+            >
+              + Booking
+            </Link>
+          ) : null}
           <button
             type="button"
             className="rounded-md bg-zinc-800 px-2.5 py-1.5 text-xs hover:bg-zinc-700"
