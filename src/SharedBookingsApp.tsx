@@ -38,6 +38,8 @@ export default function SharedBookingsApp() {
           <Route path={`${base}/access-denied`} element={<SharedBookingsAccessDeniedPage />} />
           <Route path={base} element={<SharedBookingsShell />}>
             <Route index element={<SharedOperatorBoardPage />} />
+            {/* Admin-only provisioning stays on admin.royalnordic.fi — never under the portal shell. */}
+            <Route path="operators" element={<Navigate to={`${base}/access-denied`} replace />} />
             <Route path=":id" element={<SharedDepartureDetailPage />} />
           </Route>
           <Route path="*" element={<Navigate to={`${base}/login`} replace />} />

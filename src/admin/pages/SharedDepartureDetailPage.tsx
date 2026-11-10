@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams } from 'react-router-dom'
 import { fetchSharedDepartureDetail } from '../adminApi'
 import { Badge, statusTone } from '../components/Badge'
 import { Card, ErrorBanner, PageHeader } from '../components/ui'
@@ -41,6 +41,9 @@ function PassengerRow({ row }: { row: SharedPassenger }) {
   )
 }
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
 export default function SharedDepartureDetailPage() {
   const { id } = useParams<{ id: string }>()
   const base = useSharedBookingsBase()
@@ -48,9 +51,10 @@ export default function SharedDepartureDetailPage() {
   const [data, setData] = useState<DetailState | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
+  const validId = Boolean(id && UUID_RE.test(id))
 
   useEffect(() => {
-    if (!id) return
+    if (!id || !UUID_RE.test(id)) return
     let cancelled = false
     setLoading(true)
     void fetchSharedDepartureDetail(id)
@@ -79,6 +83,10 @@ export default function SharedDepartureDetailPage() {
       cancelled = true
     }
   }, [id])
+
+  if (!validId) {
+    return <Navigate to={paths.root} replace />
+  }
 
   const dep = data?.departure
 
