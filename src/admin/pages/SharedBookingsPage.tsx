@@ -14,6 +14,7 @@ import {
   type SharedBookingsAccess,
   type SharedDepartureSummary,
 } from '../sharedBookings'
+import { sharedBookingsPaths, useSharedBookingsBase } from '../sharedBookingsPaths'
 
 const tabs: { id: SharedBoard; label: string }[] = [
   { id: 'shared_bus', label: 'Shared Bus' },
@@ -21,6 +22,8 @@ const tabs: { id: SharedBoard; label: string }[] = [
 ]
 
 export default function SharedBookingsPage() {
+  const base = useSharedBookingsBase()
+  const paths = sharedBookingsPaths(base)
   const [params, setParams] = useSearchParams()
   const requested = (params.get('board') as SharedBoard) || 'shared_bus'
   const [access, setAccess] = useState<SharedBookingsAccess | null>(null)
@@ -84,7 +87,7 @@ export default function SharedBookingsPage() {
   }
 
   if (access && access.ok && access.access === 'supplier' && board === 'my_tours') {
-    return <Navigate to="/sharedbookings?board=shared_bus" replace />
+    return <Navigate to={`${paths.root}?board=shared_bus`} replace />
   }
 
   return (
@@ -141,7 +144,7 @@ export default function SharedBookingsPage() {
           {rows.map((row) => (
             <li key={row.id}>
               <Link
-                to={`/sharedbookings/${row.id}`}
+                to={paths.departure(row.id)}
                 className="block rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:border-emerald-300 hover:shadow-md"
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">

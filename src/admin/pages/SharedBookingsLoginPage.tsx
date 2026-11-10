@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { getAdminSession, signInAdmin } from '../../lib/adminAuth'
 import { fetchSharedBookingsAccess } from '../adminApi'
-import { postLoginSharedPath } from '../sharedBookings'
+import { postLoginSharedPath, useSharedBookingsBase } from '../sharedBookingsPaths'
 
 export default function SharedBookingsLoginPage() {
   const navigate = useNavigate()
+  const base = useSharedBookingsBase()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -22,7 +23,7 @@ export default function SharedBookingsLoginPage() {
         }
         const access = await fetchSharedBookingsAccess()
         if (cancelled) return
-        navigate(postLoginSharedPath(access), { replace: true })
+        navigate(postLoginSharedPath(access, base), { replace: true })
       })
       .catch(() => {
         if (!cancelled) setChecking(false)
@@ -30,7 +31,7 @@ export default function SharedBookingsLoginPage() {
     return () => {
       cancelled = true
     }
-  }, [navigate])
+  }, [navigate, base])
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -39,7 +40,7 @@ export default function SharedBookingsLoginPage() {
     try {
       await signInAdmin(email, password)
       const access = await fetchSharedBookingsAccess()
-      navigate(postLoginSharedPath(access), { replace: true })
+      navigate(postLoginSharedPath(access, base), { replace: true })
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Login failed')
     } finally {
@@ -56,7 +57,7 @@ export default function SharedBookingsLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(165deg,#ecfdf5_0%,#f4f4f5_45%,#fafafa_100%)] px-4 py-10">
       <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm">
         <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
           Royal Nordic
@@ -118,10 +119,8 @@ export default function SharedBookingsLoginPage() {
         <p className="mt-5 text-center text-[11px] leading-relaxed text-zinc-400">
           No public registration. Contact Royal Nordic if you need access.
         </p>
-        <p className="mt-3 text-center text-[11px]">
-          <Link to="/" className="text-zinc-500 underline-offset-2 hover:underline">
-            Royal Nordic admin
-          </Link>
+        <p className="mt-3 text-center text-[11px] text-zinc-400">
+          Operator portal only — not the Royal Nordic admin console.
         </p>
       </div>
     </div>

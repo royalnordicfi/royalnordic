@@ -3,9 +3,12 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { getAdminSession, signOutAdmin } from '../../lib/adminAuth'
 import { completeSharedOperatorPasswordChange, fetchSharedBookingsAccess } from '../adminApi'
+import { sharedBookingsPaths, useSharedBookingsBase } from '../sharedBookingsPaths'
 
 export default function SharedBookingsPasswordSetupPage() {
   const navigate = useNavigate()
+  const base = useSharedBookingsBase()
+  const paths = sharedBookingsPaths(base)
   const [ready, setReady] = useState(false)
   const [allowed, setAllowed] = useState(false)
   const [password, setPassword] = useState('')
@@ -31,16 +34,16 @@ export default function SharedBookingsPasswordSetupPage() {
       setAllowed(needsSetup)
       setReady(true)
       if (access.ok && access.access === 'supplier' && !access.must_change_password) {
-        navigate('/sharedbookings', { replace: true })
+        navigate(paths.root, { replace: true })
       }
       if (access.ok && access.access === 'admin') {
-        navigate('/sharedbookings', { replace: true })
+        navigate(paths.root, { replace: true })
       }
     })()
     return () => {
       cancelled = true
     }
-  }, [navigate])
+  }, [navigate, paths.root])
 
   if (!ready) {
     return (
@@ -51,7 +54,7 @@ export default function SharedBookingsPasswordSetupPage() {
   }
 
   if (!allowed) {
-    return <Navigate to="/sharedbookings/login" replace />
+    return <Navigate to={paths.login} replace />
   }
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -71,7 +74,7 @@ export default function SharedBookingsPasswordSetupPage() {
       if (updErr) throw new Error(updErr.message || 'Could not update password')
       const result = await completeSharedOperatorPasswordChange()
       if (!result.ok) throw new Error(result.error || 'Could not complete setup')
-      navigate('/sharedbookings', { replace: true })
+      navigate(paths.root, { replace: true })
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Setup failed')
     } finally {
@@ -145,7 +148,7 @@ export default function SharedBookingsPasswordSetupPage() {
           className="mt-4 w-full text-center text-xs text-zinc-500 underline-offset-2 hover:underline"
           onClick={async () => {
             await signOutAdmin()
-            navigate('/sharedbookings/login', { replace: true })
+            navigate(paths.login, { replace: true })
           }}
         >
           Sign out

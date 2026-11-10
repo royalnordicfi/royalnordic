@@ -10,6 +10,7 @@ import {
   type SharedDepartureSummary,
   type SharedPassenger,
 } from '../sharedBookings'
+import { sharedBookingsPaths, useSharedBookingsBase } from '../sharedBookingsPaths'
 
 type DetailState = {
   departure: SharedDepartureSummary
@@ -42,6 +43,8 @@ function PassengerRow({ row }: { row: SharedPassenger }) {
 
 export default function SharedDepartureDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const base = useSharedBookingsBase()
+  const paths = sharedBookingsPaths(base)
   const [data, setData] = useState<DetailState | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
@@ -90,7 +93,7 @@ export default function SharedDepartureDetailPage() {
         }
         actions={
           <Link
-            to={`/sharedbookings?board=${dep?.board || 'shared_bus'}`}
+            to={`${paths.root}?board=${dep?.board || 'shared_bus'}`}
             className="inline-flex min-h-[40px] items-center rounded-lg border border-zinc-300 px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
           >
             ← Back

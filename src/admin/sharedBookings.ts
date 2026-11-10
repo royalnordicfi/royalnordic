@@ -218,18 +218,3 @@ export function syncStatusBanner(channelsSynced: boolean | undefined): string {
   return 'Local records only — GetYourGuide / Bókun are not connected yet'
 }
 
-export function postLoginSharedPath(access: SharedBookingsAccess): string {
-  if (!access.ok || access.access === 'none') return '/sharedbookings/access-denied'
-  if (access.access === 'supplier' && access.must_change_password) {
-    return '/sharedbookings/setup-password'
-  }
-  return '/sharedbookings'
-}
-
-export function isSharedBookingsPublicPath(pathname: string): boolean {
-  return (
-    pathname === '/sharedbookings/login' ||
-    pathname === '/sharedbookings/setup-password' ||
-    pathname === '/sharedbookings/access-denied'
-  )
-}

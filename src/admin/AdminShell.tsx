@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { Menu, RefreshCw, X } from 'lucide-react'
 import {
   getAdminSession,
@@ -8,6 +8,7 @@ import {
   type AdminSessionState,
 } from '../lib/adminAuth'
 import AdminLogin from '../components/AdminLogin'
+import { sharedBookingsPortalAbsoluteUrl } from '../lib/sharedBookingsPortal'
 import { countOpenTransportationRequests, fetchSharedBookingsAccess } from './adminApi'
 import type { SharedBookingsAccess } from './sharedBookings'
 
@@ -45,17 +46,11 @@ const fullNavGroups: { title: string; items: NavItem[] }[] = [
   },
 ]
 
-const sharedOnlyNavGroups: { title: string; items: NavItem[] }[] = [
-  {
-    title: 'Operations',
-    items: [{ to: '/sharedbookings', label: 'Shared Bookings', end: true }],
-  },
-]
-
-function isSharedBookingsPath(pathname: string) {
-  return pathname === '/sharedbookings' || pathname.startsWith('/sharedbookings/')
-}
-
+/**
+ * Full Royal Nordic admin chrome.
+ * Shared Bookings operators are never rendered here — they are sent to the
+ * public-site portal (separate origin) so AdminShell cannot leak.
+ */
 export default function AdminShell() {
   const [auth, setAuth] = useState<AdminSessionState | null>(null)
   const [ready, setReady] = useState(false)
@@ -63,9 +58,8 @@ export default function AdminShell() {
   const [requestCount, setRequestCount] = useState(0)
   const [sharedAccess, setSharedAccess] = useState<SharedBookingsAccess | null>(null)
   const [sharedAccessReady, setSharedAccessReady] = useState(false)
+  const [ejectingOperator, setEjectingOperator] = useState(false)
   const navigate = useNavigate()
-  const location = useLocation()
-  const onSharedPath = isSharedBookingsPath(location.pathname)
 
   useEffect(() => {
     let mounted = true
@@ -117,6 +111,24 @@ export default function AdminShell() {
 
   useEffect(() => {
     if (!auth?.isSignedIn) return
+    if (!sharedAccessReady) return
+    if (!(sharedAccess && sharedAccess.ok && sharedAccess.access === 'supplier')) return
+
+    let cancelled = false
+    setEjectingOperator(true)
+    void (async () => {
+      // Clear admin-origin session so operator credentials cannot linger on admin host.
+      await signOutAdmin().catch(() => undefined)
+      if (cancelled) return
+      window.location.replace(sharedBookingsPortalAbsoluteUrl('/login'))
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [auth?.isSignedIn, sharedAccess, sharedAccessReady])
+
+  useEffect(() => {
+    if (!auth?.isSignedIn) return
     if (sharedAccess && sharedAccess.ok && sharedAccess.access === 'supplier') return
     let cancelled = false
     const load = () =>
@@ -133,7 +145,7 @@ export default function AdminShell() {
     }
   }, [auth?.isSignedIn, sharedAccess])
 
-  if (!ready) {
+  if (!ready || (auth?.isSignedIn && !sharedAccessReady) || ejectingOperator) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
         <RefreshCw className="h-5 w-5 animate-spin text-emerald-700" />
@@ -142,74 +154,32 @@ export default function AdminShell() {
   }
 
   if (!auth?.isSignedIn) {
-    if (onSharedPath) {
-      return <Navigate to="/sharedbookings/login" replace />
-    }
     return <AdminLogin onSuccess={() => getAdminSession().then(setAuth)} />
   }
 
-  if (onSharedPath && !sharedAccessReady) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <RefreshCw className="h-5 w-5 animate-spin text-emerald-700" />
-      </div>
-    )
-  }
-
-  if (
-    onSharedPath &&
-    sharedAccess &&
-    sharedAccess.ok &&
-    sharedAccess.access === 'supplier' &&
-    sharedAccess.must_change_password
-  ) {
-    return <Navigate to="/sharedbookings/setup-password" replace />
-  }
-
-  if (
-    onSharedPath &&
-    sharedAccess &&
-    ((sharedAccess.ok && sharedAccess.access === 'none') || sharedAccess.ok === false)
-  ) {
-    return <Navigate to="/sharedbookings/access-denied" replace />
-  }
-
-  const isSupplierOnly =
-    Boolean(sharedAccess && sharedAccess.ok && sharedAccess.access === 'supplier')
-  const navGroups = isSupplierOnly ? sharedOnlyNavGroups : fullNavGroups
-  const brandLabel = isSupplierOnly ? 'Shared Bookings' : 'Royal Nordic Admin'
-
-  if (isSupplierOnly && !onSharedPath) {
-    return <Navigate to="/sharedbookings" replace />
-  }
-
+  // Operators never reach this chrome (ejected above). Only RN admins continue.
   return (
     <div className="min-h-screen overflow-x-clip bg-white text-zinc-900">
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-zinc-800/90 bg-zinc-950 px-4 py-2.5 text-white sm:px-5">
         <div className="min-w-0">
-          <Link
-            to={isSupplierOnly ? '/sharedbookings' : '/'}
-            className="text-[13px] font-semibold tracking-tight"
-          >
-            {brandLabel}
+          <Link to="/" className="text-[13px] font-semibold tracking-tight">
+            Royal Nordic Admin
           </Link>
           <p className="truncate text-[11px] text-zinc-400">{auth.user?.email}</p>
         </div>
         <div className="flex items-center gap-2">
-          {!isSupplierOnly ? (
-            <Link
-              to="/manual"
-              className="hidden rounded-md bg-emerald-600 px-2.5 py-1.5 text-xs font-medium hover:bg-emerald-500 sm:inline-flex"
-            >
-              + Booking
-            </Link>
-          ) : null}
+          <Link
+            to="/manual"
+            className="hidden rounded-md bg-emerald-600 px-2.5 py-1.5 text-xs font-medium hover:bg-emerald-500 sm:inline-flex"
+          >
+            + Booking
+          </Link>
           <button
             type="button"
             className="rounded-md bg-zinc-800 px-2.5 py-1.5 text-xs hover:bg-zinc-700"
             onClick={async () => {
               await signOutAdmin()
-              navigate(isSupplierOnly || onSharedPath ? '/sharedbookings/login' : '/')
+              navigate('/')
             }}
           >
             Sign out
@@ -232,7 +202,7 @@ export default function AdminShell() {
           } border-b border-zinc-200 bg-white md:block md:w-52 md:shrink-0 md:sticky md:top-[49px] md:max-h-[calc(100vh-49px)] md:self-start md:overflow-y-auto md:border-b-0 md:border-r`}
         >
           <div className="space-y-4 p-3">
-            {navGroups.map((group) => (
+            {fullNavGroups.map((group) => (
               <div key={group.title}>
                 <p className="px-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
                   {group.title}

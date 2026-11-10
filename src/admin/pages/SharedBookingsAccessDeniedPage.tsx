@@ -1,8 +1,11 @@
 import { useNavigate } from 'react-router-dom'
 import { signOutAdmin } from '../../lib/adminAuth'
+import { sharedBookingsPaths, useSharedBookingsBase } from '../sharedBookingsPaths'
 
 export default function SharedBookingsAccessDeniedPage() {
   const navigate = useNavigate()
+  const base = useSharedBookingsBase()
+  const paths = sharedBookingsPaths(base)
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 py-10">
@@ -20,7 +23,7 @@ export default function SharedBookingsAccessDeniedPage() {
           className="mt-6 w-full min-h-[44px] rounded-lg bg-zinc-900 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800"
           onClick={async () => {
             await signOutAdmin()
-            navigate('/sharedbookings/login', { replace: true })
+            navigate(paths.login, { replace: true })
           }}
         >
           Sign out

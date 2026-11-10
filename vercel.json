@@ -50,6 +50,22 @@
   ],
   "headers": [
     {
+      "source": "/admin/sharedbookings",
+      "has": [{ "type": "host", "value": "royalnordic.fi" }],
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "X-Frame-Options", "value": "DENY" }
+      ]
+    },
+    {
+      "source": "/admin/sharedbookings/(.*)",
+      "has": [{ "type": "host", "value": "royalnordic.fi" }],
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "X-Frame-Options", "value": "DENY" }
+      ]
+    },
+    {
       "source": "/(.*)",
       "has": [{ "type": "host", "value": "admin.royalnordic.fi" }],
       "headers": [

@@ -6,15 +6,19 @@ import {
   canViewSupplierPassengers,
   channelLabel,
   filterManifestForAccess,
-  isSharedBookingsPublicPath,
   occupiedSeatsFromBookings,
   payloadHasForbiddenFields,
-  postLoginSharedPath,
   supplierBreakdownFromBookings,
   syncStatusBanner,
   type SharedBookingsAccess,
   type SharedPassenger,
 } from './sharedBookings'
+import { isSharedBookingsPublicPath, postLoginSharedPath, sharedBookingsPaths } from './sharedBookingsPaths'
+import {
+  SHARED_BOOKINGS_ADMIN_BASE,
+  SHARED_BOOKINGS_PORTAL_BASE,
+  isSharedBookingsPortalPath,
+} from '../lib/sharedBookingsPortal'
 
 const adminAccess: SharedBookingsAccess = {
   ok: true,
@@ -130,20 +134,31 @@ describe('shared bookings copy', () => {
   })
 })
 
-describe('shared bookings login routing', () => {
-  it('sends operators with must_change_password to setup', () => {
-    expect(postLoginSharedPath(eliasMustChange)).toBe('/sharedbookings/setup-password')
-    expect(postLoginSharedPath(eliasAccess)).toBe('/sharedbookings')
-    expect(postLoginSharedPath(adminAccess)).toBe('/sharedbookings')
-    expect(postLoginSharedPath(noneAccess)).toBe('/sharedbookings/access-denied')
-    expect(postLoginSharedPath({ ok: false, error: 'x' })).toBe('/sharedbookings/access-denied')
+describe('shared bookings portal routing', () => {
+  it('uses portal base paths for operator post-login redirects', () => {
+    const base = SHARED_BOOKINGS_PORTAL_BASE
+    expect(postLoginSharedPath(eliasMustChange, base)).toBe(`${base}/setup-password`)
+    expect(postLoginSharedPath(eliasAccess, base)).toBe(base)
+    expect(postLoginSharedPath(adminAccess, base)).toBe(base)
+    expect(postLoginSharedPath(noneAccess, base)).toBe(`${base}/access-denied`)
   })
 
-  it('treats login/setup/denied as public shared paths', () => {
-    expect(isSharedBookingsPublicPath('/sharedbookings/login')).toBe(true)
-    expect(isSharedBookingsPublicPath('/sharedbookings/setup-password')).toBe(true)
-    expect(isSharedBookingsPublicPath('/sharedbookings/access-denied')).toBe(true)
-    expect(isSharedBookingsPublicPath('/sharedbookings')).toBe(false)
-    expect(isSharedBookingsPublicPath('/sharedbookings/operators')).toBe(false)
+  it('keeps admin management base on admin host', () => {
+    const base = SHARED_BOOKINGS_ADMIN_BASE
+    expect(sharedBookingsPaths(base).operators).toBe('/sharedbookings/operators')
+    expect(postLoginSharedPath(eliasAccess, base)).toBe('/sharedbookings')
+  })
+
+  it('detects public portal paths and public auth pages', () => {
+    expect(isSharedBookingsPortalPath('/admin/sharedbookings')).toBe(true)
+    expect(isSharedBookingsPortalPath('/admin/sharedbookings/login')).toBe(true)
+    expect(isSharedBookingsPortalPath('/sharedbookings')).toBe(false)
+    expect(isSharedBookingsPortalPath('/admin')).toBe(false)
+
+    const portal = SHARED_BOOKINGS_PORTAL_BASE
+    expect(isSharedBookingsPublicPath(`${portal}/login`, portal)).toBe(true)
+    expect(isSharedBookingsPublicPath(`${portal}/setup-password`, portal)).toBe(true)
+    expect(isSharedBookingsPublicPath(`${portal}/access-denied`, portal)).toBe(true)
+    expect(isSharedBookingsPublicPath(portal, portal)).toBe(false)
   })
 })

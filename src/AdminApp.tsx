@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import AdminShell from './admin/AdminShell'
+import OperatorPortalRedirect from './admin/OperatorPortalRedirect'
 import HomePage from './admin/pages/HomePage'
 import BookingsPage from './admin/pages/BookingsPage'
 import BookingDetailPage from './admin/pages/BookingDetailPage'
@@ -18,14 +19,13 @@ import PartnersPage from './admin/pages/PartnersPage'
 import PartnerBookingsPage from './admin/pages/PartnerBookingsPage'
 import SharedBookingsPage from './admin/pages/SharedBookingsPage'
 import SharedDepartureDetailPage from './admin/pages/SharedDepartureDetailPage'
-import SharedBookingsLoginPage from './admin/pages/SharedBookingsLoginPage'
-import SharedBookingsPasswordSetupPage from './admin/pages/SharedBookingsPasswordSetupPage'
-import SharedBookingsAccessDeniedPage from './admin/pages/SharedBookingsAccessDeniedPage'
 import SharedOperatorsPage from './admin/pages/SharedOperatorsPage'
+import { SharedBookingsBaseProvider } from './admin/sharedBookingsPaths'
+import { SHARED_BOOKINGS_ADMIN_BASE } from './lib/sharedBookingsPortal'
 
 /**
- * Operator console — only mounted when hostname is admin.royalnordic.fi
- * (or local ?admin=1 override).
+ * Royal Nordic admin console — admin.royalnordic.fi only.
+ * Operator auth UI lives on royalnordic.fi/admin/sharedbookings (separate app root).
  */
 function AdminApp() {
   useEffect(() => {
@@ -42,34 +42,43 @@ function AdminApp() {
   }, [])
 
   return (
-    <Router>
-      <Routes>
-        <Route path="sharedbookings/login" element={<SharedBookingsLoginPage />} />
-        <Route path="sharedbookings/setup-password" element={<SharedBookingsPasswordSetupPage />} />
-        <Route path="sharedbookings/access-denied" element={<SharedBookingsAccessDeniedPage />} />
-        <Route element={<AdminShell />}>
-          <Route index element={<HomePage />} />
-          <Route path="bookings" element={<BookingsPage />} />
-          <Route path="bookings/:id" element={<BookingDetailPage />} />
-          <Route path="manual" element={<ManualBookingPage />} />
-          <Route path="calendar" element={<CalendarPage />} />
-          <Route path="availability" element={<AvailabilityPage />} />
-          <Route path="requests" element={<RequestsPage />} />
-          <Route path="products" element={<ProductsPage />} />
-          <Route path="products/:id" element={<ProductEditorPage />} />
-          <Route path="customers" element={<CustomersPage />} />
-          <Route path="partners" element={<PartnersPage />} />
-          <Route path="partner-bookings" element={<PartnerBookingsPage />} />
-          <Route path="sharedbookings" element={<SharedBookingsPage />} />
-          <Route path="sharedbookings/operators" element={<SharedOperatorsPage />} />
-          <Route path="sharedbookings/:id" element={<SharedDepartureDetailPage />} />
-          <Route path="revenue" element={<RevenuePage />} />
-          <Route path="import" element={<ImportPage />} />
-          <Route path="integrations" element={<IntegrationsPage />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
+    <SharedBookingsBaseProvider base={SHARED_BOOKINGS_ADMIN_BASE}>
+      <Router>
+        <Routes>
+          {/* Operator login/setup on admin host → public portal (separate auth storage). */}
+          <Route path="sharedbookings/login" element={<OperatorPortalRedirect subpath="/login" />} />
+          <Route
+            path="sharedbookings/setup-password"
+            element={<OperatorPortalRedirect subpath="/setup-password" />}
+          />
+          <Route
+            path="sharedbookings/access-denied"
+            element={<OperatorPortalRedirect subpath="/access-denied" />}
+          />
+          <Route element={<AdminShell />}>
+            <Route index element={<HomePage />} />
+            <Route path="bookings" element={<BookingsPage />} />
+            <Route path="bookings/:id" element={<BookingDetailPage />} />
+            <Route path="manual" element={<ManualBookingPage />} />
+            <Route path="calendar" element={<CalendarPage />} />
+            <Route path="availability" element={<AvailabilityPage />} />
+            <Route path="requests" element={<RequestsPage />} />
+            <Route path="products" element={<ProductsPage />} />
+            <Route path="products/:id" element={<ProductEditorPage />} />
+            <Route path="customers" element={<CustomersPage />} />
+            <Route path="partners" element={<PartnersPage />} />
+            <Route path="partner-bookings" element={<PartnerBookingsPage />} />
+            <Route path="sharedbookings" element={<SharedBookingsPage />} />
+            <Route path="sharedbookings/operators" element={<SharedOperatorsPage />} />
+            <Route path="sharedbookings/:id" element={<SharedDepartureDetailPage />} />
+            <Route path="revenue" element={<RevenuePage />} />
+            <Route path="import" element={<ImportPage />} />
+            <Route path="integrations" element={<IntegrationsPage />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
+    </SharedBookingsBaseProvider>
   )
 }
 

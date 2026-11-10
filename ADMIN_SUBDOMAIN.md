@@ -1,14 +1,19 @@
 # admin.royalnordic.fi — Operator console setup
 
 The public site (`royalnordic.fi`) and the operator console share one Vercel project.
-Hostname decides which UI loads:
+Hostname + path decide which UI loads:
 
-| Host | UI |
+| Host / path | UI |
 | --- | --- |
 | `royalnordic.fi` | Public website |
-| `admin.royalnordic.fi` | Booking / availability admin (login required) |
+| `royalnordic.fi/admin/sharedbookings` | Shared Bookings **operator portal** (isolated; no AdminShell) |
+| `admin.royalnordic.fi` | Full Royal Nordic admin (login required) |
+| `admin.royalnordic.fi/sharedbookings` | Shared Bookings **admin management** (RN admins only) |
 
-Local preview of admin: `http://localhost:5173/?admin=1`
+Local preview of admin: `http://localhost:5173/?admin=1`  
+Local preview of operator portal: `http://localhost:5173/admin/sharedbookings/login`
+
+Operators must never use the admin host. AdminShell signs them out and sends them to the public portal (separate origin / localStorage session).
 
 ---
 

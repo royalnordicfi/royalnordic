@@ -843,6 +843,7 @@ app.listen(PORT, () => {
   console.log(`💳 Stripe integration ready`);
 });
 
+// Exact /admin only — do not redirect /admin/sharedbookings (operator portal SPA).
 app.get('/admin', (_req, res) => {
   res.redirect(302, 'https://admin.royalnordic.fi/')
 });

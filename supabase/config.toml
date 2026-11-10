@@ -4,7 +4,10 @@ site_url = "https://royalnordic.fi"
 additional_redirect_urls = [
   "https://royalnordic.fi/referralprogram/verify",
   "https://royalnordic.fi/referralprogram/reset-password",
+  "https://royalnordic.fi/admin/sharedbookings",
+  "https://royalnordic.fi/admin/sharedbookings/**",
   "https://royalnordic.fi/**",
+  "https://admin.royalnordic.fi/**",
   "http://localhost:5173/**",
   "http://127.0.0.1:5173/**",
   "http://localhost:3000/**",

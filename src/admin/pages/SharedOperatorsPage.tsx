@@ -88,7 +88,7 @@ export default function SharedOperatorsPage() {
     <div className="space-y-4">
       <PageHeader
         title="Shared Bookings operators"
-        subtitle="Admin-only provisioning. Temporary passwords are shown once and never stored."
+        subtitle="Admin-only provisioning. Operators sign in at royalnordic.fi/admin/sharedbookings — never on this admin host. Temporary passwords are shown once and never stored."
         actions={
           <Link
             to="/sharedbookings"
