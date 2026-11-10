@@ -6,8 +6,10 @@ import {
   canViewSupplierPassengers,
   channelLabel,
   filterManifestForAccess,
+  normalizeSharedBookingsAccess,
   occupiedSeatsFromBookings,
   payloadHasForbiddenFields,
+  resolveSharedAccessDecision,
   supplierBreakdownFromBookings,
   syncStatusBanner,
   type SharedBookingsAccess,
@@ -51,6 +53,13 @@ const noneAccess: SharedBookingsAccess = {
   access: 'none',
   boards: [],
   must_change_password: false,
+  channels_synced: false,
+}
+
+const inactiveOrUnauthorized: SharedBookingsAccess = {
+  ok: true,
+  access: 'none',
+  boards: [],
   channels_synced: false,
 }
 
@@ -131,6 +140,63 @@ describe('shared bookings copy', () => {
     expect(channelLabel('getyourguide')).toMatch(/not connected/i)
     expect(channelLabel('bokun')).toMatch(/not connected/i)
     expect(syncStatusBanner(false)).toMatch(/not connected/i)
+  })
+})
+
+describe('shared bookings access decisions', () => {
+  it('sends newly provisioned operators to first-login password setup', () => {
+    expect(resolveSharedAccessDecision(eliasMustChange)).toBe('setup_password')
+    expect(postLoginSharedPath(eliasMustChange, SHARED_BOOKINGS_PORTAL_BASE)).toBe(
+      `${SHARED_BOOKINGS_PORTAL_BASE}/setup-password`,
+    )
+  })
+
+  it('lets operators with no assigned departures into the portal (empty state, not denied)', () => {
+    // Access is independent of departure assignments — empty calendar is still portal.
+    expect(resolveSharedAccessDecision(eliasAccess)).toBe('portal')
+    expect(postLoginSharedPath(eliasAccess, SHARED_BOOKINGS_PORTAL_BASE)).toBe(
+      SHARED_BOOKINGS_PORTAL_BASE,
+    )
+  })
+
+  it('denies inactive operators and unauthorized users only', () => {
+    expect(resolveSharedAccessDecision(inactiveOrUnauthorized)).toBe('access_denied')
+    expect(resolveSharedAccessDecision(noneAccess)).toBe('access_denied')
+    expect(resolveSharedAccessDecision({ ok: false, error: 'not_authenticated' })).toBe(
+      'access_error',
+    )
+    expect(postLoginSharedPath(noneAccess, SHARED_BOOKINGS_PORTAL_BASE)).toBe(
+      `${SHARED_BOOKINGS_PORTAL_BASE}/access-denied`,
+    )
+  })
+
+  it('keeps admins on portal management path without password gate', () => {
+    expect(resolveSharedAccessDecision(adminAccess)).toBe('portal')
+    expect(postLoginSharedPath(adminAccess, SHARED_BOOKINGS_ADMIN_BASE)).toBe(
+      SHARED_BOOKINGS_ADMIN_BASE,
+    )
+  })
+
+  it('normalizes string jsonb payloads and string booleans', () => {
+    const normalized = normalizeSharedBookingsAccess(
+      JSON.stringify({
+        ok: true,
+        access: 'supplier',
+        boards: ['shared_bus'],
+        supplier_id: 'sup-1',
+        supplier_code: 'elias',
+        supplier_name: 'Elias',
+        must_change_password: 'true',
+        channels_synced: false,
+      }),
+    )
+    expect(normalized).toMatchObject({
+      ok: true,
+      access: 'supplier',
+      must_change_password: true,
+      supplier_code: 'elias',
+    })
+    expect(resolveSharedAccessDecision(normalized)).toBe('setup_password')
   })
 })
 

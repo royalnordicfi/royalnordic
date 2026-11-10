@@ -3,7 +3,7 @@ import {
   SHARED_BOOKINGS_ADMIN_BASE,
   SHARED_BOOKINGS_PORTAL_BASE,
 } from '../lib/sharedBookingsPortal'
-import type { SharedBookingsAccess } from './sharedBookings'
+import { resolveSharedAccessDecision, type SharedBookingsAccess } from './sharedBookings'
 
 export type SharedBookingsBase = typeof SHARED_BOOKINGS_PORTAL_BASE | typeof SHARED_BOOKINGS_ADMIN_BASE
 
@@ -41,9 +41,14 @@ export function postLoginSharedPath(
   base: string = SHARED_BOOKINGS_ADMIN_BASE,
 ): string {
   const paths = sharedBookingsPaths(base)
-  if (!access.ok || access.access === 'none') return paths.accessDenied
-  if (access.access === 'supplier' && access.must_change_password) return paths.setupPassword
-  return paths.root
+  const decision = resolveSharedAccessDecision(access)
+  if (decision === 'setup_password') return paths.setupPassword
+  if (decision === 'portal') return paths.root
+  // Transient RPC/parse failures should not be sticky Access Denied from login;
+  // send operators back to login with a recoverable state via access-denied only
+  // for explicit unauthorized (access=none). Errors also land on access-denied
+  // with a distinct copy handled by the page when error is present.
+  return paths.accessDenied
 }
 
 export function isSharedBookingsPublicPath(pathname: string, base: string): boolean {

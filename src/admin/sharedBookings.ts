@@ -218,3 +218,99 @@ export function syncStatusBanner(channelsSynced: boolean | undefined): string {
   return 'Local records only — GetYourGuide / Bókun are not connected yet'
 }
 
+function asBoolean(value: unknown, fallback = false): boolean {
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'string') {
+    const v = value.trim().toLowerCase()
+    if (v === 'true' || v === '1') return true
+    if (v === 'false' || v === '0') return false
+  }
+  return fallback
+}
+
+function asBoardList(value: unknown): SharedBoard[] {
+  if (!Array.isArray(value)) return []
+  return value.filter((b): b is SharedBoard => b === 'shared_bus' || b === 'my_tours')
+}
+
+/** Normalize RPC/jsonb payloads (object or JSON string) into a typed access result. */
+export function normalizeSharedBookingsAccess(raw: unknown): SharedBookingsAccess {
+  let value: unknown = raw
+  if (typeof value === 'string') {
+    try {
+      value = JSON.parse(value)
+    } catch {
+      return { ok: false, error: 'invalid_access_payload', access: 'none' }
+    }
+  }
+  if (!value || typeof value !== 'object') {
+    return { ok: false, error: 'invalid_access_payload', access: 'none' }
+  }
+
+  const row = value as Record<string, unknown>
+  const ok = asBoolean(row.ok, false)
+  const accessRaw = String(row.access || 'none')
+  const access =
+    accessRaw === 'admin' || accessRaw === 'supplier' || accessRaw === 'none' ? accessRaw : 'none'
+
+  if (!ok) {
+    return {
+      ok: false,
+      error: String(row.error || 'access_denied'),
+      access: 'none',
+    }
+  }
+
+  if (access === 'admin') {
+    return {
+      ok: true,
+      access: 'admin',
+      boards: asBoardList(row.boards).length ? asBoardList(row.boards) : ['shared_bus', 'my_tours'],
+      supplier_code: String(row.supplier_code || 'royal_nordic'),
+      supplier_name: String(row.supplier_name || 'Royal Nordic'),
+      must_change_password: asBoolean(row.must_change_password, false),
+      channels_synced: false,
+    }
+  }
+
+  if (access === 'supplier') {
+    return {
+      ok: true,
+      access: 'supplier',
+      boards: asBoardList(row.boards).length ? asBoardList(row.boards) : ['shared_bus'],
+      supplier_id: String(row.supplier_id || ''),
+      supplier_code: String(row.supplier_code || ''),
+      supplier_name: String(row.supplier_name || ''),
+      operator_id: row.operator_id ? String(row.operator_id) : undefined,
+      must_change_password: asBoolean(row.must_change_password, false),
+      channels_synced: false,
+    }
+  }
+
+  return {
+    ok: true,
+    access: 'none',
+    boards: [],
+    must_change_password: false,
+    channels_synced: false,
+  }
+}
+
+export type SharedAccessDecision =
+  | 'setup_password'
+  | 'portal'
+  | 'access_denied'
+  | 'access_error'
+
+/** Pure routing decision used by login + shell (no network). */
+export function resolveSharedAccessDecision(
+  access: SharedBookingsAccess | null | undefined,
+): SharedAccessDecision {
+  if (!access) return 'access_error'
+  if (access.ok === false) return 'access_error'
+  if (access.access === 'none') return 'access_denied'
+  if (access.access === 'supplier' && access.must_change_password) return 'setup_password'
+  if (access.access === 'supplier' || access.access === 'admin') return 'portal'
+  return 'access_denied'
+}
+

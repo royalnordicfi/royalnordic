@@ -29,7 +29,7 @@ import type {
   SharedPassenger,
   SharedSupplierOption,
 } from './sharedBookings'
-import { payloadHasForbiddenFields } from './sharedBookings'
+import { normalizeSharedBookingsAccess, payloadHasForbiddenFields } from './sharedBookings'
 
 async function requireAdmin() {
   const { data, error } = await supabase.auth.getSession()
@@ -1860,7 +1860,7 @@ export async function fetchSharedBookingsAccess(): Promise<SharedBookingsAccess>
   await requireSharedBookingsSession()
   const { data, error } = await supabase.rpc('get_shared_bookings_access')
   if (error) throw new Error(error.message)
-  return data as SharedBookingsAccess
+  return normalizeSharedBookingsAccess(data)
 }
 
 export async function listSharedDepartures(

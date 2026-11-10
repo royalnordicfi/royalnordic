@@ -8,7 +8,10 @@ import {
   type AdminSessionState,
 } from '../lib/adminAuth'
 import { fetchSharedBookingsAccess } from './adminApi'
-import type { SharedBookingsAccess } from './sharedBookings'
+import {
+  resolveSharedAccessDecision,
+  type SharedBookingsAccess,
+} from './sharedBookings'
 import { sharedBookingsPaths, useSharedBookingsBase } from './sharedBookingsPaths'
 
 /**
@@ -22,6 +25,8 @@ export default function SharedBookingsShell() {
   const [ready, setReady] = useState(false)
   const [access, setAccess] = useState<SharedBookingsAccess | null>(null)
   const [accessReady, setAccessReady] = useState(false)
+  const [accessLoadError, setAccessLoadError] = useState('')
+  const [retryKey, setRetryKey] = useState(0)
 
   useEffect(() => {
     let mounted = true
@@ -48,11 +53,13 @@ export default function SharedBookingsShell() {
   useEffect(() => {
     if (!auth?.isSignedIn) {
       setAccess(null)
+      setAccessLoadError('')
       setAccessReady(true)
       return
     }
     let cancelled = false
     setAccessReady(false)
+    setAccessLoadError('')
     void fetchSharedBookingsAccess()
       .then((a) => {
         if (!cancelled) {
@@ -60,16 +67,17 @@ export default function SharedBookingsShell() {
           setAccessReady(true)
         }
       })
-      .catch(() => {
+      .catch((e) => {
         if (!cancelled) {
-          setAccess({ ok: false, error: 'access_check_failed', access: 'none' })
+          setAccess(null)
+          setAccessLoadError(e instanceof Error ? e.message : 'access_check_failed')
           setAccessReady(true)
         }
       })
     return () => {
       cancelled = true
     }
-  }, [auth?.isSignedIn, auth?.user?.id])
+  }, [auth?.isSignedIn, auth?.user?.id, retryKey])
 
   if (!ready || (auth?.isSignedIn && !accessReady)) {
     return (
@@ -83,16 +91,48 @@ export default function SharedBookingsShell() {
     return <Navigate to={paths.login} replace />
   }
 
-  if (access && access.ok && access.access === 'supplier' && access.must_change_password) {
-    return <Navigate to={paths.setupPassword} replace />
+  if (accessLoadError) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+        <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm">
+          <h1 className="text-lg font-semibold text-zinc-900">Couldn’t verify access</h1>
+          <p className="mt-2 text-sm text-zinc-600">
+            Your session is signed in, but Shared Bookings access could not be loaded. This is not
+            the same as being unauthorized — try again.
+          </p>
+          <button
+            type="button"
+            className="mt-5 w-full min-h-[44px] rounded-lg bg-emerald-700 text-sm font-semibold text-white hover:bg-emerald-600"
+            onClick={() => setRetryKey((n) => n + 1)}
+          >
+            Retry
+          </button>
+          <button
+            type="button"
+            className="mt-3 w-full text-xs text-zinc-500 underline-offset-2 hover:underline"
+            onClick={async () => {
+              await signOutAdmin()
+              navigate(paths.login, { replace: true })
+            }}
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
+    )
   }
 
-  if (!access || access.ok === false || access.access === 'none') {
+  const decision = resolveSharedAccessDecision(access)
+  if (decision === 'setup_password') {
+    return <Navigate to={paths.setupPassword} replace />
+  }
+  if (decision === 'access_denied') {
+    return <Navigate to={paths.accessDenied} replace />
+  }
+  if (decision !== 'portal' || !access || access.ok === false) {
     return <Navigate to={paths.accessDenied} replace />
   }
 
-  // Portal is for operators. Admins who land here may view assigned boards,
-  // but management (operators CRUD) stays on admin.royalnordic.fi.
   const label =
     access.access === 'supplier' ? access.supplier_name : 'Royal Nordic · Shared Bookings'
 

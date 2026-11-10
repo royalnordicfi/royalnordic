@@ -38,7 +38,12 @@ export default function SharedBookingsLoginPage() {
     setError('')
     setLoading(true)
     try {
-      await signInAdmin(email, password)
+      const signed = await signInAdmin(email, password)
+      if (!signed.session) {
+        throw new Error('Signed in, but session was not ready. Please try again.')
+      }
+      // Prefer a fresh session round-trip so RPC auth.uid() is present.
+      await getAdminSession()
       const access = await fetchSharedBookingsAccess()
       navigate(postLoginSharedPath(access, base), { replace: true })
     } catch (err: unknown) {
