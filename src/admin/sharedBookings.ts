@@ -59,6 +59,20 @@ export type SupplierBreakdown = {
   confirmed_passengers: number
 }
 
+export type SharedDepartureStatus = 'active' | 'cancelled'
+
+export type SharedTourTemplate = {
+  id: string
+  code: string
+  title: string
+  category: SharedBoard
+  meeting_point: string | null
+  default_capacity: number
+  default_departure_time: string | null
+  is_active: boolean
+  created_at?: string
+}
+
 export type SharedDepartureSummary = {
   id: string
   board: SharedBoard
@@ -68,11 +82,15 @@ export type SharedDepartureSummary = {
   departure_time: string | null
   meeting_point: string | null
   capacity: number
+  status?: SharedDepartureStatus
+  template_id?: string | null
   confirmed_passengers: number
   available_seats: number
   supplier_breakdown: SupplierBreakdown[]
   channels_synced: boolean
 }
+
+export type SharedCalendarView = 'month' | 'week' | 'day'
 
 export type SharedPassenger = {
   id: string
@@ -116,6 +134,29 @@ export function occupiedSeatsFromBookings(
 
 export function availableSeats(capacity: number, confirmedPassengers: number): number {
   return Math.max(0, capacity - Math.max(0, confirmedPassengers))
+}
+
+/** Capacity must stay at or above confirmed occupancy. */
+export function canSetCapacity(capacity: number, confirmedPassengers: number): boolean {
+  const cap = Number(capacity)
+  const occ = Math.max(0, Number(confirmedPassengers) || 0)
+  return Number.isFinite(cap) && cap >= 1 && cap >= occ
+}
+
+export function occupancyTone(
+  confirmed: number,
+  capacity: number,
+): 'green' | 'amber' | 'red' | 'zinc' {
+  if (capacity <= 0) return 'zinc'
+  const ratio = confirmed / capacity
+  if (confirmed >= capacity) return 'red'
+  if (ratio >= 0.8) return 'amber'
+  if (confirmed > 0) return 'green'
+  return 'zinc'
+}
+
+export function occupancyLabel(confirmed: number, capacity: number, available: number): string {
+  return `${confirmed}/${capacity} · ${available} left`
 }
 
 export function supplierBreakdownFromBookings(

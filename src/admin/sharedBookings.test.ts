@@ -3,11 +3,13 @@ import {
   SHARED_BOOKINGS_FORBIDDEN_KEYS,
   availableSeats,
   canAccessBoard,
+  canSetCapacity,
   canViewSupplierPassengers,
   channelLabel,
   filterManifestForAccess,
   normalizeSharedBookingsAccess,
   occupiedSeatsFromBookings,
+  occupancyTone,
   payloadHasForbiddenFields,
   resolveSharedAccessDecision,
   supplierBreakdownFromBookings,
@@ -15,6 +17,11 @@ import {
   type SharedBookingsAccess,
   type SharedPassenger,
 } from './sharedBookings'
+import {
+  calendarRange,
+  shiftCalendarAnchor,
+  startOfWeekMonday,
+} from './sharedCalendar'
 import { isSharedBookingsPublicPath, postLoginSharedPath, sharedBookingsPaths } from './sharedBookingsPaths'
 import {
   SHARED_BOOKINGS_ADMIN_BASE,
@@ -89,6 +96,29 @@ describe('shared bookings seat math', () => {
     ])
     expect(occupied).toBe(5)
     expect(availableSeats(50, occupied)).toBe(45)
+  })
+
+  it('blocks capacity below confirmed occupancy', () => {
+    expect(canSetCapacity(10, 10)).toBe(true)
+    expect(canSetCapacity(9, 10)).toBe(false)
+    expect(canSetCapacity(0, 0)).toBe(false)
+    expect(occupancyTone(10, 10)).toBe('red')
+    expect(occupancyTone(8, 10)).toBe('amber')
+    expect(occupancyTone(2, 10)).toBe('green')
+  })
+
+  it('builds month/week/day calendar ranges', () => {
+    expect(startOfWeekMonday('2026-11-10')).toBe('2026-11-09')
+    const week = calendarRange('week', '2026-11-10')
+    expect(week.from).toBe('2026-11-09')
+    expect(week.to).toBe('2026-11-15')
+    expect(week.days).toHaveLength(7)
+    const month = calendarRange('month', '2026-11-10')
+    expect(month.from).toBe('2026-11-01')
+    expect(month.to).toBe('2026-11-30')
+    expect(shiftCalendarAnchor('day', '2026-11-10', 1)).toBe('2026-11-11')
+    expect(shiftCalendarAnchor('week', '2026-11-10', -1)).toBe('2026-11-03')
+    expect(shiftCalendarAnchor('month', '2026-11-10', 1)).toBe('2026-12-10')
   })
 
   it('builds supplier breakdown from confirmed only', () => {

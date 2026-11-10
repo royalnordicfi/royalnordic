@@ -28,6 +28,7 @@ import type {
   SharedOperatorRow,
   SharedPassenger,
   SharedSupplierOption,
+  SharedTourTemplate,
 } from './sharedBookings'
 import { normalizeSharedBookingsAccess, payloadHasForbiddenFields } from './sharedBookings'
 
@@ -1867,6 +1868,7 @@ export async function listSharedDepartures(
   board: SharedBoard,
   from?: string,
   to?: string,
+  includeCancelled = false,
 ): Promise<{
   ok: boolean
   error?: string
@@ -1878,6 +1880,7 @@ export async function listSharedDepartures(
     p_board: board,
     p_from: from || undefined,
     p_to: to || undefined,
+    p_include_cancelled: includeCancelled,
   })
   if (error) throw new Error(error.message)
   const payload = data as {
@@ -1906,6 +1909,7 @@ export async function fetchSharedDepartureDetail(id: string): Promise<{
   departure: SharedDepartureSummary
   passengers: SharedPassenger[]
   cancelled: SharedPassenger[]
+  assigned_supplier_ids: string[]
   channels_synced: boolean
 }> {
   await requireSharedBookingsSession()
@@ -1919,6 +1923,7 @@ export async function fetchSharedDepartureDetail(id: string): Promise<{
     departure?: SharedDepartureSummary
     passengers?: SharedPassenger[]
     cancelled?: SharedPassenger[]
+    assigned_supplier_ids?: string[] | unknown
     channels_synced?: boolean
   }
   if (payload?.ok) {
@@ -1927,6 +1932,9 @@ export async function fetchSharedDepartureDetail(id: string): Promise<{
       throw new Error(`forbidden_shared_bookings_field:${leaks.join(',')}`)
     }
   }
+  const assigned = Array.isArray(payload?.assigned_supplier_ids)
+    ? payload.assigned_supplier_ids.map(String)
+    : []
   if (!payload?.ok || !payload.departure) {
     return {
       ok: false,
@@ -1940,6 +1948,7 @@ export async function fetchSharedDepartureDetail(id: string): Promise<{
         departure_time: null,
         meeting_point: null,
         capacity: 0,
+        status: 'active',
         confirmed_passengers: 0,
         available_seats: 0,
         supplier_breakdown: [],
@@ -1947,6 +1956,7 @@ export async function fetchSharedDepartureDetail(id: string): Promise<{
       },
       passengers: [],
       cancelled: [],
+      assigned_supplier_ids: [],
       channels_synced: false,
     }
   }
@@ -1955,8 +1965,125 @@ export async function fetchSharedDepartureDetail(id: string): Promise<{
     departure: payload.departure,
     passengers: Array.isArray(payload.passengers) ? payload.passengers : [],
     cancelled: Array.isArray(payload.cancelled) ? payload.cancelled : [],
+    assigned_supplier_ids: assigned,
     channels_synced: Boolean(payload.channels_synced),
   }
+}
+
+export async function listSharedTourTemplates(includeInactive = false): Promise<{
+  ok: boolean
+  error?: string
+  templates: SharedTourTemplate[]
+}> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('list_shared_tour_templates', {
+    p_include_inactive: includeInactive,
+  })
+  if (error) throw new Error(error.message)
+  const payload = data as { ok: boolean; error?: string; templates?: SharedTourTemplate[] }
+  return {
+    ok: Boolean(payload?.ok),
+    error: payload?.error,
+    templates: Array.isArray(payload?.templates) ? payload.templates : [],
+  }
+}
+
+export async function upsertSharedTourTemplate(input: {
+  id?: string | null
+  code?: string
+  title: string
+  category?: SharedBoard
+  meeting_point?: string
+  default_capacity?: number
+  default_departure_time?: string
+  is_active?: boolean
+}): Promise<{ ok: boolean; error?: string; template?: SharedTourTemplate }> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('admin_upsert_shared_tour_template', {
+    p_id: input.id || null,
+    p_code: input.code || null,
+    p_title: input.title,
+    p_category: input.category || 'shared_bus',
+    p_meeting_point: input.meeting_point || null,
+    p_default_capacity: input.default_capacity ?? 50,
+    p_default_departure_time: input.default_departure_time || null,
+    p_is_active: input.is_active ?? true,
+  })
+  if (error) throw new Error(error.message)
+  return data as { ok: boolean; error?: string; template?: SharedTourTemplate }
+}
+
+export async function createSharedDeparture(input: {
+  template_id?: string | null
+  board?: SharedBoard
+  departure_date: string
+  departure_time?: string
+  capacity?: number
+  meeting_point?: string
+  tour_code?: string
+  tour_title?: string
+  supplier_ids?: string[]
+}): Promise<{ ok: boolean; error?: string; departure?: SharedDepartureSummary }> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('admin_create_shared_departure', {
+    p_template_id: input.template_id || null,
+    p_board: input.board || 'shared_bus',
+    p_departure_date: input.departure_date,
+    p_departure_time: input.departure_time || null,
+    p_capacity: input.capacity ?? null,
+    p_meeting_point: input.meeting_point || null,
+    p_tour_code: input.tour_code || null,
+    p_tour_title: input.tour_title || null,
+    p_supplier_ids: input.supplier_ids?.length ? input.supplier_ids : null,
+  })
+  if (error) throw new Error(error.message)
+  return data as { ok: boolean; error?: string; departure?: SharedDepartureSummary }
+}
+
+export async function updateSharedDeparture(input: {
+  departure_id: string
+  departure_date?: string
+  departure_time?: string | null
+  capacity?: number
+  meeting_point?: string | null
+  tour_title?: string
+  supplier_ids?: string[]
+}): Promise<{
+  ok: boolean
+  error?: string
+  departure?: SharedDepartureSummary
+  confirmed_passengers?: number
+  requested_capacity?: number
+}> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('admin_update_shared_departure', {
+    p_departure_id: input.departure_id,
+    p_departure_date: input.departure_date || null,
+    p_departure_time: input.departure_time === undefined ? null : input.departure_time,
+    p_capacity: input.capacity ?? null,
+    p_meeting_point: input.meeting_point === undefined ? null : input.meeting_point,
+    p_tour_title: input.tour_title || null,
+    p_supplier_ids: input.supplier_ids ? input.supplier_ids : null,
+  })
+  if (error) throw new Error(error.message)
+  return data as {
+    ok: boolean
+    error?: string
+    departure?: SharedDepartureSummary
+    confirmed_passengers?: number
+    requested_capacity?: number
+  }
+}
+
+export async function cancelSharedDeparture(
+  departureId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('admin_cancel_shared_departure', {
+    p_departure_id: departureId,
+  })
+  if (error) throw new Error(error.message)
+  return data as { ok: boolean; error?: string }
 }
 
 export async function completeSharedOperatorPasswordChange(): Promise<{
