@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getAdminSession, signInAdmin } from '../../lib/adminAuth'
+import { getAdminSession, signInAdmin, waitForAuthSession } from '../../lib/adminAuth'
 import { fetchSharedBookingsAccess } from '../adminApi'
 import { postLoginSharedPath, useSharedBookingsBase } from '../sharedBookingsPaths'
 
@@ -15,7 +15,7 @@ export default function SharedBookingsLoginPage() {
 
   useEffect(() => {
     let cancelled = false
-    void getAdminSession()
+    void waitForAuthSession()
       .then(async (s) => {
         if (!s.isSignedIn) {
           if (!cancelled) setChecking(false)
@@ -38,11 +38,7 @@ export default function SharedBookingsLoginPage() {
     setError('')
     setLoading(true)
     try {
-      const signed = await signInAdmin(email, password)
-      if (!signed.session) {
-        throw new Error('Signed in, but session was not ready. Please try again.')
-      }
-      // Prefer a fresh session round-trip so RPC auth.uid() is present.
+      await signInAdmin(email, password)
       await getAdminSession()
       const access = await fetchSharedBookingsAccess()
       navigate(postLoginSharedPath(access, base), { replace: true })

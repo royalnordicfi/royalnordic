@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, Outlet, useNavigate } from 'react-router-dom'
 import { RefreshCw } from 'lucide-react'
 import {
-  getAdminSession,
   onAdminAuthChange,
   signOutAdmin,
+  waitForAuthSession,
   type AdminSessionState,
 } from '../lib/adminAuth'
 import { fetchSharedBookingsAccess } from './adminApi'
@@ -30,7 +30,7 @@ export default function SharedBookingsShell() {
 
   useEffect(() => {
     let mounted = true
-    getAdminSession()
+    void waitForAuthSession()
       .then((s) => {
         if (mounted) {
           setAuth(s)
@@ -43,7 +43,9 @@ export default function SharedBookingsShell() {
           setReady(true)
         }
       })
-    const unsub = onAdminAuthChange((s) => mounted && setAuth(s))
+    const unsub = onAdminAuthChange((s) => {
+      if (mounted) setAuth(s)
+    })
     return () => {
       mounted = false
       unsub()
@@ -51,12 +53,18 @@ export default function SharedBookingsShell() {
   }, [])
 
   useEffect(() => {
+    // Important: while auth is still hydrating, do NOT mark accessReady.
+    // A prior bug set accessReady=true with access=null on the signed-out
+    // interim state, so the first signed-in render hit Access Denied.
+    if (!ready) return
+
     if (!auth?.isSignedIn) {
       setAccess(null)
       setAccessLoadError('')
       setAccessReady(true)
       return
     }
+
     let cancelled = false
     setAccessReady(false)
     setAccessLoadError('')
@@ -77,7 +85,7 @@ export default function SharedBookingsShell() {
     return () => {
       cancelled = true
     }
-  }, [auth?.isSignedIn, auth?.user?.id, retryKey])
+  }, [ready, auth?.isSignedIn, auth?.user?.id, retryKey])
 
   if (!ready || (auth?.isSignedIn && !accessReady)) {
     return (
@@ -109,7 +117,7 @@ export default function SharedBookingsShell() {
           </button>
           <button
             type="button"
-            className="mt-3 w-full text-xs text-zinc-500 underline-offset-2 hover:underline"
+            className="mt-3 inline-flex w-full min-h-[40px] items-center justify-center rounded-lg border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
             onClick={async () => {
               await signOutAdmin()
               navigate(paths.login, { replace: true })
@@ -129,7 +137,27 @@ export default function SharedBookingsShell() {
   if (decision === 'access_denied') {
     return <Navigate to={paths.accessDenied} replace />
   }
-  if (decision !== 'portal' || !access || access.ok === false) {
+  // Transient/unknown errors: never treat as unauthorized.
+  if (decision === 'access_error' || !access || access.ok === false) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+        <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm">
+          <h1 className="text-lg font-semibold text-zinc-900">Couldn’t verify access</h1>
+          <p className="mt-2 text-sm text-zinc-600">
+            Please retry. If this keeps happening, sign out and sign in again.
+          </p>
+          <button
+            type="button"
+            className="mt-5 w-full min-h-[44px] rounded-lg bg-emerald-700 text-sm font-semibold text-white hover:bg-emerald-600"
+            onClick={() => setRetryKey((n) => n + 1)}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
+  if (decision !== 'portal') {
     return <Navigate to={paths.accessDenied} replace />
   }
 
@@ -151,7 +179,7 @@ export default function SharedBookingsShell() {
           </div>
           <button
             type="button"
-            className="shrink-0 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+            className="inline-flex shrink-0 min-h-[40px] items-center justify-center rounded-lg border border-zinc-300 bg-white px-3 text-xs font-medium text-zinc-800 hover:bg-zinc-50"
             onClick={async () => {
               await signOutAdmin()
               navigate(paths.login, { replace: true })

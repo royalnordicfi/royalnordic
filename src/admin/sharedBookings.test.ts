@@ -159,15 +159,30 @@ describe('shared bookings access decisions', () => {
     )
   })
 
-  it('denies inactive operators and unauthorized users only', () => {
-    expect(resolveSharedAccessDecision(inactiveOrUnauthorized)).toBe('access_denied')
-    expect(resolveSharedAccessDecision(noneAccess)).toBe('access_denied')
+  it('treats missing/hydration access as error, not unauthorized', () => {
+    // Shell must not map this to Access Denied during auth hydration.
+    expect(resolveSharedAccessDecision(null)).toBe('access_error')
+    expect(resolveSharedAccessDecision(undefined)).toBe('access_error')
     expect(resolveSharedAccessDecision({ ok: false, error: 'not_authenticated' })).toBe(
       'access_error',
     )
+  })
+
+  it('denies inactive operators and unauthorized users only', () => {
+    expect(resolveSharedAccessDecision(inactiveOrUnauthorized)).toBe('access_denied')
+    expect(resolveSharedAccessDecision(noneAccess)).toBe('access_denied')
     expect(postLoginSharedPath(noneAccess, SHARED_BOOKINGS_PORTAL_BASE)).toBe(
       `${SHARED_BOOKINGS_PORTAL_BASE}/access-denied`,
     )
+  })
+
+  it('after successful password change, supplier access reaches portal', () => {
+    expect(
+      resolveSharedAccessDecision({
+        ...eliasMustChange,
+        must_change_password: false,
+      }),
+    ).toBe('portal')
   })
 
   it('keeps admins on portal management path without password gate', () => {

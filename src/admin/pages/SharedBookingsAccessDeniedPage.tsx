@@ -20,9 +20,13 @@ export default function SharedBookingsAccessDeniedPage() {
         </p>
         <button
           type="button"
-          className="mt-6 w-full min-h-[44px] rounded-lg bg-zinc-900 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800"
+          className="mt-6 inline-flex w-full min-h-[44px] items-center justify-center rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold text-zinc-900 hover:bg-zinc-50"
           onClick={async () => {
-            await signOutAdmin()
+            try {
+              await signOutAdmin()
+            } catch {
+              // still leave the dead-end screen
+            }
             navigate(paths.login, { replace: true })
           }}
         >
