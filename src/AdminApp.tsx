@@ -18,6 +18,10 @@ import PartnersPage from './admin/pages/PartnersPage'
 import PartnerBookingsPage from './admin/pages/PartnerBookingsPage'
 import SharedBookingsPage from './admin/pages/SharedBookingsPage'
 import SharedDepartureDetailPage from './admin/pages/SharedDepartureDetailPage'
+import SharedBookingsLoginPage from './admin/pages/SharedBookingsLoginPage'
+import SharedBookingsPasswordSetupPage from './admin/pages/SharedBookingsPasswordSetupPage'
+import SharedBookingsAccessDeniedPage from './admin/pages/SharedBookingsAccessDeniedPage'
+import SharedOperatorsPage from './admin/pages/SharedOperatorsPage'
 
 /**
  * Operator console — only mounted when hostname is admin.royalnordic.fi
@@ -40,6 +44,9 @@ function AdminApp() {
   return (
     <Router>
       <Routes>
+        <Route path="sharedbookings/login" element={<SharedBookingsLoginPage />} />
+        <Route path="sharedbookings/setup-password" element={<SharedBookingsPasswordSetupPage />} />
+        <Route path="sharedbookings/access-denied" element={<SharedBookingsAccessDeniedPage />} />
         <Route element={<AdminShell />}>
           <Route index element={<HomePage />} />
           <Route path="bookings" element={<BookingsPage />} />
@@ -54,6 +61,7 @@ function AdminApp() {
           <Route path="partners" element={<PartnersPage />} />
           <Route path="partner-bookings" element={<PartnerBookingsPage />} />
           <Route path="sharedbookings" element={<SharedBookingsPage />} />
+          <Route path="sharedbookings/operators" element={<SharedOperatorsPage />} />
           <Route path="sharedbookings/:id" element={<SharedDepartureDetailPage />} />
           <Route path="revenue" element={<RevenuePage />} />
           <Route path="import" element={<ImportPage />} />

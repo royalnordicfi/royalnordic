@@ -6,8 +6,10 @@ import {
   canViewSupplierPassengers,
   channelLabel,
   filterManifestForAccess,
+  isSharedBookingsPublicPath,
   occupiedSeatsFromBookings,
   payloadHasForbiddenFields,
+  postLoginSharedPath,
   supplierBreakdownFromBookings,
   syncStatusBanner,
   type SharedBookingsAccess,
@@ -20,6 +22,7 @@ const adminAccess: SharedBookingsAccess = {
   boards: ['shared_bus', 'my_tours'],
   supplier_code: 'royal_nordic',
   supplier_name: 'Royal Nordic',
+  must_change_password: false,
   channels_synced: false,
 }
 
@@ -30,13 +33,20 @@ const eliasAccess: SharedBookingsAccess = {
   supplier_id: 'sup-elias',
   supplier_code: 'elias',
   supplier_name: 'Elias',
+  must_change_password: false,
   channels_synced: false,
+}
+
+const eliasMustChange: SharedBookingsAccess = {
+  ...eliasAccess,
+  must_change_password: true,
 }
 
 const noneAccess: SharedBookingsAccess = {
   ok: true,
   access: 'none',
   boards: [],
+  must_change_password: false,
   channels_synced: false,
 }
 
@@ -117,5 +127,23 @@ describe('shared bookings copy', () => {
     expect(channelLabel('getyourguide')).toMatch(/not connected/i)
     expect(channelLabel('bokun')).toMatch(/not connected/i)
     expect(syncStatusBanner(false)).toMatch(/not connected/i)
+  })
+})
+
+describe('shared bookings login routing', () => {
+  it('sends operators with must_change_password to setup', () => {
+    expect(postLoginSharedPath(eliasMustChange)).toBe('/sharedbookings/setup-password')
+    expect(postLoginSharedPath(eliasAccess)).toBe('/sharedbookings')
+    expect(postLoginSharedPath(adminAccess)).toBe('/sharedbookings')
+    expect(postLoginSharedPath(noneAccess)).toBe('/sharedbookings/access-denied')
+    expect(postLoginSharedPath({ ok: false, error: 'x' })).toBe('/sharedbookings/access-denied')
+  })
+
+  it('treats login/setup/denied as public shared paths', () => {
+    expect(isSharedBookingsPublicPath('/sharedbookings/login')).toBe(true)
+    expect(isSharedBookingsPublicPath('/sharedbookings/setup-password')).toBe(true)
+    expect(isSharedBookingsPublicPath('/sharedbookings/access-denied')).toBe(true)
+    expect(isSharedBookingsPublicPath('/sharedbookings')).toBe(false)
+    expect(isSharedBookingsPublicPath('/sharedbookings/operators')).toBe(false)
   })
 })

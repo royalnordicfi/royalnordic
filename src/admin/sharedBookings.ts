@@ -9,6 +9,7 @@ export type SharedBookingsAccess =
       boards: SharedBoard[]
       supplier_code: string
       supplier_name: string
+      must_change_password: boolean
       channels_synced: false
     }
   | {
@@ -18,15 +19,39 @@ export type SharedBookingsAccess =
       supplier_id: string
       supplier_code: string
       supplier_name: string
+      operator_id?: string
+      must_change_password: boolean
       channels_synced: false
     }
   | {
       ok: true
       access: 'none'
       boards: SharedBoard[]
+      must_change_password?: boolean
       channels_synced: false
     }
   | { ok: false; error: string; access?: 'none' }
+
+export type SharedOperatorRow = {
+  id: string
+  user_id: string
+  email: string | null
+  display_name: string | null
+  is_active: boolean
+  must_change_password: boolean
+  password_changed_at: string | null
+  supplier_id: string
+  supplier_code: string
+  supplier_name: string
+  created_at: string
+}
+
+export type SharedSupplierOption = {
+  id: string
+  code: string
+  display_name: string
+  is_active: boolean
+}
 
 export type SupplierBreakdown = {
   supplier_code: string
@@ -191,4 +216,20 @@ export function formatDepartureWhen(date: string, time?: string | null): string 
 export function syncStatusBanner(channelsSynced: boolean | undefined): string {
   if (channelsSynced) return 'External channels connected'
   return 'Local records only — GetYourGuide / Bókun are not connected yet'
+}
+
+export function postLoginSharedPath(access: SharedBookingsAccess): string {
+  if (!access.ok || access.access === 'none') return '/sharedbookings/access-denied'
+  if (access.access === 'supplier' && access.must_change_password) {
+    return '/sharedbookings/setup-password'
+  }
+  return '/sharedbookings'
+}
+
+export function isSharedBookingsPublicPath(pathname: string): boolean {
+  return (
+    pathname === '/sharedbookings/login' ||
+    pathname === '/sharedbookings/setup-password' ||
+    pathname === '/sharedbookings/access-denied'
+  )
 }

@@ -25,7 +25,9 @@ import type {
   SharedBoard,
   SharedBookingsAccess,
   SharedDepartureSummary,
+  SharedOperatorRow,
   SharedPassenger,
+  SharedSupplierOption,
 } from './sharedBookings'
 import { payloadHasForbiddenFields } from './sharedBookings'
 
@@ -1955,4 +1957,99 @@ export async function fetchSharedDepartureDetail(id: string): Promise<{
     cancelled: Array.isArray(payload.cancelled) ? payload.cancelled : [],
     channels_synced: Boolean(payload.channels_synced),
   }
+}
+
+export async function completeSharedOperatorPasswordChange(): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('complete_shared_operator_password_change')
+  if (error) throw new Error(error.message)
+  return data as { ok: boolean; error?: string }
+}
+
+export async function listSharedBookingOperators(): Promise<{
+  ok: boolean
+  error?: string
+  operators: SharedOperatorRow[]
+}> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('list_shared_booking_operators')
+  if (error) throw new Error(error.message)
+  const payload = data as { ok: boolean; error?: string; operators?: SharedOperatorRow[] }
+  return {
+    ok: Boolean(payload?.ok),
+    error: payload?.error,
+    operators: Array.isArray(payload?.operators) ? payload.operators : [],
+  }
+}
+
+export async function listSharedSuppliersAdmin(): Promise<{
+  ok: boolean
+  error?: string
+  suppliers: SharedSupplierOption[]
+}> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('list_shared_suppliers_admin')
+  if (error) throw new Error(error.message)
+  const payload = data as { ok: boolean; error?: string; suppliers?: SharedSupplierOption[] }
+  return {
+    ok: Boolean(payload?.ok),
+    error: payload?.error,
+    suppliers: Array.isArray(payload?.suppliers) ? payload.suppliers : [],
+  }
+}
+
+async function sharedOperatorAdminFetch(body: Record<string, unknown>) {
+  const session = await requireSharedBookingsSession()
+  const res = await fetch(
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-shared-booking-operator`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify(body),
+    },
+  )
+  const payload = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    throw new Error(payload.error || `Operator request failed (${res.status})`)
+  }
+  return payload
+}
+
+export async function createSharedBookingOperator(input: {
+  email: string
+  display_name?: string
+  supplier_id: string
+}): Promise<{ temporary_password: string; operator: SharedOperatorRow }> {
+  const payload = await sharedOperatorAdminFetch({ action: 'create', ...input })
+  if (!payload.temporary_password) throw new Error('temporary_password_missing')
+  return {
+    temporary_password: String(payload.temporary_password),
+    operator: payload.operator as SharedOperatorRow,
+  }
+}
+
+export async function setSharedOperatorActive(operatorId: string, isActive: boolean): Promise<void> {
+  await sharedOperatorAdminFetch({
+    action: 'set_active',
+    operator_id: operatorId,
+    is_active: isActive,
+  })
+}
+
+export async function resetSharedOperatorTemporaryPassword(
+  operatorId: string,
+): Promise<{ temporary_password: string }> {
+  const payload = await sharedOperatorAdminFetch({
+    action: 'reset_temporary_password',
+    operator_id: operatorId,
+  })
+  if (!payload.temporary_password) throw new Error('temporary_password_missing')
+  return { temporary_password: String(payload.temporary_password) }
 }

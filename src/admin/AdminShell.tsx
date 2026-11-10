@@ -22,6 +22,7 @@ const fullNavGroups: { title: string; items: NavItem[] }[] = [
       { to: '/manual', label: 'New booking' },
       { to: '/calendar', label: 'Calendar' },
       { to: '/sharedbookings', label: 'Shared Bookings' },
+      { to: '/sharedbookings/operators', label: 'SB Operators' },
       { to: '/requests', label: 'Requests', badgeKey: 'requests' },
     ],
   },
@@ -47,9 +48,13 @@ const fullNavGroups: { title: string; items: NavItem[] }[] = [
 const sharedOnlyNavGroups: { title: string; items: NavItem[] }[] = [
   {
     title: 'Operations',
-    items: [{ to: '/sharedbookings', label: 'Shared Bookings' }],
+    items: [{ to: '/sharedbookings', label: 'Shared Bookings', end: true }],
   },
 ]
+
+function isSharedBookingsPath(pathname: string) {
+  return pathname === '/sharedbookings' || pathname.startsWith('/sharedbookings/')
+}
 
 export default function AdminShell() {
   const [auth, setAuth] = useState<AdminSessionState | null>(null)
@@ -57,8 +62,10 @@ export default function AdminShell() {
   const [open, setOpen] = useState(false)
   const [requestCount, setRequestCount] = useState(0)
   const [sharedAccess, setSharedAccess] = useState<SharedBookingsAccess | null>(null)
+  const [sharedAccessReady, setSharedAccessReady] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
+  const onSharedPath = isSharedBookingsPath(location.pathname)
 
   useEffect(() => {
     let mounted = true
@@ -85,15 +92,23 @@ export default function AdminShell() {
   useEffect(() => {
     if (!auth?.isSignedIn) {
       setSharedAccess(null)
+      setSharedAccessReady(true)
       return
     }
     let cancelled = false
+    setSharedAccessReady(false)
     void fetchSharedBookingsAccess()
       .then((a) => {
-        if (!cancelled) setSharedAccess(a)
+        if (!cancelled) {
+          setSharedAccess(a)
+          setSharedAccessReady(true)
+        }
       })
       .catch(() => {
-        if (!cancelled) setSharedAccess(null)
+        if (!cancelled) {
+          setSharedAccess(null)
+          setSharedAccessReady(true)
+        }
       })
     return () => {
       cancelled = true
@@ -102,7 +117,6 @@ export default function AdminShell() {
 
   useEffect(() => {
     if (!auth?.isSignedIn) return
-    // Supplier-only operators do not use transportation request badges.
     if (sharedAccess && sharedAccess.ok && sharedAccess.access === 'supplier') return
     let cancelled = false
     const load = () =>
@@ -128,7 +142,36 @@ export default function AdminShell() {
   }
 
   if (!auth?.isSignedIn) {
+    if (onSharedPath) {
+      return <Navigate to="/sharedbookings/login" replace />
+    }
     return <AdminLogin onSuccess={() => getAdminSession().then(setAuth)} />
+  }
+
+  if (onSharedPath && !sharedAccessReady) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <RefreshCw className="h-5 w-5 animate-spin text-emerald-700" />
+      </div>
+    )
+  }
+
+  if (
+    onSharedPath &&
+    sharedAccess &&
+    sharedAccess.ok &&
+    sharedAccess.access === 'supplier' &&
+    sharedAccess.must_change_password
+  ) {
+    return <Navigate to="/sharedbookings/setup-password" replace />
+  }
+
+  if (
+    onSharedPath &&
+    sharedAccess &&
+    ((sharedAccess.ok && sharedAccess.access === 'none') || sharedAccess.ok === false)
+  ) {
+    return <Navigate to="/sharedbookings/access-denied" replace />
   }
 
   const isSupplierOnly =
@@ -136,10 +179,7 @@ export default function AdminShell() {
   const navGroups = isSupplierOnly ? sharedOnlyNavGroups : fullNavGroups
   const brandLabel = isSupplierOnly ? 'Shared Bookings' : 'Royal Nordic Admin'
 
-  if (
-    isSupplierOnly &&
-    !location.pathname.startsWith('/sharedbookings')
-  ) {
+  if (isSupplierOnly && !onSharedPath) {
     return <Navigate to="/sharedbookings" replace />
   }
 
@@ -169,7 +209,7 @@ export default function AdminShell() {
             className="rounded-md bg-zinc-800 px-2.5 py-1.5 text-xs hover:bg-zinc-700"
             onClick={async () => {
               await signOutAdmin()
-              navigate('/')
+              navigate(isSupplierOnly || onSharedPath ? '/sharedbookings/login' : '/')
             }}
           >
             Sign out
