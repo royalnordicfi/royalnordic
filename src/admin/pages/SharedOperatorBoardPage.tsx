@@ -273,51 +273,58 @@ export default function SharedOperatorBoardPage() {
                   <ul className="space-y-2.5">
                     {deps.map((row) => (
                       <li key={row.id}>
-                        <Link
-                          to={paths.departure(row.id)}
-                          className="block rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:border-emerald-300 hover:shadow-md"
-                        >
-                          <div className="flex flex-wrap items-start justify-between gap-2">
-                            <div className="min-w-0">
-                              <p className="text-[11px] font-medium text-zinc-500">
-                                {row.departure_time || 'Time TBD'}
-                              </p>
-                              <h3 className="mt-0.5 text-base font-semibold text-zinc-900">
-                                {row.tour_title}
-                              </h3>
-                              {row.meeting_point ? (
-                                <p className="mt-1 text-xs text-zinc-500">{row.meeting_point}</p>
-                              ) : null}
+                        <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:border-emerald-300 hover:shadow-md">
+                          <Link to={paths.departure(row.id)} className="block">
+                            <div className="flex flex-wrap items-start justify-between gap-2">
+                              <div className="min-w-0">
+                                <p className="text-[11px] font-medium text-zinc-500">
+                                  {row.departure_time || 'Time TBD'}
+                                </p>
+                                <h3 className="mt-0.5 text-base font-semibold text-zinc-900">
+                                  {row.tour_title}
+                                </h3>
+                                {row.meeting_point ? (
+                                  <p className="mt-1 text-xs text-zinc-500">{row.meeting_point}</p>
+                                ) : null}
+                              </div>
+                              <OccupancyBadge row={row} />
                             </div>
-                            <OccupancyBadge row={row} />
+                            <div className="mt-3 grid grid-cols-3 gap-2">
+                              <div className="rounded-xl bg-zinc-50 px-2.5 py-2 text-center">
+                                <p className="text-[10px] uppercase tracking-wide text-zinc-400">
+                                  Confirmed
+                                </p>
+                                <p className="text-sm font-semibold tabular-nums text-zinc-900">
+                                  {row.confirmed_passengers}
+                                </p>
+                              </div>
+                              <div className="rounded-xl bg-zinc-50 px-2.5 py-2 text-center">
+                                <p className="text-[10px] uppercase tracking-wide text-zinc-400">
+                                  Capacity
+                                </p>
+                                <p className="text-sm font-semibold tabular-nums text-zinc-900">
+                                  {row.capacity}
+                                </p>
+                              </div>
+                              <div className="rounded-xl bg-zinc-50 px-2.5 py-2 text-center">
+                                <p className="text-[10px] uppercase tracking-wide text-zinc-400">
+                                  Available
+                                </p>
+                                <p className="text-sm font-semibold tabular-nums text-zinc-900">
+                                  {row.available_seats}
+                                </p>
+                              </div>
+                            </div>
+                          </Link>
+                          <div className="mt-3">
+                            <Link
+                              to={`${paths.departure(row.id)}?add=1`}
+                              className="text-xs font-medium text-emerald-800 hover:underline"
+                            >
+                              Add booking
+                            </Link>
                           </div>
-                          <div className="mt-3 grid grid-cols-3 gap-2">
-                            <div className="rounded-xl bg-zinc-50 px-2.5 py-2 text-center">
-                              <p className="text-[10px] uppercase tracking-wide text-zinc-400">
-                                Confirmed
-                              </p>
-                              <p className="text-sm font-semibold tabular-nums text-zinc-900">
-                                {row.confirmed_passengers}
-                              </p>
-                            </div>
-                            <div className="rounded-xl bg-zinc-50 px-2.5 py-2 text-center">
-                              <p className="text-[10px] uppercase tracking-wide text-zinc-400">
-                                Capacity
-                              </p>
-                              <p className="text-sm font-semibold tabular-nums text-zinc-900">
-                                {row.capacity}
-                              </p>
-                            </div>
-                            <div className="rounded-xl bg-zinc-50 px-2.5 py-2 text-center">
-                              <p className="text-[10px] uppercase tracking-wide text-zinc-400">
-                                Available
-                              </p>
-                              <p className="text-sm font-semibold tabular-nums text-zinc-900">
-                                {row.available_seats}
-                              </p>
-                            </div>
-                          </div>
-                        </Link>
+                        </div>
                       </li>
                     ))}
                   </ul>

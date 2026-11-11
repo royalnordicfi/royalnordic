@@ -101,12 +101,26 @@ export type SharedPassenger = {
   children: number
   passenger_count: number
   pickup_location: string | null
+  contact_email?: string | null
+  contact_phone?: string | null
+  notes?: string | null
   status: 'confirmed' | 'pending' | 'cancelled'
   channel: string
   sync_status: string
   supplier_code: string
   supplier_name: string
   cancelled_at?: string | null
+}
+
+export type SharedBookingInput = {
+  guest_name: string
+  adults: number
+  children: number
+  booking_ref?: string
+  pickup_location?: string
+  contact_email?: string
+  contact_phone?: string
+  notes?: string
 }
 
 /** Fields that must never appear in Elias-facing payloads. */
@@ -157,6 +171,60 @@ export function occupancyTone(
 
 export function occupancyLabel(confirmed: number, capacity: number, available: number): string {
   return `${confirmed}/${capacity} · ${available} left`
+}
+
+export function normalizePassengerCounts(adults: number, children: number): {
+  adults: number
+  children: number
+  passenger_count: number
+  ok: boolean
+  error?: string
+} {
+  const a = Math.max(0, Math.floor(Number(adults) || 0))
+  const c = Math.max(0, Math.floor(Number(children) || 0))
+  const passenger_count = a + c
+  if (passenger_count < 1) {
+    return { adults: a, children: c, passenger_count, ok: false, error: 'passenger_count_required' }
+  }
+  return { adults: a, children: c, passenger_count, ok: true }
+}
+
+export function canMutateSharedPassenger(
+  access: SharedBookingsAccess | null | undefined,
+  passenger: Pick<SharedPassenger, 'supplier_code'>,
+): boolean {
+  if (!access || access.ok === false || access.access === 'none') return false
+  if (access.access === 'admin') return true
+  if (access.access === 'supplier') return access.supplier_code === passenger.supplier_code
+  return false
+}
+
+export function bookingErrorMessage(error: string | undefined, extras?: {
+  available_seats?: number
+  confirmed_passengers?: number
+}): string {
+  switch (error) {
+    case 'capacity_exceeded':
+      return extras?.available_seats != null
+        ? `Not enough seats (only ${extras.available_seats} left)`
+        : 'Not enough seats on this departure'
+    case 'duplicate_booking_ref':
+      return 'This booking reference already exists for your supplier'
+    case 'guest_name_required':
+      return 'Guest name is required'
+    case 'passenger_count_required':
+      return 'Add at least one adult or child'
+    case 'forbidden':
+      return 'You are not allowed to change this booking'
+    case 'departure_cancelled':
+      return 'This departure is cancelled'
+    case 'booking_not_confirmed':
+      return 'Only confirmed bookings can be edited'
+    case 'password_change_required':
+      return 'Set your password before managing bookings'
+    default:
+      return error || 'Could not save booking'
+  }
 }
 
 export function supplierBreakdownFromBookings(

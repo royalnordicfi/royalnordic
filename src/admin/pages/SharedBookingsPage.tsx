@@ -55,37 +55,47 @@ const boards: { id: SharedBoard; label: string }[] = [
 function DepartureCard({
   row,
   href,
+  addHref,
   compact = false,
 }: {
   row: SharedDepartureSummary
   href: string
+  addHref?: string
   compact?: boolean
 }) {
   const tone = occupancyTone(row.confirmed_passengers, row.capacity)
   return (
-    <Link
-      to={href}
-      className={`block rounded-xl border border-zinc-200 bg-white transition hover:border-emerald-300 hover:shadow-sm ${
+    <div
+      className={`rounded-xl border border-zinc-200 bg-white transition hover:border-emerald-300 hover:shadow-sm ${
         compact ? 'px-2 py-1.5' : 'p-3'
       } ${row.status === 'cancelled' ? 'opacity-60' : ''}`}
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <p className={`truncate font-semibold text-zinc-900 ${compact ? 'text-xs' : 'text-sm'}`}>
-            {row.departure_time ? `${row.departure_time} · ` : ''}
-            {row.tour_title}
-          </p>
-          {!compact && row.meeting_point ? (
-            <p className="mt-0.5 truncate text-[11px] text-zinc-500">{row.meeting_point}</p>
-          ) : null}
+      <Link to={href} className="block">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className={`truncate font-semibold text-zinc-900 ${compact ? 'text-xs' : 'text-sm'}`}>
+              {row.departure_time ? `${row.departure_time} · ` : ''}
+              {row.tour_title}
+            </p>
+            {!compact && row.meeting_point ? (
+              <p className="mt-0.5 truncate text-[11px] text-zinc-500">{row.meeting_point}</p>
+            ) : null}
+          </div>
+          <Badge tone={tone === 'amber' ? 'yellow' : tone === 'zinc' ? 'gray' : tone}>
+            {compact
+              ? `${row.confirmed_passengers}/${row.capacity}`
+              : occupancyLabel(row.confirmed_passengers, row.capacity, row.available_seats)}
+          </Badge>
         </div>
-        <Badge tone={tone === 'amber' ? 'yellow' : tone === 'zinc' ? 'gray' : tone}>
-          {compact
-            ? `${row.confirmed_passengers}/${row.capacity}`
-            : occupancyLabel(row.confirmed_passengers, row.capacity, row.available_seats)}
-        </Badge>
-      </div>
-    </Link>
+      </Link>
+      {!compact && addHref && row.status !== 'cancelled' ? (
+        <div className="mt-2">
+          <Link to={addHref} className="text-xs font-medium text-emerald-800 hover:underline">
+            Add booking
+          </Link>
+        </div>
+      ) : null}
+    </div>
   )
 }
 
@@ -644,7 +654,11 @@ export default function SharedBookingsPage() {
                   <ul className="space-y-2">
                     {deps.map((row) => (
                       <li key={row.id}>
-                        <DepartureCard row={row} href={paths.departure(row.id)} />
+                        <DepartureCard
+                          row={row}
+                          href={paths.departure(row.id)}
+                          addHref={`${paths.departure(row.id)}?add=1`}
+                        />
                       </li>
                     ))}
                   </ul>

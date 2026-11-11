@@ -2,11 +2,14 @@ import { describe, expect, it } from 'vitest'
 import {
   SHARED_BOOKINGS_FORBIDDEN_KEYS,
   availableSeats,
+  bookingErrorMessage,
   canAccessBoard,
+  canMutateSharedPassenger,
   canSetCapacity,
   canViewSupplierPassengers,
   channelLabel,
   filterManifestForAccess,
+  normalizePassengerCounts,
   normalizeSharedBookingsAccess,
   occupiedSeatsFromBookings,
   occupancyTone,
@@ -105,6 +108,30 @@ describe('shared bookings seat math', () => {
     expect(occupancyTone(10, 10)).toBe('red')
     expect(occupancyTone(8, 10)).toBe('amber')
     expect(occupancyTone(2, 10)).toBe('green')
+  })
+
+  it('normalizes booking passenger counts and mutation permissions', () => {
+    expect(normalizePassengerCounts(2, 1)).toEqual({
+      adults: 2,
+      children: 1,
+      passenger_count: 3,
+      ok: true,
+    })
+    expect(normalizePassengerCounts(0, 0).ok).toBe(false)
+    expect(canMutateSharedPassenger(adminAccess, { supplier_code: 'elias' })).toBe(true)
+    expect(canMutateSharedPassenger(eliasAccess, { supplier_code: 'elias' })).toBe(true)
+    expect(canMutateSharedPassenger(eliasAccess, { supplier_code: 'royal_nordic' })).toBe(false)
+    expect(bookingErrorMessage('capacity_exceeded', { available_seats: 1 })).toMatch(/1 left/)
+    expect(bookingErrorMessage('duplicate_booking_ref')).toMatch(/reference/i)
+  })
+
+  it('cancelled passengers do not occupy seats', () => {
+    const occupied = occupiedSeatsFromBookings([
+      { status: 'confirmed', passenger_count: 4 },
+      { status: 'cancelled', passenger_count: 4 },
+    ])
+    expect(occupied).toBe(4)
+    expect(availableSeats(8, occupied)).toBe(4)
   })
 
   it('builds month/week/day calendar ranges', () => {

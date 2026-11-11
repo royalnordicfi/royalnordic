@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
 import {
   cancelSharedDeparture,
+  cancelSharedDepartureBooking,
+  createSharedDepartureBooking,
   fetchSharedBookingsAccess,
   fetchSharedDepartureDetail,
   listSharedSuppliersAdmin,
   updateSharedDeparture,
+  updateSharedDepartureBooking,
 } from '../adminApi'
 import { Badge, statusTone } from '../components/Badge'
 import {
@@ -16,11 +19,15 @@ import {
   PrimaryButton,
   SecondaryButton,
   inputClass,
+  textareaClass,
 } from '../components/ui'
 import {
+  bookingErrorMessage,
+  canMutateSharedPassenger,
   canSetCapacity,
   channelLabel,
   formatDepartureWhen,
+  normalizePassengerCounts,
   syncStatusBanner,
   type SharedBookingsAccess,
   type SharedDepartureSummary,
@@ -38,26 +45,15 @@ type DetailState = {
   channels_synced: boolean
 }
 
-function PassengerRow({ row }: { row: SharedPassenger }) {
-  return (
-    <li className="rounded-lg border border-zinc-200 px-3 py-3">
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="min-w-0">
-          <p className="font-medium text-zinc-900">{row.guest_name || 'Guest'}</p>
-          <p className="mt-0.5 text-xs text-zinc-500">
-            {[row.booking_ref, `${row.passenger_count} pax`, row.supplier_name]
-              .filter(Boolean)
-              .join(' · ')}
-          </p>
-          {row.pickup_location ? (
-            <p className="mt-1 text-xs text-zinc-600">Pickup: {row.pickup_location}</p>
-          ) : null}
-          <p className="mt-1 text-[11px] text-zinc-400">{channelLabel(row.channel)}</p>
-        </div>
-        <Badge tone={statusTone(row.status)}>{row.status}</Badge>
-      </div>
-    </li>
-  )
+const emptyForm = {
+  guest_name: '',
+  adults: '1',
+  children: '0',
+  booking_ref: '',
+  pickup_location: '',
+  contact_email: '',
+  contact_phone: '',
+  notes: '',
 }
 
 const UUID_RE =
@@ -65,6 +61,7 @@ const UUID_RE =
 
 export default function SharedDepartureDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const [params, setParams] = useSearchParams()
   const base = useSharedBookingsBase()
   const paths = sharedBookingsPaths(base)
   const [access, setAccess] = useState<SharedBookingsAccess | null>(null)
@@ -72,7 +69,10 @@ export default function SharedDepartureDetailPage() {
   const [suppliers, setSuppliers] = useState<SharedSupplierOption[]>([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
-  const [editing, setEditing] = useState(false)
+  const [editingDeparture, setEditingDeparture] = useState(false)
+  const [showAdd, setShowAdd] = useState(params.get('add') === '1')
+  const [editingBookingId, setEditingBookingId] = useState<string | null>(null)
+  const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
   const [date, setDate] = useState('')
   const [time, setTime] = useState('')
@@ -83,6 +83,9 @@ export default function SharedDepartureDetailPage() {
   const validId = Boolean(id && UUID_RE.test(id))
   const isAdminHost = base === SHARED_BOOKINGS_ADMIN_BASE
   const isAdmin = Boolean(access && access.ok && access.access === 'admin' && isAdminHost)
+  const canBook =
+    Boolean(access && access.ok && (access.access === 'admin' || access.access === 'supplier')) &&
+    data?.departure.status !== 'cancelled'
 
   const load = async (departureId: string) => {
     const [a, res] = await Promise.all([
@@ -133,6 +136,10 @@ export default function SharedDepartureDetailPage() {
     }
   }, [id, isAdminHost])
 
+  useEffect(() => {
+    if (params.get('add') === '1') setShowAdd(true)
+  }, [params])
+
   if (!validId) {
     return <Navigate to={paths.root} replace />
   }
@@ -141,6 +148,109 @@ export default function SharedDepartureDetailPage() {
   const confirmed = dep?.confirmed_passengers || 0
   const nextCapacity = Number(capacity)
   const capacityOk = canSetCapacity(nextCapacity, confirmed)
+
+  const openAdd = () => {
+    setEditingBookingId(null)
+    setForm(emptyForm)
+    setShowAdd(true)
+    setParams((prev) => {
+      const n = new URLSearchParams(prev)
+      n.set('add', '1')
+      return n
+    })
+  }
+
+  const closeAdd = () => {
+    setShowAdd(false)
+    setEditingBookingId(null)
+    setForm(emptyForm)
+    setParams((prev) => {
+      const n = new URLSearchParams(prev)
+      n.delete('add')
+      return n
+    })
+  }
+
+  const openEditBooking = (row: SharedPassenger) => {
+    setShowAdd(true)
+    setEditingBookingId(row.id)
+    setForm({
+      guest_name: row.guest_name || '',
+      adults: String(row.adults ?? 0),
+      children: String(row.children ?? 0),
+      booking_ref: row.booking_ref || '',
+      pickup_location: row.pickup_location || '',
+      contact_email: row.contact_email || '',
+      contact_phone: row.contact_phone || '',
+      notes: row.notes || '',
+    })
+  }
+
+  const saveBooking = async () => {
+    if (!id || !dep) return
+    const counts = normalizePassengerCounts(Number(form.adults), Number(form.children))
+    if (!counts.ok) {
+      setError(bookingErrorMessage(counts.error))
+      return
+    }
+    if (!form.guest_name.trim()) {
+      setError(bookingErrorMessage('guest_name_required'))
+      return
+    }
+    setSaving(true)
+    setError('')
+    try {
+      const payload = {
+        guest_name: form.guest_name.trim(),
+        adults: counts.adults,
+        children: counts.children,
+        booking_ref: form.booking_ref.trim() || undefined,
+        pickup_location: form.pickup_location.trim() || undefined,
+        contact_email: form.contact_email.trim() || undefined,
+        contact_phone: form.contact_phone.trim() || undefined,
+        notes: form.notes.trim() || undefined,
+      }
+      const res = editingBookingId
+        ? await updateSharedDepartureBooking(editingBookingId, payload)
+        : await createSharedDepartureBooking(id, payload)
+      if (!res.ok) {
+        setError(
+          bookingErrorMessage(res.error, {
+            available_seats: res.available_seats,
+            confirmed_passengers: res.confirmed_passengers,
+          }),
+        )
+        return
+      }
+      closeAdd()
+      await load(id)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not save booking')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const cancelBooking = async (row: SharedPassenger) => {
+    if (!id) return
+    if (!window.confirm(`Cancel booking for ${row.guest_name || 'guest'}? Seats will be released.`)) {
+      return
+    }
+    setSaving(true)
+    setError('')
+    try {
+      const res = await cancelSharedDepartureBooking(row.id)
+      if (!res.ok) {
+        setError(bookingErrorMessage(res.error))
+        return
+      }
+      await load(id)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not cancel booking')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   const saveEdits = async () => {
     if (!id || !dep) return
@@ -158,10 +268,7 @@ export default function SharedDepartureDetailPage() {
         capacity: nextCapacity,
         meeting_point: meeting.trim(),
         tour_title: title.trim(),
-        supplier_ids:
-          dep.board === 'shared_bus'
-            ? supplierIds
-            : undefined,
+        supplier_ids: dep.board === 'shared_bus' ? supplierIds : undefined,
       })
       if (!res.ok) {
         if (res.error === 'capacity_below_occupancy') {
@@ -173,7 +280,7 @@ export default function SharedDepartureDetailPage() {
         }
         return
       }
-      setEditing(false)
+      setEditingDeparture(false)
       await load(id)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not update departure')
@@ -202,7 +309,7 @@ export default function SharedDepartureDetailPage() {
         return
       }
       await load(id)
-      setEditing(false)
+      setEditingDeparture(false)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not cancel departure')
     } finally {
@@ -223,20 +330,33 @@ export default function SharedDepartureDetailPage() {
         }
         actions={
           <div className="flex flex-wrap gap-2">
+            {canBook ? (
+              <PrimaryButton type="button" onClick={openAdd}>
+                Add booking
+              </PrimaryButton>
+            ) : null}
             {isAdmin && dep && dep.status !== 'cancelled' ? (
-              editing ? (
+              editingDeparture ? (
                 <>
-                  <PrimaryButton type="button" disabled={saving || !capacityOk} onClick={() => void saveEdits()}>
-                    Save
+                  <PrimaryButton
+                    type="button"
+                    disabled={saving || !capacityOk}
+                    onClick={() => void saveEdits()}
+                  >
+                    Save departure
                   </PrimaryButton>
-                  <SecondaryButton type="button" disabled={saving} onClick={() => setEditing(false)}>
+                  <SecondaryButton
+                    type="button"
+                    disabled={saving}
+                    onClick={() => setEditingDeparture(false)}
+                  >
                     Discard
                   </SecondaryButton>
                 </>
               ) : (
                 <>
-                  <SecondaryButton type="button" onClick={() => setEditing(true)}>
-                    Edit
+                  <SecondaryButton type="button" onClick={() => setEditingDeparture(true)}>
+                    Edit departure
                   </SecondaryButton>
                   <SecondaryButton
                     type="button"
@@ -264,7 +384,93 @@ export default function SharedDepartureDetailPage() {
 
       {dep ? (
         <>
-          {editing && isAdmin ? (
+          {showAdd && canBook ? (
+            <Card className="space-y-3">
+              <h2 className="text-sm font-semibold text-zinc-900">
+                {editingBookingId ? 'Edit booking' : 'Add booking'}
+              </h2>
+              <p className="text-xs text-zinc-500">
+                {access && access.ok && access.access === 'supplier'
+                  ? `Saved under ${access.supplier_name}. Confirmed seats reduce shared capacity.`
+                  : 'Saved under Royal Nordic. Confirmed seats reduce shared capacity.'}
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Field label="Guest name" className="sm:col-span-2">
+                  <input
+                    className={inputClass}
+                    value={form.guest_name}
+                    onChange={(e) => setForm((f) => ({ ...f, guest_name: e.target.value }))}
+                    autoFocus
+                  />
+                </Field>
+                <Field label="Adults">
+                  <input
+                    type="number"
+                    min={0}
+                    className={inputClass}
+                    value={form.adults}
+                    onChange={(e) => setForm((f) => ({ ...f, adults: e.target.value }))}
+                  />
+                </Field>
+                <Field label="Children">
+                  <input
+                    type="number"
+                    min={0}
+                    className={inputClass}
+                    value={form.children}
+                    onChange={(e) => setForm((f) => ({ ...f, children: e.target.value }))}
+                  />
+                </Field>
+                <Field label="Booking reference">
+                  <input
+                    className={inputClass}
+                    value={form.booking_ref}
+                    onChange={(e) => setForm((f) => ({ ...f, booking_ref: e.target.value }))}
+                  />
+                </Field>
+                <Field label="Pickup / meeting note">
+                  <input
+                    className={inputClass}
+                    value={form.pickup_location}
+                    onChange={(e) => setForm((f) => ({ ...f, pickup_location: e.target.value }))}
+                  />
+                </Field>
+                <Field label="Contact email">
+                  <input
+                    type="email"
+                    className={inputClass}
+                    value={form.contact_email}
+                    onChange={(e) => setForm((f) => ({ ...f, contact_email: e.target.value }))}
+                  />
+                </Field>
+                <Field label="Contact phone">
+                  <input
+                    className={inputClass}
+                    value={form.contact_phone}
+                    onChange={(e) => setForm((f) => ({ ...f, contact_phone: e.target.value }))}
+                  />
+                </Field>
+                <Field label="Notes" className="sm:col-span-2">
+                  <textarea
+                    className={textareaClass}
+                    rows={2}
+                    value={form.notes}
+                    onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+                  />
+                </Field>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <PrimaryButton type="button" disabled={saving} onClick={() => void saveBooking()}>
+                  {editingBookingId ? 'Save changes' : 'Confirm booking'}
+                </PrimaryButton>
+                <SecondaryButton type="button" disabled={saving} onClick={closeAdd}>
+                  Cancel
+                </SecondaryButton>
+              </div>
+            </Card>
+          ) : null}
+
+          {editingDeparture && isAdmin ? (
             <Card className="space-y-3">
               <h2 className="text-sm font-semibold text-zinc-900">Edit departure</h2>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -378,10 +584,16 @@ export default function SharedDepartureDetailPage() {
           )}
 
           <section className="space-y-2">
-            <h2 className="text-sm font-semibold text-zinc-900">Passenger manifest</h2>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-sm font-semibold text-zinc-900">Passenger manifest</h2>
+              {canBook && !showAdd ? (
+                <SecondaryButton type="button" onClick={openAdd}>
+                  Add booking
+                </SecondaryButton>
+              ) : null}
+            </div>
             <p className="text-xs text-zinc-500">
-              Confirmed passengers occupy seats. Pending requests are listed but do not reduce
-              availability. Cancelled bookings stay in history below.
+              Confirmed passengers occupy seats. Cancelled bookings stay in history and free capacity.
             </p>
             {data && data.passengers.length === 0 ? (
               <Card>
@@ -389,9 +601,63 @@ export default function SharedDepartureDetailPage() {
               </Card>
             ) : (
               <ul className="space-y-2">
-                {data?.passengers.map((row) => (
-                  <PassengerRow key={row.id} row={row} />
-                ))}
+                {data?.passengers.map((row) => {
+                  const canMutate = canMutateSharedPassenger(access, row)
+                  return (
+                    <li key={row.id} className="rounded-lg border border-zinc-200 px-3 py-3">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-medium text-zinc-900">{row.guest_name || 'Guest'}</p>
+                          <p className="mt-0.5 text-xs text-zinc-500">
+                            {[
+                              row.booking_ref,
+                              `${row.adults} adults`,
+                              row.children ? `${row.children} children` : null,
+                              `${row.passenger_count} pax`,
+                              row.supplier_name,
+                            ]
+                              .filter(Boolean)
+                              .join(' · ')}
+                          </p>
+                          {row.pickup_location ? (
+                            <p className="mt-1 text-xs text-zinc-600">Pickup: {row.pickup_location}</p>
+                          ) : null}
+                          {row.contact_email || row.contact_phone ? (
+                            <p className="mt-1 text-xs text-zinc-600">
+                              {[row.contact_email, row.contact_phone].filter(Boolean).join(' · ')}
+                            </p>
+                          ) : null}
+                          {row.notes ? (
+                            <p className="mt-1 text-xs text-zinc-500">Notes: {row.notes}</p>
+                          ) : null}
+                          <p className="mt-1 text-[11px] text-zinc-400">{channelLabel(row.channel)}</p>
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <Badge tone={statusTone(row.status)}>{row.status}</Badge>
+                          {canMutate && row.status === 'confirmed' && dep.status !== 'cancelled' ? (
+                            <div className="flex gap-1.5">
+                              <button
+                                type="button"
+                                className="text-xs font-medium text-emerald-800 hover:underline"
+                                onClick={() => openEditBooking(row)}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                className="text-xs font-medium text-red-700 hover:underline"
+                                disabled={saving}
+                                onClick={() => void cancelBooking(row)}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    </li>
+                  )
+                })}
               </ul>
             )}
           </section>
@@ -401,7 +667,19 @@ export default function SharedDepartureDetailPage() {
               <h2 className="text-sm font-semibold text-zinc-900">Cancelled (history)</h2>
               <ul className="space-y-2 opacity-80">
                 {data.cancelled.map((row) => (
-                  <PassengerRow key={row.id} row={row} />
+                  <li key={row.id} className="rounded-lg border border-zinc-200 px-3 py-3">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="font-medium text-zinc-900">{row.guest_name || 'Guest'}</p>
+                        <p className="mt-0.5 text-xs text-zinc-500">
+                          {[row.booking_ref, `${row.passenger_count} pax`, row.supplier_name]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </p>
+                      </div>
+                      <Badge tone={statusTone(row.status)}>{row.status}</Badge>
+                    </div>
+                  </li>
                 ))}
               </ul>
             </section>

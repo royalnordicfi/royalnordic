@@ -23,6 +23,7 @@ import type {
 } from './types'
 import type {
   SharedBoard,
+  SharedBookingInput,
   SharedBookingsAccess,
   SharedDepartureSummary,
   SharedOperatorRow,
@@ -2084,6 +2085,120 @@ export async function cancelSharedDeparture(
   })
   if (error) throw new Error(error.message)
   return data as { ok: boolean; error?: string }
+}
+
+export async function createSharedDepartureBooking(
+  departureId: string,
+  input: SharedBookingInput,
+): Promise<{
+  ok: boolean
+  error?: string
+  idempotent?: boolean
+  booking?: SharedPassenger
+  confirmed_passengers?: number
+  available_seats?: number
+  requested_passengers?: number
+}> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('create_shared_departure_booking', {
+    p_departure_id: departureId,
+    p_guest_name: input.guest_name,
+    p_adults: input.adults,
+    p_children: input.children,
+    p_booking_ref: input.booking_ref || null,
+    p_pickup_location: input.pickup_location || null,
+    p_contact_email: input.contact_email || null,
+    p_contact_phone: input.contact_phone || null,
+    p_notes: input.notes || null,
+  })
+  if (error) throw new Error(error.message)
+  const payload = data as {
+    ok: boolean
+    error?: string
+    idempotent?: boolean
+    booking?: SharedPassenger
+    confirmed_passengers?: number
+    available_seats?: number
+    requested_passengers?: number
+  }
+  if (payload?.ok) {
+    const leaks = payloadHasForbiddenFields(payload)
+    if (leaks.length) {
+      throw new Error(`forbidden_shared_bookings_field:${leaks.join(',')}`)
+    }
+  }
+  return payload
+}
+
+export async function cancelSharedDepartureBooking(bookingId: string): Promise<{
+  ok: boolean
+  error?: string
+  idempotent?: boolean
+  booking?: SharedPassenger
+  confirmed_passengers?: number
+  available_seats?: number
+}> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('cancel_shared_departure_booking', {
+    p_booking_id: bookingId,
+  })
+  if (error) throw new Error(error.message)
+  const payload = data as {
+    ok: boolean
+    error?: string
+    idempotent?: boolean
+    booking?: SharedPassenger
+    confirmed_passengers?: number
+    available_seats?: number
+  }
+  if (payload?.ok) {
+    const leaks = payloadHasForbiddenFields(payload)
+    if (leaks.length) {
+      throw new Error(`forbidden_shared_bookings_field:${leaks.join(',')}`)
+    }
+  }
+  return payload
+}
+
+export async function updateSharedDepartureBooking(
+  bookingId: string,
+  input: Partial<SharedBookingInput>,
+): Promise<{
+  ok: boolean
+  error?: string
+  booking?: SharedPassenger
+  confirmed_passengers?: number
+  available_seats?: number
+  requested_passengers?: number
+}> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('update_shared_departure_booking', {
+    p_booking_id: bookingId,
+    p_guest_name: input.guest_name ?? null,
+    p_adults: input.adults ?? null,
+    p_children: input.children ?? null,
+    p_booking_ref: input.booking_ref === undefined ? null : input.booking_ref,
+    p_pickup_location: input.pickup_location === undefined ? null : input.pickup_location,
+    p_contact_email: input.contact_email === undefined ? null : input.contact_email,
+    p_contact_phone: input.contact_phone === undefined ? null : input.contact_phone,
+    p_notes: input.notes === undefined ? null : input.notes,
+  })
+  if (error) throw new Error(error.message)
+  const payload = data as {
+    ok: boolean
+    error?: string
+    booking?: SharedPassenger
+    confirmed_passengers?: number
+    available_seats?: number
+    requested_passengers?: number
+  }
+  if (payload?.ok) {
+    const leaks = payloadHasForbiddenFields(payload)
+    if (leaks.length) {
+      throw new Error(`forbidden_shared_bookings_field:${leaks.join(',')}`)
+    }
+  }
+  return payload
 }
 
 export async function completeSharedOperatorPasswordChange(): Promise<{
