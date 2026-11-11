@@ -32,6 +32,7 @@ export function sharedBookingsPaths(base: string) {
     setupPassword: `${base}/setup-password`,
     accessDenied: `${base}/access-denied`,
     operators: `${base}/operators`,
+    integrations: `${base}/integrations`,
     departure: (id: string) => `${base}/${id}`,
   }
 }

@@ -86,6 +86,11 @@ enabled = true
 verify_jwt = true
 entrypoint = "./functions/admin-shared-booking-operator/index.ts"
 
+[functions.shared-bookings-external]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/shared-bookings-external/index.ts"
+
 [functions.process-notification-outbox]
 enabled = true
 verify_jwt = false

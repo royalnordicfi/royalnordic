@@ -193,10 +193,10 @@ describe('shared bookings authorization helpers', () => {
 })
 
 describe('shared bookings copy', () => {
-  it('labels reserved channels as not connected', () => {
-    expect(channelLabel('getyourguide')).toMatch(/not connected/i)
-    expect(channelLabel('bokun')).toMatch(/not connected/i)
-    expect(syncStatusBanner(false)).toMatch(/not connected/i)
+  it('labels external channels without inventing connection state', () => {
+    expect(channelLabel('getyourguide')).toBe('GetYourGuide')
+    expect(channelLabel('bokun')).toBe('Bókun')
+    expect(syncStatusBanner(false)).toMatch(/Integrations/i)
   })
 })
 

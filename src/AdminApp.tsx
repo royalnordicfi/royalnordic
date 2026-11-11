@@ -19,6 +19,7 @@ import PartnersPage from './admin/pages/PartnersPage'
 import PartnerBookingsPage from './admin/pages/PartnerBookingsPage'
 import SharedBookingsPage from './admin/pages/SharedBookingsPage'
 import SharedDepartureDetailPage from './admin/pages/SharedDepartureDetailPage'
+import SharedIntegrationsPage from './admin/pages/SharedIntegrationsPage'
 import SharedOperatorsPage from './admin/pages/SharedOperatorsPage'
 import { SharedBookingsBaseProvider } from './admin/sharedBookingsPaths'
 import { SHARED_BOOKINGS_ADMIN_BASE } from './lib/sharedBookingsPortal'
@@ -70,6 +71,7 @@ function AdminApp() {
             <Route path="partner-bookings" element={<PartnerBookingsPage />} />
             <Route path="sharedbookings" element={<SharedBookingsPage />} />
             <Route path="sharedbookings/operators" element={<SharedOperatorsPage />} />
+            <Route path="sharedbookings/integrations" element={<SharedIntegrationsPage />} />
             <Route path="sharedbookings/:id" element={<SharedDepartureDetailPage />} />
             <Route path="revenue" element={<RevenuePage />} />
             <Route path="import" element={<ImportPage />} />

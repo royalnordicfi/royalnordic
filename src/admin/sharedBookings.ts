@@ -308,9 +308,9 @@ export function channelLabel(channel: string): string {
     case 'elias':
       return 'Elias'
     case 'getyourguide':
-      return 'GetYourGuide (not connected)'
+      return 'GetYourGuide'
     case 'bokun':
-      return 'Bókun (not connected)'
+      return 'Bókun'
     default:
       return channel
   }
@@ -324,7 +324,7 @@ export function formatDepartureWhen(date: string, time?: string | null): string 
 
 export function syncStatusBanner(channelsSynced: boolean | undefined): string {
   if (channelsSynced) return 'External channels connected'
-  return 'Local records only — GetYourGuide / Bókun are not connected yet'
+  return 'Local + optional external ingestion — configure GYG/Bókun under Shared Bookings → Integrations'
 }
 
 function asBoolean(value: unknown, fallback = false): boolean {

@@ -325,6 +325,12 @@ export default function SharedBookingsPage() {
           <div className="flex flex-wrap gap-2">
             {isAdmin ? (
               <>
+                <Link
+                  to={paths.integrations}
+                  className="inline-flex min-h-[40px] items-center rounded-lg border border-zinc-300 bg-white px-3.5 py-2 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-50"
+                >
+                  Integrations
+                </Link>
                 <SecondaryButton type="button" onClick={() => setPanel('template')}>
                   New tour
                 </SecondaryButton>

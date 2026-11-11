@@ -24,6 +24,7 @@ const fullNavGroups: { title: string; items: NavItem[] }[] = [
       { to: '/calendar', label: 'Calendar' },
       { to: '/sharedbookings', label: 'Shared Bookings' },
       { to: '/sharedbookings/operators', label: 'SB Operators' },
+      { to: '/sharedbookings/integrations', label: 'SB Integrations' },
       { to: '/requests', label: 'Requests', badgeKey: 'requests' },
     ],
   },

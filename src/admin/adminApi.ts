@@ -32,6 +32,12 @@ import type {
   SharedTourTemplate,
 } from './sharedBookings'
 import { normalizeSharedBookingsAccess, payloadHasForbiddenFields } from './sharedBookings'
+import type {
+  SharedConnectorRow,
+  SharedInboundEvent,
+  SharedIntegrationProvider,
+  SharedProductMapping,
+} from './sharedIntegrations'
 
 async function requireAdmin() {
   const { data, error } = await supabase.auth.getSession()
@@ -2294,4 +2300,118 @@ export async function resetSharedOperatorTemporaryPassword(
   })
   if (!payload.temporary_password) throw new Error('temporary_password_missing')
   return { temporary_password: String(payload.temporary_password) }
+}
+
+export async function listSharedIntegrations(): Promise<{
+  ok: boolean
+  error?: string
+  connectors: SharedConnectorRow[]
+  live_ingestion_note?: string
+}> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('admin_list_shared_integrations')
+  if (error) throw new Error(error.message)
+  const payload = data as {
+    ok: boolean
+    error?: string
+    connectors?: SharedConnectorRow[]
+    live_ingestion_note?: string
+  }
+  return {
+    ok: Boolean(payload?.ok),
+    error: payload?.error,
+    connectors: Array.isArray(payload?.connectors) ? payload.connectors : [],
+    live_ingestion_note: payload?.live_ingestion_note,
+  }
+}
+
+export async function listSharedProductMappings(provider?: SharedIntegrationProvider): Promise<{
+  ok: boolean
+  error?: string
+  mappings: SharedProductMapping[]
+}> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('admin_list_shared_product_mappings', {
+    p_provider: provider || null,
+  })
+  if (error) throw new Error(error.message)
+  const payload = data as { ok: boolean; error?: string; mappings?: SharedProductMapping[] }
+  return {
+    ok: Boolean(payload?.ok),
+    error: payload?.error,
+    mappings: Array.isArray(payload?.mappings) ? payload.mappings : [],
+  }
+}
+
+export async function upsertSharedProductMapping(input: {
+  id?: string | null
+  provider: SharedIntegrationProvider
+  external_product_id: string
+  external_option_id?: string
+  template_id?: string | null
+  supplier_id: string
+  default_departure_time?: string
+  is_active?: boolean
+}): Promise<{ ok: boolean; error?: string; mapping_id?: string }> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('admin_upsert_shared_product_mapping', {
+    p_id: input.id || null,
+    p_provider: input.provider,
+    p_external_product_id: input.external_product_id,
+    p_external_option_id: input.external_option_id || null,
+    p_template_id: input.template_id || null,
+    p_supplier_id: input.supplier_id,
+    p_default_departure_time: input.default_departure_time || null,
+    p_is_active: input.is_active ?? true,
+  })
+  if (error) throw new Error(error.message)
+  return data as { ok: boolean; error?: string; mapping_id?: string }
+}
+
+export async function listSharedInboundEvents(input?: {
+  provider?: SharedIntegrationProvider
+  status?: string
+  limit?: number
+}): Promise<{ ok: boolean; error?: string; events: SharedInboundEvent[] }> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('admin_list_shared_inbound_events', {
+    p_provider: input?.provider || null,
+    p_status: input?.status || null,
+    p_limit: input?.limit ?? 50,
+  })
+  if (error) throw new Error(error.message)
+  const payload = data as { ok: boolean; error?: string; events?: SharedInboundEvent[] }
+  return {
+    ok: Boolean(payload?.ok),
+    error: payload?.error,
+    events: Array.isArray(payload?.events) ? payload.events : [],
+  }
+}
+
+export async function retrySharedInboundEvent(
+  eventId: string,
+): Promise<{ ok: boolean; error?: string; status?: string }> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('admin_retry_shared_inbound_event', {
+    p_event_id: eventId,
+  })
+  if (error) throw new Error(error.message)
+  return data as { ok: boolean; error?: string; status?: string }
+}
+
+export async function setSharedConnectorFlags(input: {
+  provider: SharedIntegrationProvider
+  ingestion_enabled?: boolean
+  config_status?: string
+  notes?: string
+}): Promise<{ ok: boolean; error?: string; ingestion_enabled?: boolean }> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('admin_set_shared_connector_flags', {
+    p_provider: input.provider,
+    p_ingestion_enabled: input.ingestion_enabled ?? null,
+    p_config_status: input.config_status || null,
+    p_notes: input.notes ?? null,
+  })
+  if (error) throw new Error(error.message)
+  return data as { ok: boolean; error?: string; ingestion_enabled?: boolean }
 }
