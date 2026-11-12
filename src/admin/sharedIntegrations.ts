@@ -115,6 +115,10 @@ export function requiredSecretsFor(provider: SharedIntegrationProvider): string[
       'SHARED_BOOKINGS_GYG_BASIC_USER',
       'SHARED_BOOKINGS_GYG_BASIC_PASSWORD',
       'SHARED_BOOKINGS_GYG_INGESTION_ENABLED',
+      // Outbound notify uses separate GYG-provided credentials (1.6D); keep OFF until approved.
+      'SHARED_BOOKINGS_GYG_NOTIFY_USER',
+      'SHARED_BOOKINGS_GYG_NOTIFY_PASSWORD',
+      'SHARED_BOOKINGS_GYG_NOTIFY_ENABLED',
     ]
   }
   return [

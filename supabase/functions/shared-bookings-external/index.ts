@@ -249,10 +249,12 @@ serve(async (req) => {
               'POST /gyg/book',
               'POST /gyg/cancel-booking',
             ],
-            // Availability + holds real (1.6A/B). Book/cancel-booking implemented (1.6C), env-gated.
+            // Availability + holds + book/cancel ready. Outbound notify is separate env-gated worker.
             availability_live: true,
             reservations_live: true,
             booking_lifecycle_ready: true,
+            availability_notify_ready: true,
+            availability_notify_live: false,
             live: false,
           },
           bokun: {
