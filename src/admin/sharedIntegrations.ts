@@ -55,6 +55,47 @@ export type SharedInboundEvent = {
   updated_at: string
 }
 
+export type GygAvailabilityOutboxProblem = {
+  id: string
+  product_id: string
+  departure_id: string | null
+  departure_date: string | null
+  vacancies: number
+  reason: string
+  status: string
+  attempt_count: number
+  max_attempts: number
+  next_attempt_at: string | null
+  last_error: string | null
+  created_at: string
+  updated_at: string
+  sent_at: string | null
+}
+
+/** Independent flag health for admin ops (ingestion ≠ outbound notify). */
+export function gygOpsHealthSummary(input: {
+  ingestionEnvEnabled: boolean
+  notifyEnvEnabled: boolean
+  mappingCount: number
+  openInboundEvents: number
+  outboxProblems: number
+}): {
+  ingestion: 'off' | 'ready_off' | 'on'
+  notify: 'off' | 'ready_off' | 'on'
+  blockers: string[]
+} {
+  const blockers: string[] = []
+  if (input.mappingCount < 1) blockers.push('No active GYG product mappings')
+  if (input.outboxProblems > 0) blockers.push(`${input.outboxProblems} availability notify outbox problem(s)`)
+  if (input.openInboundEvents > 0) blockers.push(`${input.openInboundEvents} open inbound event(s)`)
+
+  return {
+    ingestion: input.ingestionEnvEnabled ? 'on' : input.mappingCount > 0 ? 'ready_off' : 'off',
+    notify: input.notifyEnvEnabled ? 'on' : input.mappingCount > 0 ? 'ready_off' : 'off',
+    blockers,
+  }
+}
+
 export const GYG_ADULT_CATEGORIES = ['ADULT', 'SENIOR', 'YOUTH', 'STUDENT'] as const
 export const GYG_CHILD_CATEGORIES = ['CHILD', 'INFANT'] as const
 

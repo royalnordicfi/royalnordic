@@ -2415,3 +2415,44 @@ export async function setSharedConnectorFlags(input: {
   if (error) throw new Error(error.message)
   return data as { ok: boolean; error?: string; ingestion_enabled?: boolean }
 }
+
+export async function listGygAvailabilityOutboxProblems(limit = 50): Promise<{
+  ok: boolean
+  error?: string
+  items: import('./sharedIntegrations').GygAvailabilityOutboxProblem[]
+  unavailable?: boolean
+}> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('admin_list_gyg_availability_outbox_problems', {
+    p_limit: limit,
+  })
+  if (error) {
+    // Migration 1.6D may not be applied yet — surface as empty/unavailable, not a hard crash.
+    const msg = error.message || ''
+    if (/function .*admin_list_gyg_availability_outbox_problems/i.test(msg) || /does not exist/i.test(msg)) {
+      return { ok: true, items: [], unavailable: true }
+    }
+    throw new Error(error.message)
+  }
+  const payload = data as {
+    ok: boolean
+    error?: string
+    items?: import('./sharedIntegrations').GygAvailabilityOutboxProblem[]
+  }
+  return {
+    ok: Boolean(payload?.ok),
+    error: payload?.error,
+    items: Array.isArray(payload?.items) ? payload.items : [],
+  }
+}
+
+export async function retryGygAvailabilityOutbox(
+  id: string,
+): Promise<{ ok: boolean; error?: string; status?: string }> {
+  await requireSharedBookingsSession()
+  const { data, error } = await supabase.rpc('admin_retry_gyg_availability_outbox', {
+    p_id: id,
+  })
+  if (error) throw new Error(error.message)
+  return data as { ok: boolean; error?: string; status?: string }
+}

@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import {
   fetchSharedBookingsAccess,
+  listGygAvailabilityOutboxProblems,
   listSharedInboundEvents,
   listSharedIntegrations,
   listSharedProductMappings,
   listSharedSuppliersAdmin,
   listSharedTourTemplates,
+  retryGygAvailabilityOutbox,
   retrySharedInboundEvent,
   setSharedConnectorFlags,
   upsertSharedProductMapping,
@@ -26,7 +28,9 @@ import type { SharedBookingsAccess, SharedSupplierOption, SharedTourTemplate } f
 import {
   connectorStatusLabel,
   externalEndpointPaths,
+  gygOpsHealthSummary,
   requiredSecretsFor,
+  type GygAvailabilityOutboxProblem,
   type SharedConnectorRow,
   type SharedInboundEvent,
   type SharedIntegrationProvider,
@@ -42,6 +46,8 @@ export default function SharedIntegrationsPage() {
   const [connectors, setConnectors] = useState<SharedConnectorRow[]>([])
   const [mappings, setMappings] = useState<SharedProductMapping[]>([])
   const [events, setEvents] = useState<SharedInboundEvent[]>([])
+  const [outboxProblems, setOutboxProblems] = useState<GygAvailabilityOutboxProblem[]>([])
+  const [outboxUnavailable, setOutboxUnavailable] = useState(false)
   const [templates, setTemplates] = useState<SharedTourTemplate[]>([])
   const [suppliers, setSuppliers] = useState<SharedSupplierOption[]>([])
   const [note, setNote] = useState('')
@@ -59,13 +65,14 @@ export default function SharedIntegrationsPage() {
   const isAdminHost = base === SHARED_BOOKINGS_ADMIN_BASE
 
   const reload = async () => {
-    const [a, c, m, e, t, s] = await Promise.all([
+    const [a, c, m, e, t, s, o] = await Promise.all([
       fetchSharedBookingsAccess(),
       listSharedIntegrations(),
       listSharedProductMappings(),
       listSharedInboundEvents({ limit: 40 }),
       listSharedTourTemplates(false),
       listSharedSuppliersAdmin(),
+      listGygAvailabilityOutboxProblems(40),
     ])
     setAccess(a)
     if (!c.ok) throw new Error(c.error || 'Could not load connectors')
@@ -75,6 +82,10 @@ export default function SharedIntegrationsPage() {
     if (e.ok) setEvents(e.events)
     if (t.ok) setTemplates(t.templates)
     if (s.ok) setSuppliers(s.suppliers.filter((x) => x.is_active))
+    if (o.ok) {
+      setOutboxProblems(o.items)
+      setOutboxUnavailable(Boolean(o.unavailable))
+    }
   }
 
   useEffect(() => {
@@ -162,6 +173,29 @@ export default function SharedIntegrationsPage() {
     }
   }
 
+  const retryOutbox = async (id: string) => {
+    setSaving(true)
+    setError('')
+    try {
+      const res = await retryGygAvailabilityOutbox(id)
+      if (!res.ok) setError(res.error || 'Outbox retry failed')
+      await reload()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Outbox retry failed')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const gygConnector = connectors.find((c) => c.provider === 'getyourguide')
+  const health = gygOpsHealthSummary({
+    ingestionEnvEnabled: false, // Edge env; UI never enables live flags from here
+    notifyEnvEnabled: false,
+    mappingCount: gygConnector?.mapping_count ?? mappings.filter((m) => m.provider === 'getyourguide').length,
+    openInboundEvents: gygConnector?.open_event_count ?? 0,
+    outboxProblems: outboxProblems.length,
+  })
+
   return (
     <div className="space-y-4">
       <PageHeader
@@ -185,6 +219,31 @@ export default function SharedIntegrationsPage() {
       {note ? <p className="text-xs text-zinc-500">{note}</p> : null}
       {error ? <ErrorBanner>{error}</ErrorBanner> : null}
       {loading ? <p className="text-sm text-zinc-500">Loading…</p> : null}
+
+      <Card className="space-y-2">
+        <h2 className="text-sm font-semibold text-zinc-900">Operational health</h2>
+        <div className="flex flex-wrap gap-2 text-xs">
+          <Badge tone="gray">Ingestion: {health.ingestion} (Edge flag)</Badge>
+          <Badge tone="gray">Notify: {health.notify} (Edge flag)</Badge>
+          <Badge tone={outboxProblems.length ? 'red' : 'green'}>
+            Notify outbox: {outboxUnavailable ? 'schema pending' : `${outboxProblems.length} problem(s)`}
+          </Badge>
+          <Badge tone={(gygConnector?.mapping_count || 0) > 0 ? 'green' : 'yellow'}>
+            GYG mappings: {gygConnector?.mapping_count ?? 0}
+          </Badge>
+        </div>
+        {health.blockers.length > 0 ? (
+          <ul className="list-disc space-y-0.5 pl-4 text-xs text-amber-800">
+            {health.blockers.map((b) => (
+              <li key={b}>{b}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-xs text-zinc-500">
+            No local blockers listed. Live traffic stays OFF until separately approved.
+          </p>
+        )}
+      </Card>
 
       <div className="grid gap-3 lg:grid-cols-2">
         {connectors.map((c) => (
@@ -330,6 +389,47 @@ export default function SharedIntegrationsPage() {
           </ul>
         ) : (
           <p className="text-sm text-zinc-500">No product mappings yet.</p>
+        )}
+      </Card>
+
+      <Card className="space-y-3">
+        <h2 className="text-sm font-semibold text-zinc-900">GYG availability notify outbox</h2>
+        {outboxUnavailable ? (
+          <p className="text-sm text-amber-800">
+            Outbox schema not on this database yet (apply 1.6D/1.6E migrations after approval).
+          </p>
+        ) : outboxProblems.length === 0 ? (
+          <p className="text-sm text-zinc-500">No failed or stuck availability notifications.</p>
+        ) : (
+          <ul className="space-y-2">
+            {outboxProblems.map((row) => (
+              <li
+                key={row.id}
+                className="flex flex-wrap items-start justify-between gap-2 rounded-lg border border-zinc-200 px-3 py-2"
+              >
+                <div className="min-w-0 text-sm">
+                  <p className="font-medium text-zinc-900">
+                    {row.product_id} · {row.departure_date || '—'} · vac {row.vacancies}
+                  </p>
+                  <p className="text-xs text-zinc-500">
+                    {row.status} · attempts {row.attempt_count}/{row.max_attempts} · {row.reason}
+                  </p>
+                  {row.last_error ? (
+                    <p className="mt-1 text-xs text-red-700">{row.last_error}</p>
+                  ) : null}
+                </div>
+                {['failed', 'dead', 'pending', 'processing'].includes(row.status) ? (
+                  <SecondaryButton
+                    type="button"
+                    disabled={saving}
+                    onClick={() => void retryOutbox(row.id)}
+                  >
+                    Retry
+                  </SecondaryButton>
+                ) : null}
+              </li>
+            ))}
+          </ul>
         )}
       </Card>
 
