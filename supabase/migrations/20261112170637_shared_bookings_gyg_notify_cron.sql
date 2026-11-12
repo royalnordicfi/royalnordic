@@ -8,7 +8,7 @@ RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
-AS $$
+AS $fn$
 DECLARE
   project_url TEXT;
   service_key TEXT;
@@ -47,7 +47,7 @@ EXCEPTION
     RAISE WARNING 'invoke_process_gyg_availability_outbox: %', SQLERRM;
     RETURN jsonb_build_object('ok', false, 'error', SQLERRM);
 END;
-$$;
+$fn$;
 
 REVOKE ALL ON FUNCTION public.invoke_process_gyg_availability_outbox() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.invoke_process_gyg_availability_outbox() TO service_role;
@@ -56,7 +56,8 @@ COMMENT ON FUNCTION public.invoke_process_gyg_availability_outbox() IS
   '1.6E cron entry: posts to process-gyg-availability-outbox using Vault project_url + service_role_key. Never logs secret values. Live sends still gated by SHARED_BOOKINGS_GYG_NOTIFY_ENABLED.';
 
 -- Register job only if pg_cron is available. Keep unschedule/recreate idempotent.
-DO $$
+-- Use distinct dollar-quote tags to avoid nested $$ conflicts.
+DO $do$
 BEGIN
   IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron') THEN
     PERFORM cron.unschedule(jobid)
@@ -66,9 +67,10 @@ BEGIN
     PERFORM cron.schedule(
       'process-gyg-availability-outbox',
       '* * * * *',
-      $$SELECT public.invoke_process_gyg_availability_outbox();$$
+      $cron$SELECT public.invoke_process_gyg_availability_outbox();$cron$
     );
   END IF;
 EXCEPTION WHEN others THEN
   RAISE WARNING 'Could not schedule process-gyg-availability-outbox: %', SQLERRM;
-END $$;
+END
+$do$;
