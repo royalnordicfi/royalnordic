@@ -10,6 +10,12 @@
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import {
+  buildGygAvailabilities,
+  normalizeGygActionPath,
+  parseGygAvailabilityQuery,
+  type SharedDepartureAvailabilityRow,
+} from '../_shared/gygAvailability.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -221,12 +227,15 @@ serve(async (req) => {
             credentials_configured: gygCredsConfigured(),
             ingestion_env_enabled: gygIngestionEnvEnabled(),
             endpoints: [
-              'GET|POST /gyg/get-availabilities',
+              'GET /gyg/1/get-availabilities (official /1/ prefix)',
+              'GET /gyg/get-availabilities',
               'POST /gyg/reserve',
               'POST /gyg/cancel-reservation',
               'POST /gyg/book',
               'POST /gyg/cancel-booking',
             ],
+            // Availability is real (1.6A). Reserve/book still gated by ingestion flag.
+            availability_live: true,
             live: false,
           },
           bokun: {
@@ -330,19 +339,50 @@ serve(async (req) => {
         })
       }
 
-      const actionPath = tail.slice('gyg/'.length)
+      const actionPath = normalizeGygActionPath(tail)
 
       if (actionPath === 'get-availabilities') {
-        // Without full product catalog wiring / outbound sync, return empty availability
-        // rather than inventing slots. Live sellability requires mappings + enabled ingestion.
-        return json({
-          data: {
-            availabilities: [],
-            note: gygIngestionEnvEnabled()
-              ? 'No mapped availability published yet (1.5 does not enable outbound availability notify).'
-              : 'GYG ingestion disabled — configure credentials, mappings, then SHARED_BOOKINGS_GYG_INGESTION_ENABLED.',
-          },
+        // Official: GET /1/get-availabilities/?productId&fromDateTime&toDateTime
+        // Availability does NOT require ingestion flag (read-only capacity).
+        let productId = url.searchParams.get('productId')
+        let fromDateTime = url.searchParams.get('fromDateTime')
+        let toDateTime = url.searchParams.get('toDateTime')
+
+        if (req.method === 'POST' && (!productId || !fromDateTime || !toDateTime)) {
+          const body = await req.json().catch(() => ({}))
+          const data = body?.data || body || {}
+          productId = productId || data.productId || null
+          fromDateTime = fromDateTime || data.fromDateTime || null
+          toDateTime = toDateTime || data.toDateTime || null
+        }
+
+        const parsed = parseGygAvailabilityQuery({ productId, fromDateTime, toDateTime })
+        if (!parsed.ok) {
+          return gygError('VALIDATION_FAILURE', parsed.error)
+        }
+
+        const { data: rpcData, error: rpcErr } = await admin.rpc('service_list_gyg_availabilities', {
+          p_product_id: parsed.query.productId,
+          p_from: parsed.query.fromDate,
+          p_to: parsed.query.toDate,
         })
+        if (rpcErr) {
+          console.error('service_list_gyg_availabilities', rpcErr)
+          return gygError('INTERNAL_SYSTEM_FAILURE', 'Availability lookup failed')
+        }
+        if (rpcData && rpcData.ok === false) {
+          return gygError('VALIDATION_FAILURE', rpcData.error || 'invalid availability request')
+        }
+
+        // Unknown mapping → empty array (do not emit INVALID_PRODUCT; that auto-deactivates on GYG).
+        // No departures in range → empty array (official).
+        // Sold-out active departures → vacancies: 0 (official; never NO_AVAILABILITY here).
+        const rows = (Array.isArray(rpcData?.departures) ? rpcData.departures : []) as SharedDepartureAvailabilityRow[]
+        const availabilities = buildGygAvailabilities(parsed.query.productId, rows, {
+          defaultDepartureTime: rpcData?.default_departure_time ?? null,
+        })
+
+        return json({ data: { availabilities } })
       }
 
       if (actionPath === 'reserve') {

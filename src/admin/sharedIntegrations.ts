@@ -126,6 +126,8 @@ export function requiredSecretsFor(provider: SharedIntegrationProvider): string[
 export function externalEndpointPaths(provider: SharedIntegrationProvider): string[] {
   if (provider === 'getyourguide') {
     return [
+      // Official Supplier API version prefix /1/ is accepted via path normalization.
+      '/functions/v1/shared-bookings-external/gyg/1/get-availabilities',
       '/functions/v1/shared-bookings-external/gyg/get-availabilities',
       '/functions/v1/shared-bookings-external/gyg/reserve',
       '/functions/v1/shared-bookings-external/gyg/cancel-reservation',
