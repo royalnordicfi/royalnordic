@@ -16,6 +16,14 @@ import {
   parseGygAvailabilityQuery,
   type SharedDepartureAvailabilityRow,
 } from '../_shared/gygAvailability.ts'
+import {
+  gygCancelReservationResponse,
+  gygReserveSuccessResponse,
+  mapGygCancelRpcError,
+  mapGygConsumeRpcError,
+  mapGygReserveRpcError,
+  parseGygReserveRequest,
+} from '../_shared/gygReservations.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -234,8 +242,9 @@ serve(async (req) => {
               'POST /gyg/book',
               'POST /gyg/cancel-booking',
             ],
-            // Availability is real (1.6A). Reserve/book still gated by ingestion flag.
+            // Availability + reserve/cancel holds are real (1.6A/B). Confirmed book stays gated.
             availability_live: true,
+            reservations_live: true,
             live: false,
           },
           bokun: {
@@ -386,49 +395,79 @@ serve(async (req) => {
       }
 
       if (actionPath === 'reserve') {
-        if (!gygIngestionEnvEnabled()) {
-          return gygError(
-            'INTERNAL_SYSTEM_FAILURE',
-            'Shared Bookings GYG ingestion is disabled until credentials, mappings and verification are confirmed.',
-          )
-        }
+        // Official POST /1/reserve/ — temporary holds (1.6B). Does not require ingestion flag.
+        if (req.method !== 'POST') return gygError('VALIDATION_FAILURE', 'POST required')
         const body = await req.json().catch(() => ({}))
         const data = body.data || body
-        const reservationReference = `sb-gyg-res-${crypto.randomUUID()}`
-        // Hold is recorded as inbound event only; seats are consumed on book (confirmed).
-        await admin.rpc('service_upsert_shared_inbound_event', {
-          p_provider: 'getyourguide',
-          p_event_key: `gyg:reserve:${reservationReference}`,
-          p_topic: 'reserve',
-          p_external_booking_id: reservationReference,
-          p_payload: { action: 'reserve', provider_raw: data },
+        const { data: maps } = await admin
+          .from('shared_product_mappings')
+          .select('adult_categories, child_categories')
+          .eq('provider', 'getyourguide')
+          .eq('external_product_id', String(data.productId || '').trim())
+          .eq('is_active', true)
+          .limit(1)
+        const mapping = maps?.[0]
+        const parsed = parseGygReserveRequest({
+          productId: data.productId,
+          dateTime: data.dateTime,
+          gygBookingReference: data.gygBookingReference,
+          bookingItems: data.bookingItems,
+          adultCategories: mapping?.adult_categories,
+          childCategories: mapping?.child_categories,
         })
-        return json({
-          data: {
-            reservationReference,
-            reservationExpiration: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-          },
+        if (!parsed.ok) return gygError(parsed.errorCode, parsed.errorMessage)
+
+        const { data: rpcData, error: rpcErr } = await admin.rpc('service_gyg_reserve', {
+          p_product_id: parsed.request.productId,
+          p_date_time: parsed.request.dateTime,
+          p_adults: parsed.request.adults,
+          p_children: parsed.request.children,
+          p_gyg_booking_reference: parsed.request.gygBookingReference,
+          p_hold_minutes: 60,
         })
+        if (rpcErr) {
+          console.error('service_gyg_reserve', rpcErr)
+          return gygError('INTERNAL_SYSTEM_FAILURE', 'Reservation failed')
+        }
+        if (!rpcData?.ok) {
+          const mapped = mapGygReserveRpcError(rpcData?.error)
+          return gygError(mapped.errorCode, rpcData?.error_message || mapped.errorMessage)
+        }
+
+        return json(
+          gygReserveSuccessResponse(rpcData.reservation_reference, rpcData.reservation_expiration),
+        )
       }
 
       if (actionPath === 'cancel-reservation') {
+        // Official POST /1/cancel-reservation/ → { data: {} }
+        if (req.method !== 'POST') return gygError('VALIDATION_FAILURE', 'POST required')
         const body = await req.json().catch(() => ({}))
         const data = body.data || body
         const reservationReference = String(data.reservationReference || '').trim()
+        const gygBookingReference = String(data.gygBookingReference || '').trim() || null
         if (!reservationReference) {
           return gygError('VALIDATION_FAILURE', 'reservationReference is required')
         }
-        await admin.rpc('service_upsert_shared_inbound_event', {
-          p_provider: 'getyourguide',
-          p_event_key: `gyg:cancel-reservation:${reservationReference}`,
-          p_topic: 'cancel-reservation',
-          p_external_booking_id: reservationReference,
-          p_payload: { action: 'cancel-reservation', provider_raw: data },
+
+        const { data: rpcData, error: rpcErr } = await admin.rpc('service_gyg_cancel_reservation', {
+          p_reservation_reference: reservationReference,
+          p_gyg_booking_reference: gygBookingReference,
         })
-        return json({ data: { reservationReference } })
+        if (rpcErr) {
+          console.error('service_gyg_cancel_reservation', rpcErr)
+          return gygError('INTERNAL_SYSTEM_FAILURE', 'Cancel reservation failed')
+        }
+        if (!rpcData?.ok) {
+          const mapped = mapGygCancelRpcError(rpcData?.error)
+          return gygError(mapped.errorCode, rpcData?.error_message || mapped.errorMessage)
+        }
+
+        return json(gygCancelReservationResponse())
       }
 
       if (actionPath === 'book') {
+        // Confirmed bookings stay behind ingestion flag. Hold consumption is prepared (1.6B).
         if (!gygIngestionEnvEnabled()) {
           return gygError(
             'INTERNAL_SYSTEM_FAILURE',
@@ -470,6 +509,38 @@ serve(async (req) => {
         )
         const when = parseIsoLocal(data.dateTime)
         const guest = guestFromTravelers(data.travelers)
+
+        // Prefer consuming a valid hold so capacity is not double-counted.
+        if (reservationReference) {
+          const { data: consumed, error: consumeErr } = await admin.rpc('service_gyg_consume_reservation', {
+            p_reservation_reference: reservationReference,
+            p_gyg_booking_reference: gygBookingReference || externalId,
+            p_guest_name: guest.name || 'GYG Guest',
+            p_adults: seats.adults,
+            p_children: seats.children,
+            p_contact_email: guest.email || null,
+            p_contact_phone: guest.phone || null,
+            p_notes: data.comment || null,
+          })
+          if (consumeErr) {
+            console.error('service_gyg_consume_reservation', consumeErr)
+            return gygError('INTERNAL_SYSTEM_FAILURE', 'Booking failed')
+          }
+          if (!consumed?.ok) {
+            const mapped = mapGygConsumeRpcError(consumed?.error)
+            return gygError(mapped.errorCode, consumed?.error_message || mapped.errorMessage)
+          }
+
+          return json({
+            data: {
+              bookingReference: consumed.external_ref || externalId,
+              tickets: [
+                ...Array.from({ length: seats.adults }, () => ({ category: 'ADULT' })),
+                ...Array.from({ length: seats.children }, () => ({ category: 'CHILD' })),
+              ],
+            },
+          })
+        }
 
         const processed = await upsertAndProcess(admin, {
           provider: 'getyourguide',

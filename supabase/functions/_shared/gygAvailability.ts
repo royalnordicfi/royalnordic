@@ -113,15 +113,17 @@ export function formatGygLocalDateTime(
 
 /**
  * Build GYG availabilities from Shared Bookings departure rows.
- * Includes sold-out slots (vacancies: 0). Omits nothing that is active in range —
- * caller should only pass active departures.
+ * Includes sold-out slots (vacancies: 0) for active departures in range.
+ * Unknown mappings / no departures → caller returns empty availabilities[] (official).
+ * Do not emit NO_AVAILABILITY here — that code is reserved for reserve/book.
  */
 export function buildGygAvailabilities(
   productId: string,
   rows: SharedDepartureAvailabilityRow[],
-  options?: { cutoffSeconds?: number },
+  options?: { cutoffSeconds?: number; defaultDepartureTime?: string | null },
 ): GygAvailabilitySlot[] {
   const cutoffSeconds = options?.cutoffSeconds
+  const defaultTime = options?.defaultDepartureTime
   const slots: GygAvailabilitySlot[] = rows.map((row) => {
     const vacancies = remainingSeats(
       row.capacity,
@@ -130,7 +132,10 @@ export function buildGygAvailabilities(
     )
     const slot: GygAvailabilitySlot = {
       productId,
-      dateTime: formatGygLocalDateTime(row.departure_date, row.departure_time),
+      dateTime: formatGygLocalDateTime(
+        row.departure_date,
+        row.departure_time || defaultTime || null,
+      ),
       vacancies,
     }
     if (typeof cutoffSeconds === 'number') slot.cutoffSeconds = cutoffSeconds
