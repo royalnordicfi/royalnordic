@@ -72,6 +72,27 @@ export type GygAvailabilityOutboxProblem = {
   sent_at: string | null
 }
 
+/** Edge /status snapshot (booleans only — never includes secret values). */
+export type GygExternalStatusSnapshot = {
+  credentialsConfigured: boolean
+  notifyCredentialsConfigured: boolean
+  ingestionEnvEnabled: boolean
+  notifyEnvEnabled: boolean
+  availabilityLive: boolean
+  reservationsLive: boolean
+  bookingLifecycleReady: boolean
+  availabilityNotifyReady: boolean
+  availabilityNotifyLive: boolean
+  live: boolean
+}
+
+export type GygSecretChecklistItem = {
+  name: string
+  purpose: 'inbound_basic_auth' | 'outbound_notify' | 'feature_flag'
+  configured: boolean | 'unknown'
+  requiredForLive: boolean
+}
+
 /** Independent flag health for admin ops (ingestion ≠ outbound notify). */
 export function gygOpsHealthSummary(input: {
   ingestionEnvEnabled: boolean
@@ -79,21 +100,185 @@ export function gygOpsHealthSummary(input: {
   mappingCount: number
   openInboundEvents: number
   outboxProblems: number
+  credentialsConfigured?: boolean
+  notifyCredentialsConfigured?: boolean
+  templateCount?: number
 }): {
   ingestion: 'off' | 'ready_off' | 'on'
   notify: 'off' | 'ready_off' | 'on'
   blockers: string[]
 } {
   const blockers: string[] = []
+  if (input.credentialsConfigured === false) {
+    blockers.push('GYG inbound Basic Auth secrets missing (SHARED_BOOKINGS_GYG_BASIC_USER/PASSWORD)')
+  }
+  if ((input.templateCount ?? 1) < 1) {
+    blockers.push('No Shared Bookings tour templates — create templates before mappings')
+  }
   if (input.mappingCount < 1) blockers.push('No active GYG product mappings')
+  if (input.notifyCredentialsConfigured === false) {
+    blockers.push('GYG outbound notify secrets missing (SHARED_BOOKINGS_GYG_NOTIFY_USER/PASSWORD)')
+  }
   if (input.outboxProblems > 0) blockers.push(`${input.outboxProblems} availability notify outbox problem(s)`)
   if (input.openInboundEvents > 0) blockers.push(`${input.openInboundEvents} open inbound event(s)`)
 
+  const inboundReady =
+    input.mappingCount > 0 && input.credentialsConfigured !== false && (input.templateCount ?? 1) > 0
+  const notifyReady =
+    input.mappingCount > 0 && input.notifyCredentialsConfigured !== false && (input.templateCount ?? 1) > 0
+
   return {
-    ingestion: input.ingestionEnvEnabled ? 'on' : input.mappingCount > 0 ? 'ready_off' : 'off',
-    notify: input.notifyEnvEnabled ? 'on' : input.mappingCount > 0 ? 'ready_off' : 'off',
+    ingestion: input.ingestionEnvEnabled ? 'on' : inboundReady ? 'ready_off' : 'off',
+    notify: input.notifyEnvEnabled ? 'on' : notifyReady ? 'ready_off' : 'off',
     blockers,
   }
+}
+
+/** Actionable setup errors for the Integrations page (no secret values). */
+export function gygSetupErrors(input: {
+  edgeReachable: boolean
+  credentialsConfigured: boolean
+  notifyCredentialsConfigured: boolean
+  ingestionEnvEnabled: boolean
+  notifyEnvEnabled: boolean
+  templateCount: number
+  mappingCount: number
+  outboxProblems: number
+}): string[] {
+  const errors: string[] = []
+  if (!input.edgeReachable) {
+    errors.push('shared-bookings-external /status is unreachable — check Edge deploy')
+  }
+  if (!input.credentialsConfigured) {
+    errors.push(
+      'Set SHARED_BOOKINGS_GYG_BASIC_USER and SHARED_BOOKINGS_GYG_BASIC_PASSWORD (credentials you give GYG to call your supplier API)',
+    )
+  }
+  if (!input.notifyCredentialsConfigured) {
+    errors.push(
+      'Set SHARED_BOOKINGS_GYG_NOTIFY_USER and SHARED_BOOKINGS_GYG_NOTIFY_PASSWORD (from GYG Integrator Portal → Set Up Your Testing Configuration)',
+    )
+  }
+  if (input.templateCount < 1) {
+    errors.push('Create at least one Shared Bookings tour template before saving product mappings')
+  }
+  if (input.mappingCount < 1) {
+    errors.push('Map each GYG productId to a template + supplier (verify ownership in Integrator Portal first)')
+  }
+  if (input.ingestionEnvEnabled) {
+    errors.push('SHARED_BOOKINGS_GYG_INGESTION_ENABLED is ON — turn OFF until live activation is approved')
+  }
+  if (input.notifyEnvEnabled) {
+    errors.push('SHARED_BOOKINGS_GYG_NOTIFY_ENABLED is ON — turn OFF until live activation is approved')
+  }
+  if (input.outboxProblems > 0) {
+    errors.push(`${input.outboxProblems} GYG availability outbox row(s) need retry or investigation`)
+  }
+  return errors
+}
+
+export function gygSecretChecklist(status: Partial<GygExternalStatusSnapshot> | null): GygSecretChecklistItem[] {
+  const known = Boolean(status)
+  return [
+    {
+      name: 'SHARED_BOOKINGS_GYG_BASIC_USER',
+      purpose: 'inbound_basic_auth',
+      configured: known ? status!.credentialsConfigured === true : 'unknown',
+      requiredForLive: true,
+    },
+    {
+      name: 'SHARED_BOOKINGS_GYG_BASIC_PASSWORD',
+      purpose: 'inbound_basic_auth',
+      configured: known ? status!.credentialsConfigured === true : 'unknown',
+      requiredForLive: true,
+    },
+    {
+      name: 'SHARED_BOOKINGS_GYG_INGESTION_ENABLED',
+      purpose: 'feature_flag',
+      // Flag is "configured" when present in Edge; value shown separately in readiness badges.
+      configured: known ? true : 'unknown',
+      requiredForLive: true,
+    },
+    {
+      name: 'SHARED_BOOKINGS_GYG_NOTIFY_USER',
+      purpose: 'outbound_notify',
+      configured: known ? status!.notifyCredentialsConfigured === true : 'unknown',
+      requiredForLive: true,
+    },
+    {
+      name: 'SHARED_BOOKINGS_GYG_NOTIFY_PASSWORD',
+      purpose: 'outbound_notify',
+      configured: known ? status!.notifyCredentialsConfigured === true : 'unknown',
+      requiredForLive: true,
+    },
+    {
+      name: 'SHARED_BOOKINGS_GYG_NOTIFY_ENABLED',
+      purpose: 'feature_flag',
+      configured: known ? true : 'unknown',
+      requiredForLive: true,
+    },
+  ]
+}
+
+/** GO only when config is complete and live flags remain intentionally OFF. */
+export function assessGygActivationReadiness(input: {
+  edgeDeployed: boolean
+  uiDeployed: boolean
+  certificationOk: boolean
+  credentialsConfigured: boolean
+  notifyCredentialsConfigured: boolean
+  templateCount: number
+  mappingCount: number
+  ingestionEnvEnabled: boolean
+  notifyEnvEnabled: boolean
+  notifyCronConfigured: boolean
+  outboxProblems: number
+}): { verdict: 'GO' | 'NO-GO'; blockers: string[]; notes: string[] } {
+  const blockers: string[] = []
+  const notes: string[] = []
+
+  if (!input.edgeDeployed) blockers.push('Edge Functions not deployed')
+  if (!input.uiDeployed) blockers.push('Admin/operator UI not deployed')
+  if (!input.certificationOk) blockers.push('Lifecycle certification failed')
+  if (!input.credentialsConfigured) blockers.push('Inbound GYG Basic Auth credentials missing')
+  if (!input.notifyCredentialsConfigured) blockers.push('Outbound GYG notify credentials missing')
+  if (input.templateCount < 1) blockers.push('No tour templates')
+  if (input.mappingCount < 1) blockers.push('No active product mappings')
+  if (!input.notifyCronConfigured) blockers.push('Notify outbox cron not registered')
+  if (input.outboxProblems > 0) blockers.push('Unresolved notify outbox problems')
+  if (input.ingestionEnvEnabled) blockers.push('Ingestion flag is ON (must stay OFF until explicit live approval)')
+  if (input.notifyEnvEnabled) blockers.push('Notify flag is ON (must stay OFF until explicit live approval)')
+
+  if (blockers.length === 0) {
+    notes.push('Configuration complete with live flags OFF — awaiting separate live activation approval')
+  } else {
+    notes.push('Do not enable SHARED_BOOKINGS_GYG_INGESTION_ENABLED or SHARED_BOOKINGS_GYG_NOTIFY_ENABLED yet')
+  }
+
+  return { verdict: blockers.length === 0 ? 'GO' : 'NO-GO', blockers, notes }
+}
+
+/**
+ * Unverified mapping candidates from product-truth docs only.
+ * Never auto-activate — ownership and option IDs must be confirmed in GYG Integrator Portal.
+ */
+export function proposedGygMappingCandidates(): Array<{
+  externalProductId: string
+  suggestedTitle: string
+  source: string
+  verified: false
+  notes: string
+}> {
+  return [
+    {
+      externalProductId: '1116834',
+      suggestedTitle: 'Korouoma Canyon Winter Adventure',
+      source: 'docs/product-truth-korouoma.md (GYG t1116834)',
+      verified: false,
+      notes:
+        'Confirm numeric productId and option IDs in Integrator Portal. Create matching Shared Bookings template before mapping. Do not activate until ownership verified.',
+    },
+  ]
 }
 
 export const GYG_ADULT_CATEGORIES = ['ADULT', 'SENIOR', 'YOUTH', 'STUDENT'] as const

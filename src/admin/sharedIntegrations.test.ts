@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import {
+  assessGygActivationReadiness,
   bokunHmacBaseString,
   countGygSeatCategories,
   externalEndpointPaths,
+  gygOpsHealthSummary,
+  gygSetupErrors,
   parseGygDateTime,
+  proposedGygMappingCandidates,
   requiredSecretsFor,
 } from './sharedIntegrations'
 
@@ -43,5 +47,51 @@ describe('shared integrations helpers', () => {
     expect(requiredSecretsFor('bokun')).toContain('SHARED_BOOKINGS_BOKUN_WEBHOOK_SECRET')
     expect(externalEndpointPaths('bokun')[0]).toContain('/bokun/webhook')
     expect(externalEndpointPaths('getyourguide').some((p) => p.endsWith('/gyg/book'))).toBe(true)
+  })
+
+  it('lists actionable setup errors and keeps candidates unverified', () => {
+    const errors = gygSetupErrors({
+      edgeReachable: true,
+      credentialsConfigured: false,
+      notifyCredentialsConfigured: false,
+      ingestionEnvEnabled: false,
+      notifyEnvEnabled: false,
+      templateCount: 0,
+      mappingCount: 0,
+      outboxProblems: 0,
+    })
+    expect(errors.some((e) => /BASIC_USER/.test(e))).toBe(true)
+    expect(errors.some((e) => /template/i.test(e))).toBe(true)
+    expect(proposedGygMappingCandidates().every((c) => c.verified === false)).toBe(true)
+  })
+
+  it('returns NO-GO until credentials, templates, and mappings are ready', () => {
+    const verdict = assessGygActivationReadiness({
+      edgeDeployed: true,
+      uiDeployed: true,
+      certificationOk: true,
+      credentialsConfigured: false,
+      notifyCredentialsConfigured: false,
+      templateCount: 0,
+      mappingCount: 0,
+      ingestionEnvEnabled: false,
+      notifyEnvEnabled: false,
+      notifyCronConfigured: true,
+      outboxProblems: 0,
+    })
+    expect(verdict.verdict).toBe('NO-GO')
+    expect(verdict.blockers.length).toBeGreaterThan(0)
+
+    const health = gygOpsHealthSummary({
+      ingestionEnvEnabled: false,
+      notifyEnvEnabled: false,
+      mappingCount: 0,
+      openInboundEvents: 0,
+      outboxProblems: 0,
+      credentialsConfigured: false,
+      templateCount: 0,
+    })
+    expect(health.ingestion).toBe('off')
+    expect(health.blockers.some((b) => /Basic Auth/i.test(b))).toBe(true)
   })
 })

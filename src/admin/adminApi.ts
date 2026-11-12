@@ -2325,6 +2325,59 @@ export async function listSharedIntegrations(): Promise<{
   }
 }
 
+/** Public Edge status — booleans only, no secret values. */
+export async function fetchSharedExternalStatus(): Promise<{
+  ok: boolean
+  error?: string
+  gyg: import('./sharedIntegrations').GygExternalStatusSnapshot | null
+}> {
+  const base = String(import.meta.env.VITE_SUPABASE_URL || '').replace(/\/$/, '')
+  if (!base) return { ok: false, error: 'VITE_SUPABASE_URL missing', gyg: null }
+  try {
+    const res = await fetch(`${base}/functions/v1/shared-bookings-external/status`, {
+      method: 'GET',
+      headers: { apikey: String(import.meta.env.VITE_SUPABASE_ANON_KEY || '') },
+    })
+    if (!res.ok) return { ok: false, error: `status_http_${res.status}`, gyg: null }
+    const body = (await res.json()) as {
+      ok?: boolean
+      providers?: {
+        getyourguide?: {
+          credentials_configured?: boolean
+          notify_credentials_configured?: boolean
+          ingestion_env_enabled?: boolean
+          notify_env_enabled?: boolean
+          availability_live?: boolean
+          reservations_live?: boolean
+          booking_lifecycle_ready?: boolean
+          availability_notify_ready?: boolean
+          availability_notify_live?: boolean
+          live?: boolean
+        }
+      }
+    }
+    const g = body.providers?.getyourguide
+    if (!g) return { ok: false, error: 'gyg_status_missing', gyg: null }
+    return {
+      ok: Boolean(body.ok),
+      gyg: {
+        credentialsConfigured: Boolean(g.credentials_configured),
+        notifyCredentialsConfigured: Boolean(g.notify_credentials_configured),
+        ingestionEnvEnabled: Boolean(g.ingestion_env_enabled),
+        notifyEnvEnabled: Boolean(g.notify_env_enabled),
+        availabilityLive: Boolean(g.availability_live),
+        reservationsLive: Boolean(g.reservations_live),
+        bookingLifecycleReady: Boolean(g.booking_lifecycle_ready),
+        availabilityNotifyReady: Boolean(g.availability_notify_ready),
+        availabilityNotifyLive: Boolean(g.availability_notify_live),
+        live: Boolean(g.live),
+      },
+    }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'status_fetch_failed', gyg: null }
+  }
+}
+
 export async function listSharedProductMappings(provider?: SharedIntegrationProvider): Promise<{
   ok: boolean
   error?: string

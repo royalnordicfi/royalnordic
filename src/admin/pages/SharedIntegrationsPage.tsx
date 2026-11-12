@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import {
   fetchSharedBookingsAccess,
+  fetchSharedExternalStatus,
   listGygAvailabilityOutboxProblems,
   listSharedInboundEvents,
   listSharedIntegrations,
@@ -26,11 +27,16 @@ import {
 } from '../components/ui'
 import type { SharedBookingsAccess, SharedSupplierOption, SharedTourTemplate } from '../sharedBookings'
 import {
+  assessGygActivationReadiness,
   connectorStatusLabel,
   externalEndpointPaths,
   gygOpsHealthSummary,
+  gygSecretChecklist,
+  gygSetupErrors,
+  proposedGygMappingCandidates,
   requiredSecretsFor,
   type GygAvailabilityOutboxProblem,
+  type GygExternalStatusSnapshot,
   type SharedConnectorRow,
   type SharedInboundEvent,
   type SharedIntegrationProvider,
@@ -38,6 +44,7 @@ import {
 } from '../sharedIntegrations'
 import { sharedBookingsPaths, useSharedBookingsBase } from '../sharedBookingsPaths'
 import { SHARED_BOOKINGS_ADMIN_BASE } from '../../lib/sharedBookingsPortal'
+import { runSharedBookingsCertification } from '../sharedBookingsCertification'
 
 export default function SharedIntegrationsPage() {
   const base = useSharedBookingsBase()
@@ -50,10 +57,13 @@ export default function SharedIntegrationsPage() {
   const [outboxUnavailable, setOutboxUnavailable] = useState(false)
   const [templates, setTemplates] = useState<SharedTourTemplate[]>([])
   const [suppliers, setSuppliers] = useState<SharedSupplierOption[]>([])
+  const [edgeStatus, setEdgeStatus] = useState<GygExternalStatusSnapshot | null>(null)
+  const [edgeOk, setEdgeOk] = useState(false)
   const [note, setNote] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [certOk, setCertOk] = useState<boolean | null>(null)
 
   const [provider, setProvider] = useState<SharedIntegrationProvider>('getyourguide')
   const [productId, setProductId] = useState('')
@@ -63,9 +73,10 @@ export default function SharedIntegrationsPage() {
   const [defaultTime, setDefaultTime] = useState('')
 
   const isAdminHost = base === SHARED_BOOKINGS_ADMIN_BASE
+  const candidates = proposedGygMappingCandidates()
 
   const reload = async () => {
-    const [a, c, m, e, t, s, o] = await Promise.all([
+    const [a, c, m, e, t, s, o, st] = await Promise.all([
       fetchSharedBookingsAccess(),
       listSharedIntegrations(),
       listSharedProductMappings(),
@@ -73,6 +84,7 @@ export default function SharedIntegrationsPage() {
       listSharedTourTemplates(false),
       listSharedSuppliersAdmin(),
       listGygAvailabilityOutboxProblems(40),
+      fetchSharedExternalStatus(),
     ])
     setAccess(a)
     if (!c.ok) throw new Error(c.error || 'Could not load connectors')
@@ -86,6 +98,9 @@ export default function SharedIntegrationsPage() {
       setOutboxProblems(o.items)
       setOutboxUnavailable(Boolean(o.unavailable))
     }
+    setEdgeOk(Boolean(st.ok && st.gyg))
+    setEdgeStatus(st.gyg)
+    setCertOk(runSharedBookingsCertification().ok)
   }
 
   useEffect(() => {
@@ -115,6 +130,10 @@ export default function SharedIntegrationsPage() {
     setSaving(true)
     setError('')
     try {
+      if (!templateId) {
+        setError('Select a tour template before saving a mapping')
+        return
+      }
       const res = await upsertSharedProductMapping({
         provider,
         external_product_id: productId.trim(),
@@ -122,6 +141,7 @@ export default function SharedIntegrationsPage() {
         template_id: templateId || null,
         supplier_id: supplierId,
         default_departure_time: defaultTime.trim() || undefined,
+        is_active: false,
       })
       if (!res.ok) {
         setError(res.error || 'Could not save mapping')
@@ -188,19 +208,48 @@ export default function SharedIntegrationsPage() {
   }
 
   const gygConnector = connectors.find((c) => c.provider === 'getyourguide')
+  const gygMappingCount =
+    gygConnector?.mapping_count ?? mappings.filter((m) => m.provider === 'getyourguide' && m.is_active).length
   const health = gygOpsHealthSummary({
-    ingestionEnvEnabled: false, // Edge env; UI never enables live flags from here
-    notifyEnvEnabled: false,
-    mappingCount: gygConnector?.mapping_count ?? mappings.filter((m) => m.provider === 'getyourguide').length,
+    ingestionEnvEnabled: edgeStatus?.ingestionEnvEnabled ?? false,
+    notifyEnvEnabled: edgeStatus?.notifyEnvEnabled ?? false,
+    mappingCount: gygMappingCount,
     openInboundEvents: gygConnector?.open_event_count ?? 0,
     outboxProblems: outboxProblems.length,
+    credentialsConfigured: edgeStatus?.credentialsConfigured,
+    notifyCredentialsConfigured: edgeStatus?.notifyCredentialsConfigured,
+    templateCount: templates.length,
   })
+  const setupErrors = gygSetupErrors({
+    edgeReachable: edgeOk,
+    credentialsConfigured: edgeStatus?.credentialsConfigured ?? false,
+    notifyCredentialsConfigured: edgeStatus?.notifyCredentialsConfigured ?? false,
+    ingestionEnvEnabled: edgeStatus?.ingestionEnvEnabled ?? false,
+    notifyEnvEnabled: edgeStatus?.notifyEnvEnabled ?? false,
+    templateCount: templates.length,
+    mappingCount: gygMappingCount,
+    outboxProblems: outboxProblems.length,
+  })
+  const readiness = assessGygActivationReadiness({
+    edgeDeployed: edgeOk,
+    uiDeployed: true,
+    certificationOk: certOk === true,
+    credentialsConfigured: edgeStatus?.credentialsConfigured ?? false,
+    notifyCredentialsConfigured: edgeStatus?.notifyCredentialsConfigured ?? false,
+    templateCount: templates.length,
+    mappingCount: gygMappingCount,
+    ingestionEnvEnabled: edgeStatus?.ingestionEnvEnabled ?? false,
+    notifyEnvEnabled: edgeStatus?.notifyEnvEnabled ?? false,
+    notifyCronConfigured: !outboxUnavailable,
+    outboxProblems: outboxProblems.length,
+  })
+  const secrets = gygSecretChecklist(edgeStatus)
 
   return (
     <div className="space-y-4">
       <PageHeader
         title="Shared Bookings integrations"
-        subtitle="GetYourGuide Supplier API + Bókun webhooks. Credentials stay in Edge secrets — never shown to operators."
+        subtitle="GetYourGuide Supplier API + Bókun webhooks. Credentials stay in Edge secrets — never shown here."
         actions={
           <div className="flex gap-2">
             <SecondaryButton type="button" onClick={() => void reload()} disabled={loading || saving}>
@@ -221,28 +270,117 @@ export default function SharedIntegrationsPage() {
       {loading ? <p className="text-sm text-zinc-500">Loading…</p> : null}
 
       <Card className="space-y-2">
-        <h2 className="text-sm font-semibold text-zinc-900">Operational health</h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold text-zinc-900">Production readiness</h2>
+          <Badge tone={readiness.verdict === 'GO' ? 'green' : 'red'}>{readiness.verdict}</Badge>
+        </div>
         <div className="flex flex-wrap gap-2 text-xs">
-          <Badge tone="gray">Ingestion: {health.ingestion} (Edge flag)</Badge>
-          <Badge tone="gray">Notify: {health.notify} (Edge flag)</Badge>
-          <Badge tone={outboxProblems.length ? 'red' : 'green'}>
-            Notify outbox: {outboxUnavailable ? 'schema pending' : `${outboxProblems.length} problem(s)`}
+          <Badge tone={edgeOk ? 'green' : 'red'}>Edge: {edgeOk ? 'reachable' : 'down'}</Badge>
+          <Badge tone={edgeStatus?.credentialsConfigured ? 'green' : 'yellow'}>
+            Inbound auth: {edgeStatus?.credentialsConfigured ? 'configured' : 'missing'}
           </Badge>
-          <Badge tone={(gygConnector?.mapping_count || 0) > 0 ? 'green' : 'yellow'}>
-            GYG mappings: {gygConnector?.mapping_count ?? 0}
+          <Badge tone={edgeStatus?.notifyCredentialsConfigured ? 'green' : 'yellow'}>
+            Notify auth: {edgeStatus?.notifyCredentialsConfigured ? 'configured' : 'missing'}
+          </Badge>
+          <Badge tone={edgeStatus?.live ? 'red' : 'gray'}>
+            Live traffic: {edgeStatus?.live ? 'ON' : 'OFF'}
+          </Badge>
+          <Badge tone={edgeStatus?.ingestionEnvEnabled ? 'red' : 'gray'}>
+            Ingestion: {health.ingestion}
+          </Badge>
+          <Badge tone={edgeStatus?.notifyEnvEnabled || edgeStatus?.availabilityNotifyLive ? 'red' : 'gray'}>
+            Notify: {health.notify}
+          </Badge>
+          <Badge tone={certOk ? 'green' : 'red'}>Lifecycle cert: {certOk ? 'PASS' : 'FAIL'}</Badge>
+          <Badge tone={templates.length ? 'green' : 'yellow'}>Templates: {templates.length}</Badge>
+          <Badge tone={gygMappingCount > 0 ? 'green' : 'yellow'}>Active GYG mappings: {gygMappingCount}</Badge>
+          <Badge tone={outboxProblems.length ? 'red' : 'green'}>
+            Outbox: {outboxUnavailable ? 'schema pending' : `${outboxProblems.length} problem(s)`}
           </Badge>
         </div>
-        {health.blockers.length > 0 ? (
+        {setupErrors.length > 0 ? (
           <ul className="list-disc space-y-0.5 pl-4 text-xs text-amber-800">
-            {health.blockers.map((b) => (
+            {setupErrors.map((b) => (
               <li key={b}>{b}</li>
             ))}
           </ul>
         ) : (
           <p className="text-xs text-zinc-500">
-            No local blockers listed. Live traffic stays OFF until separately approved.
+            Setup complete with live flags OFF. Await separate approval before enabling GYG traffic.
           </p>
         )}
+        {readiness.notes.map((n) => (
+          <p key={n} className="text-xs text-zinc-500">
+            {n}
+          </p>
+        ))}
+      </Card>
+
+      <Card className="space-y-2">
+        <h2 className="text-sm font-semibold text-zinc-900">GYG connection status</h2>
+        <div className="grid gap-2 sm:grid-cols-2 text-xs text-zinc-700">
+          <p>
+            Availability API:{' '}
+            <span className="font-medium">{edgeStatus?.availabilityLive ? 'ready' : '—'}</span>
+          </p>
+          <p>
+            Reservations:{' '}
+            <span className="font-medium">{edgeStatus?.reservationsLive ? 'ready' : '—'}</span>
+          </p>
+          <p>
+            Book / cancel:{' '}
+            <span className="font-medium">{edgeStatus?.bookingLifecycleReady ? 'ready' : '—'}</span>
+          </p>
+          <p>
+            Notify worker:{' '}
+            <span className="font-medium">
+              {edgeStatus?.availabilityNotifyReady ? 'ready' : '—'}
+              {edgeStatus?.availabilityNotifyLive ? ' (LIVE)' : ' (gated OFF)'}
+            </span>
+          </p>
+        </div>
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">
+            Edge secrets (presence only)
+          </p>
+          <ul className="mt-1 space-y-0.5 text-xs text-zinc-600">
+            {secrets.map((s) => (
+              <li key={s.name} className="flex flex-wrap items-center gap-2 font-mono">
+                <span>{s.name}</span>
+                <Badge
+                  tone={
+                    s.configured === true
+                      ? s.purpose === 'feature_flag'
+                        ? 'gray'
+                        : 'green'
+                      : s.configured === false
+                        ? 'yellow'
+                        : 'gray'
+                  }
+                >
+                  {s.purpose === 'feature_flag' && s.name.includes('INGESTION')
+                    ? edgeStatus?.ingestionEnvEnabled
+                      ? 'ON'
+                      : 'OFF'
+                    : s.purpose === 'feature_flag' && s.name.includes('NOTIFY_ENABLED')
+                      ? edgeStatus?.notifyEnvEnabled
+                        ? 'ON'
+                        : 'OFF'
+                      : s.configured === true
+                        ? 'present'
+                        : s.configured === false
+                          ? 'missing'
+                          : 'unknown'}
+                </Badge>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-[11px] text-zinc-500">
+            Obtain inbound Basic Auth values you register with GYG; obtain notify credentials from Integrator
+            Portal → Set Up Your Testing Configuration. Set via{' '}
+            <span className="font-mono">supabase secrets set</span> — never paste into this UI.
+          </p>
+        </div>
       </Card>
 
       <div className="grid gap-3 lg:grid-cols-2">
@@ -302,7 +440,7 @@ export default function SharedIntegrationsPage() {
             </div>
             <SecondaryButton
               type="button"
-              disabled={saving || c.mapping_count < 1}
+              disabled={saving || c.mapping_count < 1 || !edgeStatus?.credentialsConfigured}
               onClick={() => void markReady(c.provider)}
             >
               Mark ready (still off until Edge flag)
@@ -313,6 +451,12 @@ export default function SharedIntegrationsPage() {
 
       <Card className="space-y-3">
         <h2 className="text-sm font-semibold text-zinc-900">Map external product → tour template</h2>
+        {templates.length === 0 ? (
+          <p className="text-sm text-amber-800">
+            No tour templates yet. Create templates on the Shared Bookings calendar page before activating
+            mappings.
+          </p>
+        ) : null}
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Provider">
             <select
@@ -369,11 +513,14 @@ export default function SharedIntegrationsPage() {
         </div>
         <PrimaryButton
           type="button"
-          disabled={saving || !productId.trim() || !supplierId}
+          disabled={saving || !productId.trim() || !supplierId || !templateId}
           onClick={() => void saveMapping()}
         >
-          Save mapping
+          Save mapping as inactive draft
         </PrimaryButton>
+        <p className="text-[11px] text-zinc-500">
+          New mappings save inactive until ownership, option IDs, capacity, and departure times are verified.
+        </p>
         {mappings.length > 0 ? (
           <ul className="divide-y divide-zinc-100 rounded-lg border border-zinc-200">
             {mappings.map((m) => (
@@ -383,21 +530,37 @@ export default function SharedIntegrationsPage() {
                   {m.external_option_id ? ` / ${m.external_option_id}` : ''} →{' '}
                   {m.template_title || 'template'} ({m.supplier_name})
                 </span>
-                <Badge tone={m.is_active ? 'green' : 'gray'}>{m.is_active ? 'active' : 'off'}</Badge>
+                <Badge tone={m.is_active ? 'green' : 'gray'}>{m.is_active ? 'active' : 'inactive'}</Badge>
               </li>
             ))}
           </ul>
         ) : (
           <p className="text-sm text-zinc-500">No product mappings yet.</p>
         )}
+        <div className="rounded-lg border border-dashed border-zinc-300 px-3 py-2">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">
+            Unverified candidates (not activated)
+          </p>
+          <ul className="mt-1 space-y-1 text-xs text-zinc-600">
+            {candidates.map((c) => (
+              <li key={c.externalProductId}>
+                <span className="font-mono">{c.externalProductId}</span> → {c.suggestedTitle} · {c.source}.{' '}
+                {c.notes}
+              </li>
+            ))}
+            <li>
+              Active departures without templates: Standard Group Northern Lights (20:00), Guaranteed Northern
+              Lights &amp; Photography Tour (18:30) — create templates and confirm GYG productIds in Integrator
+              Portal before mapping.
+            </li>
+          </ul>
+        </div>
       </Card>
 
       <Card className="space-y-3">
         <h2 className="text-sm font-semibold text-zinc-900">GYG availability notify outbox</h2>
         {outboxUnavailable ? (
-          <p className="text-sm text-amber-800">
-            Outbox schema not on this database yet (apply 1.6D/1.6E migrations after approval).
-          </p>
+          <p className="text-sm text-amber-800">Outbox schema not available on this database.</p>
         ) : outboxProblems.length === 0 ? (
           <p className="text-sm text-zinc-500">No failed or stuck availability notifications.</p>
         ) : (

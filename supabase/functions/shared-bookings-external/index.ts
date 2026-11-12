@@ -82,8 +82,19 @@ function gygCredsConfigured(): boolean {
   )
 }
 
+function gygNotifyCredsConfigured(): boolean {
+  return Boolean(
+    Deno.env.get('SHARED_BOOKINGS_GYG_NOTIFY_USER') &&
+      Deno.env.get('SHARED_BOOKINGS_GYG_NOTIFY_PASSWORD'),
+  )
+}
+
 function gygIngestionEnvEnabled(): boolean {
   return String(Deno.env.get('SHARED_BOOKINGS_GYG_INGESTION_ENABLED') || '').toLowerCase() === 'true'
+}
+
+function gygNotifyEnvEnabled(): boolean {
+  return String(Deno.env.get('SHARED_BOOKINGS_GYG_NOTIFY_ENABLED') || '').toLowerCase() === 'true'
 }
 
 function bokunSecretConfigured(): boolean {
@@ -240,7 +251,9 @@ serve(async (req) => {
             mode: 'supplier_api',
             auth: 'HTTP Basic Auth (official GYG Supplier API)',
             credentials_configured: gygCredsConfigured(),
+            notify_credentials_configured: gygNotifyCredsConfigured(),
             ingestion_env_enabled: gygIngestionEnvEnabled(),
+            notify_env_enabled: gygNotifyEnvEnabled(),
             endpoints: [
               'GET /gyg/1/get-availabilities (official /1/ prefix)',
               'GET /gyg/get-availabilities',
@@ -254,8 +267,9 @@ serve(async (req) => {
             reservations_live: true,
             booking_lifecycle_ready: true,
             availability_notify_ready: true,
-            availability_notify_live: false,
-            live: false,
+            availability_notify_live: gygNotifyEnvEnabled() && gygNotifyCredsConfigured(),
+            // Live only when inbound Basic Auth + ingestion flag are both set.
+            live: gygCredsConfigured() && gygIngestionEnvEnabled(),
           },
           bokun: {
             mode: 'webhooks',
