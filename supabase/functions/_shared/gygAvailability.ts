@@ -25,7 +25,7 @@ export type SharedDepartureAvailabilityRow = {
   departure_time: string | null
   capacity: number
   confirmed_passengers: number
-  /** Pending holds (1.6B). Counted when present; currently usually 0. */
+  /** Active unexpired pending holds only (1.6B). */
   held_passengers?: number
 }
 
