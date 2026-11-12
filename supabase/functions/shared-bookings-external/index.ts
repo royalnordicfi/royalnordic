@@ -20,10 +20,17 @@ import {
   gygCancelReservationResponse,
   gygReserveSuccessResponse,
   mapGygCancelRpcError,
-  mapGygConsumeRpcError,
   mapGygReserveRpcError,
   parseGygReserveRequest,
 } from '../_shared/gygReservations.ts'
+import {
+  gygBookSuccessResponse,
+  gygCancelBookingResponse,
+  mapGygCancelBookingRpcError,
+  mapGygConfirmRpcError,
+  parseGygBookRequest,
+  parseGygCancelBookingRequest,
+} from '../_shared/gygBookings.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -242,9 +249,10 @@ serve(async (req) => {
               'POST /gyg/book',
               'POST /gyg/cancel-booking',
             ],
-            // Availability + reserve/cancel holds are real (1.6A/B). Confirmed book stays gated.
+            // Availability + holds real (1.6A/B). Book/cancel-booking implemented (1.6C), env-gated.
             availability_live: true,
             reservations_live: true,
+            booking_lifecycle_ready: true,
             live: false,
           },
           bokun: {
@@ -467,7 +475,8 @@ serve(async (req) => {
       }
 
       if (actionPath === 'book') {
-        // Confirmed bookings stay behind ingestion flag. Hold consumption is prepared (1.6B).
+        // Official POST /1/book/ — confirm reservation (1.6C). Live confirmed writes stay env-gated.
+        if (req.method !== 'POST') return gygError('VALIDATION_FAILURE', 'POST required')
         if (!gygIngestionEnvEnabled()) {
           return gygError(
             'INTERNAL_SYSTEM_FAILURE',
@@ -476,149 +485,95 @@ serve(async (req) => {
         }
         const body = await req.json().catch(() => ({}))
         const data = body.data || body
-        const productId = String(data.productId || '').trim()
-        const gygBookingReference = String(data.gygBookingReference || data.bookingReference || '').trim()
-        const reservationReference = String(data.reservationReference || '').trim()
-        const externalId = gygBookingReference || reservationReference
-        if (!productId || !externalId) {
-          return gygError('VALIDATION_FAILURE', 'productId and gygBookingReference are required')
-        }
-
-        const { data: maps } = await admin.from('shared_product_mappings').select('*').eq('provider', 'getyourguide').eq('external_product_id', productId).eq('is_active', true).limit(1)
+        const { data: maps } = await admin
+          .from('shared_product_mappings')
+          .select('*')
+          .eq('provider', 'getyourguide')
+          .eq('external_product_id', String(data.productId || '').trim())
+          .eq('is_active', true)
+          .limit(1)
         const mapping = maps?.[0]
+        const parsed = parseGygBookRequest({
+          productId: data.productId,
+          dateTime: data.dateTime,
+          gygBookingReference: data.gygBookingReference,
+          bookingReference: data.bookingReference,
+          reservationReference: data.reservationReference,
+          bookingItems: data.bookingItems,
+          travelers: data.travelers,
+          comment: data.comment,
+          adultCategories: mapping?.adult_categories,
+          childCategories: mapping?.child_categories,
+        })
+        if (!parsed.ok) return gygError(parsed.errorCode, parsed.errorMessage)
         if (!mapping) {
-          await upsertAndProcess(admin, {
-            provider: 'getyourguide',
-            eventKey: `gyg:book:${externalId}`,
-            topic: 'book',
-            externalBookingId: externalId,
-            payload: {
-              action: 'create',
-              external_product_id: productId,
-              external_booking_id: externalId,
-              provider_raw: data,
-            },
-          })
-          return gygError('VALIDATION_FAILURE', `Unknown productId ${productId} — configure Shared Bookings product mapping`)
+          return gygError(
+            'VALIDATION_FAILURE',
+            `Unknown productId ${parsed.request.productId} — configure Shared Bookings product mapping`,
+          )
         }
 
-        const seats = countGygCategories(
-          data.bookingItems,
-          mapping.adult_categories || ['ADULT', 'SENIOR', 'YOUTH', 'STUDENT'],
-          mapping.child_categories || ['CHILD', 'INFANT'],
+        const { data: confirmed, error: confirmErr } = await admin.rpc('service_gyg_confirm_booking', {
+          p_product_id: parsed.request.productId,
+          p_date_time: parsed.request.dateTime,
+          p_gyg_booking_reference: parsed.request.gygBookingReference,
+          p_reservation_reference: parsed.request.reservationReference,
+          p_adults: parsed.request.adults,
+          p_children: parsed.request.children,
+          p_guest_name: parsed.request.guestName,
+          p_contact_email: parsed.request.contactEmail,
+          p_contact_phone: parsed.request.contactPhone,
+          p_notes: parsed.request.notes,
+        })
+        if (confirmErr) {
+          console.error('service_gyg_confirm_booking', confirmErr)
+          return gygError('INTERNAL_SYSTEM_FAILURE', 'Booking failed')
+        }
+        if (!confirmed?.ok) {
+          const mapped = mapGygConfirmRpcError(confirmed?.error)
+          return gygError(mapped.errorCode, confirmed?.error_message || mapped.errorMessage)
+        }
+
+        const bookingReference = String(
+          confirmed.booking_reference || confirmed.external_ref || parsed.request.gygBookingReference,
         )
-        const when = parseIsoLocal(data.dateTime)
-        const guest = guestFromTravelers(data.travelers)
-
-        // Prefer consuming a valid hold so capacity is not double-counted.
-        if (reservationReference) {
-          const { data: consumed, error: consumeErr } = await admin.rpc('service_gyg_consume_reservation', {
-            p_reservation_reference: reservationReference,
-            p_gyg_booking_reference: gygBookingReference || externalId,
-            p_guest_name: guest.name || 'GYG Guest',
-            p_adults: seats.adults,
-            p_children: seats.children,
-            p_contact_email: guest.email || null,
-            p_contact_phone: guest.phone || null,
-            p_notes: data.comment || null,
-          })
-          if (consumeErr) {
-            console.error('service_gyg_consume_reservation', consumeErr)
-            return gygError('INTERNAL_SYSTEM_FAILURE', 'Booking failed')
-          }
-          if (!consumed?.ok) {
-            const mapped = mapGygConsumeRpcError(consumed?.error)
-            return gygError(mapped.errorCode, consumed?.error_message || mapped.errorMessage)
-          }
-
-          return json({
-            data: {
-              bookingReference: consumed.external_ref || externalId,
-              tickets: [
-                ...Array.from({ length: seats.adults }, () => ({ category: 'ADULT' })),
-                ...Array.from({ length: seats.children }, () => ({ category: 'CHILD' })),
-              ],
-            },
-          })
-        }
-
-        const processed = await upsertAndProcess(admin, {
-          provider: 'getyourguide',
-          eventKey: `gyg:book:${externalId}`,
-          topic: 'book',
-          externalBookingId: externalId,
-          payload: {
-            action: 'create',
-            external_product_id: productId,
-            external_booking_id: externalId,
-            departure_date: when.date,
-            departure_time: when.time || mapping.default_departure_time || null,
-            guest_name: guest.name || 'GYG Guest',
-            adults: seats.adults,
-            children: seats.children,
-            contact_email: guest.email || null,
-            contact_phone: guest.phone || null,
-            notes: data.comment || null,
-            provider_raw: data,
-          },
-        })
-
-        if (!processed?.ok) {
-          if (processed?.error === 'capacity_exceeded') {
-            return gygError(
-              'NO_AVAILABILITY',
-              `This activity is sold out; requested ${seats.adults + seats.children}.`,
-            )
-          }
-          if (processed?.error === 'unmatched_departure' || processed?.error === 'unknown_product') {
-            return gygError('VALIDATION_FAILURE', processed.error_message || processed.error)
-          }
-          if (processed?.error === 'ingestion_disabled') {
-            return gygError('INTERNAL_SYSTEM_FAILURE', 'Ingestion disabled in Shared Bookings connector settings')
-          }
-          return gygError('INTERNAL_SYSTEM_FAILURE', processed?.error || 'booking_failed')
-        }
-
-        return json({
-          data: {
-            bookingReference: externalId,
-            tickets: [
-              ...Array.from({ length: seats.adults }, () => ({ category: 'ADULT' })),
-              ...Array.from({ length: seats.children }, () => ({ category: 'CHILD' })),
-            ],
-          },
-        })
+        const adults = Number(confirmed.adults ?? parsed.request.adults) || 0
+        const children = Number(confirmed.children ?? parsed.request.children) || 0
+        return json(gygBookSuccessResponse(bookingReference, adults, children))
       }
 
       if (actionPath === 'cancel-booking') {
-        const body = await req.json().catch(() => ({}))
-        const data = body.data || body
-        const bookingReference = String(
-          data.bookingReference || data.gygBookingReference || '',
-        ).trim()
-        if (!bookingReference) {
-          return gygError('VALIDATION_FAILURE', 'bookingReference is required')
-        }
-
+        // Official POST /1/cancel-booking/ → { data: {} }. Stable idempotency (no Date.now keys).
+        if (req.method !== 'POST') return gygError('VALIDATION_FAILURE', 'POST required')
         if (!gygIngestionEnvEnabled()) {
           return gygError(
             'INTERNAL_SYSTEM_FAILURE',
             'Shared Bookings GYG ingestion is disabled until credentials, mappings and verification are confirmed.',
           )
         }
-
-        const processed = await upsertAndProcess(admin, {
-          provider: 'getyourguide',
-          eventKey: `gyg:cancel-booking:${bookingReference}:${Date.now()}`,
-          topic: 'cancel-booking',
-          externalBookingId: bookingReference,
-          payload: { action: 'cancel', external_booking_id: bookingReference, provider_raw: data },
+        const body = await req.json().catch(() => ({}))
+        const data = body.data || body
+        const parsed = parseGygCancelBookingRequest({
+          bookingReference: data.bookingReference,
+          gygBookingReference: data.gygBookingReference,
+          productId: data.productId,
         })
+        if (!parsed.ok) return gygError(parsed.errorCode, parsed.errorMessage)
 
-        if (!processed?.ok && processed?.error === 'missing_external_ref') {
-          return gygError('INVALID_BOOKING', 'The booking does not exist or is not in a valid state.')
+        const { data: cancelled, error: cancelErr } = await admin.rpc('service_gyg_cancel_booking', {
+          p_booking_reference: parsed.bookingReference,
+          p_gyg_booking_reference: parsed.gygBookingReference,
+        })
+        if (cancelErr) {
+          console.error('service_gyg_cancel_booking', cancelErr)
+          return gygError('INTERNAL_SYSTEM_FAILURE', 'Cancel booking failed')
         }
-        return json({ data: { bookingReference } })
+        if (!cancelled?.ok) {
+          const mapped = mapGygCancelBookingRpcError(cancelled?.error)
+          return gygError(mapped.errorCode, cancelled?.error_message || mapped.errorMessage)
+        }
+
+        return json(gygCancelBookingResponse())
       }
 
       return gygError('VALIDATION_FAILURE', `Unsupported GYG path: ${actionPath}`)
