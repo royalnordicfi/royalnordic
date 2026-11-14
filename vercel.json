@@ -50,6 +50,20 @@
   ],
   "headers": [
     {
+      "source": "/api/gyg",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" },
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/api/gyg/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" },
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
       "source": "/admin/sharedbookings",
       "has": [{ "type": "host", "value": "royalnordic.fi" }],
       "headers": [

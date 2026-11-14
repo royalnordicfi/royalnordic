@@ -356,13 +356,14 @@ export function requiredSecretsFor(provider: SharedIntegrationProvider): string[
 export function externalEndpointPaths(provider: SharedIntegrationProvider): string[] {
   if (provider === 'getyourguide') {
     return [
-      // Official Supplier API version prefix /1/ is accepted via path normalization.
+      // Public Integrator Portal gateway (royalnordic.fi → Edge).
+      'https://royalnordic.fi/api/gyg/1/get-availabilities',
+      'https://royalnordic.fi/api/gyg/1/reserve',
+      'https://royalnordic.fi/api/gyg/1/cancel-reservation',
+      'https://royalnordic.fi/api/gyg/1/book',
+      'https://royalnordic.fi/api/gyg/1/cancel-booking',
+      // Upstream Edge (internal).
       '/functions/v1/shared-bookings-external/gyg/1/get-availabilities',
-      '/functions/v1/shared-bookings-external/gyg/get-availabilities',
-      '/functions/v1/shared-bookings-external/gyg/reserve',
-      '/functions/v1/shared-bookings-external/gyg/cancel-reservation',
-      '/functions/v1/shared-bookings-external/gyg/book',
-      '/functions/v1/shared-bookings-external/gyg/cancel-booking',
     ]
   }
   return ['/functions/v1/shared-bookings-external/bokun/webhook']

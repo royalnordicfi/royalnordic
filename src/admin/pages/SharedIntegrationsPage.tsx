@@ -53,6 +53,7 @@ import {
   SHARED_BUS_TEMPLATE_TITLE,
   isSharedBusTourTitle,
 } from '../sharedBus'
+import { gygIntegratorPortalConfig } from '../gygGateway'
 
 export default function SharedIntegrationsPage() {
   const base = useSharedBookingsBase()
@@ -352,6 +353,21 @@ export default function SharedIntegrationsPage() {
 
       <Card className="space-y-2">
         <h2 className="text-sm font-semibold text-zinc-900">GYG connection status</h2>
+        {(() => {
+          const portal = gygIntegratorPortalConfig()
+          return (
+            <div className="rounded-lg bg-zinc-50 px-3 py-2 text-xs text-zinc-700">
+              <p className="font-semibold text-zinc-900">Integrator Portal (enter after verification)</p>
+              <p className="mt-1 font-mono">
+                Host {portal.host} · Port {portal.port} · Path {portal.path}
+              </p>
+              <p className="mt-0.5 text-[11px] text-zinc-500">
+                Public gateway proxies to Shared Bookings Edge. Example:{' '}
+                <span className="font-mono">https://royalnordic.fi/api/gyg/1/get-availabilities</span>
+              </p>
+            </div>
+          )
+        })()}
         <div className="grid gap-2 sm:grid-cols-2 text-xs text-zinc-700">
           <p>
             Availability API:{' '}

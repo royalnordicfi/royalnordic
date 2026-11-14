@@ -46,7 +46,9 @@ describe('shared integrations helpers', () => {
     expect(requiredSecretsFor('getyourguide')).toContain('SHARED_BOOKINGS_GYG_BASIC_USER')
     expect(requiredSecretsFor('bokun')).toContain('SHARED_BOOKINGS_BOKUN_WEBHOOK_SECRET')
     expect(externalEndpointPaths('bokun')[0]).toContain('/bokun/webhook')
-    expect(externalEndpointPaths('getyourguide').some((p) => p.endsWith('/gyg/book'))).toBe(true)
+    expect(
+      externalEndpointPaths('getyourguide').some((p) => p.includes('/api/gyg/1/book')),
+    ).toBe(true)
   })
 
   it('lists actionable setup errors and keeps candidates unverified', () => {
