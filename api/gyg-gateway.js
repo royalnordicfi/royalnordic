@@ -77,7 +77,9 @@ export default async function handler(req, res) {
     const host = readHeader(req, 'host') || 'royalnordic.fi'
     const proto = readHeader(req, 'x-forwarded-proto') || 'https'
     const url = new URL(req.url || '/', `${proto}://${host}`)
-    const mapped = mapPath(url.pathname)
+    // Rewrites to this function pass the public path as __gyg (req.url becomes /api/gyg-gateway).
+    const publicPath = url.searchParams.get('__gyg') || url.pathname
+    const mapped = mapPath(publicPath)
 
     if (!mapped.ok) {
       return sendJson(res, 404, {
@@ -111,7 +113,11 @@ export default async function handler(req, res) {
       })
     }
 
-    const target = `${supabaseUrl}/functions/v1/shared-bookings-external/${mapped.edgeTail}${url.search || ''}`
+    // Forward original query string without the internal __gyg rewrite marker.
+    const forward = new URLSearchParams(url.searchParams)
+    forward.delete('__gyg')
+    const qs = forward.toString()
+    const target = `${supabaseUrl}/functions/v1/shared-bookings-external/${mapped.edgeTail}${qs ? `?${qs}` : ''}`
     const headers = {
       apikey: anon,
       Accept: 'application/json',

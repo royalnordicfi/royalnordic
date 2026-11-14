@@ -33,11 +33,11 @@
   "rewrites": [
     {
       "source": "/api/gyg",
-      "destination": "/api/gyg-gateway"
+      "destination": "/api/gyg-gateway?__gyg=/api/gyg"
     },
     {
       "source": "/api/gyg/(.*)",
-      "destination": "/api/gyg-gateway"
+      "destination": "/api/gyg-gateway?__gyg=/api/gyg/$1"
     },
     {
       "source": "/api/(.*)",
