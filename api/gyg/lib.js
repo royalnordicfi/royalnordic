@@ -1,8 +1,18 @@
 /**
- * Shared GYG gateway proxy (used by /api/gyg and /api/gyg/*).
+ * GYG gateway shared logic for Vercel Functions (Web Handler).
  */
 
-import { buildEdgeProxyUrl, mapGygGatewayPath } from './_map.js'
+export const GYG_PUBLIC_BASE_PATH = '/api/gyg'
+
+export const GYG_SUPPLIER_ACTIONS = [
+  'get-availabilities',
+  'reserve',
+  'cancel-reservation',
+  'book',
+  'cancel-booking',
+]
+
+const ACTION_SET = new Set(GYG_SUPPLIER_ACTIONS)
 
 const HOP_BY_HOP = new Set([
   'connection',
@@ -16,6 +26,47 @@ const HOP_BY_HOP = new Set([
   'host',
   'content-length',
 ])
+
+export function mapGygGatewayPath(pathname) {
+  const raw = String(pathname || '')
+  const normalized = raw.split('?')[0].replace(/\/+$/, '') || '/'
+  const prefix = GYG_PUBLIC_BASE_PATH
+  if (normalized !== prefix && !normalized.startsWith(`${prefix}/`)) {
+    return { ok: false, error: 'not_gyg_gateway' }
+  }
+
+  const rest = normalized === prefix ? '' : normalized.slice(prefix.length + 1)
+  if (!rest || rest === 'status' || rest === 'health') {
+    return { ok: true, kind: 'status', edgeTail: 'status' }
+  }
+
+  let actionPath = rest
+  if (actionPath.startsWith('1/')) actionPath = actionPath.slice(2)
+  actionPath = actionPath.replace(/\/+$/, '')
+
+  if (!ACTION_SET.has(actionPath)) {
+    return { ok: false, error: 'unsupported_endpoint' }
+  }
+
+  return {
+    ok: true,
+    kind: 'gyg',
+    action: actionPath,
+    edgeTail: `gyg/1/${actionPath}`,
+  }
+}
+
+export function buildEdgeProxyUrl(supabaseUrl, edgeTail, search = '') {
+  const base = String(supabaseUrl || '')
+    .trim()
+    .replace(/\/+$/, '')
+  if (!base) throw new Error('supabase_url_missing')
+  const tail = String(edgeTail || '')
+    .replace(/^\/+/, '')
+    .replace(/\/+$/, '')
+  const q = search && search !== '?' ? search : ''
+  return `${base}/functions/v1/shared-bookings-external/${tail}${q}`
+}
 
 function json(status, body) {
   return new Response(JSON.stringify(body), {
@@ -34,10 +85,6 @@ function supabaseConfig() {
   return { url, anon }
 }
 
-/**
- * @param {Request} request
- * @param {string} [pathnameOverride]
- */
 export async function proxyGygGateway(request, pathnameOverride) {
   if (request.method === 'OPTIONS') {
     return new Response(null, {
@@ -62,7 +109,6 @@ export async function proxyGygGateway(request, pathnameOverride) {
     })
   }
 
-  // Supplier actions require HTTP Basic Auth. Status remains open (booleans only).
   if (mapped.kind === 'gyg') {
     const authHeader = request.headers.get('authorization') || ''
     if (!/^Basic\s+\S+/i.test(authHeader)) {
@@ -136,4 +182,10 @@ export async function proxyGygGateway(request, pathnameOverride) {
     statusText: upstream.statusText,
     headers: outHeaders,
   })
+}
+
+export function gygHandler(pathname) {
+  return async function handler(request) {
+    return proxyGygGateway(request, pathname)
+  }
 }

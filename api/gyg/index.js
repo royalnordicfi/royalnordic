@@ -1,4 +1,3 @@
-import { gygHandler } from './_handler.js'
+import { gygHandler } from './lib.js'
 
-/** GET /api/gyg → status */
 export default gygHandler('/api/gyg/status')
