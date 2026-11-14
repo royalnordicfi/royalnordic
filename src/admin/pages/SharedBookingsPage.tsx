@@ -39,6 +39,13 @@ import {
   shiftCalendarAnchor,
 } from '../sharedCalendar'
 import { sharedBookingsPaths, useSharedBookingsBase } from '../sharedBookingsPaths'
+import {
+  SHARED_BUS_CAPACITY,
+  SHARED_BUS_DEPARTURE_TIME,
+  SHARED_BUS_MEETING_POINT,
+  SHARED_BUS_TEMPLATE_CODE,
+  SHARED_BUS_TEMPLATE_TITLE,
+} from '../sharedBus'
 import { WEEKDAY_HEADERS_MON_FIRST, todayTourDateISO } from '../../lib/tourDate'
 
 const views: { id: SharedCalendarView; label: string }[] = [
@@ -120,18 +127,18 @@ export default function SharedBookingsPage() {
   const [panel, setPanel] = useState<'none' | 'template' | 'departure'>('none')
   const [saving, setSaving] = useState(false)
 
-  const [tplTitle, setTplTitle] = useState('')
+  const [tplTitle, setTplTitle] = useState(SHARED_BUS_TEMPLATE_TITLE)
   const [tplCategory, setTplCategory] = useState<SharedBoard>('shared_bus')
-  const [tplMeeting, setTplMeeting] = useState('')
-  const [tplCapacity, setTplCapacity] = useState('50')
-  const [tplTime, setTplTime] = useState('')
+  const [tplMeeting, setTplMeeting] = useState(SHARED_BUS_MEETING_POINT)
+  const [tplCapacity, setTplCapacity] = useState(String(SHARED_BUS_CAPACITY))
+  const [tplTime, setTplTime] = useState(SHARED_BUS_DEPARTURE_TIME)
 
   const [depTemplateId, setDepTemplateId] = useState('')
   const [depDate, setDepDate] = useState(anchor)
-  const [depTime, setDepTime] = useState('')
-  const [depCapacity, setDepCapacity] = useState('50')
-  const [depMeeting, setDepMeeting] = useState('')
-  const [depTitle, setDepTitle] = useState('')
+  const [depTime, setDepTime] = useState(SHARED_BUS_DEPARTURE_TIME)
+  const [depCapacity, setDepCapacity] = useState(String(SHARED_BUS_CAPACITY))
+  const [depMeeting, setDepMeeting] = useState(SHARED_BUS_MEETING_POINT)
+  const [depTitle, setDepTitle] = useState(SHARED_BUS_TEMPLATE_TITLE)
   const [depSupplierIds, setDepSupplierIds] = useState<string[]>([])
 
   const range = useMemo(() => calendarRange(view, anchor), [view, anchor])
@@ -187,9 +194,26 @@ export default function SharedBookingsPage() {
             listSharedSuppliersAdmin(),
           ])
           if (cancelled) return
-          if (tpl.ok) setTemplates(tpl.templates)
+          if (tpl.ok) {
+            setTemplates(tpl.templates)
+            const bus =
+              tpl.templates.find((x) => x.code === SHARED_BUS_TEMPLATE_CODE) ||
+              tpl.templates.find(
+                (x) => /standard\s+group/i.test(x.title) && !/guaranteed/i.test(x.title),
+              )
+            if (bus) {
+              setDepTemplateId(bus.id)
+              setDepTime(bus.default_departure_time || SHARED_BUS_DEPARTURE_TIME)
+              setDepCapacity(String(bus.default_capacity || SHARED_BUS_CAPACITY))
+              setDepMeeting(bus.meeting_point || SHARED_BUS_MEETING_POINT)
+              setDepTitle(bus.title)
+            }
+          }
           if (sup.ok) {
-            setSuppliers(sup.suppliers.filter((s) => s.code !== 'royal_nordic' && s.is_active))
+            const partners = sup.suppliers.filter((s) => s.code !== 'royal_nordic' && s.is_active)
+            setSuppliers(partners)
+            const elias = partners.find((s) => s.code === 'elias')
+            if (elias) setDepSupplierIds([elias.id])
           }
         }
       })

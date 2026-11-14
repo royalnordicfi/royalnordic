@@ -62,7 +62,11 @@ describe('shared integrations helpers', () => {
     })
     expect(errors.some((e) => /BASIC_USER/.test(e))).toBe(true)
     expect(errors.some((e) => /template/i.test(e))).toBe(true)
-    expect(proposedGygMappingCandidates().every((c) => c.verified === false)).toBe(true)
+    const candidates = proposedGygMappingCandidates()
+    expect(candidates.every((c) => c.verified === false)).toBe(true)
+    expect(candidates.every((c) => /Standard Group Northern Lights/i.test(c.suggestedTitle))).toBe(true)
+    expect(candidates.every((c) => !c.externalProductId)).toBe(true)
+    expect(candidates.every((c) => !/korouoma|guaranteed/i.test(c.suggestedTitle))).toBe(true)
   })
 
   it('returns NO-GO until credentials, templates, and mappings are ready', () => {

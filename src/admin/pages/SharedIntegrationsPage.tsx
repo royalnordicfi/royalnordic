@@ -45,6 +45,14 @@ import {
 import { sharedBookingsPaths, useSharedBookingsBase } from '../sharedBookingsPaths'
 import { SHARED_BOOKINGS_ADMIN_BASE } from '../../lib/sharedBookingsPortal'
 import { runSharedBookingsCertification } from '../sharedBookingsCertification'
+import {
+  SHARED_BUS_CAPACITY,
+  SHARED_BUS_DEPARTURE_TIME,
+  SHARED_BUS_GYG_SUPPLIER_CODE,
+  SHARED_BUS_TEMPLATE_CODE,
+  SHARED_BUS_TEMPLATE_TITLE,
+  isSharedBusTourTitle,
+} from '../sharedBus'
 
 export default function SharedIntegrationsPage() {
   const base = useSharedBookingsBase()
@@ -70,10 +78,14 @@ export default function SharedIntegrationsPage() {
   const [optionId, setOptionId] = useState('')
   const [templateId, setTemplateId] = useState('')
   const [supplierId, setSupplierId] = useState('')
-  const [defaultTime, setDefaultTime] = useState('')
+  const [defaultTime, setDefaultTime] = useState(SHARED_BUS_DEPARTURE_TIME)
 
   const isAdminHost = base === SHARED_BOOKINGS_ADMIN_BASE
   const candidates = proposedGygMappingCandidates()
+  const standardTemplates = templates.filter(
+    (t) => t.code === SHARED_BUS_TEMPLATE_CODE || isSharedBusTourTitle(t.title),
+  )
+  const mappingTemplates = provider === 'getyourguide' ? standardTemplates : templates
 
   const reload = async () => {
     const [a, c, m, e, t, s, o, st] = await Promise.all([
@@ -92,8 +104,10 @@ export default function SharedIntegrationsPage() {
     setNote(c.live_ingestion_note || '')
     if (m.ok) setMappings(m.mappings)
     if (e.ok) setEvents(e.events)
-    if (t.ok) setTemplates(t.templates)
-    if (s.ok) setSuppliers(s.suppliers.filter((x) => x.is_active))
+    const nextTemplates = t.ok ? t.templates : []
+    if (t.ok) setTemplates(nextTemplates)
+    const nextSuppliers = s.ok ? s.suppliers.filter((x) => x.is_active) : []
+    if (s.ok) setSuppliers(nextSuppliers)
     if (o.ok) {
       setOutboxProblems(o.items)
       setOutboxUnavailable(Boolean(o.unavailable))
@@ -101,6 +115,14 @@ export default function SharedIntegrationsPage() {
     setEdgeOk(Boolean(st.ok && st.gyg))
     setEdgeStatus(st.gyg)
     setCertOk(runSharedBookingsCertification().ok)
+
+    const busTpl =
+      nextTemplates.find((x) => x.code === SHARED_BUS_TEMPLATE_CODE) ||
+      nextTemplates.find((x) => isSharedBusTourTitle(x.title))
+    if (busTpl) setTemplateId(busTpl.id)
+    const rn = nextSuppliers.find((x) => x.code === SHARED_BUS_GYG_SUPPLIER_CODE)
+    if (rn) setSupplierId(rn.id)
+    setDefaultTime(SHARED_BUS_DEPARTURE_TIME)
   }
 
   useEffect(() => {
@@ -134,13 +156,25 @@ export default function SharedIntegrationsPage() {
         setError('Select a tour template before saving a mapping')
         return
       }
+      if (provider === 'getyourguide') {
+        const busTpl = standardTemplates.find((t) => t.id === templateId)
+        if (!busTpl) {
+          setError('GetYourGuide mappings are limited to Standard Group Northern Lights')
+          return
+        }
+        if (defaultTime.trim() !== SHARED_BUS_DEPARTURE_TIME) {
+          setError(`Standard Bus departure time must be ${SHARED_BUS_DEPARTURE_TIME}`)
+          return
+        }
+      }
       const res = await upsertSharedProductMapping({
         provider,
         external_product_id: productId.trim(),
         external_option_id: optionId.trim() || undefined,
         template_id: templateId || null,
         supplier_id: supplierId,
-        default_departure_time: defaultTime.trim() || undefined,
+        default_departure_time:
+          provider === 'getyourguide' ? SHARED_BUS_DEPARTURE_TIME : defaultTime.trim() || undefined,
         is_active: false,
       })
       if (!res.ok) {
@@ -249,7 +283,7 @@ export default function SharedIntegrationsPage() {
     <div className="space-y-4">
       <PageHeader
         title="Shared Bookings integrations"
-        subtitle="GetYourGuide Supplier API + Bókun webhooks. Credentials stay in Edge secrets — never shown here."
+        subtitle={`Standard Group Northern Lights shared bus only (${SHARED_BUS_DEPARTURE_TIME} / ${SHARED_BUS_CAPACITY}). GYG maps to Royal Nordic product IDs only — never Guaranteed/Korouoma/other. Credentials stay in Edge secrets.`}
         actions={
           <div className="flex gap-2">
             <SecondaryButton type="button" onClick={() => void reload()} disabled={loading || saving}>
@@ -450,11 +484,14 @@ export default function SharedIntegrationsPage() {
       </div>
 
       <Card className="space-y-3">
-        <h2 className="text-sm font-semibold text-zinc-900">Map external product → tour template</h2>
-        {templates.length === 0 ? (
+        <h2 className="text-sm font-semibold text-zinc-900">
+          Map GYG product → {SHARED_BUS_TEMPLATE_TITLE}
+        </h2>
+        {standardTemplates.length === 0 ? (
           <p className="text-sm text-amber-800">
-            No tour templates yet. Create templates on the Shared Bookings calendar page before activating
-            mappings.
+            Standard Bus template missing. Apply migration{' '}
+            <span className="font-mono">shared_bookings_standard_bus_only</span> (or create template{' '}
+            <span className="font-mono">{SHARED_BUS_TEMPLATE_CODE}</span>) before saving mappings.
           </p>
         ) : null}
         <div className="grid gap-3 sm:grid-cols-2">
@@ -473,29 +510,43 @@ export default function SharedIntegrationsPage() {
               className={selectClass}
               value={supplierId}
               onChange={(e) => setSupplierId(e.target.value)}
+              disabled={provider === 'getyourguide'}
             >
               <option value="">Select supplier</option>
-              {suppliers.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.display_name}
-                </option>
-              ))}
+              {suppliers
+                .filter((s) => provider !== 'getyourguide' || s.code === SHARED_BUS_GYG_SUPPLIER_CODE)
+                .map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.display_name}
+                  </option>
+                ))}
             </select>
           </Field>
-          <Field label="External product ID">
-            <input className={inputClass} value={productId} onChange={(e) => setProductId(e.target.value)} />
+          <Field label="External product ID (verified only)">
+            <input
+              className={inputClass}
+              value={productId}
+              placeholder="Paste verified GYG productId"
+              onChange={(e) => setProductId(e.target.value)}
+            />
           </Field>
-          <Field label="External option ID (optional)">
-            <input className={inputClass} value={optionId} onChange={(e) => setOptionId(e.target.value)} />
+          <Field label="External option ID (verified only)">
+            <input
+              className={inputClass}
+              value={optionId}
+              placeholder="Optional verified optionId"
+              onChange={(e) => setOptionId(e.target.value)}
+            />
           </Field>
           <Field label="Tour template">
             <select
               className={selectClass}
               value={templateId}
               onChange={(e) => setTemplateId(e.target.value)}
+              disabled={provider === 'getyourguide'}
             >
               <option value="">Select template</option>
-              {templates.map((t) => (
+              {mappingTemplates.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.title}
                 </option>
@@ -505,8 +556,8 @@ export default function SharedIntegrationsPage() {
           <Field label="Default departure time">
             <input
               className={inputClass}
-              placeholder="09:00"
               value={defaultTime}
+              readOnly={provider === 'getyourguide'}
               onChange={(e) => setDefaultTime(e.target.value)}
             />
           </Field>
@@ -519,7 +570,8 @@ export default function SharedIntegrationsPage() {
           Save mapping as inactive draft
         </PrimaryButton>
         <p className="text-[11px] text-zinc-500">
-          New mappings save inactive until ownership, option IDs, capacity, and departure times are verified.
+          GYG drafts stay inactive. Do not invent product/option IDs. Guaranteed NL and other tours stay out of
+          scope.
         </p>
         {mappings.length > 0 ? (
           <ul className="divide-y divide-zinc-100 rounded-lg border border-zinc-200">
@@ -539,20 +591,14 @@ export default function SharedIntegrationsPage() {
         )}
         <div className="rounded-lg border border-dashed border-zinc-300 px-3 py-2">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">
-            Unverified candidates (not activated)
+            Awaiting verified GYG IDs (not activated)
           </p>
           <ul className="mt-1 space-y-1 text-xs text-zinc-600">
             {candidates.map((c) => (
-              <li key={c.externalProductId}>
-                <span className="font-mono">{c.externalProductId}</span> → {c.suggestedTitle} · {c.source}.{' '}
-                {c.notes}
+              <li key={c.suggestedTitle}>
+                {c.suggestedTitle} · {c.source}. {c.notes}
               </li>
             ))}
-            <li>
-              Active departures without templates: Standard Group Northern Lights (20:00), Guaranteed Northern
-              Lights &amp; Photography Tour (18:30) — create templates and confirm GYG productIds in Integrator
-              Portal before mapping.
-            </li>
           </ul>
         </div>
       </Card>

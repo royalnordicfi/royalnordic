@@ -82,18 +82,24 @@ export function runSharedBookingsCertification(now = new Date('2026-11-12T12:00:
 
   const rn = 'supplier-rn'
   const elias = 'supplier-elias'
+  // Standard Group Northern Lights shared bus — RN + Elias share one 50-seat departure at 20:00.
   const dep: SimDeparture = {
     id: 'dep-1',
-    capacity: 10,
+    capacity: 50,
     status: 'active',
     date: '2026-11-20',
-    time: '10:00',
+    time: '20:00',
     assignedSupplierIds: [rn, elias],
     bookings: [],
   }
 
   // 1. Admin creates departure
-  push(1, 'Admin creates a departure', dep.status === 'active' && dep.capacity === 10, `capacity=${dep.capacity}`)
+  push(
+    1,
+    'Admin creates a departure',
+    dep.status === 'active' && dep.capacity === 50 && dep.time === '20:00',
+    `capacity=${dep.capacity} time=${dep.time}`,
+  )
 
   // 2. Operator sees assigned departure only
   const eliasSees = dep.assignedSupplierIds.includes(elias)
@@ -117,29 +123,39 @@ export function runSharedBookingsCertification(now = new Date('2026-11-12T12:00:
   })
   push(3, 'Operator creates a booking', dep.bookings.length === 1, 'booking b1 confirmed')
 
-  // 4. Capacity updates
+  // 4. Capacity updates (shared across suppliers)
   const afterCreate = seats(dep, now)
-  push(4, 'Capacity updates correctly', afterCreate === 7, `available=${afterCreate}`)
+  push(4, 'Capacity updates correctly', afterCreate === 47, `available=${afterCreate}`)
 
   // 5. Booking changes update occupancy
   dep.bookings[0].adults = 4
   const afterEdit = seats(dep, now)
-  push(5, 'Booking changes update occupancy', afterEdit === 6, `available=${afterEdit}`)
+  push(5, 'Booking changes update occupancy', afterEdit === 46, `available=${afterEdit}`)
 
   // 6. Cancellation restores capacity
   dep.bookings[0].status = 'cancelled'
   const afterCancel = seats(dep, now)
-  push(6, 'Booking cancellation restores capacity', afterCancel === 10, `available=${afterCancel}`)
+  push(6, 'Booking cancellation restores capacity', afterCancel === 50, `available=${afterCancel}`)
 
   // 7. GYG availability reflects remaining capacity
   dep.bookings[0].status = 'confirmed'
   dep.bookings[0].adults = 2
+  // Elias booking also consumes shared capacity
+  dep.bookings.push({
+    id: 'b2',
+    supplierId: elias,
+    adults: 5,
+    children: 0,
+    status: 'confirmed',
+    channel: 'elias',
+    bookingRef: 'EL-2',
+  })
   const gygVacancies = seats(dep, now)
   const availPayload = buildGygNotifyAvailabilityRequest('prod123', dep.date, dep.time, gygVacancies)
   push(
     7,
     'GYG availability reflects remaining capacity',
-    availPayload.data.availabilities[0].vacancies === 8,
+    availPayload.data.availabilities[0].vacancies === 43 && gygVacancies === 43,
     `vacancies=${availPayload.data.availabilities[0].vacancies}`,
   )
 
@@ -163,7 +179,7 @@ export function runSharedBookingsCertification(now = new Date('2026-11-12T12:00:
   push(
     8,
     'GYG reservation creates a temporary hold',
-    holdOk && seats(dep, now) === 5 && Boolean(reserveResp.data.reservationReference),
+    holdOk && seats(dep, now) === 40 && Boolean(reserveResp.data.reservationReference),
     `available=${seats(dep, now)} ref=${reserveResp.data.reservationReference}`,
   )
 
@@ -180,7 +196,7 @@ export function runSharedBookingsCertification(now = new Date('2026-11-12T12:00:
   push(
     9,
     'GYG booking confirms the hold exactly once',
-    consumeOk && afterConfirm === 5 && still === 5 && bookResp.data.tickets.length === 3,
+    consumeOk && afterConfirm === 40 && still === 40 && bookResp.data.tickets.length === 3,
     `available=${afterConfirm} tickets=${bookResp.data.tickets.length}`,
   )
 
@@ -191,7 +207,7 @@ export function runSharedBookingsCertification(now = new Date('2026-11-12T12:00:
   push(
     10,
     'GYG cancellation restores capacity',
-    afterGygCancel === 8 && Object.keys(cancelBody.data).length === 0,
+    afterGygCancel === 43 && Object.keys(cancelBody.data).length === 0,
     `available=${afterGygCancel}`,
   )
 
@@ -207,7 +223,7 @@ export function runSharedBookingsCertification(now = new Date('2026-11-12T12:00:
   push(
     11,
     'Outbound availability notifications enqueue correctly',
-    shouldNotify && coalesce === 'prod123|2026-11-20|10:00',
+    shouldNotify && coalesce === 'prod123|2026-11-20|20:00',
     `notify=${shouldNotify} key=${coalesce}`,
   )
 
@@ -227,19 +243,23 @@ export function runSharedBookingsCertification(now = new Date('2026-11-12T12:00:
   const afterDup = beforeDup
   push(13, 'Duplicate requests do not duplicate bookings', beforeDup === afterDup, `confirmed=${afterDup}`)
 
-  // 14. Concurrent bookings cannot oversell
+  // 14. Concurrent bookings cannot oversell (RN + Elias + GYG against shared 50)
   const concurrentOk =
-    canReserveSeats(10, 8, 0, 3) === false && canReserveSeats(10, 8, 0, 2) === true
-  push(14, 'Concurrent bookings cannot oversell', concurrentOk, 'capacity guard holds')
+    canReserveSeats(50, 48, 0, 3) === false &&
+    canReserveSeats(50, 48, 0, 2) === true &&
+    canReserveSeats(50, 40, 8, 3) === false
+  push(14, 'Concurrent bookings cannot oversell', concurrentOk, 'shared capacity guard holds')
 
-  // 15. Supplier isolation
+  // 15. Supplier isolation (operators see own rows; combined capacity still shared)
   const eliasBookings = dep.bookings.filter((b) => b.supplierId === elias && b.status !== 'cancelled')
   const leak = eliasBookings.some((b) => b.supplierId !== elias)
+  const adminSeesCombined =
+    dep.bookings.filter((b) => b.status === 'confirmed').reduce((s, b) => s + pax(b), 0) === 7
   push(
     15,
     'Supplier isolation and authorization remain enforced',
-    !leak && eliasSees,
-    `elias_rows=${eliasBookings.length}`,
+    !leak && eliasSees && adminSeesCombined,
+    `elias_rows=${eliasBookings.length} combined_confirmed=${adminSeesCombined}`,
   )
 
   // Extra: cancel-reservation response shape

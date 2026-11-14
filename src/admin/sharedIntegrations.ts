@@ -259,8 +259,8 @@ export function assessGygActivationReadiness(input: {
 }
 
 /**
- * Unverified mapping candidates from product-truth docs only.
- * Never auto-activate — ownership and option IDs must be confirmed in GYG Integrator Portal.
+ * GYG mapping slots for Standard Bus only.
+ * Product/option IDs are intentionally empty until verified in Integrator Portal — never invent them.
  */
 export function proposedGygMappingCandidates(): Array<{
   externalProductId: string
@@ -271,12 +271,12 @@ export function proposedGygMappingCandidates(): Array<{
 }> {
   return [
     {
-      externalProductId: '1116834',
-      suggestedTitle: 'Korouoma Canyon Winter Adventure',
-      source: 'docs/product-truth-korouoma.md (GYG t1116834)',
+      externalProductId: '',
+      suggestedTitle: 'Standard Group Northern Lights',
+      source: 'Shared Bookings 1.6H — Standard Bus only',
       verified: false,
       notes:
-        'Confirm numeric productId and option IDs in Integrator Portal. Create matching Shared Bookings template before mapping. Do not activate until ownership verified.',
+        'Await verified GetYourGuide productId + optionId for Royal Nordic Standard Group Northern Lights (20:00 / 50). Do not map Guaranteed, Korouoma, or any other product. Save inactive until verified.',
     },
   ]
 }
