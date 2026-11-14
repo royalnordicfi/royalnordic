@@ -91,10 +91,15 @@ export default async function handler(req, res) {
     if (mapped.kind === 'gyg') {
       const authHeader = readHeader(req, 'authorization')
       if (!/^Basic\s+\S+/i.test(authHeader)) {
+        // Official GYG Supplier API: application auth failures are HTTP 200 + errorCode.
+        // Edge still re-validates Basic Auth against Supabase secrets (never stored here).
         return sendJson(
           res,
-          401,
-          { error: 'Unauthorized' },
+          200,
+          {
+            errorCode: 'AUTHORIZATION_FAILURE',
+            errorMessage: 'The provided authentication credentials are not valid.',
+          },
           { 'WWW-Authenticate': 'Basic realm="GetYourGuide Supplier API"' },
         )
       }

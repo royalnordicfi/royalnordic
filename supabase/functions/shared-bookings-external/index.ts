@@ -360,16 +360,28 @@ serve(async (req) => {
     // ---------------- GetYourGuide Supplier API ----------------
     if (tail.startsWith('gyg/')) {
       if (!gygCredsConfigured()) {
+        // No secret values leaked — operator must configure Edge secrets first.
         return gygError(
           'INTERNAL_SYSTEM_FAILURE',
           'GetYourGuide Basic Auth credentials are not configured on this supplier endpoint.',
         )
       }
       if (!verifyGygBasic(req)) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json', 'WWW-Authenticate': 'Basic' },
-        })
+        // Official GYG: application errors use HTTP 200 + errorCode (incl. AUTHORIZATION_FAILURE).
+        return new Response(
+          JSON.stringify({
+            errorCode: 'AUTHORIZATION_FAILURE',
+            errorMessage: 'The provided authentication credentials are not valid.',
+          }),
+          {
+            status: 200,
+            headers: {
+              ...corsHeaders,
+              'Content-Type': 'application/json',
+              'WWW-Authenticate': 'Basic realm="GetYourGuide Supplier API"',
+            },
+          },
+        )
       }
 
       const actionPath = normalizeGygActionPath(tail)
