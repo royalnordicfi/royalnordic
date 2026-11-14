@@ -1,6 +1,4 @@
-import { proxyGygGateway } from './_proxy.js'
+import { gygHandler } from './_handler.js'
 
-/** GET/POST /api/gyg → Edge status (reachability). */
-export default async function handler(request) {
-  return proxyGygGateway(request, '/api/gyg/status')
-}
+/** GET /api/gyg → status */
+export default gygHandler('/api/gyg/status')
