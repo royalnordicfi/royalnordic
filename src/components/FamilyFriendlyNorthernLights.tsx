@@ -107,12 +107,17 @@ const FamilyFriendlyNorthernLights = () => {
             <strong>Family format</strong> · Shorter evening · All ages welcome
           </p>
         }
+        cinematic={{
+          image: cms.gallery[0]?.src || FALLBACK.gallery[0].src,
+          imageAlt: cms.gallery[0]?.alt || FALLBACK.gallery[0].alt,
+          imageSecondary: cms.gallery[1]?.src,
+        }}
         heroAction={
           <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
             Check availability
           </button>
         }
-        images={cms.gallery}
+        images={cms.gallery.length > 1 ? cms.gallery.slice(1) : cms.gallery}
         facts={[
           { label: 'Duration', value: cms.duration || '2 hours' },
           { label: 'Group', value: cms.groupSize || 'Max 16' },

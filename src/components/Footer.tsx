@@ -3,7 +3,7 @@ import { CONTACT } from '../lib/contactInfo'
 
 const Footer = () => {
   return (
-    <footer className="relative border-t border-white/[0.06] bg-midnight text-snow">
+    <footer className="relative border-t border-white/[0.04] bg-[#050807] text-snow">
       <div className="rn-container py-12 sm:py-14 lg:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-5">
@@ -75,7 +75,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-11 flex flex-col gap-3 border-t border-white/[0.06] pt-6 text-[11.5px] text-text-dim sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-11 flex flex-col gap-3 border-t border-white/[0.04] pt-6 text-[11.5px] text-text-dim sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} Royal Nordic · Rovaniemi, Finnish Lapland</p>
           <div className="flex items-center gap-5">
             <Link className="rn-footer-link" to="/privacy-policy">Privacy Policy</Link>

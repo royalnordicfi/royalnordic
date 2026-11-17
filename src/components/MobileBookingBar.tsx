@@ -28,15 +28,18 @@ const MobileBookingBar = ({
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-[#040807]/96 py-3 backdrop-blur-md lg:hidden"
-      style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-black/[0.06] py-3 backdrop-blur-md lg:hidden"
+      style={{
+        background: 'color-mix(in srgb, #f3f0e8 92%, white)',
+        paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))',
+      }}
     >
       <div className="rn-container flex items-center justify-between gap-3">
         <div className="min-w-0">
           {showSale ? (
             <>
               <p className="flex items-baseline gap-2">
-                <span className="text-sm text-white/45 line-through decoration-[color-mix(in_srgb,var(--rn-sale)_80%,transparent)]">
+                <span className="text-sm text-panel-muted line-through decoration-[color-mix(in_srgb,var(--rn-sale)_80%,transparent)]">
                   €{Number.isInteger(referencePrice) ? referencePrice : referencePrice.toFixed(2)}
                 </span>
                 <span className="font-display text-xl font-semibold leading-none text-[var(--rn-sale)]">
@@ -49,13 +52,13 @@ const MobileBookingBar = ({
             </>
           ) : (
             <>
-              <p className="text-[10px] font-medium tracking-[0.06em] text-text-dim">From</p>
+              <p className="text-[10px] font-medium tracking-[0.06em] text-panel-muted">From</p>
               <p
-                className="text-[1.3rem] font-bold leading-none tracking-tight text-white"
+                className="text-[1.3rem] font-bold leading-none tracking-tight text-panel-ink"
                 style={{ fontFamily: 'var(--rn-font-body)' }}
               >
                 €{priceFrom}
-                <span className="ml-1.5 text-[11px] font-medium tracking-normal text-text-dim">
+                <span className="ml-1.5 text-[11px] font-medium tracking-normal text-panel-muted">
                   {unitLabel}
                 </span>
               </p>

@@ -102,6 +102,11 @@ const SnowmobileSafari = () => {
             Exclusive −{percent}% with code <strong className="text-aurora-soft">{code}</strong>
           </p>
         }
+        cinematic={{
+          image: GALLERY[0]?.src,
+          imageAlt: GALLERY[0]?.alt || 'Arctic snowmobile safari near Rovaniemi',
+          imageSecondary: GALLERY[1]?.src,
+        }}
         heroAction={
           <>
             <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
@@ -116,7 +121,7 @@ const SnowmobileSafari = () => {
             </div>
           </>
         }
-        images={GALLERY}
+        images={GALLERY.length > 1 ? GALLERY.slice(1) : GALLERY}
         afterGallery={
           <aside className="rn-notice" role="note">
             <p className="rn-notice__label">To drive</p>
