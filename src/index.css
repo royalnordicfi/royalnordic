@@ -1282,6 +1282,83 @@
     font-weight: 600;
   }
 
+  /* Day tours catalogue: larger editorial cards; 2-col until room for a clean 3-col. */
+  .rn-card-grid--day {
+    align-items: stretch;
+    max-width: 72rem;
+    margin-inline: auto;
+    grid-template-columns: 1fr;
+    gap: 1.15rem;
+  }
+  @media (min-width: 640px) {
+    .rn-card-grid--day {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem 1.35rem;
+    }
+    .rn-card-grid--day > *:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      max-width: 28rem;
+      width: 100%;
+      justify-self: center;
+    }
+  }
+  @media (min-width: 1100px) {
+    .rn-card-grid--day {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.35rem 1.45rem;
+    }
+    .rn-card-grid--day > *:last-child:nth-child(odd) {
+      grid-column: auto;
+      max-width: none;
+      justify-self: stretch;
+    }
+  }
+  .rn-card-grid--day .rn-tour-card__media {
+    aspect-ratio: 16 / 10;
+  }
+  @media (min-width: 640px) {
+    .rn-card-grid--day .rn-tour-card__media {
+      aspect-ratio: 3 / 2;
+    }
+  }
+  .rn-card-grid--day .rn-tour-card__title {
+    min-height: 2.55em;
+    font-size: 1.15rem;
+    line-height: 1.22;
+  }
+  @media (min-width: 640px) {
+    .rn-card-grid--day .rn-tour-card__title {
+      font-size: 1.28rem;
+    }
+  }
+  .rn-card-grid--day .rn-tour-card__desc {
+    min-height: 3.9em;
+    -webkit-line-clamp: 3;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--rn-text-muted) 92%, #fff);
+  }
+  .rn-card-grid--day .rn-tour-card__meta {
+    min-height: 1.35em;
+    font-size: 0.78rem;
+    color: color-mix(in srgb, var(--rn-text-dim) 88%, #fff);
+  }
+  .rn-card-grid--day .rn-tour-card__foot {
+    margin-top: auto;
+    padding-top: 0.85rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .rn-card-grid--day .rn-tour-card__body {
+    padding: 0.85rem 0.1rem 0;
+  }
+  .rn-card-grid--day .rn-tour-card__now {
+    font-size: 1.5rem;
+  }
+  .rn-card-grid--day .rn-tour-card__cta {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
   /* Calendar day selection — fast, subtle */
   .rn-bf-day {
     transition:
