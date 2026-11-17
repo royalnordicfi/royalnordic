@@ -165,7 +165,7 @@ const TransportationSaariselka = () => {
         </div>
       </ExperienceProductLayout>
 
-      <Footer />
+      <Footer variant="home" />
       <MobileBookingBar
         priceFrom={vehiclePrice}
         onBook={scrollToBook}

@@ -165,12 +165,17 @@ const PrivateSantaClausExperience = () => {
         title={cms.title}
         lede={cms.lede}
         benefits={cms.benefits.slice(0, 4)}
+        cinematic={{
+          image: cms.gallery[0]?.src || FALLBACK.gallery[0].src,
+          imageAlt: cms.gallery[0]?.alt || 'Private Santa Claus meeting in Rovaniemi',
+          imageSecondary: cms.gallery[1]?.src,
+        }}
         heroAction={
           <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
             Check availability
           </button>
         }
-        images={cms.gallery}
+        images={cms.gallery.length > 1 ? cms.gallery.slice(1) : cms.gallery}
         facts={[
           { label: 'Duration', value: cms.duration || 'Approximately 1.5 hours' },
           { label: 'Group', value: cms.groupSize || `Private · max ${capacity}` },
@@ -303,11 +308,11 @@ const PrivateSantaClausExperience = () => {
         </TourSection>
 
         <div className="rn-tour-section">
-          <ProductFaq items={cms.faqs} schemaId="private-santa-faq" tone="dark" />
+          <ProductFaq items={cms.faqs} schemaId="private-santa-faq" tone="snow" />
         </div>
       </ExperienceProductLayout>
 
-      <Footer />
+      <Footer variant="home" />
       <MobileBookingBar
         priceFrom={groupPrice}
         referencePrice={referencePrice}

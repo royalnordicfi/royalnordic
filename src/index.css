@@ -6151,48 +6151,13 @@ html.rn-intro-lock body {
   }
 }
 
-/* ─── Cinematic product hero (flagship) ─── */
-.rn-exp-cinema {
-  min-height: min(78vh, 36rem);
-}
-@media (min-width: 640px) {
-  .rn-exp-cinema {
-    min-height: min(82vh, 40rem);
-  }
-}
-.rn-exp-cinema__veil {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(180deg, rgba(2, 8, 6, 0.42) 0%, rgba(2, 8, 6, 0.18) 34%, rgba(2, 8, 6, 0.78) 72%, #020806 100%),
-    radial-gradient(ellipse 48% 42% at 18% 68%, rgba(16, 140, 98, 0.16), transparent 62%);
-}
-.rn-exp-cinema__ghost {
-  opacity: 0;
-  mix-blend-mode: lighten;
-}
-@media (prefers-reduced-motion: no-preference) and (min-width: 1024px) {
-  .rn-exp-cinema__ghost {
-    animation: rn-cinema-ghost 14s ease-in-out infinite alternate;
-  }
-}
-@keyframes rn-cinema-ghost {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 0.22;
-  }
-}
+/* ─── Legacy cinema title (kept for safety) ─── */
 .rn-exp-cinema__title {
   font-size: clamp(1.95rem, 1.2rem + 2.4vw, 3.15rem);
   line-height: 1.08;
   letter-spacing: -0.032em;
   text-wrap: balance;
   max-width: 16ch;
-}
-.rn-product__body-pad {
-  padding-top: 0.5rem;
 }
 .rn-benefit-rail--on-media li {
   color: rgba(255, 255, 255, 0.92);
@@ -6204,6 +6169,400 @@ html.rn-intro-lock body {
 .rn-product__proof--on-media strong {
   color: var(--rn-aurora-soft);
   letter-spacing: 0.06em;
+}
+
+/* ═══════════════════════════════════════════
+   Royal Nordic 2.0 — Tour product pages
+   Cinematic hero + ivory editorial + sticky booking
+   ═══════════════════════════════════════════ */
+.rn-product--v2 {
+  --rn-ivory: #f3f0e8;
+  --rn-ivory-deep: #ebe6db;
+  --rn-sage: #e4e8e2;
+  --rn-forest-ink: #0c1410;
+  --rn-forest-muted: #4a5a52;
+  --rn-home-aurora: #0f8f63;
+  background: #020806;
+}
+
+.rn-exp-stage {
+  position: relative;
+  isolation: isolate;
+  padding-bottom: 3.5rem;
+}
+@media (min-width: 640px) {
+  .rn-exp-stage {
+    padding-bottom: 4.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .rn-exp-stage {
+    padding-bottom: 5.5rem;
+  }
+}
+
+.rn-exp-stage__media {
+  pointer-events: none;
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 0;
+  height: min(92vh, 46rem);
+  overflow: hidden;
+}
+.rn-exp-stage__img,
+.rn-exp-stage__ghost {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.rn-exp-stage__ghost {
+  opacity: 0;
+  mix-blend-mode: lighten;
+}
+@media (prefers-reduced-motion: no-preference) and (min-width: 1024px) {
+  .rn-exp-stage__ghost {
+    animation: rn-cinema-ghost 14s ease-in-out infinite alternate;
+  }
+}
+@keyframes rn-cinema-ghost {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.22;
+  }
+}
+.rn-exp-stage__veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(2, 8, 6, 0.55) 0%,
+      rgba(2, 8, 6, 0.22) 28%,
+      rgba(2, 8, 6, 0.55) 58%,
+      rgba(2, 8, 6, 0.92) 82%,
+      #020806 100%
+    ),
+    radial-gradient(ellipse 50% 44% at 14% 70%, rgba(15, 143, 99, 0.18), transparent 64%);
+}
+.rn-exp-stage__chrome {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 7rem;
+}
+
+.rn-exp-stage__grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1.5rem;
+  padding-top: calc(var(--rn-chrome-h) + 1.35rem);
+}
+@media (min-width: 640px) {
+  .rn-exp-stage__grid {
+    gap: 1.75rem;
+    padding-top: calc(var(--rn-chrome-h) + 1.65rem);
+  }
+}
+@media (min-width: 1024px) {
+  .rn-exp-stage__grid--book {
+    grid-template-columns: minmax(0, 1fr) minmax(20rem, 26rem);
+    column-gap: 2.25rem;
+    align-items: start;
+  }
+}
+@media (min-width: 1280px) {
+  .rn-exp-stage__grid--book {
+    column-gap: 3rem;
+    grid-template-columns: minmax(0, 1fr) minmax(22rem, 27rem);
+  }
+}
+
+.rn-exp-stage__intro {
+  min-width: 0;
+  padding-bottom: 1.25rem;
+}
+@media (min-width: 1024px) {
+  .rn-exp-stage__intro {
+    min-height: min(52vh, 26rem);
+    padding-bottom: 2rem;
+  }
+}
+
+.rn-exp-stage__copy {
+  margin-top: 1.35rem;
+  max-width: 36rem;
+}
+@media (min-width: 640px) {
+  .rn-exp-stage__copy {
+    margin-top: 1.65rem;
+  }
+}
+
+.rn-exp-stage__eyebrow {
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--rn-aurora-soft) 88%, white);
+}
+
+.rn-exp-stage__title {
+  margin-top: 0.65rem;
+  font-family: var(--rn-font-display);
+  font-size: clamp(1.85rem, 1.15rem + 2.2vw, 3.05rem);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: #fff;
+  text-wrap: balance;
+  max-width: 18ch;
+}
+
+.rn-exp-stage__lede {
+  margin-top: 1rem;
+  max-width: 34rem;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.82);
+}
+@media (min-width: 640px) {
+  .rn-exp-stage__lede {
+    margin-top: 1.1rem;
+    font-size: 1.0625rem;
+    line-height: 1.62;
+  }
+}
+
+.rn-exp-stage__copy .rn-product__proof {
+  margin-top: 1rem;
+}
+.rn-exp-stage__copy .rn-benefit-rail {
+  margin-top: 1.35rem;
+}
+@media (min-width: 640px) {
+  .rn-exp-stage__copy .rn-benefit-rail {
+    margin-top: 1.55rem;
+  }
+}
+
+.rn-exp-stage__actions {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.rn-exp-stage__book {
+  min-width: 0;
+}
+@media (min-width: 1024px) {
+  .rn-exp-stage__book {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    padding-top: 0.35rem;
+  }
+}
+
+/* Ivory editorial body under / beside the hero */
+.rn-exp-body {
+  min-width: 0;
+  border-radius: 1.35rem 1.35rem 0 0;
+  background: var(--rn-ivory);
+  color: var(--rn-forest-ink);
+  padding: 1.35rem 1.1rem 2.5rem;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.18);
+}
+@media (min-width: 640px) {
+  .rn-exp-body {
+    border-radius: 1.5rem 1.5rem 0 0;
+    padding: 1.75rem 1.5rem 3rem;
+  }
+}
+@media (min-width: 1024px) {
+  .rn-exp-body {
+    border-radius: 1.6rem;
+    padding: 1.85rem 1.75rem 3.25rem;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.55) inset,
+      0 18px 48px rgba(0, 0, 0, 0.16);
+  }
+  .rn-exp-stage__grid--book .rn-exp-body {
+    grid-column: 1;
+  }
+}
+.rn-exp-body--inset {
+  border-radius: 1.35rem;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.55) inset,
+    0 16px 40px rgba(0, 0, 0, 0.22);
+}
+
+.rn-exp-body .rn-tour-section {
+  border-top-color: rgba(12, 20, 16, 0.08);
+}
+.rn-exp-body .rn-tour-section--band {
+  border-color: rgba(12, 20, 16, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.28));
+}
+.rn-exp-body .rn-tour-section__eyebrow {
+  color: color-mix(in srgb, var(--rn-home-aurora) 72%, #0c1410);
+}
+.rn-exp-body .rn-tour-section__title {
+  color: var(--rn-forest-ink);
+}
+.rn-exp-body .rn-tour-section__body,
+.rn-exp-body .rn-product__editorial p,
+.rn-exp-body .text-text-muted {
+  color: var(--rn-forest-muted);
+}
+.rn-exp-body .text-white,
+.rn-exp-body .text-white\/90 {
+  color: var(--rn-forest-ink) !important;
+}
+.rn-exp-body a.text-aurora-soft,
+.rn-exp-body .text-aurora-soft {
+  color: var(--rn-home-aurora);
+}
+.rn-exp-body .rn-facts {
+  color: var(--rn-forest-ink);
+  border-color: rgba(12, 20, 16, 0.1);
+}
+.rn-exp-body .rn-facts > div {
+  color: var(--rn-forest-ink);
+}
+.rn-exp-body .rn-facts > div:not(:first-child)::before {
+  background: rgba(12, 20, 16, 0.1);
+}
+.rn-exp-body .rn-facts dt {
+  color: var(--rn-forest-muted);
+}
+.rn-exp-body .rn-facts dd {
+  color: var(--rn-forest-ink);
+}
+.rn-exp-body .rn-highlights__num {
+  color: var(--rn-home-aurora);
+}
+.rn-exp-body .rn-highlights__text {
+  color: var(--rn-forest-muted);
+}
+.rn-exp-body .rn-product__gallery::after {
+  display: none;
+}
+.rn-exp-body .rn-gallery__tile {
+  border-radius: 1rem;
+}
+.rn-exp-body .rn-inclusions__item {
+  color: var(--rn-forest-ink);
+}
+.rn-exp-body .rn-tour-guarantee__summary,
+.rn-exp-body .rn-tour-guarantee__detail {
+  color: var(--rn-forest-muted);
+}
+.rn-exp-body .rn-tour-guarantee__eyebrow {
+  color: var(--rn-home-aurora);
+}
+.rn-exp-body .rn-tour-guarantee__toggle {
+  color: var(--rn-home-aurora);
+}
+.rn-exp-body .text-white,
+.rn-exp-body .font-display.text-white,
+.rn-exp-body h3.text-white,
+.rn-exp-body span.text-white,
+.rn-exp-body dd.text-white {
+  color: var(--rn-forest-ink) !important;
+}
+.rn-exp-body .text-aurora-soft,
+.rn-exp-body .text-aurora {
+  color: var(--rn-home-aurora) !important;
+}
+.rn-exp-body .border-aurora\/35 {
+  border-color: color-mix(in srgb, var(--rn-home-aurora) 35%, transparent);
+}
+.rn-exp-body .bg-aurora\/10 {
+  background: color-mix(in srgb, var(--rn-home-aurora) 12%, transparent);
+}
+.rn-exp-body .rn-highlights li,
+.rn-exp-body .rn-itinerary,
+.rn-exp-body details,
+.rn-exp-body summary {
+  color: var(--rn-forest-ink);
+}
+.rn-exp-body button:hover {
+  color: var(--rn-home-aurora);
+}
+
+/* Refined booking panel for 2.0 */
+.rn-product--v2 .rn-book-panel-light {
+  border-radius: 1.2rem;
+  border: 1px solid rgba(12, 20, 16, 0.08);
+  background: linear-gradient(180deg, #faf8f2 0%, #f3f0e8 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 22px 56px rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(12, 20, 16, 0.02);
+}
+.rn-product--v2 .rn-book-aside__summary {
+  padding: 0.85rem 1.05rem 0.75rem;
+}
+.rn-product--v2 .rn-book-aside__body {
+  padding: 0.55rem 0.9rem 0.85rem;
+}
+@media (min-width: 1024px) {
+  .rn-product--v2 .rn-product__book .rn-book-aside,
+  .rn-product--v2 .rn-sticky-book .rn-book-aside {
+    max-width: none;
+    min-width: 0;
+    margin-left: 0;
+  }
+}
+
+/* Related experience cards on ivory */
+.rn-exp-related {
+  display: grid;
+  gap: 1rem;
+}
+@media (min-width: 640px) {
+  .rn-exp-related {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.15rem;
+  }
+}
+.rn-exp-related .rn-tour-card {
+  background: #fff;
+  border: 1px solid rgba(12, 20, 16, 0.06);
+  border-radius: 1.1rem;
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(12, 20, 16, 0.06);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rn-exp-related .rn-tour-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 36px rgba(12, 20, 16, 0.1);
+  }
+}
+.rn-exp-related .rn-tour-card__title {
+  color: var(--rn-forest-ink);
+}
+.rn-exp-related .rn-tour-card__desc,
+.rn-exp-related .rn-tour-card__meta,
+.rn-exp-related .rn-tour-card__eyebrow {
+  color: var(--rn-forest-muted);
+}
+
+/* Mobile booking bar — 2.0 */
+.rn-mobile-book {
+  border-top: 1px solid rgba(12, 20, 16, 0.1);
+  background: color-mix(in srgb, #f3f0e8 92%, #071210);
+  backdrop-filter: blur(12px);
+}
+.rn-mobile-book .rn-btn-primary {
+  border-radius: 999px;
 }
 
 /* Stagger utility for denser editorial sections */

@@ -116,12 +116,18 @@ const KorouomaTour = () => {
         title={cms.title}
         lede={cms.lede}
         benefits={cms.benefits.slice(0, 4)}
+        cinematic={{
+          image: cms.gallery[0]?.src || FALLBACK.gallery[0].src,
+          imageAlt:
+            cms.gallery[0]?.alt || 'Frozen waterfall and snowy cliffs at Korouoma Canyon',
+          imageSecondary: cms.gallery[1]?.src,
+        }}
         heroAction={
           <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
             Check availability
           </button>
         }
-        images={cms.gallery}
+        images={cms.gallery.length > 1 ? cms.gallery.slice(1) : cms.gallery}
         facts={[
           { label: 'Duration', value: cms.duration || '6 hours' },
           { label: 'Group', value: cms.groupSize || 'Max 8 / vehicle' },
@@ -181,11 +187,11 @@ const KorouomaTour = () => {
         </TourSection>
 
         <div className="rn-tour-section">
-          <ProductFaq items={cms.faqs} schemaId="korouoma-faq" tone="dark" />
+          <ProductFaq items={cms.faqs} schemaId="korouoma-faq" tone="snow" />
         </div>
       </ExperienceProductLayout>
 
-      <Footer />
+      <Footer variant="home" />
       <MobileBookingBar
         priceFrom={cms.pricing.current}
         referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}

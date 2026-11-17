@@ -4,6 +4,7 @@ import Footer from './Footer'
 import MobileBookingBar from './MobileBookingBar'
 import ProductFaq from './seo/ProductFaq'
 import ReviewCarousel from './ReviewCarousel'
+import TourCard from './TourCard'
 import ExperienceProductLayout from './experience/ExperienceProductLayout'
 import ExperienceHighlights from './experience/ExperienceHighlights'
 import ExperienceItinerary from './experience/ExperienceItinerary'
@@ -66,6 +67,43 @@ const FALLBACK: TourPageFallback = {
   seasonEnd: GUARANTEED_NL_SEASON_END,
 }
 
+const RELATED = [
+  {
+    to: '/northern-lights-private-tour',
+    image: '/nordicci7.jpg',
+    imageAlt: 'Private Northern Lights experience in Finnish Lapland',
+    title: 'Private Northern Lights Tour',
+    description: 'Exclusive evening for your group of up to eight guests.',
+    duration: 'About 5 hours',
+    groupSize: 'Private · max 8',
+    pickup: true,
+    priceFrom: 1349,
+    priceUnit: '/ private group',
+    pricePrefix: 'From',
+  },
+  {
+    to: '/northern-lights-standard-group',
+    image: '/nortti8.jpg',
+    imageAlt: 'Standard group Northern Lights tour near Rovaniemi',
+    title: 'Standard Group Northern Lights',
+    description: 'Shared aurora evening with hotel pickup from Rovaniemi.',
+    duration: '3–5 hours',
+    groupSize: 'Shared group',
+    pickup: true,
+  },
+  {
+    to: '/ice-fishing',
+    image: '/icefishing.jpeg',
+    imageAlt: 'Ice fishing on a frozen Lapland lake',
+    title: 'Ice Fishing Experience',
+    description: 'Daytime lake fishing with guide, equipment and fire.',
+    duration: '3–4 hours',
+    groupSize: 'Max 8',
+    pickup: true,
+    priceFrom: 119,
+  },
+] as const
+
 const NorthernLightsTour = () => {
   const cms = useCmsTourPresentation(1, FALLBACK)
 
@@ -107,6 +145,8 @@ const NorthernLightsTour = () => {
   ]
 
   const guarantee = cms.guaranteeInfo || GUARANTEED_NL_GUARANTEE_FULL
+  const heroImage = cms.gallery[0]?.src || '/nortti1.jpg'
+  const galleryImages = cms.gallery.length > 1 ? cms.gallery.slice(1) : cms.gallery
 
   return (
     <div className="rn-page pb-24 lg:pb-0">
@@ -121,7 +161,7 @@ const NorthernLightsTour = () => {
         lede={cms.lede}
         benefits={cms.benefits.slice(0, 4)}
         cinematic={{
-          image: cms.gallery[0]?.src || '/nortti1.jpg',
+          image: heroImage,
           imageAlt: cms.gallery[0]?.alt || 'Northern Lights over Finnish Lapland',
           imageSecondary: cms.gallery[1]?.src,
         }}
@@ -130,12 +170,7 @@ const NorthernLightsTour = () => {
             <strong>★★★★★</strong> Guest reviews · Small groups · Free professional photos
           </p>
         }
-        heroAction={
-          <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[50px] px-8">
-            Check availability
-          </button>
-        }
-        images={cms.gallery.slice(1)}
+        images={galleryImages}
         facts={[
           { label: 'Duration', value: cms.duration || '2–10 hours' },
           { label: 'Group', value: cms.groupSize || 'Max 8 / vehicle' },
@@ -224,11 +259,19 @@ const NorthernLightsTour = () => {
         </TourSection>
 
         <div className="rn-tour-section">
-          <ProductFaq items={cms.faqs} schemaId="nl-faq" tone="dark" />
+          <ProductFaq items={cms.faqs} schemaId="nl-faq" tone="snow" />
         </div>
+
+        <TourSection eyebrow="Also explore" title="Related experiences">
+          <div className="rn-exp-related">
+            {RELATED.map((tour) => (
+              <TourCard key={tour.to} {...tour} />
+            ))}
+          </div>
+        </TourSection>
       </ExperienceProductLayout>
 
-      <Footer />
+      <Footer variant="home" />
       <MobileBookingBar
         priceFrom={pricing.current}
         referencePrice={pricing.saleActive ? pricing.reference ?? undefined : undefined}

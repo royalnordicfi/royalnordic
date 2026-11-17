@@ -153,12 +153,19 @@ const NorthernLightsPrivateTour = () => {
             <strong>Private group</strong> · Max {capacity} · Hotel pickup
           </p>
         }
+        cinematic={{
+          image: cms.gallery[0]?.src || FALLBACK.gallery[0].src,
+          imageAlt:
+            cms.gallery[0]?.alt ||
+            'Private Northern Lights experience under the aurora in Finnish Lapland',
+          imageSecondary: cms.gallery[1]?.src,
+        }}
         heroAction={
           <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
             Check availability
           </button>
         }
-        images={cms.gallery}
+        images={cms.gallery.length > 1 ? cms.gallery.slice(1) : cms.gallery}
         facts={[
           { label: 'Duration', value: cms.duration || 'About 5 hours' },
           { label: 'Group', value: cms.groupSize || `Private · max ${capacity}` },
@@ -257,11 +264,11 @@ const NorthernLightsPrivateTour = () => {
         </TourSection>
 
         <div className="rn-tour-section">
-          <ProductFaq items={cms.faqs} schemaId="private-nl-faq" tone="dark" />
+          <ProductFaq items={cms.faqs} schemaId="private-nl-faq" tone="snow" />
         </div>
       </ExperienceProductLayout>
 
-      <Footer />
+      <Footer variant="home" />
       <MobileBookingBar
         priceFrom={groupPrice}
         onBook={scrollToBook}
