@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import CategoryHero from './CategoryHero'
 import CategoryPageEnd from './CategoryPageEnd'
-import CategorySectionHeader from './CategorySectionHeader'
 import Footer from './Footer'
 import ReviewCarousel from './ReviewCarousel'
 import TourCard from './TourCard'
@@ -23,7 +21,6 @@ import {
   PRIVATE_NL_TOUR_ID,
   STANDARD_GROUP_ADULT_PRICE,
   STANDARD_GROUP_LISTING_TITLE,
-  STANDARD_GROUP_MEETING_POINT,
   STANDARD_GROUP_PATH,
   STANDARD_GROUP_TOUR_ID,
 } from '../lib/tourBookingRules'
@@ -114,63 +111,6 @@ const ALL_TOURS = [
     : []),
 ]
 
-/** Comparison columns sourced only from existing listing / booking constants. */
-const COMPARE_COLUMNS = [
-  {
-    to: '/northern-lights-tour',
-    tourId: 1 as number | null,
-    short: 'Small Group',
-    groupSize: 'Max 8',
-    duration: '2–10 hours',
-    pickup: 'Hotel pickup',
-    photography: 'Free professional photos',
-    guarantee: 'Camera-capture refund',
-    price: `€${GUARANTEED_NL_CATALOG_ADULT_PRICE} / adult`,
-  },
-  {
-    to: PRIVATE_NL_PATH,
-    tourId: PRIVATE_NL_TOUR_ID as number | null,
-    short: 'Private Northern Lights',
-    groupSize: 'Private · max 8',
-    duration: 'About 5 hours',
-    pickup: 'Hotel pickup',
-    photography: 'Professional photography',
-    guarantee: '100% guarantee',
-    price: `€${PRIVATE_NL_GROUP_PRICE} / private group`,
-  },
-  {
-    to: STANDARD_GROUP_PATH,
-    tourId: STANDARD_GROUP_TOUR_ID as number | null,
-    short: 'Standard Group Bus',
-    groupSize: 'Max 50',
-    duration: 'About 5 hours',
-    pickup: `Meeting point · ${STANDARD_GROUP_MEETING_POINT.split(',')[0]}`,
-    photography: '—',
-    guarantee: '100% guarantee',
-    price: `€${STANDARD_GROUP_ADULT_PRICE} / person`,
-  },
-  {
-    to: '/family-friendly-northern-lights',
-    tourId: 8 as number | null,
-    short: 'Family-Friendly Tour',
-    groupSize: 'Family format',
-    duration: '2 hours',
-    pickup: 'Hotel pickup',
-    photography: '—',
-    guarantee: 'Aurora not guaranteed',
-    price: '€79 / adult',
-  },
-] as const
-
-const COMPARE_ROW_KEYS = [
-  { label: 'Group size', key: 'groupSize' },
-  { label: 'Duration', key: 'duration' },
-  { label: 'Pickup', key: 'pickup' },
-  { label: 'Photography', key: 'photography' },
-  { label: 'Guarantee', key: 'guarantee' },
-  { label: 'Price', key: 'price' },
-] as const
-
 const NorthernLightsTours: React.FC = () => {
   const [activeIds, setActiveIds] = useState<Set<number> | null>(null)
   const [cmsById, setCmsById] = useState<Map<number, TourCms>>(() => new Map())
@@ -206,11 +146,6 @@ const NorthernLightsTours: React.FC = () => {
       }
     })
   }, [activeIds, cmsById])
-
-  const compareColumns = useMemo(() => {
-    const visibleTos = new Set(tours.map((t) => t.to))
-    return COMPARE_COLUMNS.filter((col) => visibleTos.has(col.to))
-  }, [tours])
 
   return (
     <div className="rn-page">
@@ -252,50 +187,6 @@ const NorthernLightsTours: React.FC = () => {
               />
             ))}
           </div>
-
-          {compareColumns.length > 1 ? (
-            <div className="rn-nl-compare mt-10 sm:mt-12" aria-labelledby="rn-nl-compare-heading">
-              <CategorySectionHeader
-                eyebrow="Compare"
-                title="Which tour is right for me?"
-                titleId="rn-nl-compare-heading"
-                lede="Scan group size, logistics, photography, and guarantee terms before you book."
-              />
-
-              <div className="rn-nl-compare__scroll mt-6" role="region" aria-label="Tour comparison table" tabIndex={0}>
-                <table className="rn-nl-compare__table">
-                  <thead>
-                    <tr>
-                      <th scope="col" className="rn-nl-compare__corner">
-                        <span className="sr-only">Attribute</span>
-                      </th>
-                      {compareColumns.map((col) => (
-                        <th key={col.to} scope="col" className="rn-nl-compare__head">
-                          <Link to={col.to} className="rn-nl-compare__head-link">
-                            {col.short}
-                          </Link>
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {COMPARE_ROW_KEYS.map((row) => (
-                      <tr key={row.label}>
-                        <th scope="row" className="rn-nl-compare__row-label">
-                          {row.label}
-                        </th>
-                        {compareColumns.map((col) => (
-                          <td key={`${row.label}-${col.to}`} className="rn-nl-compare__cell">
-                            {col[row.key]}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ) : null}
         </div>
       </section>
 
