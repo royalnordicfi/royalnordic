@@ -1,38 +1,53 @@
 import { Link } from 'react-router-dom'
+import TourCard from '../TourCard'
+import { RN_SNOWMOBILE_PROMO } from '../../lib/bokun'
 import {
   GUARANTEED_NL_CATALOG_ADULT_PRICE,
   GUARANTEED_NL_REFERENCE_ADULT_PRICE,
   GUARANTEED_NL_SHORT_NAME,
 } from '../../seo/guaranteedNorthernLightsTour'
 
-const PCT = Math.round(
-  ((GUARANTEED_NL_REFERENCE_ADULT_PRICE - GUARANTEED_NL_CATALOG_ADULT_PRICE) /
-    GUARANTEED_NL_REFERENCE_ADULT_PRICE) *
-    100,
-)
-
 const CARDS = [
   {
     to: '/northern-lights-tour',
     image: '/nortti1.jpg',
-    alt: 'Guests under the Northern Lights in Finnish Lapland',
+    imageAlt: 'Guests under the Northern Lights in Finnish Lapland',
     title: GUARANTEED_NL_SHORT_NAME,
-    meta: `Small group · From €${GUARANTEED_NL_CATALOG_ADULT_PRICE}`,
-    badge: PCT > 0 ? `−${PCT}%` : undefined,
+    description: 'Small-group aurora hunt with hotel pickup and free professional photos.',
+    duration: '2–10 hours',
+    groupSize: 'Small group · max 8',
+    pickup: true,
+    badge: 'Aurora',
+    priceFrom: GUARANTEED_NL_CATALOG_ADULT_PRICE,
+    referencePrice: GUARANTEED_NL_REFERENCE_ADULT_PRICE,
+    ctaLabel: 'Check availability',
   },
   {
     to: '/snowmobile-safari',
     image: '/snowmobiling1.jpg',
-    alt: 'Arctic snowmobile safari near Rovaniemi',
+    imageAlt: 'Arctic snowmobile safari near Rovaniemi',
     title: 'Snowmobile Safari',
-    meta: 'Guided wilderness ride',
+    description: 'Guided wilderness ride through Arctic forest trails near Rovaniemi.',
+    duration: 'About 2 hours',
+    groupSize: '2 per snowmobile',
+    pickup: false,
+    logistics: 'Meeting point',
+    badge: 'Adventure',
+    priceFrom: RN_SNOWMOBILE_PROMO.adultWithCode,
+    referencePrice: RN_SNOWMOBILE_PROMO.adultRegular,
+    ctaLabel: 'View experience',
   },
   {
     to: '/daytime-experiences',
     image: '/ranua5.jpeg',
-    alt: 'Wildlife and winter landscapes on a Lapland day tour',
+    imageAlt: 'Wildlife and winter landscapes on a Lapland day tour',
     title: 'Arctic Day Tours',
-    meta: 'Wildlife · Nature · Culture',
+    description: 'Wildlife, canyon hiking, ice fishing, and cultural day experiences.',
+    duration: 'Half & full day',
+    groupSize: 'Small group',
+    pickup: true,
+    badge: 'Day tours',
+    ctaLabel: 'Browse day tours',
   },
 ] as const
 
@@ -56,32 +71,11 @@ export default function HomeFeatured() {
           </Link>
         </header>
 
-        <ul className="rn-ql-featured rn-stagger mt-10 sm:mt-12">
-          {CARDS.map((card) => (
-            <li key={card.to}>
-              <Link to={card.to} className="rn-ql-feat-card rn-reveal group">
-                <img
-                  src={card.image}
-                  alt={card.alt}
-                  className="rn-ql-feat-card__img"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className="rn-ql-feat-card__shade" aria-hidden />
-                {'badge' in card && card.badge ? (
-                  <span className="rn-ql-feat-card__badge">{card.badge}</span>
-                ) : null}
-                <div className="rn-ql-feat-card__body">
-                  <h3 className="rn-ql-feat-card__title">{card.title}</h3>
-                  <p className="rn-ql-feat-card__meta">{card.meta}</p>
-                </div>
-                <span className="rn-ql-feat-card__arrow" aria-hidden>
-                  →
-                </span>
-              </Link>
-            </li>
+        <div className="rn-card-grid rn-card-grid--balanced mt-10 sm:mt-12">
+          {CARDS.map((card, i) => (
+            <TourCard key={card.to} {...card} className={`rn-reveal rn-stagger-${(i % 3) + 1}`} />
           ))}
-        </ul>
+        </div>
       </div>
     </section>
   )

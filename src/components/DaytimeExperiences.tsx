@@ -193,11 +193,6 @@ const DaytimeExperiences: React.FC = () => {
     return COMPARE_COLUMNS.filter((col) => visibleTos.has(col.to))
   }, [experiences])
 
-  const gridClass =
-    experiences.length <= 4
-      ? 'rn-card-grid rn-card-grid--balanced'
-      : 'rn-card-grid rn-card-grid--day'
-
   return (
     <div className="rn-page">
       <CategoryHero
@@ -210,7 +205,7 @@ const DaytimeExperiences: React.FC = () => {
       <section className="rn-section-follow" aria-label="Daytime experiences">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-70" aria-hidden />
         <div className="rn-container relative">
-          <div className={gridClass}>
+          <div className="rn-card-grid rn-card-grid--day">
             {experiences.map((exp) => (
               <TourCard
                 key={exp.to}

@@ -52,11 +52,16 @@ const TourCard = ({
   priceUnit = '/ adult',
   pricePrefix,
   logistics,
-  ctaLabel = 'Explore',
+  ctaLabel = 'View experience',
   className = '',
   imagePosition = 'center',
 }: TourCardProps) => {
-  const meta = [duration, groupSize, pickup ? 'Hotel pickup' : logistics].filter(Boolean).join(' · ')
+  const category = badge || location
+  const highlights = [
+    duration,
+    groupSize,
+    pickup ? 'Hotel pickup' : logistics,
+  ].filter(Boolean) as string[]
   const showSale =
     typeof priceFrom === 'number' &&
     typeof referencePrice === 'number' &&
@@ -81,7 +86,6 @@ const TourCard = ({
           }}
         />
         <div className="rn-tour-card__shade" aria-hidden />
-        {badge && <span className="rn-tour-card__badge">{badge}</span>}
         {pct > 0 ? (
           <span className="rn-tour-card__pct" aria-label={`${pct}% off`}>
             −{pct}%
@@ -89,10 +93,16 @@ const TourCard = ({
         ) : null}
       </div>
       <div className="rn-tour-card__body">
-        <p className="rn-tour-card__eyebrow">{location}</p>
+        <p className="rn-tour-card__eyebrow">{category}</p>
         <h3 className="rn-tour-card__title">{title}</h3>
-        {description && <p className="rn-tour-card__desc">{description}</p>}
-        {meta && <p className="rn-tour-card__meta">{meta}</p>}
+        {description ? <p className="rn-tour-card__desc">{description}</p> : null}
+        {highlights.length > 0 ? (
+          <ul className="rn-tour-card__meta" aria-label="Tour highlights">
+            {highlights.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        ) : null}
         <div className="rn-tour-card__foot">
           {typeof priceFrom === 'number' ? (
             <div className="rn-tour-card__price">
@@ -104,7 +114,9 @@ const TourCard = ({
               ) : (
                 <p className="rn-tour-card__price-row">
                   {pricePrefix ? <span className="rn-tour-card__from">{pricePrefix}</span> : null}
-                  <span className="rn-tour-card__now rn-tour-card__now--plain">€{formatMoney(priceFrom)}</span>
+                  <span className="rn-tour-card__now rn-tour-card__now--plain">
+                    €{formatMoney(priceFrom)}
+                  </span>
                 </p>
               )}
               <span className="rn-tour-card__per">{priceUnit}</span>

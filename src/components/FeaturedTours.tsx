@@ -58,9 +58,9 @@ const FeaturedTours = () => {
             All day tours →
           </Link>
         </div>
-        <div className="rn-card-grid rn-card-grid--day mt-8">
+        <div className="rn-card-grid rn-card-grid--balanced mt-8">
           {TOURS.map((tour, i) => (
-            <TourCard key={tour.to} {...tour} className={`rn-stagger-${(i % 4) + 1}`} />
+            <TourCard key={tour.to} {...tour} className={`rn-stagger-${(i % 3) + 1}`} />
           ))}
         </div>
       </div>
