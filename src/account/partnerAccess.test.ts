@@ -27,10 +27,10 @@ describe('partnerAccess', () => {
   })
 
   it('routes partners intent using db access when provided', () => {
-    expect(resolvePostLoginPath(null, 'partners', 'none')).toBe('/partners/apply')
+    expect(resolvePostLoginPath(null, 'partners', 'none')).toBe('/travel-trade#apply')
     expect(resolvePostLoginPath(user({}), 'partners', 'pending')).toBe('/partners/status')
     expect(resolvePostLoginPath(user({}), 'partners', 'approved')).toBe('/partners/dashboard')
-    expect(resolvePostLoginPath(user({}), 'partners', 'declined')).toBe('/partners/apply')
+    expect(resolvePostLoginPath(user({}), 'partners', 'declined')).toBe('/travel-trade#apply')
   })
 
   it('keeps rewards intent on rewards dashboard', () => {
@@ -42,13 +42,13 @@ describe('partnerAccess', () => {
   it('maps declined and revoked-like metadata without granting dashboard', () => {
     expect(getPartnerAccessFromUser(user({ app: { partner_status: 'declined' } }))).toBe('declined')
     expect(getPartnerAccessFromUser(user({ app: { partner_status: 'revoked' } }))).toBe('none')
-    expect(resolvePostLoginPath(user({}), 'partners', 'declined')).toBe('/partners/apply')
-    expect(resolvePostLoginPath(user({}), 'partners', 'none')).toBe('/partners/apply')
+    expect(resolvePostLoginPath(user({}), 'partners', 'declined')).toBe('/travel-trade#apply')
+    expect(resolvePostLoginPath(user({}), 'partners', 'none')).toBe('/travel-trade#apply')
   })
 
   it('prefers DB access over stale JWT approved hint', () => {
     const staleApproved = user({ app: { partner_status: 'approved' } })
-    expect(resolvePostLoginPath(staleApproved, 'partners', 'none')).toBe('/partners/apply')
+    expect(resolvePostLoginPath(staleApproved, 'partners', 'none')).toBe('/travel-trade#apply')
     expect(resolvePostLoginPath(staleApproved, 'partners', 'pending')).toBe('/partners/status')
   })
 })

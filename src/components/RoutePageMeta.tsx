@@ -88,7 +88,8 @@ const META: Record<
   '/travel-trade': {
     title: 'Partner With Royal Nordic | Travel Trade Lapland',
     description:
-      'Travel agency and B2B partnerships for premium Rovaniemi tours — Northern Lights, daytime experiences, private itineraries, and transfers.',
+      'Apply to partner with Royal Nordic for travel trade and B2B Lapland experiences — Northern Lights, daytime tours, private itineraries and transfers. Applications are reviewed before any partner access.',
+    ogImage: 'https://royalnordic.fi/nortti5.jpg',
   },
   '/account': {
     title: 'Account | Royal Nordic Rewards & Partners',
@@ -96,9 +97,11 @@ const META: Record<
       'Sign in to Royal Nordic Rewards or apply for a travel-trade partnership. Partner approval is reviewed by our team.',
   },
   '/partners/apply': {
-    title: 'Partner Application | Royal Nordic',
+    title: 'Partner With Royal Nordic | Travel Trade Lapland',
     description:
       'Apply to partner with Royal Nordic for travel trade and B2B Lapland experiences. Applications are reviewed before any partner access.',
+    ogImage: 'https://royalnordic.fi/nortti5.jpg',
+    noIndex: true,
   },
   '/partners/dashboard': {
     title: 'Partner Dashboard | Royal Nordic',
@@ -256,8 +259,8 @@ export default function RoutePageMeta() {
             }
           : pathname.startsWith('/partners')
             ? {
-                ...META['/partners/apply'],
-                noIndex: pathname !== '/partners/apply',
+                ...META['/travel-trade'],
+                noIndex: true,
               }
             : undefined)
   const title = entry?.title ?? 'Royal Nordic | Lavish Experiences in Lapland'

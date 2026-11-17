@@ -15,7 +15,7 @@ const CHOICES = [
     intent: 'partners' as const,
     title: 'Partners',
     text: 'Travel trade and B2B — apply for partnership. Approval is reviewed by Royal Nordic.',
-    primary: { to: '/partners/apply', label: 'Apply to partner' },
+    primary: { to: '/travel-trade#apply', label: 'Apply to partner' },
     secondary: { to: '/account/signin?intent=partners', label: 'Sign in' },
   },
 ]

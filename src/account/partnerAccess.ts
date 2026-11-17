@@ -67,8 +67,8 @@ export function resolvePostLoginPath(
   if (intent === 'partners') {
     if (partner === 'approved') return '/partners/dashboard'
     if (partner === 'pending') return '/partners/status'
-    if (partner === 'declined') return '/partners/apply'
-    return '/partners/apply'
+    if (partner === 'declined') return '/travel-trade#apply'
+    return '/travel-trade#apply'
   }
 
   if (intent === 'rewards') {

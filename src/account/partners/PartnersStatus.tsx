@@ -60,7 +60,7 @@ export default function PartnersStatus() {
   }
 
   if (info?.access !== 'pending') {
-    return <Navigate to="/partners/apply" replace />
+    return <Navigate to="/travel-trade#apply" replace />
   }
 
   return (

@@ -85,7 +85,7 @@ export default function PartnersShell() {
     return <Navigate to="/partners/status" replace />
   }
   if (info?.access !== 'approved') {
-    return <Navigate to="/partners/apply" replace />
+    return <Navigate to="/travel-trade#apply" replace />
   }
 
   return (

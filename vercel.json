@@ -5,6 +5,16 @@
   "outputDirectory": "dist",
   "redirects": [
     {
+      "source": "/partners/apply",
+      "destination": "/travel-trade#apply",
+      "permanent": true
+    },
+    {
+      "source": "/partners/apply/",
+      "destination": "/travel-trade#apply",
+      "permanent": true
+    },
+    {
       "source": "/admin-panel",
       "destination": "https://admin.royalnordic.fi/",
       "permanent": true

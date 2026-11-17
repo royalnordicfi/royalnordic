@@ -4912,6 +4912,333 @@ html[data-rn-shell='checkout'] .App {
   gap: 0.35rem;
 }
 
+/* ——— Travel trade / Partners landing ——— */
+.rn-partner-landing {
+  background:
+    linear-gradient(185deg, #020806 0%, #04110c 18%, var(--rn-midnight) 48%, #020504 100%);
+}
+
+.rn-partner-hero {
+  min-height: min(70vh, 34rem);
+}
+@media (min-width: 640px) {
+  .rn-partner-hero {
+    min-height: min(74vh, 38rem);
+  }
+}
+.rn-partner-hero__veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(2, 8, 6, 0.4) 0%, rgba(2, 8, 6, 0.25) 36%, rgba(2, 8, 6, 0.82) 78%, #020806 100%),
+    radial-gradient(ellipse 50% 48% at 14% 72%, rgba(16, 140, 98, 0.16), transparent 62%),
+    radial-gradient(ellipse 38% 42% at 90% 28%, rgba(6, 42, 32, 0.4), transparent 58%);
+}
+.rn-partner-hero__title {
+  font-size: clamp(2.05rem, 1.35rem + 2.35vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.034em;
+  text-wrap: balance;
+}
+
+.rn-partner-trust {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+@media (min-width: 640px) {
+  .rn-partner-trust {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.85rem 1.5rem;
+  }
+}
+.rn-partner-trust__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  max-width: 16rem;
+}
+.rn-partner-trust__dot {
+  flex-shrink: 0;
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-top: 0.4em;
+  border-radius: 999px;
+  background: linear-gradient(145deg, var(--rn-aurora-soft), rgba(18, 155, 108, 0.55));
+  box-shadow: 0 0 0 3px rgba(18, 155, 108, 0.12);
+}
+.rn-partner-trust__title {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(241, 245, 243, 0.92);
+}
+.rn-partner-trust__text {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 12px;
+  color: rgba(241, 245, 243, 0.55);
+}
+
+.rn-partner-split {
+  display: grid;
+  gap: 2.5rem;
+}
+@media (min-width: 1024px) {
+  .rn-partner-split {
+    grid-template-columns: minmax(0, 1.15fr) minmax(19rem, 0.85fr);
+    gap: 2.75rem 3rem;
+    align-items: start;
+  }
+  .rn-partner-split__aside {
+    position: sticky;
+    top: calc(var(--rn-chrome-h) + 1rem);
+  }
+}
+
+.rn-partner-portal {
+  position: relative;
+}
+.rn-partner-portal__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.85rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 194, 107, 0.28);
+  background: rgba(245, 194, 107, 0.08);
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f3d7a1;
+}
+.rn-partner-portal__badge-dot {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: #f5c26b;
+}
+.rn-partner-portal__window {
+  overflow: hidden;
+  border-radius: calc(var(--rn-radius) + 2px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    radial-gradient(ellipse 70% 80% at 100% 0%, rgba(15, 143, 99, 0.12), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.35);
+}
+.rn-partner-portal__chrome {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(0, 0, 0, 0.22);
+}
+.rn-partner-portal__chrome span {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+.rn-partner-portal__body {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  min-height: 14rem;
+}
+@media (min-width: 640px) {
+  .rn-partner-portal__body {
+    grid-template-columns: 9rem 1fr;
+    min-height: 15.5rem;
+  }
+}
+.rn-partner-portal__nav {
+  padding: 0.9rem 0.7rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(0, 0, 0, 0.18);
+}
+.rn-partner-portal__brand {
+  margin-bottom: 0.75rem;
+  padding-inline: 0.35rem;
+  font-family: var(--rn-font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: white;
+}
+.rn-partner-portal__nav ul {
+  display: grid;
+  gap: 0.2rem;
+}
+.rn-partner-portal__nav li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  padding: 0.4rem 0.45rem;
+  border-radius: 6px;
+  font-size: 11.5px;
+  color: rgba(241, 245, 243, 0.55);
+}
+.rn-partner-portal__nav li.is-active {
+  background: rgba(18, 155, 108, 0.14);
+  color: rgba(241, 245, 243, 0.92);
+}
+.rn-partner-portal__nav em {
+  font-style: normal;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(241, 245, 243, 0.35);
+}
+.rn-partner-portal__content {
+  padding: 1rem 1rem 1.15rem;
+}
+.rn-partner-portal__tiles {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+@media (min-width: 480px) {
+  .rn-partner-portal__tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.rn-partner-portal__tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.7rem 0.75rem;
+  border-radius: var(--rn-radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 12.5px;
+  font-weight: 550;
+  color: rgba(241, 245, 243, 0.82);
+}
+.rn-partner-portal__tile em {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: rgba(241, 245, 243, 0.4);
+}
+
+.rn-partner-benefits__item {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  padding: 1.05rem 1.05rem 1.1rem;
+  border-radius: var(--rn-radius);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
+  transition:
+    border-color 0.35s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) {
+  .rn-partner-benefits__item:hover {
+    border-color: rgba(125, 236, 192, 0.16);
+    transform: translateY(-1px);
+  }
+}
+.rn-partner-benefits__mark {
+  flex-shrink: 0;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-top: 0.4em;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rn-aurora) 75%, white);
+  box-shadow: 0 0 0 3px rgba(18, 155, 108, 0.12);
+}
+.rn-partner-benefits__title {
+  font-family: var(--rn-font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--rn-text);
+}
+.rn-partner-benefits__text {
+  margin-top: 0.35rem;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--rn-text-muted);
+}
+
+.rn-partner-apply-panel {
+  border-radius: calc(var(--rn-radius) + 2px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02)),
+    rgba(4, 12, 10, 0.55);
+  padding: 1.25rem 1.15rem 1.35rem;
+  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.32);
+}
+@media (min-width: 640px) {
+  .rn-partner-apply-panel {
+    padding: 1.45rem 1.4rem 1.5rem;
+  }
+}
+.rn-partner-apply__title {
+  margin-top: 0.45rem;
+  font-family: var(--rn-font-display);
+  font-size: 1.45rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: white;
+}
+@media (min-width: 640px) {
+  .rn-partner-apply__title {
+    font-size: 1.6rem;
+  }
+}
+.rn-partner-apply__lede {
+  margin-top: 0.55rem;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--rn-text-muted);
+}
+
+.rn-partner-contact {
+  display: grid;
+  gap: 1.75rem;
+}
+@media (min-width: 768px) {
+  .rn-partner-contact {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 2.5rem;
+    align-items: end;
+  }
+}
+.rn-partner-contact__channels {
+  display: grid;
+  gap: 1rem;
+}
+.rn-partner-contact__label {
+  display: block;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rn-text-dim);
+}
+.rn-partner-contact__value {
+  display: inline-block;
+  margin-top: 0.3rem;
+  font-size: 15px;
+  font-weight: 550;
+  color: white;
+  transition: color 0.2s ease;
+}
+a.rn-partner-contact__value:hover {
+  color: var(--rn-aurora-soft);
+}
+.rn-partner-contact__value--muted {
+  font-weight: 500;
+  color: var(--rn-text-muted);
+}
+
 /* ——— Royal Nordic Rewards ——— */
 .rn-rewards-landing {
   background:

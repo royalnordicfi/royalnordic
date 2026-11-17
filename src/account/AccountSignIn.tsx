@@ -61,7 +61,7 @@ export default function AccountSignIn() {
           intent === 'partners' ? (
             <>
               New partner?{' '}
-              <Link to="/partners/apply" className="text-aurora-soft underline-offset-2 hover:underline">
+              <Link to="/travel-trade#apply" className="text-aurora-soft underline-offset-2 hover:underline">
                 Apply here
               </Link>
               {' · '}

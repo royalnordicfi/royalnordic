@@ -1,396 +1,285 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import CategoryHero from './CategoryHero'
+import { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import CategoryPageEnd from './CategoryPageEnd'
-import CategorySectionHeader from './CategorySectionHeader'
 import Footer from './Footer'
+import PartnerApplicationForm from '../account/partners/PartnerApplicationForm'
+import { RewardsAuthProvider, useRewardsAuth } from '../rewards/RewardsAuthContext'
+import { fetchPartnerAccess, type PartnerAccess } from '../account/partnerAccess'
+import { CONTACT } from '../lib/contactInfo'
 
-const EXPERIENCES = [
-  {
-    title: 'Northern Lights Experiences',
-    description:
-      'Guaranteed, family-friendly, and private aurora tours from Rovaniemi — ready to recommend or book for your clients.',
-    image: '/nortti1.jpg',
-    imageAlt: 'Northern Lights over Finnish Lapland',
-    to: '/northern-lights-tours',
-  },
-  {
-    title: 'Daytime Lapland Adventures',
-    description:
-      'Ice fishing, wildlife parks, canyon days and seasonal adventures that fit neatly into a Lapland itinerary.',
-    image: '/korouoma1.jpg',
-    imageAlt: 'Winter day tour in Finnish Lapland',
-    to: '/daytime-experiences',
-  },
-  {
-    title: 'Private & Customized Tours',
-    description:
-      'Tailored programmes for private groups and travellers who need a schedule built around their brief.',
-    image: '/nordicci7.jpg',
-    imageAlt: 'Private Lapland experience under the aurora',
-    to: '/customized-tour',
-  },
-  {
-    title: 'Private Transportation',
-    description:
-      'Door-to-door transfers across Lapland resorts and airports, including fixed routes and custom arrangements.',
-    image: '/royal-trans-1.jpg',
-    imageAlt: 'Private transfer vehicle in Finnish Lapland',
-    to: '/transportation',
-  },
+const TRUST = [
+  { title: 'Trusted local operator', text: 'Rovaniemi-based team' },
+  { title: 'Wide range of experiences', text: 'Aurora, day tours, private' },
+  { title: 'Dedicated partner support', text: 'Direct coordination' },
 ] as const
 
 const BENEFITS = [
   {
-    title: 'Local Expertise',
-    text: "Rovaniemi-based operations with knowledge of Lapland's experiences and conditions.",
+    title: 'Authentic Lapland experiences',
+    text: 'Northern Lights evenings, daytime adventures, private programmes and transfers — ready to recommend to your clients.',
   },
   {
-    title: 'Flexible Arrangements',
-    text: 'Support for individual travellers, private groups and customized programmes, subject to operational availability.',
+    title: 'Reliable operations',
+    text: 'Professional local guides and clear operational standards for the Arctic season.',
   },
   {
-    title: 'Direct Communication',
-    text: 'Coordinate booking details, pickup arrangements and group requirements directly with our team.',
+    title: 'Flexible cooperation',
+    text: 'Built for travel agencies, DMCs, hotels and concierge teams — commercial terms agreed privately.',
+  },
+  {
+    title: 'Partner support',
+    text: 'Coordinate bookings, pickups and group needs directly with our Rovaniemi team.',
   },
 ] as const
 
-const STEPS = [
-  {
-    n: '01',
-    title: 'Tell us about your business',
-    text: 'Share your agency details, client markets and requirements.',
-  },
-  {
-    n: '02',
-    title: 'Agree on the arrangements',
-    text: 'We discuss suitable experiences, availability, commercial terms and booking procedures.',
-  },
-  {
-    n: '03',
-    title: 'Start working together',
-    text: 'Coordinate your first enquiries and bookings with our team.',
-  },
-] as const
+const PORTAL_NAV = ['Overview', 'Bookings', 'Availability', 'Company'] as const
 
-type FormState = {
-  name: string
-  company: string
-  email: string
-  phone: string
-  message: string
-}
+function TravelTradeInner() {
+  const location = useLocation()
+  const { isSignedIn, loading, user } = useRewardsAuth()
+  const [partner, setPartner] = useState<PartnerAccess>('none')
 
-const emptyForm: FormState = {
-  name: '',
-  company: '',
-  email: '',
-  phone: '',
-  message: '',
-}
-
-const TravelTrade: React.FC = () => {
-  const [formData, setFormData] = useState<FormState>(emptyForm)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
-
-  const update = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData((prev) => ({ ...prev, [key]: e.target.value }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setSubmitStatus('idle')
-
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-customized-tour-request`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            type: 'partner',
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            message: [
-              'Travel trade / partnership enquiry',
-              formData.company ? `Company: ${formData.company}` : null,
-              formData.message,
-            ]
-              .filter(Boolean)
-              .join('\n\n'),
-            to: ['royalnordicfi@gmail.com', 'contact@royalnordic.fi'],
-            subject: 'Travel Trade Partnership Enquiry - ROYAL NORDIC',
-          }),
-        }
-      )
-
-      if (!response.ok) throw new Error('Failed to send request')
-
-      setSubmitStatus('success')
-      setFormData(emptyForm)
-      window.setTimeout(() => setSubmitStatus('idle'), 6000)
-    } catch {
-      setSubmitStatus('error')
-    } finally {
-      setIsSubmitting(false)
+  useEffect(() => {
+    if (!isSignedIn) {
+      setPartner('none')
+      return
     }
-  }
+    void fetchPartnerAccess().then((r) => setPartner(r.access))
+  }, [isSignedIn, user?.id])
+
+  useEffect(() => {
+    const id = location.hash.replace(/^#/, '')
+    if (!id) return
+    const t = window.setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 80)
+    return () => window.clearTimeout(t)
+  }, [location.hash, location.pathname])
+
+  const signInTo =
+    !loading && isSignedIn && partner === 'approved'
+      ? '/partners/dashboard'
+      : !loading && isSignedIn && partner === 'pending'
+        ? '/partners/status'
+        : '/account/signin?intent=partners'
+
+  const signInLabel =
+    !loading && isSignedIn && partner === 'approved'
+      ? 'Open partner dashboard'
+      : !loading && isSignedIn && partner === 'pending'
+        ? 'View application status'
+        : 'Partner Sign In'
 
   return (
-    <div className="rn-page">
-      <CategoryHero
-        title="Your Local Experience Partner in Finnish Lapland"
-        subtitle="Partner with Royal Nordic to bring unforgettable Arctic experiences to your clients — from Northern Lights adventures to private tours and tailored group arrangements."
-        image="/nortti5.jpg"
-        eyebrow="Royal Nordic · Travel trade"
-        actions={
-          <>
-            <a href="#partnership-enquiry" className="rn-btn-primary min-h-[48px] px-7">
+    <div className="rn-page rn-partner-landing">
+      <section className="rn-partner-hero relative flex items-end overflow-hidden">
+        <img
+          src="/nortti5.jpg"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover object-center"
+          fetchPriority="high"
+          onError={(e) => {
+            e.currentTarget.src = '/nortti1.jpg'
+          }}
+        />
+        <div className="rn-partner-hero__veil" aria-hidden />
+        <div className="rn-hero-chrome-veil pointer-events-none absolute inset-x-0 top-0 h-28 sm:h-36" aria-hidden />
+
+        <div className="rn-container relative z-10 w-full pb-10 pt-[calc(var(--rn-chrome-h)+1.5rem)] sm:pb-12 sm:pt-[calc(var(--rn-chrome-h)+1.75rem)] lg:pb-14">
+          <p className="rn-eyebrow rn-reveal text-aurora-soft">Travel trade · Partners</p>
+          <h1 className="rn-partner-hero__title rn-reveal mt-3 max-w-[16ch] font-display font-semibold text-white">
+            Partner with Royal Nordic
+          </h1>
+          <p className="rn-reveal mt-4 max-w-xl text-[15px] leading-relaxed text-white/78 sm:mt-5 sm:text-[16.5px] sm:leading-[1.6]">
+            Work with a trusted local operator in Rovaniemi — Northern Lights, daytime experiences,
+            private itineraries and transfers for your clients.
+          </p>
+
+          <ul className="rn-partner-trust rn-reveal mt-7 sm:mt-8" aria-label="Why partners choose us">
+            {TRUST.map((item) => (
+              <li key={item.title} className="rn-partner-trust__item">
+                <span className="rn-partner-trust__dot" aria-hidden />
+                <span>
+                  <span className="rn-partner-trust__title">{item.title}</span>
+                  <span className="rn-partner-trust__text">{item.text}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="rn-reveal mt-8 flex flex-wrap items-center gap-3">
+            <a href="#apply" className="rn-btn-primary min-h-[48px] px-7 sm:px-8">
               Become a Partner
             </a>
-            <a href="#experiences" className="rn-btn-secondary min-h-[48px] px-6">
-              Explore Our Experiences
+            <Link to={signInTo} className="rn-btn-secondary min-h-[48px] px-6">
+              {signInLabel}
+            </Link>
+            <a
+              href="#portal"
+              className="inline-flex min-h-[48px] items-center px-2 text-sm font-medium text-white/75 transition hover:text-white"
+            >
+              About the partner portal
             </a>
-          </>
-        }
-      />
-
-      <section
-        id="experiences"
-        className="rn-section-follow scroll-mt-[calc(var(--rn-chrome-h)+1rem)]"
-        aria-labelledby="rn-trade-exp-heading"
-      >
-        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-60" aria-hidden />
-        <div className="rn-container relative">
-          <CategorySectionHeader
-            eyebrow="Experience catalogue"
-            title="Experiences your clients can enjoy"
-            titleId="rn-trade-exp-heading"
-            lede="Premium Lapland products with clear public pages — ready to share with agencies, DMCs, hotels and concierge teams."
-          />
-
-          <div className="rn-private-exp-grid rn-private-exp-grid--four mt-7 sm:mt-8">
-            {EXPERIENCES.map((item) => (
-              <Link key={item.to} to={item.to} className="rn-private-exp-card group">
-                <div className="rn-private-exp-card__media">
-                  <img
-                    src={item.image}
-                    alt={item.imageAlt}
-                    className="rn-private-exp-card__img"
-                    loading="lazy"
-                    decoding="async"
-                    onError={(e) => {
-                      e.currentTarget.src = '/nortti1.jpg'
-                    }}
-                  />
-                  <div className="rn-private-exp-card__shade" aria-hidden />
-                </div>
-                <div className="rn-private-exp-card__body">
-                  <h3 className="rn-private-exp-card__title">{item.title}</h3>
-                  <p className="rn-private-exp-card__desc">{item.description}</p>
-                </div>
-              </Link>
-            ))}
           </div>
         </div>
       </section>
 
-      <section className="rn-section-band" aria-labelledby="rn-trade-why-heading">
-        <div className="rn-container">
-          <CategorySectionHeader
-            eyebrow="Why partner with us"
-            title="Built for professional travel partners"
-            titleId="rn-trade-why-heading"
-            lede="We work with travel agencies, international tour operators, DMCs, hotels and concierge services looking for a reliable local partner in Rovaniemi."
-          />
+      <section
+        className="rn-section-follow relative scroll-mt-[calc(var(--rn-chrome-h)+1rem)]"
+        aria-labelledby="rn-partner-main-heading"
+      >
+        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-45" aria-hidden />
+        <div className="rn-container relative">
+          <h2 id="rn-partner-main-heading" className="sr-only">
+            Partner portal preview and application
+          </h2>
 
-          <ul className="rn-benefit-row mt-8">
-            {BENEFITS.map((item) => (
-              <li key={item.title} className="rn-benefit-row__item">
-                <h3 className="rn-benefit-row__title">{item.title}</h3>
-                <p className="rn-benefit-row__text">{item.text}</p>
+          <div className="rn-partner-split">
+            <div className="rn-partner-split__main space-y-12 sm:space-y-14">
+              <div id="portal" className="scroll-mt-[calc(var(--rn-chrome-h)+1rem)]">
+                <p className="rn-eyebrow">Partner Portal</p>
+                <h3 className="rn-h2-tight mt-2.5 text-white">Your partner workspace</h3>
+                <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-text-muted">
+                  A dedicated portal for approved partners — booking tools, availability and company
+                  details. Launching soon; access opens only after Royal Nordic approval.
+                </p>
+
+                <div className="rn-partner-portal rn-reveal mt-7 sm:mt-8">
+                  <div className="rn-partner-portal__badge">
+                    <span className="rn-partner-portal__badge-dot" aria-hidden />
+                    Launching soon
+                  </div>
+                  <div className="rn-partner-portal__window" aria-hidden>
+                    <div className="rn-partner-portal__chrome">
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                    <div className="rn-partner-portal__body">
+                      <aside className="rn-partner-portal__nav">
+                        <p className="rn-partner-portal__brand">Partners</p>
+                        <ul>
+                          {PORTAL_NAV.map((item, i) => (
+                            <li key={item} className={i === 0 ? 'is-active' : undefined}>
+                              {item}
+                              {i > 0 ? <em>Soon</em> : null}
+                            </li>
+                          ))}
+                        </ul>
+                      </aside>
+                      <div className="rn-partner-portal__content">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-aurora-soft">
+                          Overview
+                        </p>
+                        <p className="mt-2 font-display text-lg font-semibold text-white">
+                          Partner dashboard
+                        </p>
+                        <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-text-muted">
+                          Manage company details today. Bookings, availability and reports arrive with
+                          the portal launch — not exposed before approval.
+                        </p>
+                        <div className="rn-partner-portal__tiles">
+                          {['Bookings', 'Availability', 'Reports'].map((label) => (
+                            <div key={label} className="rn-partner-portal__tile">
+                              <span>{label}</span>
+                              <em>Coming soon</em>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p className="rn-eyebrow">Why partner with us</p>
+                <h3 className="rn-h2-tight mt-2.5 text-white">Built for professional travel partners</h3>
+                <ul className="rn-partner-benefits mt-7 grid gap-4 sm:mt-8 sm:grid-cols-2 sm:gap-5">
+                  {BENEFITS.map((item) => (
+                    <li key={item.title} className="rn-partner-benefits__item rn-reveal">
+                      <span className="rn-partner-benefits__mark" aria-hidden />
+                      <div>
+                        <h4 className="rn-partner-benefits__title">{item.title}</h4>
+                        <p className="rn-partner-benefits__text">{item.text}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <aside
+              id="apply"
+              className="rn-partner-split__aside scroll-mt-[calc(var(--rn-chrome-h)+1rem)]"
+            >
+              <div className="rn-partner-apply-panel">
+                <PartnerApplicationForm embedded />
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section
+        className="border-t border-white/[0.06] bg-midnight/50 py-12 sm:py-14"
+        aria-labelledby="rn-partner-contact-heading"
+      >
+        <div className="rn-container">
+          <div className="rn-partner-contact">
+            <div>
+              <p className="rn-eyebrow">Contact</p>
+              <h2 id="rn-partner-contact-heading" className="rn-h2-tight mt-2.5 text-white">
+                Prefer to talk first?
+              </h2>
+              <p className="mt-3 max-w-md text-[15px] leading-relaxed text-text-muted">
+                Reach our Rovaniemi team for partnership questions. Commercial terms stay private.
+              </p>
+            </div>
+            <ul className="rn-partner-contact__channels">
+              <li>
+                <span className="rn-partner-contact__label">Email</span>
+                <a href={CONTACT.emailHref} className="rn-partner-contact__value">
+                  {CONTACT.email}
+                </a>
               </li>
-            ))}
-          </ul>
+              <li>
+                <span className="rn-partner-contact__label">Phone</span>
+                <a href={CONTACT.phoneHref} className="rn-partner-contact__value">
+                  {CONTACT.phoneDisplay}
+                </a>
+              </li>
+              <li>
+                <span className="rn-partner-contact__label">Location</span>
+                <span className="rn-partner-contact__value rn-partner-contact__value--muted">
+                  {CONTACT.location}
+                </span>
+              </li>
+            </ul>
+          </div>
         </div>
       </section>
 
       <CategoryPageEnd
-        title="Ready to discuss a partnership?"
-        lede="Share a little about your business and the experiences your clients need. We'll follow up with next steps."
+        title="Ready to partner?"
+        lede="Submit an application today. Access and trade rates open only after Royal Nordic approval."
         links={[
-          { to: '#partnership-enquiry', label: 'Become a Partner', primary: true },
+          { to: '#apply', label: 'Become a Partner', primary: true },
+          { to: signInTo, label: signInLabel },
           { to: '/northern-lights-tours', label: 'Northern Lights' },
-          { to: '/daytime-experiences', label: 'Day Tours' },
-          { to: '/transportation', label: 'Transfers' },
+          { to: '/contact', label: 'Contact' },
         ]}
       />
-
-      <section className="rn-section-band" aria-labelledby="rn-trade-steps-heading">
-        <div className="rn-container">
-          <CategorySectionHeader
-            eyebrow="How cooperation works"
-            title="A clear path to working together"
-            titleId="rn-trade-steps-heading"
-            lede="Commercial terms stay private. We agree rates, booking flow and communication directly with each partner."
-          />
-
-          <ol className="rn-private-steps mt-8">
-            {STEPS.map((step) => (
-              <li key={step.n} className="rn-private-steps__item">
-                <span className="rn-private-steps__n" aria-hidden>
-                  {step.n}
-                </span>
-                <div>
-                  <h3 className="rn-private-steps__title">{step.title}</h3>
-                  <p className="rn-private-steps__text">{step.text}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section
-        id="partnership-enquiry"
-        className="rn-section-tight border-t border-white/[0.06] bg-surface scroll-mt-[calc(var(--rn-chrome-h)+1rem)]"
-        aria-labelledby="rn-trade-enquiry-heading"
-      >
-        <div className="rn-container">
-          <div className="rn-inquiry">
-            <CategorySectionHeader
-              eyebrow="Partnership enquiry"
-              title="Let's Build Something Together"
-              titleId="rn-trade-enquiry-heading"
-              lede={
-                <>
-                  Tell us a little about your business and what you&apos;re looking for. Our team will be happy to
-                  discuss a potential partnership. Prefer email? Write to{' '}
-                  <a href="mailto:contact@royalnordic.fi" className="font-medium text-aurora-soft hover:underline">
-                    contact@royalnordic.fi
-                  </a>{' '}
-                  or call{' '}
-                  <a href="tel:+3584578345138" className="font-medium text-aurora-soft hover:underline">
-                    +358 45 78345138
-                  </a>
-                  .
-                </>
-              }
-            />
-
-            <form onSubmit={handleSubmit} className="rn-inquiry-form mt-8">
-              <div className="rn-inquiry-form__grid">
-                <label className="rn-inquiry-field">
-                  <span className="rn-inquiry-field__label">Full name</span>
-                  <input
-                    id="tt-name"
-                    type="text"
-                    name="name"
-                    required
-                    autoComplete="name"
-                    value={formData.name}
-                    onChange={update('name')}
-                    className="rn-inquiry-field__input"
-                    placeholder="Your full name"
-                  />
-                </label>
-
-                <label className="rn-inquiry-field">
-                  <span className="rn-inquiry-field__label">Company / agency</span>
-                  <input
-                    id="tt-company"
-                    type="text"
-                    name="company"
-                    autoComplete="organization"
-                    value={formData.company}
-                    onChange={update('company')}
-                    className="rn-inquiry-field__input"
-                    placeholder="Agency, DMC or hotel"
-                  />
-                </label>
-
-                <label className="rn-inquiry-field">
-                  <span className="rn-inquiry-field__label">Work email</span>
-                  <input
-                    id="tt-email"
-                    type="email"
-                    name="email"
-                    required
-                    autoComplete="email"
-                    value={formData.email}
-                    onChange={update('email')}
-                    className="rn-inquiry-field__input"
-                    placeholder="you@agency.com"
-                  />
-                </label>
-
-                <label className="rn-inquiry-field">
-                  <span className="rn-inquiry-field__label">
-                    Phone <span className="rn-inquiry-field__optional">optional</span>
-                  </span>
-                  <input
-                    id="tt-phone"
-                    type="tel"
-                    name="phone"
-                    autoComplete="tel"
-                    value={formData.phone}
-                    onChange={update('phone')}
-                    className="rn-inquiry-field__input"
-                    placeholder="+358 …"
-                  />
-                </label>
-
-                <label className="rn-inquiry-field rn-inquiry-field--full">
-                  <span className="rn-inquiry-field__label">Partnership requirements / message</span>
-                  <textarea
-                    id="tt-message"
-                    name="message"
-                    required
-                    rows={5}
-                    value={formData.message}
-                    onChange={update('message')}
-                    className="rn-inquiry-field__input rn-inquiry-field__textarea"
-                    placeholder="Markets, products, dates, group size, and how you prefer to book…"
-                  />
-                </label>
-              </div>
-
-              {submitStatus === 'success' ? (
-                <p className="rn-inquiry-form__status rn-inquiry-form__status--ok" role="status">
-                  Thank you — check your email for confirmation. We will reply soon.
-                </p>
-              ) : null}
-
-              {submitStatus === 'error' ? (
-                <p className="rn-inquiry-form__status rn-inquiry-form__status--err" role="alert">
-                  Something went wrong. Please email contact@royalnordic.fi directly.
-                </p>
-              ) : null}
-
-              <div className="rn-inquiry-form__actions">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="rn-btn-primary min-h-[48px] px-8 disabled:opacity-55"
-                >
-                  {isSubmitting ? 'Sending…' : 'Send Partnership Enquiry'}
-                </button>
-                <p className="rn-inquiry-form__note">We reply personally. Commercial terms are discussed privately.</p>
-              </div>
-            </form>
-          </div>
-        </div>
-      </section>
 
       <Footer />
     </div>
   )
 }
+
+const TravelTrade = () => (
+  <RewardsAuthProvider>
+    <TravelTradeInner />
+  </RewardsAuthProvider>
+)
 
 export default TravelTrade

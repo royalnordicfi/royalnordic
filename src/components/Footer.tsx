@@ -40,9 +40,9 @@ const Footer = () => {
             <ul className="space-y-2 text-[13px]">
               <li><Link className="rn-footer-link" to="/account">Account</Link></li>
               <li><Link className="rn-footer-link" to="/referralprogram">Rewards</Link></li>
-              <li><Link className="rn-footer-link" to="/partners/apply">Partners</Link></li>
-              <li><Link className="rn-footer-link" to="/contact">Contact</Link></li>
               <li><Link className="rn-footer-link" to="/travel-trade">Partner With Us</Link></li>
+              <li><Link className="rn-footer-link" to="/travel-trade#apply">Become a Partner</Link></li>
+              <li><Link className="rn-footer-link" to="/contact">Contact</Link></li>
               <li>
                 <a className="rn-footer-link" href={CONTACT.emailHref}>
                   {CONTACT.email}

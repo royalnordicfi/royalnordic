@@ -198,7 +198,7 @@ function App() {
             <Route path="signin" element={<AccountSignIn />} />
           </Route>
           <Route path="/partners" element={<AccountLayout />}>
-            <Route index element={<Navigate to="/partners/apply" replace />} />
+            <Route index element={<Navigate to="/travel-trade#apply" replace />} />
             <Route path="apply" element={<PartnersApply />} />
             <Route path="status" element={<PartnersStatus />} />
             <Route path="dashboard" element={<PartnersShell />}>
