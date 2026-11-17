@@ -46,7 +46,12 @@ const CategoryHero = ({
         }`}
       >
         {lead ? <div className="mb-3.5 sm:mb-4">{lead}</div> : null}
-        {eyebrow ? <p className="rn-eyebrow">{eyebrow}</p> : null}
+        {eyebrow ? (
+          <p className="rn-ql-kicker rn-ql-kicker--on-media">
+            <span className="rn-ql-kicker__rule" aria-hidden />
+            {eyebrow}
+          </p>
+        ) : null}
         <h1
           className={`rn-category-hero__title ${eyebrow || lead ? 'mt-2' : 'mt-0'} ${
             compact ? 'rn-category-hero__title--compact' : ''

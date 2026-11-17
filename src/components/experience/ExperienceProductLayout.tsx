@@ -81,11 +81,14 @@ export default function ExperienceProductLayout({
           <div className="rn-container relative z-10 w-full pb-10 pt-[calc(var(--rn-chrome-h)+1.5rem)] sm:pb-12 sm:pt-[calc(var(--rn-chrome-h)+1.85rem)]">
             <ExperienceBreadcrumb items={breadcrumbs} tone="onMedia" />
             <div className="rn-exp-cinema__copy mt-6 max-w-rn-narrow sm:mt-8">
-              <p className="rn-eyebrow text-aurora-soft">{eyebrow}</p>
-              <h1 className="rn-exp-cinema__title mt-2.5 font-display font-semibold text-white">
+              <p className="rn-ql-kicker rn-ql-kicker--on-media">
+                <span className="rn-ql-kicker__rule" aria-hidden />
+                {eyebrow}
+              </p>
+              <h1 className="rn-exp-cinema__title mt-3 font-display font-semibold text-white">
                 {title}
               </h1>
-              <p className="mt-4 max-w-2xl text-[15.5px] leading-relaxed text-white/80 sm:mt-4.5 sm:text-[17px] sm:leading-[1.6]">
+              <p className="mt-4 max-w-2xl text-[15.5px] leading-relaxed text-white/78 sm:mt-4.5 sm:text-[17px] sm:leading-[1.6]">
                 {lede}
               </p>
               {proof ? <div className="rn-product__proof rn-product__proof--on-media mt-4">{proof}</div> : null}

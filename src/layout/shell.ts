@@ -23,14 +23,11 @@ const OVERLAY_EXACT = new Set([
   '/referralprogram',
   '/privacy-policy',
   '/terms-conditions',
-  /** Flagship product uses cinematic overlay hero */
+  /** Cinematic product heroes share overlay chrome with the homepage */
   '/northern-lights-tour',
-])
-
-const PRODUCT_EXACT = new Set([
-  '/family-friendly-northern-lights',
-  '/northern-lights-standard-group',
   '/northern-lights-private-tour',
+  '/northern-lights-standard-group',
+  '/family-friendly-northern-lights',
   '/ice-fishing',
   '/ranua-zoo',
   '/korouoma-canyon',
@@ -38,6 +35,9 @@ const PRODUCT_EXACT = new Set([
   '/snowshoe-rental',
   '/snowmobile-safari',
   '/monster-truck-northern-lights',
+])
+
+const PRODUCT_EXACT = new Set([
   '/transportation-rovaniemi-levi',
   '/transportation-rovaniemi-saariselka',
   '/transportation-customized',

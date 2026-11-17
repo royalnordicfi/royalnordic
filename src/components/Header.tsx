@@ -53,10 +53,9 @@ const Header = () => {
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   const hasHero = isHeroShell(pathname)
-  const isHome = pathname === '/'
   const transparent = hasHero && !scrolled
-  /** Quiet-luxury floating glass pill on the homepage */
-  const floating = isHome
+  /** Quiet-luxury floating glass pill on cinematic / overlay routes */
+  const floating = hasHero
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10)

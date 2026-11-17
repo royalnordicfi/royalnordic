@@ -4,23 +4,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        black: '#010403',
-        midnight: '#030706',
+        black: '#020504',
+        midnight: '#050807',
         surface: {
-          DEFAULT: '#08110e',
-          2: '#0c1713',
-          elevated: '#101c18',
+          DEFAULT: '#0a100e',
+          2: '#101816',
+          elevated: '#141e1b',
         },
-        elevated: '#101c18',
+        elevated: '#141e1b',
         text: {
-          DEFAULT: '#f1f5f3',
-          muted: '#95a39c',
-          dim: '#66756e',
+          DEFAULT: '#f4f7f5',
+          muted: 'rgba(244, 247, 245, 0.62)',
+          dim: 'rgba(244, 247, 245, 0.42)',
         },
         aurora: {
-          DEFAULT: '#0f8f63',
-          hover: '#0c7a54',
-          soft: '#8dceb2',
+          DEFAULT: '#7dcead',
+          hover: '#95d9bd',
+          soft: '#7dcead',
         },
         sale: {
           DEFAULT: '#c45c4a',
@@ -33,13 +33,13 @@ export default {
           ink: '#0c1410',
           muted: '#5c6b64',
         },
-        snow: '#f1f5f3',
+        snow: '#f4f7f5',
         'snow-warm': '#e8ece9',
-        frost: '#0c1713',
-        ink: '#f1f5f3',
-        'ink-muted': '#95a39c',
-        navy: '#0c1713',
-        'midnight-soft': '#08110e',
+        frost: '#101816',
+        ink: '#f4f7f5',
+        'ink-muted': 'rgba(244, 247, 245, 0.62)',
+        navy: '#101816',
+        'midnight-soft': '#0a100e',
       },
       fontFamily: {
         display: ['Cormorant Garamond', 'Georgia', 'serif'],
@@ -58,15 +58,15 @@ export default {
         'rn-measure': 'var(--rn-measure-lede)',
       },
       borderRadius: {
-        rn: '10px',
-        'rn-lg': '12px',
+        rn: '14px',
+        'rn-lg': '20px',
       },
       boxShadow: {
-        rn: '0 24px 60px rgba(0, 0, 0, 0.5)',
-        'rn-soft': '0 12px 32px rgba(0, 0, 0, 0.35)',
-        'rn-glow': '0 0 32px rgba(15, 143, 99, 0.16)',
+        rn: '0 24px 60px rgba(0, 0, 0, 0.45)',
+        'rn-soft': '0 12px 32px rgba(0, 0, 0, 0.28)',
+        'rn-glow': '0 0 32px rgba(125, 206, 173, 0.18)',
       },
     },
   },
   plugins: [],
-};
+}
