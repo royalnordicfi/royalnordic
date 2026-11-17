@@ -6886,6 +6886,191 @@ html.rn-intro-lock body {
   color: inherit;
 }
 
+/* Homepage dual-row review collage */
+.rn-ql-rcollage {
+  overflow-x: clip;
+}
+.rn-ql-rcollage__stage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 4%,
+    #000 96%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 4%,
+    #000 96%,
+    transparent 100%
+  );
+}
+@media (min-width: 768px) {
+  .rn-ql-rcollage__stage {
+    gap: 1.1rem;
+    mask-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      #000 6%,
+      #000 94%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      #000 6%,
+      #000 94%,
+      transparent 100%
+    );
+  }
+}
+.rn-ql-rcollage__row {
+  overflow: hidden;
+  width: 100%;
+  outline: none;
+  touch-action: pan-y;
+}
+.rn-ql-rcollage__row:focus-visible {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rn-aurora-soft) 40%, transparent);
+}
+.rn-ql-rcollage__track {
+  display: flex;
+  width: max-content;
+  gap: 0.85rem;
+  will-change: transform;
+  animation-name: rn-ql-rcollage-rtl;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.rn-ql-rcollage__row--ltr .rn-ql-rcollage__track {
+  animation-name: rn-ql-rcollage-ltr;
+}
+.rn-ql-rcollage__row:hover .rn-ql-rcollage__track,
+.rn-ql-rcollage__row:focus-within .rn-ql-rcollage__track,
+.rn-ql-rcollage__row.is-paused .rn-ql-rcollage__track {
+  animation-play-state: paused;
+}
+.rn-ql-rcollage__item {
+  flex: 0 0 auto;
+  width: min(18.5rem, 78vw);
+}
+@media (min-width: 640px) {
+  .rn-ql-rcollage__item {
+    width: 20.5rem;
+  }
+  .rn-ql-rcollage__track {
+    gap: 1rem;
+  }
+}
+@keyframes rn-ql-rcollage-rtl {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+@keyframes rn-ql-rcollage-ltr {
+  from { transform: translate3d(-50%, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+.rn-ql-rcard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 11.5rem;
+  padding: 1rem 1.05rem 1.05rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: color-mix(in srgb, var(--rn-ql-elevated, #121816) 92%, #000);
+  box-shadow: none;
+}
+.rn-ql-rcard__stars {
+  display: inline-flex;
+  gap: 0.12rem;
+  color: color-mix(in srgb, var(--rn-aurora-soft) 55%, #c9b896);
+}
+.rn-ql-rcard__quote {
+  margin: 0.65rem 0 0;
+  flex: 1;
+}
+.rn-ql-rcard__quote p {
+  margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  overflow: hidden;
+  font-family: var(--rn-font-display);
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: rgba(247, 250, 248, 0.9);
+}
+.rn-ql-rcard__foot {
+  margin-top: 0.85rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.rn-ql-rcard__name {
+  font-style: normal;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #fff;
+}
+.rn-ql-rcard__meta {
+  font-size: 0.65rem;
+  font-weight: 550;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rn-text-dim, rgba(255, 255, 255, 0.45));
+}
+
+.rn-ql-rcollage__swipe {
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.rn-ql-rcollage__swipe::-webkit-scrollbar {
+  display: none;
+}
+.rn-ql-rcollage__swipe-track {
+  display: flex;
+  width: max-content;
+  gap: 0.85rem;
+  padding-inline: 1rem;
+}
+.rn-ql-rcollage__swipe .rn-ql-rcollage__item {
+  scroll-snap-align: start;
+}
+
+.rn-ql-rcollage__static {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+@media (min-width: 640px) {
+  .rn-ql-rcollage__static {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+}
+@media (min-width: 1024px) {
+  .rn-ql-rcollage__static {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rn-ql-hero__video,
   .rn-ql-hero__title,
@@ -6895,6 +7080,10 @@ html.rn-intro-lock body {
   .rn-ql-trust {
     animation: none !important;
     opacity: 1 !important;
+    transform: none !important;
+  }
+  .rn-ql-rcollage__track {
+    animation: none !important;
     transform: none !important;
   }
   .rn-ql-btn:hover,
