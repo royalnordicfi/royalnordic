@@ -40,9 +40,9 @@ export default function HomeHero() {
             <Link to="/northern-lights-tour" className="rn-home-btn rn-home-btn--primary">
               Book Northern Lights
             </Link>
-            <Link to="/northern-lights-tours" className="rn-home-btn rn-home-btn--ghost">
-              View aurora evenings
-            </Link>
+            <a href="#experiences" className="rn-home-btn rn-home-btn--ghost">
+              Explore experiences
+            </a>
           </div>
           <p className="rn-home-hero__offer">
             <span>Flagship from</span>{' '}
@@ -50,6 +50,11 @@ export default function HomeHero() {
             <span className="rn-home-hero__now">€{GUARANTEED_NL_CATALOG_ADULT_PRICE}</span>
             <span> / adult · Small Group tour</span>
           </p>
+          <ul className="rn-home-hero__trust" aria-label="Why travellers book with us">
+            <li>Aurora guarantee on Small Group tour</li>
+            <li>Max 8 guests per vehicle</li>
+            <li>Local guides from Rovaniemi</li>
+          </ul>
         </div>
 
         <div className="rn-home-hero__discover mt-8 sm:mt-10 lg:mt-12">
