@@ -27,7 +27,7 @@ export default function PartnersStatus() {
 
   if (!ready) {
     return (
-      <div className="rn-container py-14">
+      <div className="rn-container rn-shell-pad pb-14">
         <div className="rn-rewards-skel h-8 w-48" />
         <div className="mt-6 rn-rewards-skel h-32 w-full max-w-md" />
       </div>
@@ -40,7 +40,7 @@ export default function PartnersStatus() {
 
   if (info?.access === 'declined') {
     return (
-      <div className="rn-container py-12 sm:py-16">
+      <div className="rn-container rn-shell-pad pb-12 sm:pb-16">
         <AuthFormShell
           eyebrow="Royal Nordic Partners"
           title="Application declined"
@@ -64,7 +64,7 @@ export default function PartnersStatus() {
   }
 
   return (
-    <div className="rn-container py-12 sm:py-16">
+    <div className="rn-container rn-shell-pad pb-12 sm:pb-16">
       <AuthFormShell
         eyebrow="Royal Nordic Partners"
         title="Application under review"

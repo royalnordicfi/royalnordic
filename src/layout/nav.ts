@@ -22,12 +22,8 @@ export const EXPERIENCE_NAV: NavChild[] = [
   { label: 'Transfers', to: '/transportation', hint: 'Saariselkä, Levi & custom routes' },
 ]
 
-/** Primary desktop links (experiences also appear in the mega menu) */
+/** Primary desktop links after Experiences mega — avoid duplicating EXPERIENCE_NAV destinations */
 export const PRIMARY_NAV: NavItem[] = [
-  { label: 'Northern Lights', to: '/northern-lights-tours' },
-  { label: 'Day Tours', to: '/daytime-experiences' },
-  { label: 'Private & Custom', to: '/customized-tour' },
-  { label: 'Transfers', to: '/transportation' },
   { label: 'Partner With Us', to: '/travel-trade' },
   { label: 'Contact', to: '/contact' },
 ]

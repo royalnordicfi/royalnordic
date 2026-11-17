@@ -40,7 +40,7 @@ export default function AuthFormShell({
 
 export function FieldLabel({ htmlFor, children }: { htmlFor: string; children: ReactNode }) {
   return (
-    <label htmlFor={htmlFor} className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[var(--rn-text-muted)]">
+    <label htmlFor={htmlFor} className="rn-form-label">
       {children}
     </label>
   )

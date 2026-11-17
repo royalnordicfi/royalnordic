@@ -41,7 +41,7 @@ const CategoryHero = ({
       <div className="rn-category-hero__veil" aria-hidden />
       <div className="rn-hero-chrome-veil pointer-events-none absolute inset-x-0 top-0 h-28 sm:h-36" aria-hidden />
       <div
-        className={`rn-container relative z-10 w-full pt-[calc(var(--rn-chrome-h)+1.35rem)] sm:pt-[calc(var(--rn-chrome-h)+1.5rem)] ${
+        className={`rn-container rn-hero-pad relative z-10 w-full ${
           compact ? 'pb-7 sm:pb-8' : 'pb-8 sm:pb-10'
         }`}
       >

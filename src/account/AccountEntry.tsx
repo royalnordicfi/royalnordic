@@ -42,7 +42,7 @@ export default function AccountEntry() {
         }}
         aria-hidden
       />
-      <div className="rn-container relative py-14 sm:py-20 lg:py-24">
+      <div className="rn-container rn-shell-pad relative pb-14 sm:pb-20 lg:pb-24">
         <p className="rn-eyebrow text-aurora-soft">Royal Nordic</p>
         <h1 className="mt-3 max-w-2xl font-display text-[2.1rem] font-semibold leading-[1.08] tracking-[-0.03em] text-white sm:text-[2.85rem]">
           Sign in or get started

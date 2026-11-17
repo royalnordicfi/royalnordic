@@ -51,7 +51,7 @@ export default function AccountSignIn() {
         : 'We’ll open the dashboard you’re authorized to use.'
 
   return (
-    <div className="rn-container py-12 sm:py-16">
+    <div className="rn-container rn-shell-pad pb-12 sm:pb-16">
       <AuthFormShell
         eyebrow="Royal Nordic Account"
         title="Sign in"

@@ -5958,6 +5958,9 @@ a.rn-partner-contact__value:hover {
     padding: 1.5rem 1.75rem;
   }
 }
+.rn-rewards-auth .rn-form-label {
+  color: var(--rn-text-muted);
+}
 .rn-rewards-auth .rn-form-input {
   background: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.14);

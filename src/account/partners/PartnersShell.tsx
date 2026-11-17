@@ -67,7 +67,7 @@ export default function PartnersShell() {
 
   if (loading || !ready) {
     return (
-      <div className="rn-container py-14">
+      <div className="rn-container rn-shell-pad pb-14">
         <div className="rn-rewards-skel h-8 w-48" />
         <div className="mt-6 rn-rewards-skel h-10 w-full max-w-lg" />
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -89,7 +89,7 @@ export default function PartnersShell() {
   }
 
   return (
-    <div className="rn-container py-10 sm:py-14">
+    <div className="rn-container rn-shell-pad pb-10 sm:pb-14">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="rn-eyebrow text-aurora-soft">Royal Nordic Partners</p>

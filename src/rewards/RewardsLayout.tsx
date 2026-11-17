@@ -9,13 +9,14 @@ function RewardsChrome() {
   const isApp =
     location.pathname.startsWith('/referralprogram/dashboard') ||
     location.pathname.startsWith('/referralprogram/claim-code')
+  const isLanding = location.pathname === '/referralprogram'
 
   async function logout() {
     await signOutRewards()
   }
 
   return (
-    <div className="rn-rewards min-h-[60vh]">
+    <div className={`rn-rewards min-h-[60vh] ${isLanding ? '' : 'rn-shell-pad'}`}>
       {isApp ? (
         <div className="border-b border-[var(--rn-border)] bg-[var(--rn-surface)]/80 backdrop-blur-sm">
           <div className="rn-container flex items-center justify-between gap-3 py-3.5">

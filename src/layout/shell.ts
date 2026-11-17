@@ -21,6 +21,8 @@ const OVERLAY_EXACT = new Set([
   '/customized-tour',
   '/contact',
   '/referralprogram',
+  '/privacy-policy',
+  '/terms-conditions',
 ])
 
 const PRODUCT_EXACT = new Set([
