@@ -86,21 +86,31 @@ const ContactForm: React.FC<ContactFormProps> = ({
 
   const inputClass = 'rn-form-input'
   const idPrefix = compact ? 'home-contact' : 'page-contact'
+  const panelClass = compact
+    ? `rn-panel p-5 sm:p-6 ${className}`
+    : `rn-panel rn-contact-form p-5 sm:p-7 ${className}`
 
   return (
-    <div className={`rn-panel ${compact ? 'p-5 sm:p-6' : 'p-6 sm:p-8'} ${className}`}>
-      <h3 className={`font-semibold text-panel-ink ${compact ? 'text-base' : 'font-display text-xl'}`}>
-        Send a message
-      </h3>
-      <p className="mt-1.5 text-sm text-panel-muted">
-        General questions, existing bookings, private tours, and partner enquiries.
-      </p>
+    <div className={panelClass.trim()}>
+      {compact ? (
+        <>
+          <h3 className="text-base font-semibold text-panel-ink">Send a message</h3>
+          <p className="mt-1.5 text-sm text-panel-muted">
+            General questions, existing bookings, private tours, and partner enquiries.
+          </p>
+        </>
+      ) : (
+        <>
+          <h3 className="rn-contact-form__title">Send a message</h3>
+          <p className="rn-contact-form__lede">We reply personally.</p>
+        </>
+      )}
 
-      <form onSubmit={handleSubmit} className={`mt-5 space-y-4 ${compact ? '' : 'sm:space-y-5'}`}>
-        <div className="grid gap-3.5 md:grid-cols-2">
+      <form onSubmit={handleSubmit} className={`mt-5 space-y-3.5 ${compact ? '' : 'sm:space-y-4'}`}>
+        <div className="grid gap-3.5 sm:grid-cols-2">
           <div>
             <label htmlFor={`${idPrefix}-name`} className="rn-form-label">
-              Full name *
+              Full name
             </label>
             <input
               type="text"
@@ -116,7 +126,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
           </div>
           <div>
             <label htmlFor={`${idPrefix}-email`} className="rn-form-label">
-              Email *
+              Email
             </label>
             <input
               type="email"
@@ -132,10 +142,10 @@ const ContactForm: React.FC<ContactFormProps> = ({
           </div>
         </div>
 
-        <div className="grid gap-3.5 md:grid-cols-2">
+        <div className="grid gap-3.5 sm:grid-cols-2">
           <div>
             <label htmlFor={`${idPrefix}-phone`} className="rn-form-label">
-              Phone
+              Phone <span className="normal-case tracking-normal text-panel-muted/80">(optional)</span>
             </label>
             <input
               type="tel"
@@ -150,7 +160,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
           </div>
           <div>
             <label htmlFor={`${idPrefix}-topic`} className="rn-form-label">
-              Topic *
+              Topic
             </label>
             <select
               id={`${idPrefix}-topic`}
@@ -171,7 +181,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
 
         <div>
           <label htmlFor={`${idPrefix}-message`} className="rn-form-label">
-            Message *
+            Message
           </label>
           <textarea
             id={`${idPrefix}-message`}
@@ -185,14 +195,26 @@ const ContactForm: React.FC<ContactFormProps> = ({
           />
         </div>
 
-        {submitError ? <p className="text-sm text-red-600">{submitError}</p> : null}
+        {submitError ? (
+          <p className="rn-form-error" role="alert">
+            {submitError}
+          </p>
+        ) : null}
         {showSuccess ? (
-          <p className="text-sm text-emerald-700">Message sent. We’ll get back to you soon.</p>
+          <p className="rn-form-success" role="status">
+            Message sent. We&apos;ll get back to you soon.
+          </p>
         ) : null}
 
-        <button type="submit" disabled={isSubmitting} className="rn-btn-panel">
-          {isSubmitting ? 'Sending…' : 'Send message'}
-        </button>
+        <div className={compact ? '' : 'pt-1'}>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`rn-btn-panel min-h-[48px] px-7 disabled:opacity-55 ${compact ? '' : 'w-full sm:w-auto'}`}
+          >
+            {isSubmitting ? 'Sending…' : 'Send message'}
+          </button>
+        </div>
       </form>
     </div>
   )

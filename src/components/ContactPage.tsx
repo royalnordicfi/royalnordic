@@ -1,97 +1,88 @@
 import { Link } from 'react-router-dom'
-import { Mail, Phone } from 'lucide-react'
 import CategoryHero from './CategoryHero'
 import ContactForm from './ContactForm'
 import Footer from './Footer'
 import { CONTACT } from '../lib/contactInfo'
 
-const TOPICS = [
+const LINKS = [
   {
-    title: 'General questions',
-    text: 'Tour details, timing, pickup areas, and planning a stay around Rovaniemi.',
+    to: '/customized-tour',
+    label: 'Private & Custom Tours',
+    hint: 'Tailored itineraries',
   },
   {
-    title: 'Existing bookings',
-    text: 'Changes, pickup confirmation, or anything about a booking you already hold.',
+    to: '/travel-trade',
+    label: 'Partner With Us',
+    hint: 'Agencies & hotels',
   },
-  {
-    title: 'Private & custom',
-    text: 'Tailored itineraries, private groups, and multi-day programmes.',
-  },
-  {
-    title: 'Travel trade',
-    text: 'Agency, DMC, hotel, and concierge partnerships — or use Partner With Us.',
-  },
-]
+] as const
 
 const ContactPage = () => {
   return (
-    <div className="rn-page flex min-h-screen flex-col">
+    <div className="rn-page">
       <CategoryHero
-        title="Contact Royal Nordic"
-        subtitle="Phone, email, or the form — for general questions, existing bookings, private tours, and partner enquiries."
+        title="Contact us"
+        subtitle="Reach our Rovaniemi team by phone, email, or the form — for tours, bookings, and private planning."
         image="/nortti5.jpg"
-        compact
+        eyebrow="Royal Nordic · Contact"
       />
 
-      <main className="rn-hero-follow relative flex-1 bg-midnight pb-16 pt-2 sm:pb-20 sm:pt-4 lg:pb-24 lg:pt-6">
-        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-70" aria-hidden />
-        <div className="rn-container relative z-10">
-          <div className="grid gap-12 lg:grid-cols-12 lg:gap-16 xl:gap-20 lg:items-start">
-            <div className="space-y-10 lg:col-span-4 xl:col-span-5">
-              <div>
-                <p className="rn-eyebrow">Direct lines</p>
-                <ul className="mt-4 space-y-3 text-sm">
-                  <li>
-                    <a
-                      href={CONTACT.phoneHref}
-                      className="inline-flex items-center gap-2.5 text-white transition hover:text-aurora-soft"
-                    >
-                      <Phone className="h-4 w-4 text-aurora-soft" aria-hidden />
-                      {CONTACT.phoneDisplay}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href={CONTACT.emailHref}
-                      className="inline-flex items-center gap-2.5 text-white transition hover:text-aurora-soft"
-                    >
-                      <Mail className="h-4 w-4 text-aurora-soft" aria-hidden />
-                      {CONTACT.email}
-                    </a>
-                  </li>
-                  <li className="pl-6 text-text-muted">{CONTACT.location}</li>
-                </ul>
-              </div>
+      <section
+        className="rn-section-follow"
+        aria-labelledby="rn-contact-heading"
+      >
+        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-55" aria-hidden />
+        <div className="rn-container relative">
+          <h2 id="rn-contact-heading" className="sr-only">
+            Contact details and message form
+          </h2>
 
-              <div>
-                <p className="rn-eyebrow">What we can help with</p>
-                <ul className="mt-4 space-y-0">
-                  {TOPICS.map((item) => (
-                    <li key={item.title} className="border-t border-white/[0.08] py-3.5 first:border-t-0 first:pt-0">
-                      <p className="font-medium text-white">{item.title}</p>
-                      <p className="mt-1 text-sm leading-relaxed text-text-muted">{item.text}</p>
+          <div className="rn-contact">
+            <aside className="rn-contact__aside">
+              <p className="rn-eyebrow">Direct contact</p>
+
+              <ul className="rn-contact__channels mt-5">
+                <li className="rn-contact__channel">
+                  <span className="rn-contact__channel-label">Phone</span>
+                  <a href={CONTACT.phoneHref} className="rn-contact__channel-value">
+                    {CONTACT.phoneDisplay}
+                  </a>
+                </li>
+                <li className="rn-contact__channel">
+                  <span className="rn-contact__channel-label">Email</span>
+                  <a href={CONTACT.emailHref} className="rn-contact__channel-value">
+                    {CONTACT.email}
+                  </a>
+                </li>
+                <li className="rn-contact__channel">
+                  <span className="rn-contact__channel-label">Location</span>
+                  <span className="rn-contact__channel-value rn-contact__channel-value--muted">
+                    {CONTACT.location}
+                  </span>
+                </li>
+              </ul>
+
+              <div className="mt-8 sm:mt-9">
+                <p className="rn-eyebrow">Also useful</p>
+                <ul className="rn-contact__nav mt-3">
+                  {LINKS.map((item) => (
+                    <li key={item.to} className="rn-contact__nav-item">
+                      <Link to={item.to} className="rn-contact__nav-link">
+                        <span>{item.label}</span>
+                        <span className="rn-contact__nav-hint">{item.hint}</span>
+                      </Link>
                     </li>
                   ))}
                 </ul>
               </div>
+            </aside>
 
-              <p className="text-sm text-text-muted">
-                Travel agencies and hotels:{' '}
-                <Link to="/travel-trade" className="text-aurora-soft hover:underline">
-                  Partner With Us
-                </Link>
-              </p>
-            </div>
-
-            <div className="lg:col-span-8 xl:col-span-7">
-              <div className="max-w-2xl lg:max-w-none">
-                <ContactForm />
-              </div>
+            <div className="rn-contact__form">
+              <ContactForm />
             </div>
           </div>
         </div>
-      </main>
+      </section>
 
       <Footer />
     </div>

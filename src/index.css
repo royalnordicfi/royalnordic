@@ -546,6 +546,102 @@
     color: var(--rn-panel-ink);
     border-radius: var(--rn-radius);
   }
+
+  /* Contact page — balanced detail + form composition */
+  .rn-contact {
+    display: grid;
+    gap: 2rem;
+    align-items: start;
+  }
+  @media (min-width: 1024px) {
+    .rn-contact {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr);
+      gap: 2.75rem 3.25rem;
+    }
+  }
+  .rn-contact__channels {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.85rem;
+  }
+  .rn-contact__channel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .rn-contact__channel-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--rn-text-dim);
+  }
+  .rn-contact__channel-value {
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: #fff;
+    transition: color 0.2s ease;
+  }
+  a.rn-contact__channel-value:hover {
+    color: var(--rn-aurora-soft);
+  }
+  .rn-contact__channel-value--muted {
+    font-size: 0.9375rem;
+    font-weight: 400;
+    color: var(--rn-text-muted);
+  }
+  .rn-contact__nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .rn-contact__nav-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .rn-contact__nav-link {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.85rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: #fff;
+    transition: color 0.2s ease;
+  }
+  .rn-contact__nav-link:hover {
+    color: var(--rn-aurora-soft);
+  }
+  .rn-contact__nav-hint {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--rn-text-dim);
+  }
+  .rn-contact-form {
+    border: 1px solid rgba(12, 20, 16, 0.07);
+    background: linear-gradient(180deg, #fcfdfb 0%, #f5f7f4 100%);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.85) inset,
+      0 18px 44px rgba(0, 0, 0, 0.28);
+  }
+  .rn-contact-form__title {
+    font-family: var(--rn-font-display);
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    color: var(--rn-panel-ink);
+  }
+  .rn-contact-form__lede {
+    margin-top: 0.35rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--rn-panel-muted);
+  }
   /* Scoped ink utilities for light sections — never a blanket h1..h6 rule,
      which would also repaint white text sitting on a dark photo card
      nested inside a light section. */
