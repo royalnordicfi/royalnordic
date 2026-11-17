@@ -1,15 +1,29 @@
 import { Link } from 'react-router-dom'
 import { CONTACT } from '../lib/contactInfo'
 
-const Footer = () => {
+type Props = {
+  /** Homepage uses a slightly more editorial footer treatment */
+  variant?: 'default' | 'home'
+}
+
+const Footer = ({ variant = 'default' }: Props) => {
+  const home = variant === 'home'
   return (
-    <footer className="relative border-t border-white/[0.06] bg-midnight text-snow">
-      <div className="rn-container py-12 sm:py-14 lg:py-16">
+    <footer
+      className={`relative text-snow ${
+        home
+          ? 'border-t border-[rgba(12,20,16,0.08)] bg-[#071210]'
+          : 'border-t border-white/[0.06] bg-midnight'
+      }`}
+    >
+      <div className={`rn-container ${home ? 'py-14 sm:py-16 lg:py-20' : 'py-12 sm:py-14 lg:py-16'}`}>
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-5">
             <div className="mb-3.5 flex items-center gap-2.5">
               <img src="/logo.png" alt="" className="h-7 w-auto opacity-95" width={28} height={28} />
-              <span className="font-display text-xl font-semibold tracking-[0.02em] text-white/96">Royal Nordic</span>
+              <span className="font-display text-xl font-semibold tracking-[0.02em] text-white/96">
+                Royal Nordic
+              </span>
             </div>
             <p className="max-w-xs text-[13.5px] leading-relaxed text-text-muted">
               Small-group Lapland experiences from Rovaniemi — aurora hunts, day tours, and private
@@ -22,14 +36,46 @@ const Footer = () => {
               Experiences
             </h3>
             <ul className="space-y-2 text-[13px]">
-              <li><Link className="rn-footer-link" to="/northern-lights-tours">Northern Lights</Link></li>
-              <li><Link className="rn-footer-link" to="/northern-lights-tour">Small Group Northern Lights</Link></li>
-              <li><Link className="rn-footer-link" to="/northern-lights-private-tour">Private Northern Lights</Link></li>
-              <li><Link className="rn-footer-link" to="/northern-lights-standard-group">Standard Group Northern Lights</Link></li>
-              <li><Link className="rn-footer-link" to="/daytime-experiences">Day Tours</Link></li>
-              <li><Link className="rn-footer-link" to="/customized-tour">Private &amp; Custom</Link></li>
-              <li><Link className="rn-footer-link" to="/transportation">Transfers</Link></li>
-              <li><Link className="rn-footer-link" to="/blog">Travel guides</Link></li>
+              <li>
+                <Link className="rn-footer-link" to="/northern-lights-tours">
+                  Northern Lights
+                </Link>
+              </li>
+              <li>
+                <Link className="rn-footer-link" to="/northern-lights-tour">
+                  Small Group Northern Lights
+                </Link>
+              </li>
+              <li>
+                <Link className="rn-footer-link" to="/northern-lights-private-tour">
+                  Private Northern Lights
+                </Link>
+              </li>
+              <li>
+                <Link className="rn-footer-link" to="/northern-lights-standard-group">
+                  Standard Group Northern Lights
+                </Link>
+              </li>
+              <li>
+                <Link className="rn-footer-link" to="/daytime-experiences">
+                  Day Tours
+                </Link>
+              </li>
+              <li>
+                <Link className="rn-footer-link" to="/customized-tour">
+                  Private &amp; Custom
+                </Link>
+              </li>
+              <li>
+                <Link className="rn-footer-link" to="/transportation">
+                  Transfers
+                </Link>
+              </li>
+              <li>
+                <Link className="rn-footer-link" to="/blog">
+                  Travel guides
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -38,11 +84,31 @@ const Footer = () => {
               Company
             </h3>
             <ul className="space-y-2 text-[13px]">
-              <li><Link className="rn-footer-link" to="/account">Account</Link></li>
-              <li><Link className="rn-footer-link" to="/referralprogram">Rewards</Link></li>
-              <li><Link className="rn-footer-link" to="/travel-trade">Partner With Us</Link></li>
-              <li><Link className="rn-footer-link" to="/travel-trade#apply">Become a Partner</Link></li>
-              <li><Link className="rn-footer-link" to="/contact">Contact</Link></li>
+              <li>
+                <Link className="rn-footer-link" to="/account">
+                  Account
+                </Link>
+              </li>
+              <li>
+                <Link className="rn-footer-link" to="/referralprogram">
+                  Rewards
+                </Link>
+              </li>
+              <li>
+                <Link className="rn-footer-link" to="/travel-trade">
+                  Partner With Us
+                </Link>
+              </li>
+              <li>
+                <Link className="rn-footer-link" to="/travel-trade#apply">
+                  Become a Partner
+                </Link>
+              </li>
+              <li>
+                <Link className="rn-footer-link" to="/contact">
+                  Contact
+                </Link>
+              </li>
               <li>
                 <a className="rn-footer-link" href={CONTACT.emailHref}>
                   {CONTACT.email}
@@ -62,12 +128,22 @@ const Footer = () => {
             </h3>
             <ul className="space-y-2 text-[13px]">
               <li>
-                <a className="rn-footer-link" href="https://www.instagram.com/royalnordic.fi/" target="_blank" rel="noreferrer">
+                <a
+                  className="rn-footer-link"
+                  href="https://www.instagram.com/royalnordic.fi/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   Instagram
                 </a>
               </li>
               <li>
-                <a className="rn-footer-link" href="https://www.tiktok.com/@royalnordic" target="_blank" rel="noreferrer">
+                <a
+                  className="rn-footer-link"
+                  href="https://www.tiktok.com/@royalnordic"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   TikTok
                 </a>
               </li>
@@ -78,8 +154,12 @@ const Footer = () => {
         <div className="mt-11 flex flex-col gap-3 border-t border-white/[0.06] pt-6 text-[11.5px] text-text-dim sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} Royal Nordic · Rovaniemi, Finnish Lapland</p>
           <div className="flex items-center gap-5">
-            <Link className="rn-footer-link" to="/privacy-policy">Privacy Policy</Link>
-            <Link className="rn-footer-link" to="/terms-conditions">Terms &amp; Conditions</Link>
+            <Link className="rn-footer-link" to="/privacy-policy">
+              Privacy Policy
+            </Link>
+            <Link className="rn-footer-link" to="/terms-conditions">
+              Terms &amp; Conditions
+            </Link>
           </div>
         </div>
       </div>
