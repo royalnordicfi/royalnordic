@@ -20,6 +20,7 @@ const OVERLAY_EXACT = new Set([
   '/reindeer-rides',
   '/customized-tour',
   '/contact',
+  '/referralprogram',
 ])
 
 const PRODUCT_EXACT = new Set([

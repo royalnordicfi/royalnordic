@@ -4913,6 +4913,211 @@ html[data-rn-shell='checkout'] .App {
 }
 
 /* ——— Royal Nordic Rewards ——— */
+.rn-rewards-landing {
+  background:
+    linear-gradient(185deg, #020806 0%, #04110c 18%, var(--rn-midnight) 48%, #020504 100%);
+}
+
+.rn-rewards-hero {
+  min-height: min(72vh, 36rem);
+}
+@media (min-width: 640px) {
+  .rn-rewards-hero {
+    min-height: min(76vh, 40rem);
+  }
+}
+.rn-rewards-hero__veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(2, 8, 6, 0.42) 0%, rgba(2, 8, 6, 0.28) 38%, rgba(2, 8, 6, 0.78) 78%, #020806 100%),
+    radial-gradient(ellipse 55% 50% at 18% 70%, rgba(16, 140, 98, 0.18), transparent 62%),
+    radial-gradient(ellipse 40% 45% at 88% 30%, rgba(6, 42, 32, 0.35), transparent 60%);
+}
+.rn-rewards-hero__title {
+  font-size: clamp(2.05rem, 1.35rem + 2.4vw, 3.35rem);
+  line-height: 1.08;
+  letter-spacing: -0.034em;
+  text-wrap: balance;
+}
+
+.rn-rewards-status {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  max-width: 32rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--rn-radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(4, 12, 10, 0.45);
+  backdrop-filter: blur(10px);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: rgba(241, 245, 243, 0.78);
+}
+.rn-rewards-status__dot {
+  flex-shrink: 0;
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-top: 0.4em;
+  border-radius: 999px;
+  background: color-mix(in srgb, #f5c26b 85%, white);
+  box-shadow: 0 0 0 3px rgba(245, 194, 107, 0.14);
+}
+
+.rn-rewards-value__card {
+  padding: 1.35rem 1.3rem 1.45rem;
+  border-radius: var(--rn-radius);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)),
+    rgba(6, 16, 12, 0.35);
+  transition:
+    border-color 0.35s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.35s ease;
+}
+@media (min-width: 640px) {
+  .rn-rewards-value__card {
+    padding: 1.55rem 1.5rem 1.65rem;
+  }
+}
+@media (hover: hover) {
+  .rn-rewards-value__card:hover {
+    border-color: rgba(125, 236, 192, 0.18);
+    transform: translateY(-2px);
+    background:
+      linear-gradient(165deg, rgba(18, 155, 108, 0.07), rgba(255, 255, 255, 0.02)),
+      rgba(6, 16, 12, 0.4);
+  }
+}
+.rn-rewards-value__eyebrow {
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rn-aurora-soft);
+}
+.rn-rewards-value__title {
+  margin-top: 0.7rem;
+  font-family: var(--rn-font-display);
+  font-size: clamp(1.65rem, 1.4rem + 0.7vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--rn-text);
+}
+.rn-rewards-value__text {
+  margin-top: 0.65rem;
+  max-width: 28rem;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--rn-text-muted);
+}
+
+.rn-rewards-step__n {
+  display: block;
+  font-family: var(--rn-font-clean, var(--rn-font-body));
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  color: var(--rn-aurora-soft);
+}
+.rn-rewards-step__title {
+  margin-top: 0.85rem;
+  font-family: var(--rn-font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--rn-text);
+}
+.rn-rewards-step__text {
+  margin-top: 0.45rem;
+  max-width: 18rem;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--rn-text-muted);
+}
+
+.rn-rewards-preview {
+  border-radius: calc(var(--rn-radius) + 2px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background:
+    radial-gradient(ellipse 70% 80% at 100% 0%, rgba(15, 143, 99, 0.14), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015));
+  padding: 1.25rem 1.2rem 1.35rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+}
+@media (min-width: 640px) {
+  .rn-rewards-preview {
+    padding: 1.5rem 1.6rem 1.55rem;
+  }
+}
+.rn-rewards-preview__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.035);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rn-text-dim);
+}
+.rn-rewards-preview__head {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: 1.15rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+@media (min-width: 640px) {
+  .rn-rewards-preview__head {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+.rn-rewards-preview__chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 12px;
+  font-weight: 550;
+  color: rgba(241, 245, 243, 0.72);
+  pointer-events: none;
+  user-select: none;
+}
+.rn-rewards-preview__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.15rem;
+}
+@media (min-width: 640px) {
+  .rn-rewards-preview__stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.85rem;
+  }
+}
+.rn-rewards-preview__stat {
+  padding: 0.85rem 0.9rem;
+  border-radius: var(--rn-radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(0, 0, 0, 0.18);
+}
+.rn-rewards-preview__note {
+  margin-top: 1rem;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--rn-text-dim);
+}
+
 .rn-rewards-skel {
   border-radius: var(--rn-radius-sm);
   background: linear-gradient(

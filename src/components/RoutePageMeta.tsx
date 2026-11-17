@@ -108,7 +108,7 @@ const META: Record<
   '/referralprogram': {
     title: 'Royal Nordic Rewards | Give 10% Off, Earn 10% Credit',
     description:
-      'Join Royal Nordic Rewards — create your referral code, share Lapland experiences, and earn Royal Nordic Credit toward future bookings.',
+      'Give 10% off and earn 10% Royal Nordic Credit. Create your referral code now — guest discounts and credit redemption unlock when Rewards goes live.',
     ogImage: 'https://royalnordic.fi/nortti1.jpg',
   },
   '/contact': {
