@@ -18,6 +18,7 @@ const OVERLAY_EXACT = new Set([
   '/transportation',
   '/travel-trade',
   '/reindeer-rides',
+  '/customized-tour',
 ])
 
 const PRODUCT_EXACT = new Set([
@@ -32,7 +33,6 @@ const PRODUCT_EXACT = new Set([
   '/snowshoe-rental',
   '/snowmobile-safari',
   '/monster-truck-northern-lights',
-  '/customized-tour',
   '/transportation-rovaniemi-levi',
   '/transportation-rovaniemi-saariselka',
   '/transportation-customized',

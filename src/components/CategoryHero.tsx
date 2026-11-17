@@ -9,6 +9,8 @@ type CategoryHeroProps = {
   eyebrow?: string | null
   /** Optional lead row (e.g. article back link) stacked above the title */
   lead?: ReactNode
+  /** Optional CTA row below the supporting text */
+  actions?: ReactNode
 }
 
 const CategoryHero = ({
@@ -18,6 +20,7 @@ const CategoryHero = ({
   compact = false,
   eyebrow = null,
   lead = null,
+  actions = null,
 }: CategoryHeroProps) => {
   return (
     <section
@@ -51,6 +54,7 @@ const CategoryHero = ({
           {title}
         </h1>
         <p className="rn-category-hero__lede">{subtitle}</p>
+        {actions ? <div className="mt-5 flex flex-wrap gap-3 sm:mt-6">{actions}</div> : null}
       </div>
     </section>
   )

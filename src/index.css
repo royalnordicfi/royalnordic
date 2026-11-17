@@ -2673,6 +2673,245 @@
     color: #fff;
   }
 
+  /* Private & custom experience cards */
+  .rn-private-exp-grid {
+    display: grid;
+    gap: 1.1rem;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .rn-private-exp-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.2rem 1.3rem;
+    }
+    .rn-private-exp-grid > *:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      max-width: 28rem;
+      width: 100%;
+      justify-self: center;
+    }
+  }
+  @media (min-width: 1100px) {
+    .rn-private-exp-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.35rem;
+    }
+    .rn-private-exp-grid > *:last-child:nth-child(odd) {
+      grid-column: auto;
+      max-width: none;
+      justify-self: stretch;
+    }
+  }
+  .rn-private-exp-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--rn-radius);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: linear-gradient(165deg, rgba(14, 24, 20, 0.9), rgba(6, 12, 10, 0.96));
+    transition: border-color 0.25s ease;
+  }
+  .rn-private-exp-card:hover {
+    border-color: color-mix(in srgb, var(--rn-aurora-soft) 28%, transparent);
+  }
+  .rn-private-exp-card__media {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+  }
+  .rn-private-exp-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .rn-private-exp-card:hover .rn-private-exp-card__img {
+    transform: scale(1.02);
+  }
+  .rn-private-exp-card__shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(3, 7, 6, 0.45), transparent 55%);
+    pointer-events: none;
+  }
+  .rn-private-exp-card__body {
+    padding: 0.95rem 1rem 1.1rem;
+  }
+  .rn-private-exp-card__title {
+    font-family: var(--rn-font-display);
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    color: #fff;
+  }
+  .rn-private-exp-card__desc {
+    margin-top: 0.4rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--rn-text-muted) 94%, #fff);
+  }
+
+  /* Private planning steps */
+  .rn-private-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.35rem;
+  }
+  @media (min-width: 768px) {
+    .rn-private-steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.5rem 2rem;
+    }
+  }
+  .rn-private-steps__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    padding-top: 0.35rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .rn-private-steps__n {
+    font-family: var(--rn-font-display);
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--rn-aurora-soft);
+  }
+  .rn-private-steps__title {
+    font-family: var(--rn-font-display);
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #fff;
+  }
+  .rn-private-steps__text {
+    margin-top: 0.35rem;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--rn-text-muted);
+  }
+
+  /* Dark inquiry form */
+  .rn-inquiry {
+    max-width: 42rem;
+  }
+  .rn-inquiry-form {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--rn-radius-lg, 12px);
+    background: linear-gradient(165deg, rgba(16, 28, 24, 0.92), rgba(8, 14, 12, 0.98));
+    padding: 1.15rem 1.1rem 1.25rem;
+  }
+  @media (min-width: 640px) {
+    .rn-inquiry-form {
+      padding: 1.4rem 1.45rem 1.5rem;
+    }
+  }
+  .rn-inquiry-form__grid {
+    display: grid;
+    gap: 0.95rem;
+  }
+  @media (min-width: 640px) {
+    .rn-inquiry-form__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem 1.1rem;
+    }
+    .rn-inquiry-field--full {
+      grid-column: 1 / -1;
+    }
+  }
+  .rn-inquiry-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .rn-inquiry-field__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: color-mix(in srgb, var(--rn-text) 88%, transparent);
+  }
+  .rn-inquiry-field__optional {
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--rn-text-dim);
+    text-transform: lowercase;
+  }
+  .rn-inquiry-field__input {
+    width: 100%;
+    min-height: 48px;
+    border-radius: var(--rn-radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(3, 7, 6, 0.55);
+    padding: 0.7rem 0.85rem;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    color: var(--rn-text);
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      background 0.2s ease;
+  }
+  .rn-inquiry-field__input::placeholder {
+    color: color-mix(in srgb, var(--rn-text-dim) 85%, transparent);
+  }
+  .rn-inquiry-field__input:hover {
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+  .rn-inquiry-field__input:focus {
+    outline: none;
+    border-color: color-mix(in srgb, var(--rn-aurora-soft) 55%, transparent);
+    box-shadow: 0 0 0 3px var(--rn-aurora-glow);
+    background: rgba(3, 7, 6, 0.72);
+  }
+  .rn-inquiry-field__textarea {
+    min-height: 8.5rem;
+    resize: vertical;
+  }
+  .rn-inquiry-form__status {
+    margin-top: 1rem;
+    border-radius: var(--rn-radius-sm);
+    padding: 0.7rem 0.85rem;
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+  .rn-inquiry-form__status--ok {
+    background: color-mix(in srgb, var(--rn-aurora) 16%, transparent);
+    color: var(--rn-aurora-soft);
+  }
+  .rn-inquiry-form__status--err {
+    background: rgba(196, 92, 74, 0.14);
+    color: #e8a99a;
+  }
+  .rn-inquiry-form__actions {
+    margin-top: 1.15rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  @media (min-width: 640px) {
+    .rn-inquiry-form__actions {
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+    }
+  }
+  .rn-inquiry-form__note {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--rn-text-dim);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rn-private-exp-card__img,
+    .rn-private-exp-card:hover .rn-private-exp-card__img {
+      transition: none;
+      transform: none;
+    }
+  }
+
   /* Northern Lights catalogue comparison */
   .rn-nl-compare__scroll {
     overflow-x: auto;
