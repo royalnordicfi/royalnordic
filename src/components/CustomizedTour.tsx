@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import CategoryHero from './CategoryHero'
+import CategorySectionHeader from './CategorySectionHeader'
 import Footer from './Footer'
 import ExperienceAccordion from './experience/ExperienceAccordion'
 import { buildCustomInquiryMessage } from '../lib/customInquiry'
@@ -154,7 +155,6 @@ const CustomizedTour: React.FC = () => {
         title="Your Lapland. Your Experience."
         subtitle="Private journeys across Finnish Lapland, thoughtfully designed around your interests, schedule and group."
         image="/nordicci7.jpg"
-        compact
         eyebrow="Royal Nordic · Private & custom"
         actions={
           <>
@@ -168,19 +168,15 @@ const CustomizedTour: React.FC = () => {
         }
       />
 
-      <section className="rn-section-tight rn-hero-follow relative pt-0 pb-10 sm:pb-12" aria-labelledby="rn-private-exp-heading">
+      <section className="rn-section-follow" aria-labelledby="rn-private-exp-heading">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-60" aria-hidden />
         <div className="rn-container relative">
-          <header className="max-w-rn-measure">
-            <p className="rn-eyebrow">Experiences we tailor</p>
-            <h2 id="rn-private-exp-heading" className="rn-h2-tight mt-2 text-white">
-              Customizable Lapland experiences
-            </h2>
-            <p className="mt-2.5 text-[15px] leading-relaxed text-text-muted">
-              Built from the journeys we already run — aurora evenings, day adventures, family formats, and private
-              multi-day schedules.
-            </p>
-          </header>
+          <CategorySectionHeader
+            eyebrow="Experiences we tailor"
+            title="Customizable Lapland experiences"
+            titleId="rn-private-exp-heading"
+            lede="Built from the journeys we already run — aurora evenings, day adventures, family formats, and private multi-day schedules."
+          />
 
           <div className="rn-private-exp-grid mt-7 sm:mt-8">
             {EXPERIENCES.map((item) => {
@@ -223,14 +219,13 @@ const CustomizedTour: React.FC = () => {
         </div>
       </section>
 
-      <section className="border-t border-white/[0.06] bg-midnight py-10 sm:py-12" aria-labelledby="rn-private-steps-heading">
+      <section className="rn-section-band" aria-labelledby="rn-private-steps-heading">
         <div className="rn-container">
-          <header className="max-w-rn-measure">
-            <p className="rn-eyebrow">How it works</p>
-            <h2 id="rn-private-steps-heading" className="rn-h2-tight mt-2 text-white">
-              How private planning works
-            </h2>
-          </header>
+          <CategorySectionHeader
+            eyebrow="How it works"
+            title="How private planning works"
+            titleId="rn-private-steps-heading"
+          />
           <ol className="rn-private-steps mt-8">
             {STEPS.map((step) => (
               <li key={step.n} className="rn-private-steps__item">
@@ -254,16 +249,12 @@ const CustomizedTour: React.FC = () => {
       >
         <div className="rn-container">
           <div className="rn-inquiry">
-            <header className="max-w-rn-measure">
-              <p className="rn-eyebrow">Inquiry</p>
-              <h2 id="rn-inquiry-heading" className="rn-h2 mt-2 text-white">
-                Let&apos;s plan something extraordinary.
-              </h2>
-              <p className="mt-3 text-[15px] leading-relaxed text-text-muted">
-                Tell us what you have in mind. We&apos;ll create a personalized proposal for your time in Lapland.
-                No payment is required to submit this inquiry.
-              </p>
-            </header>
+            <CategorySectionHeader
+              eyebrow="Inquiry"
+              title="Let's plan something extraordinary."
+              titleId="rn-inquiry-heading"
+              lede="Tell us what you have in mind. We'll create a personalized proposal for your time in Lapland. No payment is required to submit this inquiry."
+            />
 
             <form onSubmit={handleSubmit} className="rn-inquiry-form mt-8" noValidate={false}>
               <div className="rn-inquiry-form__grid">
@@ -377,9 +368,7 @@ const CustomizedTour: React.FC = () => {
 
       <section className="rn-section-tight border-t border-white/[0.06] bg-midnight pb-6" aria-labelledby="rn-private-faq-heading">
         <div className="rn-container">
-          <h2 id="rn-private-faq-heading" className="rn-h2-tight text-white">
-            Practical questions
-          </h2>
+          <CategorySectionHeader title="Practical questions" titleId="rn-private-faq-heading" />
           <div className="mt-5 max-w-3xl">
             <ExperienceAccordion items={FAQ} />
           </div>

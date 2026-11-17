@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import CategoryHero from './CategoryHero'
 import CategoryPageEnd from './CategoryPageEnd'
+import CategorySectionHeader from './CategorySectionHeader'
 import Footer from './Footer'
 import ReviewCarousel from './ReviewCarousel'
 import TourCard from './TourCard'
@@ -216,11 +217,10 @@ const NorthernLightsTours: React.FC = () => {
         title="Northern Lights Tours in Rovaniemi"
         subtitle={`Small-group, private, bus, and family evenings from a local Rovaniemi team. ${GUARANTEED_NL_GUARANTEE_SHORT}`}
         image="/nortti5.jpg"
-        compact
         eyebrow="Royal Nordic · Aurora"
       />
 
-      <section className="rn-section-tight rn-hero-follow relative pt-0 pb-8 sm:pb-10" aria-label="Northern Lights experiences">
+      <section className="rn-section-follow" aria-label="Northern Lights experiences">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-70" aria-hidden />
         <div className="rn-container relative">
           <div className="rn-card-grid rn-card-grid--balanced">
@@ -254,15 +254,12 @@ const NorthernLightsTours: React.FC = () => {
 
           {compareColumns.length > 1 ? (
             <div className="rn-nl-compare mt-10 sm:mt-12" aria-labelledby="rn-nl-compare-heading">
-              <header className="max-w-rn-measure">
-                <p className="rn-eyebrow">Compare</p>
-                <h2 id="rn-nl-compare-heading" className="rn-h2-tight mt-2 text-white">
-                  Which tour is right for me?
-                </h2>
-                <p className="mt-2.5 text-[14.5px] leading-relaxed text-text-muted sm:text-[15px]">
-                  Scan group size, logistics, photography, and guarantee terms before you book.
-                </p>
-              </header>
+              <CategorySectionHeader
+                eyebrow="Compare"
+                title="Which tour is right for me?"
+                titleId="rn-nl-compare-heading"
+                lede="Scan group size, logistics, photography, and guarantee terms before you book."
+              />
 
               <div className="rn-nl-compare__scroll mt-6" role="region" aria-label="Tour comparison table" tabIndex={0}>
                 <table className="rn-nl-compare__table">

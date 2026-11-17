@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import CategoryHero from './CategoryHero'
+import CategoryPageEnd from './CategoryPageEnd'
+import CategorySectionHeader from './CategorySectionHeader'
 import Footer from './Footer'
 
 const EXPERIENCES = [
@@ -146,7 +148,6 @@ const TravelTrade: React.FC = () => {
         title="Your Local Experience Partner in Finnish Lapland"
         subtitle="Partner with Royal Nordic to bring unforgettable Arctic experiences to your clients — from Northern Lights adventures to private tours and tailored group arrangements."
         image="/nortti5.jpg"
-        compact
         eyebrow="Royal Nordic · Travel trade"
         actions={
           <>
@@ -162,21 +163,17 @@ const TravelTrade: React.FC = () => {
 
       <section
         id="experiences"
-        className="rn-section-tight rn-hero-follow relative scroll-mt-[calc(var(--rn-chrome-h)+1rem)] pt-0 pb-10 sm:pb-12"
+        className="rn-section-follow scroll-mt-[calc(var(--rn-chrome-h)+1rem)]"
         aria-labelledby="rn-trade-exp-heading"
       >
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-60" aria-hidden />
         <div className="rn-container relative">
-          <header className="max-w-rn-measure">
-            <p className="rn-eyebrow">Experience catalogue</p>
-            <h2 id="rn-trade-exp-heading" className="rn-h2-tight mt-2 text-white">
-              Experiences your clients can enjoy
-            </h2>
-            <p className="mt-2.5 text-[15px] leading-relaxed text-text-muted">
-              Premium Lapland products with clear public pages — ready to share with agencies, DMCs, hotels and
-              concierge teams.
-            </p>
-          </header>
+          <CategorySectionHeader
+            eyebrow="Experience catalogue"
+            title="Experiences your clients can enjoy"
+            titleId="rn-trade-exp-heading"
+            lede="Premium Lapland products with clear public pages — ready to share with agencies, DMCs, hotels and concierge teams."
+          />
 
           <div className="rn-private-exp-grid rn-private-exp-grid--four mt-7 sm:mt-8">
             {EXPERIENCES.map((item) => (
@@ -204,78 +201,45 @@ const TravelTrade: React.FC = () => {
         </div>
       </section>
 
-      <section
-        className="border-t border-white/[0.06] bg-midnight py-10 sm:py-12"
-        aria-labelledby="rn-trade-why-heading"
-      >
+      <section className="rn-section-band" aria-labelledby="rn-trade-why-heading">
         <div className="rn-container">
-          <header className="max-w-rn-measure">
-            <p className="rn-eyebrow">Why partner with us</p>
-            <h2 id="rn-trade-why-heading" className="rn-h2-tight mt-2 text-white">
-              Built for professional travel partners
-            </h2>
-            <p className="mt-2.5 text-[15px] leading-relaxed text-text-muted">
-              We work with travel agencies, international tour operators, DMCs, hotels and concierge services
-              looking for a reliable local partner in Rovaniemi.
-            </p>
-          </header>
+          <CategorySectionHeader
+            eyebrow="Why partner with us"
+            title="Built for professional travel partners"
+            titleId="rn-trade-why-heading"
+            lede="We work with travel agencies, international tour operators, DMCs, hotels and concierge services looking for a reliable local partner in Rovaniemi."
+          />
 
-          <ul className="rn-transfer-benefits mt-8">
+          <ul className="rn-benefit-row mt-8">
             {BENEFITS.map((item) => (
-              <li key={item.title} className="rn-transfer-benefits__item">
-                <h3 className="rn-transfer-benefits__title">{item.title}</h3>
-                <p className="rn-transfer-benefits__text">{item.text}</p>
+              <li key={item.title} className="rn-benefit-row__item">
+                <h3 className="rn-benefit-row__title">{item.title}</h3>
+                <p className="rn-benefit-row__text">{item.text}</p>
               </li>
             ))}
           </ul>
         </div>
       </section>
 
-      <section className="rn-section-tight border-t border-white/[0.06] bg-midnight" aria-labelledby="rn-trade-mid-cta">
-        <div className="rn-container">
-          <div className="rn-page-end">
-            <h2 id="rn-trade-mid-cta" className="rn-h2-tight text-white">
-              Ready to discuss a partnership?
-            </h2>
-            <p className="mt-2.5 text-[15px] leading-relaxed text-text-muted">
-              Share a little about your business and the experiences your clients need. We&apos;ll follow up with
-              next steps.
-            </p>
-            <div className="mt-5 flex flex-col gap-3.5 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-3">
-              <a href="#partnership-enquiry" className="rn-btn-primary min-h-[48px] justify-center px-7">
-                Become a Partner
-              </a>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <Link to="/northern-lights-tours" className="rn-page-end__link">
-                  Northern Lights
-                </Link>
-                <Link to="/daytime-experiences" className="rn-page-end__link">
-                  Day Tours
-                </Link>
-                <Link to="/transportation" className="rn-page-end__link">
-                  Transfers
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <CategoryPageEnd
+        title="Ready to discuss a partnership?"
+        lede="Share a little about your business and the experiences your clients need. We'll follow up with next steps."
+        links={[
+          { to: '#partnership-enquiry', label: 'Become a Partner', primary: true },
+          { to: '/northern-lights-tours', label: 'Northern Lights' },
+          { to: '/daytime-experiences', label: 'Day Tours' },
+          { to: '/transportation', label: 'Transfers' },
+        ]}
+      />
 
-      <section
-        className="border-t border-white/[0.06] bg-midnight py-10 sm:py-12"
-        aria-labelledby="rn-trade-steps-heading"
-      >
+      <section className="rn-section-band" aria-labelledby="rn-trade-steps-heading">
         <div className="rn-container">
-          <header className="max-w-rn-measure">
-            <p className="rn-eyebrow">How cooperation works</p>
-            <h2 id="rn-trade-steps-heading" className="rn-h2-tight mt-2 text-white">
-              A clear path to working together
-            </h2>
-            <p className="mt-2.5 text-[15px] leading-relaxed text-text-muted">
-              Commercial terms stay private. We agree rates, booking flow and communication directly with each
-              partner.
-            </p>
-          </header>
+          <CategorySectionHeader
+            eyebrow="How cooperation works"
+            title="A clear path to working together"
+            titleId="rn-trade-steps-heading"
+            lede="Commercial terms stay private. We agree rates, booking flow and communication directly with each partner."
+          />
 
           <ol className="rn-private-steps mt-8">
             {STEPS.map((step) => (
@@ -300,24 +264,25 @@ const TravelTrade: React.FC = () => {
       >
         <div className="rn-container">
           <div className="rn-inquiry">
-            <header className="max-w-rn-measure">
-              <p className="rn-eyebrow">Partnership enquiry</p>
-              <h2 id="rn-trade-enquiry-heading" className="rn-h2 mt-2 text-white">
-                Let&apos;s Build Something Together
-              </h2>
-              <p className="mt-3 text-[15px] leading-relaxed text-text-muted">
-                Tell us a little about your business and what you&apos;re looking for. Our team will be happy to
-                discuss a potential partnership. Prefer email? Write to{' '}
-                <a href="mailto:contact@royalnordic.fi" className="font-medium text-aurora-soft hover:underline">
-                  contact@royalnordic.fi
-                </a>{' '}
-                or call{' '}
-                <a href="tel:+3584578345138" className="font-medium text-aurora-soft hover:underline">
-                  +358 45 78345138
-                </a>
-                .
-              </p>
-            </header>
+            <CategorySectionHeader
+              eyebrow="Partnership enquiry"
+              title="Let's Build Something Together"
+              titleId="rn-trade-enquiry-heading"
+              lede={
+                <>
+                  Tell us a little about your business and what you&apos;re looking for. Our team will be happy to
+                  discuss a potential partnership. Prefer email? Write to{' '}
+                  <a href="mailto:contact@royalnordic.fi" className="font-medium text-aurora-soft hover:underline">
+                    contact@royalnordic.fi
+                  </a>{' '}
+                  or call{' '}
+                  <a href="tel:+3584578345138" className="font-medium text-aurora-soft hover:underline">
+                    +358 45 78345138
+                  </a>
+                  .
+                </>
+              }
+            />
 
             <form onSubmit={handleSubmit} className="rn-inquiry-form mt-8">
               <div className="rn-inquiry-form__grid">

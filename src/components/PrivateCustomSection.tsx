@@ -37,10 +37,16 @@ const PrivateCustomSection = () => {
               multi-experience days — quoted personally, not pulled from a fixed catalogue.
             </p>
             <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3">
-              <Link to="/customized-tour" className="rn-btn-primary w-full justify-center sm:w-auto">
+              <Link
+                to="/customized-tour"
+                className="rn-btn-primary min-h-[48px] w-full justify-center px-7 sm:w-auto"
+              >
                 Plan your private experience
               </Link>
-              <Link to="/travel-trade" className="rn-btn-secondary w-full justify-center sm:w-auto">
+              <Link
+                to="/travel-trade"
+                className="rn-btn-secondary min-h-[48px] w-full justify-center px-6 sm:w-auto"
+              >
                 Travel trade partners
               </Link>
             </div>

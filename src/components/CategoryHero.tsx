@@ -4,8 +4,9 @@ type CategoryHeroProps = {
   title: string
   subtitle: string
   image: string
+  /** Default true — category pages use the compact, controlled hero height. */
   compact?: boolean
-  /** Omit for a cleaner hero; pass e.g. "Royal Nordic" when it adds context */
+  /** Omit for a cleaner hero; pass e.g. "Royal Nordic · Aurora" when it adds context */
   eyebrow?: string | null
   /** Optional lead row (e.g. article back link) stacked above the title */
   lead?: ReactNode
@@ -17,7 +18,7 @@ const CategoryHero = ({
   title,
   subtitle,
   image,
-  compact = false,
+  compact = true,
   eyebrow = null,
   lead = null,
   actions = null,

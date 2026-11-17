@@ -3,7 +3,16 @@
 @tailwind utilities;
 
 :root {
-  /* Royal Nordic — luxury Arctic darkness */
+  /**
+   * Royal Nordic shared design tokens
+   * Use across public marketing pages:
+   * - Type: .rn-eyebrow · .rn-h2-tight (sections) · .rn-h2 (brand moments) · .rn-section-lede
+   * - Rhythm: .rn-section · .rn-section-tight · .rn-section-follow · .rn-section-band
+   * - Chrome: CategoryHero · CategorySectionHeader · TourCard · CategoryPageEnd
+   * - Grids: .rn-card-grid--balanced | --day | --transfers (shared card chrome)
+   * - Forms: .rn-inquiry* (dark) · .rn-form-* (light panel)
+   */
+  /* Luxury Arctic darkness */
   --rn-black: #010403;
   --rn-midnight: #030706;
   --rn-surface: #08110e;
@@ -246,6 +255,48 @@
     .rn-section-tight {
       padding-block: var(--rn-space-7);
     }
+  }
+
+  /**
+   * Catalogue band directly under CategoryHero.
+   * Replaces ad-hoc `rn-section-tight rn-hero-follow pt-0 pb-*` stacks.
+   */
+  .rn-section-follow {
+    position: relative;
+    z-index: 10;
+    margin-top: 0;
+    padding-top: 0.25rem;
+    padding-bottom: 2rem;
+  }
+  @media (min-width: 640px) {
+    .rn-section-follow {
+      padding-top: 0.5rem;
+      padding-bottom: 2.5rem;
+    }
+  }
+
+  /**
+   * Mid-page content band — benefits, steps, compare companions.
+   * Shared border + vertical rhythm for category pages.
+   */
+  .rn-section-band {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--rn-midnight);
+    padding-block: 2.5rem;
+  }
+  @media (min-width: 640px) {
+    .rn-section-band {
+      padding-block: 3rem;
+    }
+  }
+
+  /* Section supporting copy under rn-h2-tight */
+  .rn-section-lede {
+    margin-top: 0.625rem;
+    max-width: var(--rn-measure-section);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--rn-text-muted);
   }
 
   /**
@@ -1215,13 +1266,111 @@
     }
   }
 
-  /* Equal premium catalogue: two columns on tablet/desktop for four products. */
-  .rn-card-grid--balanced {
+  /**
+   * Shared TourCard chrome for catalogue grids.
+   * Layout modifiers (--balanced / --day / --transfers) only change columns + max-width.
+   */
+  .rn-card-grid--balanced,
+  .rn-card-grid--day,
+  .rn-card-grid--transfers {
     align-items: stretch;
-    max-width: 68rem;
     margin-inline: auto;
     grid-template-columns: 1fr;
     gap: 1.15rem;
+  }
+
+  .rn-card-grid--balanced .rn-tour-card__media,
+  .rn-card-grid--day .rn-tour-card__media,
+  .rn-card-grid--transfers .rn-tour-card__media {
+    aspect-ratio: 16 / 10;
+  }
+  @media (min-width: 640px) {
+    .rn-card-grid--balanced .rn-tour-card__media,
+    .rn-card-grid--day .rn-tour-card__media,
+    .rn-card-grid--transfers .rn-tour-card__media {
+      aspect-ratio: 3 / 2;
+    }
+  }
+
+  .rn-card-grid--balanced .rn-tour-card__title,
+  .rn-card-grid--day .rn-tour-card__title,
+  .rn-card-grid--transfers .rn-tour-card__title {
+    min-height: 2.55em;
+    font-size: 1.16rem;
+    line-height: 1.22;
+  }
+  @media (min-width: 640px) {
+    .rn-card-grid--balanced .rn-tour-card__title,
+    .rn-card-grid--day .rn-tour-card__title,
+    .rn-card-grid--transfers .rn-tour-card__title {
+      font-size: 1.28rem;
+    }
+  }
+  @media (min-width: 640px) {
+    .rn-card-grid--balanced .rn-tour-card__title {
+      font-size: 1.32rem;
+    }
+  }
+
+  .rn-card-grid--balanced .rn-tour-card__desc,
+  .rn-card-grid--day .rn-tour-card__desc,
+  .rn-card-grid--transfers .rn-tour-card__desc {
+    min-height: 3.9em;
+    -webkit-line-clamp: 3;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--rn-text-muted) 92%, #fff);
+  }
+
+  .rn-card-grid--balanced .rn-tour-card__meta,
+  .rn-card-grid--day .rn-tour-card__meta,
+  .rn-card-grid--transfers .rn-tour-card__meta {
+    min-height: 1.35em;
+    font-size: 0.78rem;
+    letter-spacing: 0.01em;
+    color: color-mix(in srgb, var(--rn-text-dim) 88%, #fff);
+  }
+
+  .rn-card-grid--balanced .rn-tour-card__foot,
+  .rn-card-grid--day .rn-tour-card__foot,
+  .rn-card-grid--transfers .rn-tour-card__foot {
+    margin-top: auto;
+    padding-top: 0.85rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .rn-card-grid--balanced .rn-tour-card__body,
+  .rn-card-grid--day .rn-tour-card__body,
+  .rn-card-grid--transfers .rn-tour-card__body {
+    padding: 0.85rem 0.1rem 0;
+    gap: 0;
+  }
+
+  .rn-card-grid--balanced .rn-tour-card__now,
+  .rn-card-grid--day .rn-tour-card__now,
+  .rn-card-grid--transfers .rn-tour-card__now {
+    font-size: 1.5rem;
+  }
+  .rn-card-grid--balanced .rn-tour-card__now {
+    font-size: 1.55rem;
+  }
+
+  .rn-card-grid--balanced .rn-tour-card__per,
+  .rn-card-grid--day .rn-tour-card__per,
+  .rn-card-grid--transfers .rn-tour-card__per {
+    font-size: 0.72rem;
+  }
+
+  .rn-card-grid--balanced .rn-tour-card__cta,
+  .rn-card-grid--day .rn-tour-card__cta,
+  .rn-card-grid--transfers .rn-tour-card__cta {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  /* Two-column premium catalogue (e.g. Northern Lights four-up). */
+  .rn-card-grid--balanced {
+    max-width: 68rem;
   }
   @media (min-width: 640px) {
     .rn-card-grid--balanced {
@@ -1235,64 +1384,10 @@
       gap: 1.45rem 1.55rem;
     }
   }
-  .rn-card-grid--balanced .rn-tour-card__media {
-    aspect-ratio: 16 / 10;
-  }
-  @media (min-width: 640px) {
-    .rn-card-grid--balanced .rn-tour-card__media {
-      aspect-ratio: 3 / 2;
-    }
-  }
-  .rn-card-grid--balanced .rn-tour-card__title {
-    min-height: 2.6em;
-    font-size: 1.18rem;
-    line-height: 1.22;
-  }
-  @media (min-width: 640px) {
-    .rn-card-grid--balanced .rn-tour-card__title {
-      font-size: 1.32rem;
-    }
-  }
-  .rn-card-grid--balanced .rn-tour-card__desc {
-    min-height: 3.9em;
-    -webkit-line-clamp: 3;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    color: color-mix(in srgb, var(--rn-text-muted) 92%, #fff);
-  }
-  .rn-card-grid--balanced .rn-tour-card__meta {
-    min-height: 1.35em;
-    font-size: 0.78rem;
-    letter-spacing: 0.01em;
-    color: color-mix(in srgb, var(--rn-text-dim) 88%, #fff);
-  }
-  .rn-card-grid--balanced .rn-tour-card__foot {
-    margin-top: auto;
-    padding-top: 0.85rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-  }
-  .rn-card-grid--balanced .rn-tour-card__body {
-    padding: 0.85rem 0.1rem 0;
-    gap: 0;
-  }
-  .rn-card-grid--balanced .rn-tour-card__now {
-    font-size: 1.55rem;
-  }
-  .rn-card-grid--balanced .rn-tour-card__per {
-    font-size: 0.72rem;
-  }
-  .rn-card-grid--balanced .rn-tour-card__cta {
-    font-size: 0.9rem;
-    font-weight: 600;
-  }
 
-  /* Day tours catalogue: larger editorial cards; 2-col until room for a clean 3-col. */
+  /* Day tours: 2-col until room for a clean 3-col. */
   .rn-card-grid--day {
-    align-items: stretch;
     max-width: 72rem;
-    margin-inline: auto;
-    grid-template-columns: 1fr;
-    gap: 1.15rem;
   }
   @media (min-width: 640px) {
     .rn-card-grid--day {
@@ -1317,59 +1412,10 @@
       justify-self: stretch;
     }
   }
-  .rn-card-grid--day .rn-tour-card__media {
-    aspect-ratio: 16 / 10;
-  }
-  @media (min-width: 640px) {
-    .rn-card-grid--day .rn-tour-card__media {
-      aspect-ratio: 3 / 2;
-    }
-  }
-  .rn-card-grid--day .rn-tour-card__title {
-    min-height: 2.55em;
-    font-size: 1.15rem;
-    line-height: 1.22;
-  }
-  @media (min-width: 640px) {
-    .rn-card-grid--day .rn-tour-card__title {
-      font-size: 1.28rem;
-    }
-  }
-  .rn-card-grid--day .rn-tour-card__desc {
-    min-height: 3.9em;
-    -webkit-line-clamp: 3;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    color: color-mix(in srgb, var(--rn-text-muted) 92%, #fff);
-  }
-  .rn-card-grid--day .rn-tour-card__meta {
-    min-height: 1.35em;
-    font-size: 0.78rem;
-    color: color-mix(in srgb, var(--rn-text-dim) 88%, #fff);
-  }
-  .rn-card-grid--day .rn-tour-card__foot {
-    margin-top: auto;
-    padding-top: 0.85rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-  }
-  .rn-card-grid--day .rn-tour-card__body {
-    padding: 0.85rem 0.1rem 0;
-  }
-  .rn-card-grid--day .rn-tour-card__now {
-    font-size: 1.5rem;
-  }
-  .rn-card-grid--day .rn-tour-card__cta {
-    font-size: 0.9rem;
-    font-weight: 600;
-  }
 
-  /* Transfers catalogue: three balanced route cards */
+  /* Transfers: three balanced route cards */
   .rn-card-grid--transfers {
-    align-items: stretch;
     max-width: 72rem;
-    margin-inline: auto;
-    grid-template-columns: 1fr;
-    gap: 1.15rem;
   }
   @media (min-width: 640px) {
     .rn-card-grid--transfers {
@@ -1394,52 +1440,9 @@
       justify-self: stretch;
     }
   }
-  .rn-card-grid--transfers .rn-tour-card__media {
-    aspect-ratio: 16 / 10;
-  }
-  @media (min-width: 640px) {
-    .rn-card-grid--transfers .rn-tour-card__media {
-      aspect-ratio: 3 / 2;
-    }
-  }
-  .rn-card-grid--transfers .rn-tour-card__title {
-    min-height: 2.5em;
-    font-size: 1.18rem;
-    line-height: 1.22;
-  }
-  @media (min-width: 640px) {
-    .rn-card-grid--transfers .rn-tour-card__title {
-      font-size: 1.28rem;
-    }
-  }
-  .rn-card-grid--transfers .rn-tour-card__desc {
-    min-height: 3.9em;
-    -webkit-line-clamp: 3;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    color: color-mix(in srgb, var(--rn-text-muted) 92%, #fff);
-  }
-  .rn-card-grid--transfers .rn-tour-card__meta {
-    min-height: 1.35em;
-    font-size: 0.78rem;
-    color: color-mix(in srgb, var(--rn-text-dim) 88%, #fff);
-  }
-  .rn-card-grid--transfers .rn-tour-card__foot {
-    margin-top: auto;
-    padding-top: 0.85rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-  }
-  .rn-card-grid--transfers .rn-tour-card__body {
-    padding: 0.85rem 0.1rem 0;
-  }
-  .rn-card-grid--transfers .rn-tour-card__now {
-    font-size: 1.5rem;
-  }
-  .rn-card-grid--transfers .rn-tour-card__cta {
-    font-size: 0.9rem;
-    font-weight: 600;
-  }
 
+  /* Editorial three-up benefits (transfers, partners, etc.) */
+  .rn-benefit-row,
   .rn-transfer-benefits {
     list-style: none;
     margin: 0;
@@ -1448,15 +1451,18 @@
     gap: 1.25rem;
   }
   @media (min-width: 768px) {
+    .rn-benefit-row,
     .rn-transfer-benefits {
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 1.5rem 2rem;
     }
   }
+  .rn-benefit-row__item,
   .rn-transfer-benefits__item {
     padding-top: 0.85rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
+  .rn-benefit-row__title,
   .rn-transfer-benefits__title {
     font-family: var(--rn-font-display);
     font-size: 1.2rem;
@@ -1464,6 +1470,7 @@
     line-height: 1.25;
     color: #fff;
   }
+  .rn-benefit-row__text,
   .rn-transfer-benefits__text {
     margin-top: 0.4rem;
     font-size: 0.9375rem;

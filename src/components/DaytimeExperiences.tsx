@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import CategoryHero from './CategoryHero'
 import CategoryPageEnd from './CategoryPageEnd'
+import CategorySectionHeader from './CategorySectionHeader'
 import Footer from './Footer'
 import ReviewCarousel from './ReviewCarousel'
 import TourCard from './TourCard'
@@ -203,14 +204,10 @@ const DaytimeExperiences: React.FC = () => {
         title="Daytime Experiences in Lapland"
         subtitle="Ice fishing, wildlife, canyon hiking, private Santa visits, and Arctic snowmobile safari — planned from Rovaniemi."
         image="/korouoma1.jpg"
-        compact
         eyebrow="Royal Nordic · Day tours"
       />
 
-      <section
-        className="rn-section-tight rn-hero-follow relative pt-0 pb-8 sm:pb-10"
-        aria-label="Daytime experiences"
-      >
+      <section className="rn-section-follow" aria-label="Daytime experiences">
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-70" aria-hidden />
         <div className="rn-container relative">
           <div className={gridClass}>
@@ -237,15 +234,12 @@ const DaytimeExperiences: React.FC = () => {
 
           {compareColumns.length > 1 ? (
             <div className="rn-nl-compare mt-10 sm:mt-12" aria-labelledby="rn-day-compare-heading">
-              <header className="max-w-rn-measure">
-                <p className="rn-eyebrow">Compare</p>
-                <h2 id="rn-day-compare-heading" className="rn-h2-tight mt-2 text-white">
-                  Which day experience suits you?
-                </h2>
-                <p className="mt-2.5 text-[14.5px] leading-relaxed text-text-muted sm:text-[15px]">
-                  Scan activity type, duration, group format, and verified inclusions before you book.
-                </p>
-              </header>
+              <CategorySectionHeader
+                eyebrow="Compare"
+                title="Which day experience suits you?"
+                titleId="rn-day-compare-heading"
+                lede="Scan activity type, duration, group format, and verified inclusions before you book."
+              />
 
               <div
                 className="rn-nl-compare__scroll mt-6"

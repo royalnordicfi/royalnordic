@@ -49,9 +49,7 @@ const FeaturedTours = () => {
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="rn-eyebrow">More experiences</p>
-            <h2 className="mt-2 font-display text-2xl font-semibold text-white sm:text-3xl">
-              Day trips &amp; family evenings
-            </h2>
+            <h2 className="rn-h2-tight mt-2 text-white">Day trips &amp; family evenings</h2>
           </div>
           <Link
             to="/daytime-experiences"
@@ -60,7 +58,7 @@ const FeaturedTours = () => {
             All day tours →
           </Link>
         </div>
-        <div className="rn-card-grid mt-8">
+        <div className="rn-card-grid rn-card-grid--day mt-8">
           {TOURS.map((tour, i) => (
             <TourCard key={tour.to} {...tour} className={`rn-stagger-${(i % 4) + 1}`} />
           ))}

@@ -1,6 +1,7 @@
 import React from 'react'
 import CategoryHero from './CategoryHero'
 import CategoryPageEnd from './CategoryPageEnd'
+import CategorySectionHeader from './CategorySectionHeader'
 import Footer from './Footer'
 import TourCard from './TourCard'
 import {
@@ -81,7 +82,6 @@ const TransportationCategory = () => {
         title="Private Transfers Across Finnish Lapland"
         subtitle="Comfortable, private journeys between Rovaniemi, Lapland's resorts and airports — tailored to your schedule."
         image="/royal-trans-4.jpg"
-        compact
         eyebrow="Royal Nordic · Transfers"
         actions={
           <a href="#transfers" className="rn-btn-primary min-h-[48px] px-7">
@@ -92,21 +92,18 @@ const TransportationCategory = () => {
 
       <section
         id="transfers"
-        className="rn-section-tight rn-hero-follow relative scroll-mt-[calc(var(--rn-chrome-h)+1rem)] pt-0 pb-8 sm:pb-10"
+        className="rn-section-follow scroll-mt-[calc(var(--rn-chrome-h)+1rem)]"
         aria-labelledby="rn-transfers-heading"
       >
         <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-60" aria-hidden />
         <div className="rn-container relative">
-          <header className="mb-6 max-w-rn-measure sm:mb-7">
-            <p className="rn-eyebrow">Routes</p>
-            <h2 id="rn-transfers-heading" className="rn-h2-tight mt-2 text-white">
-              Choose your transfer
-            </h2>
-            <p className="mt-2.5 text-[15px] leading-relaxed text-text-muted">
-              Fixed routes with clear per-vehicle rates, plus custom transportation when you need a different
-              destination or larger group.
-            </p>
-          </header>
+          <CategorySectionHeader
+            className="mb-6 sm:mb-7"
+            eyebrow="Routes"
+            title="Choose your transfer"
+            titleId="rn-transfers-heading"
+            lede="Fixed routes with clear per-vehicle rates, plus custom transportation when you need a different destination or larger group."
+          />
 
           <div className="rn-card-grid rn-card-grid--transfers">
             {TRANSFERS.map((item) => (
@@ -133,28 +130,20 @@ const TransportationCategory = () => {
         </div>
       </section>
 
-      <section
-        className="border-t border-white/[0.06] bg-midnight py-10 sm:py-12"
-        aria-labelledby="rn-transfer-benefits-heading"
-      >
+      <section className="rn-section-band" aria-labelledby="rn-transfer-benefits-heading">
         <div className="rn-container">
-          <header className="max-w-rn-measure">
-            <p className="rn-eyebrow">Why book with us</p>
-            <h2 id="rn-transfer-benefits-heading" className="rn-h2-tight mt-2 text-white">
-              Travel comfortably. Arrive effortlessly.
-            </h2>
-            <p className="mt-2.5 text-[15px] leading-relaxed text-text-muted">
-              Saariselkä is bookable online at €{SAARISELKA_VEHICLE_PRICE} one way per vehicle. Levi/Kittilä
-              (from €{LEVI_VEHICLE_PRICE}) and custom routes are confirmed by request so we can match flights,
-              luggage and fleet needs.
-            </p>
-          </header>
+          <CategorySectionHeader
+            eyebrow="Why book with us"
+            title="Travel comfortably. Arrive effortlessly."
+            titleId="rn-transfer-benefits-heading"
+            lede={`Saariselkä is bookable online at €${SAARISELKA_VEHICLE_PRICE} one way per vehicle. Levi/Kittilä (from €${LEVI_VEHICLE_PRICE}) and custom routes are confirmed by request so we can match flights, luggage and fleet needs.`}
+          />
 
-          <ul className="rn-transfer-benefits mt-8">
+          <ul className="rn-benefit-row mt-8">
             {BENEFITS.map((item) => (
-              <li key={item.title} className="rn-transfer-benefits__item">
-                <h3 className="rn-transfer-benefits__title">{item.title}</h3>
-                <p className="rn-transfer-benefits__text">{item.text}</p>
+              <li key={item.title} className="rn-benefit-row__item">
+                <h3 className="rn-benefit-row__title">{item.title}</h3>
+                <p className="rn-benefit-row__text">{item.text}</p>
               </li>
             ))}
           </ul>
