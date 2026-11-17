@@ -118,17 +118,12 @@ const IceFishingTour = () => {
         title={cms.title}
         lede={cms.lede}
         benefits={cms.benefits.slice(0, 4)}
-        cinematic={{
-          image: cms.gallery[0]?.src || FALLBACK.gallery[0].src,
-          imageAlt: cms.gallery[0]?.alt || 'Ice fishing on a frozen Lapland lake',
-          imageSecondary: cms.gallery[1]?.src,
-        }}
         heroAction={
           <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
             Check availability
           </button>
         }
-        images={cms.gallery.length > 1 ? cms.gallery.slice(1) : cms.gallery}
+        images={cms.gallery}
         facts={[
           { label: 'Duration', value: cms.duration || '3–4 hours' },
           { label: 'Group', value: cms.groupSize || 'Max 8' },
@@ -190,11 +185,11 @@ const IceFishingTour = () => {
         </TourSection>
 
         <div className="rn-tour-section">
-          <ProductFaq items={cms.faqs} schemaId="ice-faq" tone="snow" />
+          <ProductFaq items={cms.faqs} schemaId="ice-faq" tone="dark" />
         </div>
       </ExperienceProductLayout>
 
-      <Footer variant="home" />
+      <Footer />
       <MobileBookingBar
         priceFrom={cms.pricing.current}
         referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}

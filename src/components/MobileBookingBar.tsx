@@ -28,7 +28,7 @@ const MobileBookingBar = ({
 
   return (
     <div
-      className="rn-mobile-book fixed inset-x-0 bottom-0 z-40 py-3 lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-[#040807]/96 py-3 backdrop-blur-md lg:hidden"
       style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
     >
       <div className="rn-container flex items-center justify-between gap-3">
@@ -36,26 +36,26 @@ const MobileBookingBar = ({
           {showSale ? (
             <>
               <p className="flex items-baseline gap-2">
-                <span className="text-sm text-[rgba(12,20,16,0.4)] line-through">
+                <span className="text-sm text-white/45 line-through decoration-[color-mix(in_srgb,var(--rn-sale)_80%,transparent)]">
                   €{Number.isInteger(referencePrice) ? referencePrice : referencePrice.toFixed(2)}
                 </span>
-                <span className="font-display text-xl font-semibold leading-none text-[#0c1410]">
+                <span className="font-display text-xl font-semibold leading-none text-[var(--rn-sale)]">
                   €{Number.isInteger(priceFrom) ? priceFrom : priceFrom.toFixed(2)}
                 </span>
               </p>
-              <p className="mt-0.5 text-[10px] font-medium tracking-[0.04em] text-[#4a5a52]">
+              <p className="mt-0.5 text-[10px] font-medium tracking-[0.04em] text-[var(--rn-sale-soft)]">
                 {unitLabel} · special offer
               </p>
             </>
           ) : (
             <>
-              <p className="text-[10px] font-medium tracking-[0.06em] text-[#4a5a52]">From</p>
+              <p className="text-[10px] font-medium tracking-[0.06em] text-text-dim">From</p>
               <p
-                className="text-[1.3rem] font-bold leading-none tracking-tight text-[#0c1410]"
+                className="text-[1.3rem] font-bold leading-none tracking-tight text-white"
                 style={{ fontFamily: 'var(--rn-font-body)' }}
               >
                 €{priceFrom}
-                <span className="ml-1.5 text-[11px] font-medium tracking-normal text-[#4a5a52]">
+                <span className="ml-1.5 text-[11px] font-medium tracking-normal text-text-dim">
                   {unitLabel}
                 </span>
               </p>

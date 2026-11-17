@@ -137,13 +137,7 @@ ${formData.message ? `Additional Message:\n${formData.message}` : ''}`
         eyebrow="Rovaniemi · Partner aurora"
         title="Monster Truck Northern Lights Experience"
         lede="Monster truck into snowy wilderness for aurora viewing with a local guide — partner activity, request by form."
-        cinematic={{
-          image: GALLERY[0]?.src || '/monsteri1.jpg',
-          imageAlt:
-            GALLERY[0]?.alt || 'Monster truck Northern Lights experience in Lapland',
-          imageSecondary: GALLERY[1]?.src,
-        }}
-        images={GALLERY.length > 1 ? GALLERY.slice(1) : GALLERY}
+        images={GALLERY}
         facts={[
           { label: 'Duration', value: '3 hours' },
           { label: 'Group', value: 'Flexible' },
@@ -332,7 +326,7 @@ ${formData.message ? `Additional Message:\n${formData.message}` : ''}`
         </section>
       </ExperienceProductLayout>
 
-      <Footer variant="home" />
+      <Footer />
     </div>
   )
 }

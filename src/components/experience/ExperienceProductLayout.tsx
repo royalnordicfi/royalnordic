@@ -28,16 +28,16 @@ type Props = {
   benefits?: readonly string[]
   heroAction?: React.ReactNode
   /**
-   * Full-bleed cinematic product hero.
-   * When set with booking, copy sits left and the real booking panel sits right.
+   * Full-bleed cinematic product hero (flagship standard).
+   * When set, title/lede/benefits render in the hero; the content column starts with gallery.
    */
   cinematic?: CinematicHeroConfig
 }
 
 /**
- * Shared two-column tour / experience / transfer product shell (Royal Nordic 2.0).
- * Desktop (lg+): cinematic copy left, live booking card sticky on the right.
- * Mobile/tablet: intro → booking → gallery/editorial; MobileBookingBar for sticky CTA.
+ * Shared two-column tour / experience / transfer product shell.
+ * Desktop (lg+): content left, booking card sticky + viewport-capped on the right.
+ * Mobile/tablet: single column; sticky sidebar off — MobileBookingBar handles CTA.
  */
 export default function ExperienceProductLayout({
   breadcrumbs,
@@ -57,135 +57,126 @@ export default function ExperienceProductLayout({
   cinematic,
 }: Props) {
   const cinema = Boolean(cinematic)
-  const hasBook = Boolean(booking)
-
-  const benefitList =
-    benefits && benefits.length > 0 ? (
-      <ul
-        className={`rn-benefit-rail ${cinema ? 'rn-benefit-rail--on-media' : ''}`}
-        aria-label="Key benefits"
-      >
-        {benefits.slice(0, 4).map((item) => (
-          <li key={item}>
-            <span className="rn-benefit-rail__icon" aria-hidden />
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
-    ) : null
-
-  const editorial = (
-    <>
-      {images.length > 0 ? (
-        <div className="rn-product__gallery">
-          <ExperienceGallery images={images} />
-        </div>
-      ) : null}
-      {afterGallery ? <div className="mt-4 sm:mt-6">{afterGallery}</div> : null}
-      {facts.length > 0 ? (
-        <div className="mt-5 sm:mt-7">
-          <ExperienceFacts items={facts} />
-        </div>
-      ) : null}
-      <div className="rn-product__editorial mt-2">{children}</div>
-    </>
-  )
-
-  if (cinema && cinematic) {
-    return (
-      <div className="rn-product rn-product--v2 rn-product--cinema">
-        <div className="rn-exp-stage">
-          <div className="rn-exp-stage__media" aria-hidden>
-            <img
-              src={cinematic.image}
-              alt=""
-              className="rn-exp-stage__img"
-              fetchPriority="high"
-            />
-            {cinematic.imageSecondary ? (
-              <img
-                src={cinematic.imageSecondary}
-                alt=""
-                className="rn-exp-stage__ghost"
-              />
-            ) : null}
-            <div className="rn-exp-stage__veil" />
-            <div className="rn-hero-chrome-veil rn-exp-stage__chrome" />
-          </div>
-
-          <div
-            className={`rn-container-product rn-exp-stage__grid ${
-              hasBook ? 'rn-exp-stage__grid--book' : ''
-            }`}
-          >
-            <header className="rn-exp-stage__intro">
-              <ExperienceBreadcrumb items={breadcrumbs} tone="onMedia" />
-              <div className="rn-exp-stage__copy">
-                <p className="rn-exp-stage__eyebrow">{eyebrow}</p>
-                <h1 className="rn-exp-stage__title">{title}</h1>
-                <p className="rn-exp-stage__lede">{lede}</p>
-                {proof ? <div className="rn-product__proof rn-product__proof--on-media">{proof}</div> : null}
-                {benefitList}
-                {/* Redundant on desktop when the live booking panel is visible beside the copy */}
-                {heroAction ? (
-                  <div className={`rn-exp-stage__actions ${hasBook ? 'lg:hidden' : ''}`}>
-                    {heroAction}
-                  </div>
-                ) : null}
-              </div>
-            </header>
-
-            {hasBook ? (
-              <aside id="book" className="rn-exp-stage__book">
-                <div className="rn-sticky-book rn-product__book">{booking}</div>
-                {bookingBelow ? <div className="mt-2.5">{bookingBelow}</div> : null}
-              </aside>
-            ) : null}
-
-            <div className="rn-exp-body">{editorial}</div>
-          </div>
-        </div>
-        {afterContent}
-      </div>
-    )
-  }
 
   return (
-    <div className="rn-product rn-product--v2">
+    <div className={`rn-product ${cinema ? 'rn-product--cinema' : ''}`}>
+      {cinematic ? (
+        <header className="rn-exp-cinema relative flex items-end overflow-hidden">
+          <img
+            src={cinematic.image}
+            alt={cinematic.imageAlt}
+            className="absolute inset-0 h-full w-full object-cover object-center"
+            fetchPriority="high"
+          />
+          {cinematic.imageSecondary ? (
+            <img
+              src={cinematic.imageSecondary}
+              alt=""
+              className="rn-exp-cinema__ghost absolute inset-0 h-full w-full object-cover"
+              aria-hidden
+            />
+          ) : null}
+          <div className="rn-exp-cinema__veil" aria-hidden />
+          <div className="rn-hero-chrome-veil pointer-events-none absolute inset-x-0 top-0 h-28 sm:h-36" aria-hidden />
+          <div className="rn-container relative z-10 w-full pb-10 pt-[calc(var(--rn-chrome-h)+1.5rem)] sm:pb-12 sm:pt-[calc(var(--rn-chrome-h)+1.85rem)]">
+            <ExperienceBreadcrumb items={breadcrumbs} tone="onMedia" />
+            <div className="rn-exp-cinema__copy mt-6 max-w-rn-narrow sm:mt-8">
+              <p className="rn-eyebrow text-aurora-soft">{eyebrow}</p>
+              <h1 className="rn-exp-cinema__title mt-2.5 font-display font-semibold text-white">
+                {title}
+              </h1>
+              <p className="mt-4 max-w-2xl text-[15.5px] leading-relaxed text-white/80 sm:mt-4.5 sm:text-[17px] sm:leading-[1.6]">
+                {lede}
+              </p>
+              {proof ? <div className="rn-product__proof rn-product__proof--on-media mt-4">{proof}</div> : null}
+              {benefits && benefits.length > 0 ? (
+                <ul className="rn-benefit-rail rn-benefit-rail--on-media mt-6 sm:mt-7" aria-label="Key benefits">
+                  {benefits.slice(0, 4).map((item) => (
+                    <li key={item}>
+                      <span className="rn-benefit-rail__icon" aria-hidden />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              {heroAction ? (
+                <div className="mt-8 flex flex-wrap items-center gap-3">{heroAction}</div>
+              ) : null}
+            </div>
+          </div>
+        </header>
+      ) : null}
+
       <div className="rn-product__glow" aria-hidden />
-      <div className="rn-container-product rn-shell-pad rn-shell-pad--product pb-16 sm:pb-24">
-        <ExperienceBreadcrumb items={breadcrumbs} />
+      <div
+        className={`rn-container-product pb-16 sm:pb-24 ${
+          cinema ? 'rn-product__body-pad' : 'rn-shell-pad rn-shell-pad--product'
+        }`}
+      >
+        {!cinema ? <ExperienceBreadcrumb items={breadcrumbs} /> : null}
 
         <div
           className={
-            hasBook
-              ? 'mt-4 grid gap-7 sm:gap-8 lg:mt-8 lg:grid-cols-12 lg:items-start lg:gap-x-10 xl:gap-x-14'
-              : 'mt-4 lg:mt-8'
+            booking
+              ? `grid gap-7 sm:gap-8 lg:grid-cols-12 lg:items-stretch lg:gap-x-10 xl:gap-x-14 ${
+                  cinema ? 'mt-8 lg:mt-10' : 'mt-4 lg:mt-8'
+                }`
+              : cinema
+                ? 'mt-8 lg:mt-10'
+                : 'mt-4 lg:mt-8'
           }
         >
-          <div className={hasBook ? 'min-w-0 lg:col-span-7' : 'min-w-0'}>
-            <header className="rn-product__intro rn-reveal max-w-rn-narrow">
-              <p className="rn-eyebrow">{eyebrow}</p>
-              <h1 className="rn-product__title mt-2.5 font-display font-semibold text-white sm:mt-3">
-                {title}
-              </h1>
-              <p className="rn-product__lede mt-3.5 text-[15px] leading-relaxed text-text-muted sm:mt-4 sm:text-[16.5px] sm:leading-[1.65]">
-                {lede}
-              </p>
-              {proof ? <div className="rn-product__proof mt-4">{proof}</div> : null}
-              {benefitList ? <div className="mt-6 sm:mt-7">{benefitList}</div> : null}
-              {heroAction ? (
-                <div className={`mt-7 flex flex-wrap items-center gap-3 ${hasBook ? 'lg:hidden' : ''}`}>
-                  {heroAction}
-                </div>
-              ) : null}
-            </header>
+          <div className={booking ? 'min-w-0 lg:col-span-7' : 'min-w-0'}>
+            {!cinema ? (
+              <header className="rn-product__intro rn-reveal max-w-rn-narrow">
+                <p className="rn-eyebrow">{eyebrow}</p>
+                <h1 className="rn-product__title mt-2.5 font-display font-semibold text-white sm:mt-3">
+                  {title}
+                </h1>
+                <p className="rn-product__lede mt-3.5 text-[15px] leading-relaxed text-text-muted sm:mt-4 sm:text-[16.5px] sm:leading-[1.65]">
+                  {lede}
+                </p>
+                {proof ? <div className="rn-product__proof mt-4">{proof}</div> : null}
+                {benefits && benefits.length > 0 ? (
+                  <ul className="rn-benefit-rail mt-6 sm:mt-7" aria-label="Key benefits">
+                    {benefits.slice(0, 4).map((item) => (
+                      <li key={item}>
+                        <span className="rn-benefit-rail__icon" aria-hidden />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                {heroAction ? (
+                  <div className="mt-7 flex flex-wrap items-center gap-3 lg:hidden">{heroAction}</div>
+                ) : null}
+                {heroAction ? (
+                  <div className="mt-8 hidden lg:block">
+                    <div className="flex flex-wrap items-center gap-3">{heroAction}</div>
+                  </div>
+                ) : null}
+              </header>
+            ) : null}
 
-            <div className="rn-exp-body rn-exp-body--inset mt-8 sm:mt-10">{editorial}</div>
+            {images.length > 0 ? (
+              <div className={`rn-product__gallery ${cinema ? 'mt-0' : 'mt-7 sm:mt-10'}`}>
+                <ExperienceGallery images={images} />
+              </div>
+            ) : null}
+
+            {afterGallery ? <div className="mt-4 sm:mt-6">{afterGallery}</div> : null}
+
+            {facts.length > 0 ? (
+              <div className="mt-5 sm:mt-7">
+                <ExperienceFacts items={facts} />
+              </div>
+            ) : null}
+
+            <div className="rn-product__editorial mt-2">{children}</div>
           </div>
 
-          {hasBook ? (
-            <aside id="book" className="lg:col-span-5 lg:self-start">
+          {booking ? (
+            <aside id="book" className="lg:col-span-5 lg:self-stretch">
               <div className="rn-sticky-book rn-product__book">{booking}</div>
               {bookingBelow ? <div className="mt-2.5">{bookingBelow}</div> : null}
             </aside>

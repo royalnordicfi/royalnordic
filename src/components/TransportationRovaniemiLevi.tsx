@@ -331,7 +331,7 @@ const TransportationRovaniemiLevi = () => {
         </section>
       </ExperienceProductLayout>
 
-      <Footer variant="home" />
+      <Footer />
     </div>
   )
 }

@@ -143,17 +143,12 @@ const RanuaZooTour = () => {
         title={cms.title}
         lede={cms.lede}
         benefits={cms.benefits.slice(0, 4)}
-        cinematic={{
-          image: cms.gallery[0]?.src || FALLBACK.gallery[0].src,
-          imageAlt: cms.gallery[0]?.alt || 'Ranua Wildlife Park in Finnish Lapland',
-          imageSecondary: cms.gallery[1]?.src,
-        }}
         heroAction={
           <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
             Check availability
           </button>
         }
-        images={cms.gallery.length > 1 ? cms.gallery.slice(1) : cms.gallery}
+        images={cms.gallery}
         facts={[
           { label: 'Duration', value: cms.duration || '~5 hours' },
           { label: 'Start', value: departure },
@@ -261,11 +256,11 @@ const RanuaZooTour = () => {
         </TourSection>
 
         <div className="rn-tour-section">
-          <ProductFaq items={cms.faqs} schemaId="ranua-faq" tone="snow" />
+          <ProductFaq items={cms.faqs} schemaId="ranua-faq" tone="dark" />
         </div>
       </ExperienceProductLayout>
 
-      <Footer variant="home" />
+      <Footer />
       <MobileBookingBar
         priceFrom={cms.pricing.current}
         referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}

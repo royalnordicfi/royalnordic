@@ -102,13 +102,6 @@ const SnowmobileSafari = () => {
             Exclusive −{percent}% with code <strong className="text-aurora-soft">{code}</strong>
           </p>
         }
-        cinematic={{
-          image: GALLERY[0]?.src || '/snowmobiling1.jpg',
-          imageAlt:
-            GALLERY[0]?.alt ||
-            'Snowmobile riders on a snowy trail through Arctic forest near Rovaniemi',
-          imageSecondary: GALLERY[1]?.src,
-        }}
         heroAction={
           <>
             <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
@@ -123,7 +116,7 @@ const SnowmobileSafari = () => {
             </div>
           </>
         }
-        images={GALLERY.length > 1 ? GALLERY.slice(1) : GALLERY}
+        images={GALLERY}
         afterGallery={
           <aside className="rn-notice" role="note">
             <p className="rn-notice__label">To drive</p>
@@ -266,7 +259,7 @@ const SnowmobileSafari = () => {
         label="Check availability"
         onBook={scrollToBook}
       />
-      <Footer variant="home" />
+      <Footer />
     </div>
   )
 }

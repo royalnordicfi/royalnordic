@@ -635,7 +635,7 @@ const TransportationCustomized = () => {
         </section>
       </ExperienceProductLayout>
 
-      <Footer variant="home" />
+      <Footer />
     </div>
   )
 }
