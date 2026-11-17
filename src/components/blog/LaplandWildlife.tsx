@@ -181,6 +181,21 @@ const LaplandWildlife: React.FC = () => {
     category: "Wildlife",
     author: "Royal Nordic Team",
     heroImage: "/ranua1.jpg",
+    heroImageAlt: "Wildlife at Ranua Wildlife Park in Finnish Lapland",
+    figures: [
+      {
+        src: "/ranua3.jpeg",
+        alt: "Arctic animals in winter habitats at Ranua",
+        caption: "Ranua focuses on northern species in spacious outdoor enclosures.",
+        afterHeading: "The Big Five",
+      },
+      {
+        src: "/ranua4.jpeg",
+        alt: "Winter day at Ranua Wildlife Park",
+        caption: "Clear winter days are excellent for photography around the park paths.",
+        afterHeading: "Best Times to Visit",
+      },
+    ],
     relatedExperiences: [
       {
         title: "Ranua Wildlife Park – Entry & transfer",

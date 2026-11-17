@@ -11,7 +11,22 @@ const BestTimeVisitLapland: React.FC = () => {
     category: "Travel Guide",
     excerpt: "When should you visit Lapland? Complete month-by-month guide covering Northern Lights, activities, weather, crowds, and pricing for every season.",
     heroImage: "/lights6.jpg",
+    heroImageAlt: "Seasonal Lapland landscape under winter skies",
     author: "Royal Nordic Team",
+    figures: [
+      {
+        src: "/lights2.jpg",
+        alt: "Northern Lights season landscape in Finnish Lapland",
+        caption: "Darkness and snow cover change sharply month to month.",
+        afterHeading: "Quick Answer",
+      },
+      {
+        src: "/korouoma2.jpg",
+        alt: "Daytime winter scenery on a Lapland outing",
+        caption: "Shoulder months can pair aurora chances with milder daytime weather.",
+        afterHeading: "Month-by-Month",
+      },
+    ],
     relatedExperiences: [
       {
         title: "Northern Lights tours",

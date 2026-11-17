@@ -11,7 +11,22 @@ const LaplandWinterActivities: React.FC = () => {
     category: "Travel Guide",
     excerpt: "Discover the best winter activities in Finnish Lapland. From Northern Lights hunting to snowshoeing, ice fishing, and more - your complete guide to Arctic adventures.",
     heroImage: "/lights4.jpg",
+    heroImageAlt: "Winter activities under the Northern Lights in Lapland",
     author: "Royal Nordic Team",
+    figures: [
+      {
+        src: "/nortti1.jpg",
+        alt: "Guests watching the aurora on a Northern Lights tour",
+        caption: "Aurora evenings are the signature winter experience from Rovaniemi.",
+        afterHeading: "Northern Lights Hunting",
+      },
+      {
+        src: "/snowmobiling1.jpg",
+        alt: "Snowmobile safari through Arctic forest near Rovaniemi",
+        caption: "Daytime adventures balance quieter evenings under the sky.",
+        afterHeading: "Snowmobiling",
+      },
+    ],
     relatedExperiences: [
       {
         title: "Northern Lights tour",

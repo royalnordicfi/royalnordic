@@ -91,6 +91,21 @@ const BestTimeNorthernLights: React.FC = () => {
     category: "Northern Lights",
     author: "Royal Nordic Team",
     heroImage: "/lights5.jpg",
+    heroImageAlt: "Northern Lights over a snowy Lapland forest",
+    figures: [
+      {
+        src: "/lights7.jpg",
+        alt: "Green aurora ribbons above snowy Lapland trees",
+        caption: "Clear, dark skies remain the most important viewing condition.",
+        afterHeading: "Peak Season",
+      },
+      {
+        src: "/nortti3.jpg",
+        alt: "Aurora display during a winter evening in Finnish Lapland",
+        caption: "Peak activity is often late evening into the early hours.",
+        afterHeading: "Best Time of Day",
+      },
+    ],
     relatedExperiences: [
       {
         title: "Northern Lights tour",

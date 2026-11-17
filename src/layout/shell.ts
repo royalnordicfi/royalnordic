@@ -53,7 +53,8 @@ export function resolveShellMode(pathname: string): ShellMode {
   if (pathname === '/checkout') return 'checkout'
   if (OVERLAY_EXACT.has(pathname)) return 'overlay'
   if (PRODUCT_EXACT.has(pathname)) return 'product'
-  if (pathname.startsWith('/blog/')) return 'standard'
+  // Article heroes are cinematic overlays; blog index stays standard.
+  if (pathname.startsWith('/blog/')) return 'overlay'
   return 'standard'
 }
 

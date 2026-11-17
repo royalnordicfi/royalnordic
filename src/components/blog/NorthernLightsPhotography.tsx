@@ -150,7 +150,22 @@ const NorthernLightsPhotography: React.FC = () => {
     readTime: "6 min read",
     category: "Photography",
     author: "Royal Nordic Team",
-    heroImage: "/lights1.jpg",
+    heroImage: "/nortti9.jpg",
+    heroImageAlt: "Aurora display ideal for night photography practice",
+    figures: [
+      {
+        src: "/lights1.jpg",
+        alt: "Northern Lights arcs across a clear Lapland sky",
+        caption: "Wide compositions leave room for both sky and silhouette.",
+        afterHeading: "Essential Camera Equipment",
+      },
+      {
+        src: "/nortti11.jpg",
+        alt: "Soft green aurora above winter forest near Rovaniemi",
+        caption: "Manual focus and a stable tripod matter more than fancy lenses.",
+        afterHeading: "Camera Settings",
+      },
+    ],
     relatedExperiences: [
       {
         title: "Northern Lights tour",

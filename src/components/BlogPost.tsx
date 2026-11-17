@@ -1,5 +1,8 @@
-import React from 'react'
-import BlogArticleLayout, { type RelatedExperience } from './blog/BlogArticleLayout'
+import BlogArticleLayout, {
+  type ArticleFigure,
+  type RelatedExperience,
+} from './blog/BlogArticleLayout'
+import { getBlogEntry } from '../data/blogCatalog'
 
 interface BlogPostProps {
   post: {
@@ -13,22 +16,29 @@ interface BlogPostProps {
     category: string
     author?: string
     heroImage?: string
+    heroImageAlt?: string
     relatedExperiences?: RelatedExperience[]
+    figures?: ArticleFigure[]
   }
 }
 
-const BlogPost: React.FC<BlogPostProps> = ({ post }) => {
+const BlogPost = ({ post }: BlogPostProps) => {
+  const catalog = getBlogEntry(post.slug)
+
   return (
     <BlogArticleLayout
       title={post.title}
       excerpt={post.excerpt}
       category={post.category}
       readTime={post.readTime}
+      slug={post.slug}
       author={post.author}
       date={post.date}
-      heroImage={post.heroImage}
+      heroImage={post.heroImage || catalog?.image}
+      heroImageAlt={post.heroImageAlt || catalog?.imageAlt}
       content={post.content}
       relatedExperiences={post.relatedExperiences}
+      figures={post.figures}
     />
   )
 }

@@ -10,8 +10,23 @@ const GlassIglooGuide: React.FC = () => {
     readTime: "8 min read",
     category: "Accommodation",
     excerpt: "Everything you need to know about staying in a glass igloo in Lapland. Compare resorts, prices, booking tips, and what to expect from this iconic Arctic experience.",
-    heroImage: "/lights1.jpg",
+    heroImage: "/lights8.jpg",
+    heroImageAlt: "Northern Lights filling the night sky over Lapland",
     author: "Royal Nordic Team",
+    figures: [
+      {
+        src: "/lights9.jpg",
+        alt: "Bright aurora display over Arctic winter landscape",
+        caption: "Clear skies still matter — a glass roof cannot remove cloud cover.",
+        afterHeading: "What is a Glass Igloo",
+      },
+      {
+        src: "/nordicci6.jpg",
+        alt: "Quiet winter night atmosphere in Finnish Lapland",
+        caption: "Many guests combine a stay with a guided aurora hunt away from lights.",
+        afterHeading: "Booking Tips",
+      },
+    ],
     relatedExperiences: [
       {
         title: "Northern Lights tour",

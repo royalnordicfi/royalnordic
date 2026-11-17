@@ -11,7 +11,22 @@ const WhatToWearLapland: React.FC = () => {
     category: "Travel Guide",
     excerpt: "Complete guide to dressing for Lapland's Arctic winter. Learn the layering system, essential gear, and what to pack for temperatures down to -30°C.",
     heroImage: "/snowshoe3.jpg",
+    heroImageAlt: "Winter clothing for outdoor adventures in Lapland",
     author: "Royal Nordic Team",
+    figures: [
+      {
+        src: "/family3.jpg",
+        alt: "Family dressed for a winter evening outdoors",
+        caption: "Base, mid, and shell layers beat one bulky coat.",
+        afterHeading: "The Three-Layer System",
+      },
+      {
+        src: "/family4.jpg",
+        alt: "Guests in warm layers during a Lapland winter activity",
+        caption: "Accessories — gloves, hat, neck gaiter — seal the system.",
+        afterHeading: "Essential Accessories",
+      },
+    ],
     relatedExperiences: [
       {
         title: "Northern Lights tour",

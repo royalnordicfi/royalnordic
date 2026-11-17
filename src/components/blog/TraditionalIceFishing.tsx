@@ -11,6 +11,21 @@ const TraditionalIceFishing: React.FC = () => {
     category: "Activities",
     excerpt: "Discover the ancient art of ice fishing in Finnish Lapland. Learn traditional techniques, what to expect, and how to experience this authentic Arctic activity.",
     heroImage: "/icefishing2.jpg",
+    heroImageAlt: "Ice fishing on a frozen lake in Lapland",
+    figures: [
+      {
+        src: "/icefishing3.jpg",
+        alt: "Guided ice fishing stop on a snowy Lapland lake",
+        caption: "A warm fire and hot drinks are part of many guided outings.",
+        afterHeading: "What to Expect",
+      },
+      {
+        src: "/icefishing.jpeg",
+        alt: "Winter lake landscape during an ice fishing day",
+        caption: "Dress for sitting still — insulation matters more than fashion.",
+        afterHeading: "What to Wear",
+      },
+    ],
     content: `Ice fishing is one of Finland's most traditional winter activities, dating back thousands of years. In Lapland, this ancient practice combines survival skills, patience, and a deep connection with nature. Experience the authentic Arctic lifestyle while trying to catch fish through a hole in the ice.
 
 ## What is Ice Fishing?

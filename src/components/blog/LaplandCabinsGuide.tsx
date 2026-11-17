@@ -11,7 +11,22 @@ const LaplandCabinsGuide: React.FC = () => {
     category: "Accommodation",
     excerpt: "Discover the charm of traditional Finnish log cabins in Lapland. Complete guide to cabin types, what's included, best locations, and booking tips for an authentic Arctic experience.",
     heroImage: "/slideshow3.jpg",
+    heroImageAlt: "Snowy Lapland landscape suited to cabin stays",
     author: "Royal Nordic Team",
+    figures: [
+      {
+        src: "/slideshow4.jpg",
+        alt: "Winter forest and open snow near cabin country",
+        caption: "Cabins trade city convenience for quiet and dark skies.",
+        afterHeading: "Why Choose a Cabin",
+      },
+      {
+        src: "/santaclaus1.jpg",
+        alt: "Winter evening atmosphere in the Rovaniemi area",
+        caption: "Plan transfers if you want both a cabin stay and town-based tours.",
+        afterHeading: "Best Cabin Locations",
+      },
+    ],
     relatedExperiences: [
       {
         title: "Customized tour",

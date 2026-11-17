@@ -117,6 +117,21 @@ const WhatToPackLapland: React.FC = () => {
     category: "Travel Tips",
     author: "Royal Nordic Team",
     heroImage: "/snowshoe2.jpg",
+    heroImageAlt: "Winter travellers prepared for Lapland outdoors",
+    figures: [
+      {
+        src: "/family2.jpg",
+        alt: "Guests dressed for a winter evening outdoors in Lapland",
+        caption: "Layering keeps you flexible as conditions change through the day.",
+        afterHeading: "Essential Clothing Layers",
+      },
+      {
+        src: "/nortti5.jpg",
+        alt: "Winter night landscape suited to aurora photography",
+        caption: "Spare batteries matter — cold drains camera power quickly.",
+        afterHeading: "Photography Gear",
+      },
+    ],
     relatedExperiences: [
       {
         title: "Northern Lights tour",

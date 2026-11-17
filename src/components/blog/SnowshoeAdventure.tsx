@@ -11,7 +11,22 @@ const SnowshoeAdventure: React.FC = () => {
     category: "Activities",
     excerpt: "Discover the magic of snowshoeing in Lapland's pristine wilderness. Learn about this traditional Arctic activity and how to experience the untouched beauty of Finnish Lapland.",
     heroImage: "/snowshoe1.jpg",
+    heroImageAlt: "Snowshoeing through a snowy Lapland forest",
     author: "Royal Nordic Team",
+    figures: [
+      {
+        src: "/snowshoe4.jpg",
+        alt: "Snowshoes on a quiet forest trail in Lapland",
+        caption: "Packed trails and open forest both work well near Rovaniemi.",
+        afterHeading: "Best Locations",
+      },
+      {
+        src: "/korouoma1.jpg",
+        alt: "Snow-covered wilderness landscape in Finnish Lapland",
+        caption: "Slow travel reveals details you miss from the road.",
+        afterHeading: "Wildlife and Nature",
+      },
+    ],
     relatedExperiences: [
       {
         title: "Snowshoe rental",

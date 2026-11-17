@@ -160,50 +160,62 @@ const META: Record<
   '/blog/best-time-northern-lights-lapland-2025': {
     title: 'Best Time for Northern Lights in Lapland | Royal Nordic',
     description: 'When to see the Aurora Borealis in Finnish Lapland — seasons, weather, and practical tips from Rovaniemi guides.',
+    ogImage: 'https://royalnordic.fi/lights5.jpg',
   },
   '/blog/what-to-pack-lapland-winter-adventure': {
     title: 'What to Pack for Lapland Winter | Royal Nordic',
     description: 'Practical packing list for Lapland winters — layers, boots, and essentials for Northern Lights and daytime tours.',
+    ogImage: 'https://royalnordic.fi/snowshoe2.jpg',
   },
   '/blog/northern-lights-photography-tips-beginners': {
     title: 'Northern Lights Photography Tips for Beginners | Royal Nordic',
     description: 'Simple aurora photography tips for beginners visiting Rovaniemi and Finnish Lapland.',
+    ogImage: 'https://royalnordic.fi/nortti9.jpg',
   },
   '/blog/lapland-wildlife-animals-ranua-zoo': {
     title: 'Lapland Wildlife & Ranua Zoo Guide | Royal Nordic',
     description: 'Meet Arctic animals around Rovaniemi — polar bears, reindeer, and what to expect at Ranua Wildlife Park.',
+    ogImage: 'https://royalnordic.fi/ranua1.jpg',
   },
   '/blog/traditional-ice-fishing-finnish-lapland': {
     title: 'Traditional Ice Fishing in Finnish Lapland | Royal Nordic',
     description: 'How ice fishing works in Lapland — what to expect on a guided winter fishing experience from Rovaniemi.',
+    ogImage: 'https://royalnordic.fi/icefishing2.jpg',
   },
   '/blog/snowshoe-adventure-exploring-lapland-wilderness': {
     title: 'Snowshoe Adventure in Lapland | Royal Nordic',
     description: 'Explore Lapland’s winter trails on snowshoes — tips for independent adventures near Rovaniemi.',
+    ogImage: 'https://royalnordic.fi/snowshoe1.jpg',
   },
   '/blog/lapland-winter-activities-complete-guide': {
     title: 'Lapland Winter Activities Guide | Royal Nordic',
     description: 'A practical guide to winter activities in Finnish Lapland — Northern Lights, daytime tours, and more.',
+    ogImage: 'https://royalnordic.fi/lights4.jpg',
   },
   '/blog/what-to-wear-lapland-winter-clothing-guide': {
     title: 'What to Wear in Lapland Winter | Royal Nordic',
     description: 'Clothing guide for Lapland winters — layers, boots, and how to stay warm on outdoor tours.',
+    ogImage: 'https://royalnordic.fi/snowshoe3.jpg',
   },
   '/blog/best-time-visit-lapland-seasonal-guide': {
     title: 'Best Time to Visit Lapland | Royal Nordic',
     description: 'Seasonal guide to visiting Finnish Lapland — Northern Lights season, snow, and family-friendly timing.',
+    ogImage: 'https://royalnordic.fi/lights6.jpg',
   },
   '/blog/where-to-stay-lapland-accommodation-guide': {
     title: 'Where to Stay in Lapland | Royal Nordic',
     description: 'Accommodation ideas for Lapland trips — hotels, cabins, and what works for Rovaniemi-based tours.',
+    ogImage: 'https://royalnordic.fi/slideshow2.jpg',
   },
   '/blog/glass-igloos-lapland-complete-guide': {
     title: 'Glass Igloos in Lapland Guide | Royal Nordic',
     description: 'What to know about glass igloo stays in Lapland — timing, expectations, and nearby experiences.',
+    ogImage: 'https://royalnordic.fi/lights8.jpg',
   },
   '/blog/finnish-cabins-lapland-authentic-guide': {
     title: 'Finnish Cabins in Lapland Guide | Royal Nordic',
     description: 'Authentic Finnish cabin stays in Lapland — what to expect and how to plan around winter tours.',
+    ogImage: 'https://royalnordic.fi/slideshow3.jpg',
   },
   '/privacy-policy': {
     title: 'Privacy Policy | Royal Nordic',

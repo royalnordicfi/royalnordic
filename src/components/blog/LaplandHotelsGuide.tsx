@@ -11,7 +11,22 @@ const LaplandHotelsGuide: React.FC = () => {
     category: "Accommodation",
     excerpt: "Complete guide to Lapland accommodations - from luxury hotels to cozy cabins. Find the perfect place to stay for your Arctic adventure in Rovaniemi and beyond.",
     heroImage: "/slideshow2.jpg",
+    heroImageAlt: "Winter accommodation setting in Finnish Lapland",
     author: "Royal Nordic Team",
+    figures: [
+      {
+        src: "/slideshow1.jpg",
+        alt: "Snowy Lapland townscape at dusk",
+        caption: "Rovaniemi hotels make evening aurora pickups straightforward.",
+        afterHeading: "Rovaniemi: The Gateway",
+      },
+      {
+        src: "/lights3.jpg",
+        alt: "Aurora above winter trees near Rovaniemi",
+        caption: "Staying in town still pairs well with guided dark-sky evenings.",
+        afterHeading: "Glass Igloos",
+      },
+    ],
     relatedExperiences: [
       {
         title: "Northern Lights tour",
