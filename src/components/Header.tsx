@@ -3,29 +3,12 @@ import { createPortal } from 'react-dom'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronDown, Menu, X } from 'lucide-react'
 import { isHeroShell } from '../layout/shell'
-
-type NavChild = { label: string; to: string; hint: string }
-
-const EXPERIENCES: NavChild[] = [
-  { label: 'Northern Lights', to: '/northern-lights-tours', hint: 'Aurora hunts & pro photos' },
-  { label: 'Day Tours', to: '/daytime-experiences', hint: 'Arctic daytime experiences' },
-  { label: 'Private & Custom', to: '/customized-tour', hint: 'Tailored Lapland itineraries' },
-  { label: 'Transfers', to: '/transportation', hint: 'Saariselkä, Levi & custom routes' },
-]
-
-const NAV = [
-  { label: 'Northern Lights', to: '/northern-lights-tours' },
-  { label: 'Day Tours', to: '/daytime-experiences' },
-  { label: 'Private & Custom', to: '/customized-tour' },
-  { label: 'Transfers', to: '/transportation' },
-  { label: 'Partner With Us', to: '/travel-trade' },
-  { label: 'Contact', to: '/contact' },
-]
-
-const MOBILE_EXTRA = [
-  { label: 'Partner With Us', to: '/travel-trade', hint: 'Travel trade & partnerships' },
-  { label: 'Contact', to: '/contact', hint: 'Phone, email & enquiry form' },
-]
+import {
+  EXPERIENCE_NAV,
+  HEADER_BOOK_CTA,
+  MOBILE_EXTRA_NAV,
+  PRIMARY_NAV,
+} from '../layout/nav'
 
 function resolveNav(to: string, navigate: ReturnType<typeof useNavigate>, pathname: string) {
   if (to.startsWith('/#')) {
@@ -73,7 +56,7 @@ const Header = () => {
   const transparent = hasHero && !scrolled
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12)
+    const onScroll = () => setScrolled(window.scrollY > 10)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -99,7 +82,7 @@ const Header = () => {
     closeTimer.current = window.setTimeout(() => {
       setExperiencesOpen(false)
       closeTimer.current = null
-    }, 220)
+    }, 200)
   }
 
   const closeExperiencesNow = () => {
@@ -158,7 +141,6 @@ const Header = () => {
     const backdrop = backdropRef.current
     if (!panel || !backdrop) return Promise.resolve()
 
-    // Commit current animated values, then cancel — so reverse mid-slide doesn't jump.
     const matrix = new DOMMatrix(getComputedStyle(panel).transform)
     const fromX = matrix.m41
     const fromOp = Number(getComputedStyle(backdrop).opacity) || 0
@@ -232,7 +214,6 @@ const Header = () => {
     void slidePanel(false).then(() => finishClose(gen))
   }
 
-  // Slide in after the drawer is mounted (refs ready); always from the right edge.
   useEffect(() => {
     if (menuPhase !== 'open') return
     const id = window.requestAnimationFrame(() => void slidePanel(true))
@@ -260,14 +241,18 @@ const Header = () => {
   return (
     <>
       <header
-        className={`rn-header fixed left-0 right-0 z-50 ${
-          transparent ? 'rn-header--transparent' : 'rn-header--solid'
-        }`}
+        className={[
+          'rn-header',
+          transparent ? 'rn-header--transparent' : 'rn-header--solid',
+          scrolled ? 'rn-header--scrolled' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
         style={{ top: 'var(--rn-promo-bar-height, 0px)' }}
       >
-        <div className="rn-header__inner rn-container flex items-center justify-between gap-4">
-          <Link to="/" className="rn-header__brand flex shrink-0 items-center" aria-label="Royal Nordic home">
-            <img src="/logo.png" alt="" className="rn-header__brand-mark" width={26} height={26} />
+        <div className="rn-header__inner rn-container">
+          <Link to="/" className="rn-header__brand" aria-label="Royal Nordic home">
+            <img src="/logo.png" alt="" className="rn-header__brand-mark" width={28} height={28} />
             <span className="rn-header__brand-name">Royal Nordic</span>
           </Link>
 
@@ -285,15 +270,17 @@ const Header = () => {
                   aria-haspopup="menu"
                   aria-controls={menuId}
                   onClick={() => (experiencesOpen ? scheduleCloseExperiences() : openExperiences())}
-                  className={`rn-nav-link inline-flex items-center ${
-                    experiencesOpen || EXPERIENCES.some((c) => isActive(c.to)) ? 'rn-nav-link--active' : ''
+                  className={`rn-nav-link ${
+                    experiencesOpen || EXPERIENCE_NAV.some((c) => isActive(c.to))
+                      ? 'rn-nav-link--active'
+                      : ''
                   }`}
                 >
                   Experiences
-                  <ChevronDown size={14} className="rn-nav-link__chevron" aria-hidden strokeWidth={1.75} />
+                  <ChevronDown size={13} className="rn-nav-link__chevron" aria-hidden strokeWidth={1.75} />
                 </button>
 
-                {experiencesOpen && (
+                {experiencesOpen ? (
                   <div
                     id={menuId}
                     role="menu"
@@ -301,7 +288,7 @@ const Header = () => {
                   >
                     <p className="rn-mega__label">Experiences</p>
                     <ul className="rn-mega__list">
-                      {EXPERIENCES.map((child) => (
+                      {EXPERIENCE_NAV.map((child) => (
                         <li key={child.to}>
                           <button
                             type="button"
@@ -324,10 +311,10 @@ const Header = () => {
                       ))}
                     </ul>
                   </div>
-                )}
+                ) : null}
               </div>
 
-              {NAV.map((item) => (
+              {PRIMARY_NAV.map((item) => (
                 <button
                   key={item.label}
                   type="button"
@@ -339,8 +326,8 @@ const Header = () => {
               ))}
             </nav>
 
-            <Link to="/northern-lights-tour" className="rn-header-cta hidden sm:inline-flex">
-              Book a tour
+            <Link to={HEADER_BOOK_CTA.to} className="rn-header-cta">
+              {HEADER_BOOK_CTA.label}
             </Link>
             <button
               ref={openRef}
@@ -360,76 +347,78 @@ const Header = () => {
         </div>
       </header>
 
-      {menuMounted &&
-        createPortal(
-          <div
-            className={`rn-mobile-drawer fixed inset-0 z-[70] xl:hidden${
-              menuOpen ? ' rn-mobile-drawer--open' : ''
-            }`}
-            role="dialog"
-            aria-modal="true"
-          >
-            <button
-              ref={backdropRef}
-              type="button"
-              className="rn-mobile-drawer__backdrop"
-              aria-label="Close menu"
-              onClick={() => closeMenu()}
-            />
-            <div ref={panelRef} className="rn-mobile-drawer__panel">
-              <div className="rn-mobile-drawer__head">
-                <span className="font-display text-lg tracking-wide text-white/95">Menu</span>
-                <button
-                  ref={closeRef}
-                  type="button"
-                  className="rn-mobile-drawer__close"
-                  aria-label="Close menu"
-                  onClick={() => closeMenu()}
-                >
-                  <X size={18} strokeWidth={1.75} />
-                </button>
-              </div>
-              <nav className="rn-mobile-drawer__nav" aria-label="Mobile">
-                <p className="rn-mobile-drawer__label">Experiences</p>
-                {EXPERIENCES.map((item) => (
+      {menuMounted
+        ? createPortal(
+            <div
+              className={`rn-mobile-drawer${menuOpen ? ' rn-mobile-drawer--open' : ''}`}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Site menu"
+            >
+              <button
+                ref={backdropRef}
+                type="button"
+                className="rn-mobile-drawer__backdrop"
+                aria-label="Close menu"
+                onClick={() => closeMenu()}
+              />
+              <div ref={panelRef} className="rn-mobile-drawer__panel">
+                <div className="rn-mobile-drawer__head">
+                  <span className="rn-mobile-drawer__brand">Royal Nordic</span>
                   <button
-                    key={item.to}
+                    ref={closeRef}
                     type="button"
-                    onClick={() => go(item.to)}
-                    className={`rn-mobile-drawer__link ${isActive(item.to) ? 'rn-mobile-drawer__link--active' : ''}`}
+                    className="rn-mobile-drawer__close"
+                    aria-label="Close menu"
+                    onClick={() => closeMenu()}
                   >
-                    <span className="rn-mobile-drawer__link-title">{item.label}</span>
-                    <span className="rn-mobile-drawer__link-hint">{item.hint}</span>
+                    <X size={18} strokeWidth={1.75} />
                   </button>
-                ))}
-                <div className="rn-mobile-drawer__rule" aria-hidden />
-                {MOBILE_EXTRA.map((item) => (
-                  <button
-                    key={item.to}
-                    type="button"
-                    onClick={() => go(item.to)}
-                    className={`rn-mobile-drawer__link rn-mobile-drawer__link--solo ${
-                      isActive(item.to) ? 'rn-mobile-drawer__link--active' : ''
-                    }`}
+                </div>
+                <nav className="rn-mobile-drawer__nav" aria-label="Mobile">
+                  <p className="rn-mobile-drawer__label">Experiences</p>
+                  {EXPERIENCE_NAV.map((item) => (
+                    <button
+                      key={item.to}
+                      type="button"
+                      onClick={() => go(item.to)}
+                      className={`rn-mobile-drawer__link ${
+                        isActive(item.to) ? 'rn-mobile-drawer__link--active' : ''
+                      }`}
+                    >
+                      <span className="rn-mobile-drawer__link-title">{item.label}</span>
+                      <span className="rn-mobile-drawer__link-hint">{item.hint}</span>
+                    </button>
+                  ))}
+                  <div className="rn-mobile-drawer__rule" aria-hidden />
+                  {MOBILE_EXTRA_NAV.map((item) => (
+                    <button
+                      key={item.to}
+                      type="button"
+                      onClick={() => go(item.to)}
+                      className={`rn-mobile-drawer__link rn-mobile-drawer__link--solo ${
+                        isActive(item.to) ? 'rn-mobile-drawer__link--active' : ''
+                      }`}
+                    >
+                      <span className="rn-mobile-drawer__link-title">{item.label}</span>
+                      <span className="rn-mobile-drawer__link-hint">{item.hint}</span>
+                    </button>
+                  ))}
+                </nav>
+                <div className="rn-mobile-drawer__foot">
+                  <Link
+                    to={HEADER_BOOK_CTA.to}
+                    onClick={() => closeMenu()}
+                    className="rn-header-cta rn-header-cta--drawer"
                   >
-                    <span className="rn-mobile-drawer__link-title">{item.label}</span>
-                    <span className="rn-mobile-drawer__link-hint">{item.hint}</span>
-                  </button>
-                ))}
-              </nav>
-              <div className="rn-mobile-drawer__foot">
-                <Link
-                  to="/northern-lights-tour"
-                  onClick={() => closeMenu()}
-                  className="rn-header-cta rn-header-cta--drawer"
-                >
-                  Book a tour
-                </Link>
+                    {HEADER_BOOK_CTA.label}
+                  </Link>
+                </div>
               </div>
-            </div>
-          </div>,
-          document.body
-        )}
+            </div>,
+            document.body
+          )
+        : null}
     </>
   )
 }

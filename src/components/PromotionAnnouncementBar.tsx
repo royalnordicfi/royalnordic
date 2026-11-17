@@ -70,7 +70,7 @@ const PromotionAnnouncementBar = () => {
       <button
         type="button"
         onClick={goToDestination}
-        className="rn-promo-bar__btn focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-emerald-300"
+        className="rn-promo-bar__btn focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[rgba(141,206,178,0.55)]"
         aria-label={`${config.announcementText}. Book now.`}
       >
         <span className="rn-promo-bar__static">
