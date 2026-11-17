@@ -6,7 +6,7 @@ const WhyRoyalNordic = () => {
     },
     {
       title: 'Small groups by design',
-      text: 'Our Guaranteed Northern Lights Tour caps at eight guests per vehicle.',
+      text: 'Our Small Group Northern Lights Tour caps at eight guests per vehicle.',
     },
     {
       title: 'Book direct with real support',

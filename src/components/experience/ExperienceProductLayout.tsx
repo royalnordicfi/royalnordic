@@ -60,20 +60,18 @@ export default function ExperienceProductLayout({
           <div className={booking ? 'min-w-0 lg:col-span-7' : 'min-w-0'}>
             <header className="rn-product__intro rn-reveal max-w-rn-narrow">
               <p className="rn-eyebrow">{eyebrow}</p>
-              <h1 className="rn-product__title mt-2 font-display font-semibold text-white sm:mt-2.5">
+              <h1 className="rn-product__title mt-2.5 font-display font-semibold text-white sm:mt-3">
                 {title}
               </h1>
-              <p className="rn-product__lede mt-3 text-[15px] leading-relaxed text-text-muted sm:mt-3.5 sm:text-[16px]">
+              <p className="rn-product__lede mt-3.5 text-[15px] leading-relaxed text-text-muted sm:mt-4 sm:text-[16.5px] sm:leading-[1.65]">
                 {lede}
               </p>
-              {proof ? <div className="rn-product__proof mt-3.5">{proof}</div> : null}
+              {proof ? <div className="rn-product__proof mt-4">{proof}</div> : null}
               {benefits && benefits.length > 0 ? (
-                <ul className="rn-benefit-rail mt-6" aria-label="Key benefits">
-                  {benefits.slice(0, 5).map((item) => (
+                <ul className="rn-benefit-rail mt-6 sm:mt-7" aria-label="Key benefits">
+                  {benefits.slice(0, 4).map((item) => (
                     <li key={item}>
-                      <span className="rn-benefit-rail__mark" aria-hidden>
-                        ✓
-                      </span>
+                      <span className="rn-benefit-rail__icon" aria-hidden />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -83,14 +81,14 @@ export default function ExperienceProductLayout({
                 <div className="mt-7 flex flex-wrap items-center gap-3 lg:hidden">{heroAction}</div>
               ) : null}
               {heroAction ? (
-                <div className="mt-7 hidden lg:block">
+                <div className="mt-8 hidden lg:block">
                   <div className="flex flex-wrap items-center gap-3">{heroAction}</div>
                 </div>
               ) : null}
             </header>
 
             {images.length > 0 ? (
-              <div className="rn-product__gallery mt-6 sm:mt-9">
+              <div className="rn-product__gallery mt-7 sm:mt-10">
                 <ExperienceGallery images={images} />
               </div>
             ) : null}

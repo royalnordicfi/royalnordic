@@ -8,7 +8,7 @@ const FinalCta = () => {
           <p className="rn-eyebrow">Book direct</p>
           <h2 className="rn-h2-tight mt-2 text-white">Ready when you are</h2>
           <p className="rn-section-lede">
-            Check availability for our Guaranteed Northern Lights tour, or tell us what kind of Lapland trip you
+            Check availability for our Small Group Northern Lights tour, or tell us what kind of Lapland trip you
             need — we reply personally.
           </p>
         </div>

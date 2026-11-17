@@ -65,7 +65,7 @@ function main() {
   }
 
   const required = [
-    'Guaranteed Northern Lights Tour Rovaniemi',
+    'Small Group Northern Lights & Photography Tour Rovaniemi',
     'rel="canonical" href="https://royalnordic.fi/northern-lights-tour"',
     'jsonld-product',
     '"@type": "Product"',

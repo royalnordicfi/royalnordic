@@ -164,6 +164,12 @@ const PrivateSantaClausExperience = () => {
         eyebrow="Rovaniemi · Private Christmas"
         title={cms.title}
         lede={cms.lede}
+        benefits={cms.benefits.slice(0, 4)}
+        heroAction={
+          <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
+            Check availability
+          </button>
+        }
         images={cms.gallery}
         facts={[
           { label: 'Duration', value: cms.duration || 'Approximately 1.5 hours' },
@@ -176,12 +182,7 @@ const PrivateSantaClausExperience = () => {
             priceFrom={groupPrice}
             referencePrice={referencePrice}
             priceNote="/ private group"
-            trustLines={[
-              'Private experience',
-              `Up to ${capacity} guests`,
-              'Hotel pickup & return',
-              'Free cancellation 24h',
-            ]}
+            trustLines={['Private experience', 'Hotel pickup', 'Free cancellation 24h']}
             offerLine="Exclusive private Santa meeting · Flat group price"
           >
             {cms.loading && !cms.tour ? (

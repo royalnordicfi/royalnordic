@@ -58,7 +58,7 @@ const Hero = () => {
               <span className="font-display text-xl font-semibold text-[var(--rn-sale)]">
                 €{GUARANTEED_NL_CATALOG_ADULT_PRICE}
               </span>
-              <span className="ml-1">/ adult · Guaranteed Northern Lights</span>
+              <span className="ml-1">/ adult · Small Group Northern Lights</span>
             </span>
           </p>
         </div>

@@ -313,7 +313,7 @@ ${formData.message ? `Additional Message:\n${formData.message}` : ''}`
                 {
                   title: 'Northern Lights',
                   content:
-                    'Aurora sightings are never guaranteed. This is a partner-led evening format — not our Guaranteed Northern Lights Tour with 100% camera-capture refund terms.',
+                    'Aurora sightings are never guaranteed. This is a partner-led evening format — not our Small Group Northern Lights Tour with 100% camera-capture refund terms.',
                 },
                 {
                   title: 'Third-party activity',

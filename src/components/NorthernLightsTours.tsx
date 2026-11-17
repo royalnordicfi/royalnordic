@@ -14,6 +14,7 @@ import {
   GUARANTEED_NL_CATALOG_ADULT_PRICE,
   GUARANTEED_NL_GUARANTEE_SHORT,
   GUARANTEED_NL_REFERENCE_ADULT_PRICE,
+  GUARANTEED_NL_SHORT_NAME,
 } from '../seo/guaranteedNorthernLightsTour'
 import {
   PRIVATE_NL_GROUP_PRICE,
@@ -32,8 +33,8 @@ const ALL_TOURS = [
     tourId: 1 as number | null,
     to: '/northern-lights-tour',
     image: '/nortti1.jpg',
-    imageAlt: 'Guaranteed Northern Lights and photography, small group',
-    title: 'Guaranteed Northern Lights & Photography — Small Group',
+    imageAlt: 'Small group Northern Lights and photography tour in Lapland',
+    title: GUARANTEED_NL_SHORT_NAME,
     description:
       'Small-group aurora hunt with hotel pickup and free professional photos. Camera-capture refund guarantee.',
     duration: '2–10 hours',
@@ -118,7 +119,7 @@ const COMPARE_COLUMNS = [
   {
     to: '/northern-lights-tour',
     tourId: 1 as number | null,
-    short: 'Guaranteed Small Group',
+    short: 'Small Group',
     groupSize: 'Max 8',
     duration: '2–10 hours',
     pickup: 'Hotel pickup',
@@ -304,9 +305,9 @@ const NorthernLightsTours: React.FC = () => {
       />
       <CategoryPageEnd
         title="Ready to book your aurora evening?"
-        lede="Start with our Guaranteed Small Group tour, or choose private, bus, or family formats from the catalogue above."
+        lede="Start with our Small Group Northern Lights Tour, or choose private, bus, or family formats from the catalogue above."
         links={[
-          { to: '/northern-lights-tour', label: 'Check Guaranteed availability', primary: true },
+          { to: '/northern-lights-tour', label: 'Check Small Group availability', primary: true },
           { to: PRIVATE_NL_PATH, label: 'Private tour' },
           { to: STANDARD_GROUP_PATH, label: 'Standard Group bus' },
           { to: '/daytime-experiences', label: 'Day tours' },

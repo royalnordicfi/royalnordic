@@ -23,9 +23,9 @@ export default function BookingAside({
   priceNote = '/ adult',
   quoteLabel,
   trustLines = [
-    'Free cancellation up to 24h before',
-    'Secure Stripe payment',
-    'Hotel pickup in Rovaniemi',
+    'Free cancellation 24h',
+    'Secure payment',
+    'Hotel pickup',
   ],
   offerLine,
   children,
@@ -35,7 +35,7 @@ export default function BookingAside({
     typeof priceFrom === 'number' &&
     typeof referencePrice === 'number' &&
     referencePrice > priceFrom
-  const trust = trustLines.slice(0, 4)
+  const trust = trustLines.slice(0, 3)
 
   return (
     <div className={`rn-book-panel-light rn-book-signature rn-book-aside ${className}`}>
@@ -82,9 +82,7 @@ export default function BookingAside({
           <ul className="rn-book-aside__trust" aria-label="Booking reassurances">
             {trust.map((line) => (
               <li key={line}>
-                <span className="rn-book-aside__trust-mark" aria-hidden>
-                  ✓
-                </span>
+                <span className="rn-book-aside__trust-dot" aria-hidden />
                 <span>{line}</span>
               </li>
             ))}

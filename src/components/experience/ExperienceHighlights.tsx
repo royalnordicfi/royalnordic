@@ -3,16 +3,16 @@ type Props = {
   className?: string
 }
 
-/** Minimal numbered highlights — no icon grid. */
+/** Concise numbered highlights — premium rhythm, no icon clutter. */
 export default function ExperienceHighlights({ items, className = '' }: Props) {
   return (
-    <ol className={`rn-highlights space-y-4 ${className}`}>
+    <ol className={`rn-highlights ${className}`}>
       {items.map((item, i) => (
-        <li key={item} className="flex gap-4">
-          <span className="font-clean text-[11px] font-semibold tracking-[0.14em] text-aurora-soft">
+        <li key={item} className="rn-highlights__item">
+          <span className="rn-highlights__num" aria-hidden>
             {String(i + 1).padStart(2, '0')}
           </span>
-          <span className="text-[15px] leading-snug text-text-muted sm:text-base">{item}</span>
+          <span className="rn-highlights__text">{item}</span>
         </li>
       ))}
     </ol>

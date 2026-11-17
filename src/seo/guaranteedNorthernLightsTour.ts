@@ -1,11 +1,18 @@
 /**
- * Single source of truth for Guaranteed Northern Lights Tour SEO + Product schema.
- * Used by RoutePageMeta, RouteJsonLd, and the build-time prerender script (mirrored in scripts/).
+ * Single source of truth for Small Group Northern Lights & Photography Tour
+ * SEO + Product schema. Used by RoutePageMeta, RouteJsonLd, and the build-time
+ * prerender script (mirrored in scripts/).
  */
 
 export const SITE = 'https://royalnordic.fi'
 
 export const GUARANTEED_NL_PATH = '/northern-lights-tour'
+
+/** Full product title — H1, schema, booking draft name. */
+export const GUARANTEED_NL_PRODUCT_NAME = 'Small Group Northern Lights & Photography Tour'
+
+/** Shorter label for nav, cards, breadcrumbs, and compact UI. */
+export const GUARANTEED_NL_SHORT_NAME = 'Small Group Northern Lights Tour'
 
 /** Current bookable adult price (EUR). Must match tours.adult_price for tour id 1. */
 export const GUARANTEED_NL_CATALOG_ADULT_PRICE = 99
@@ -32,23 +39,38 @@ export const GUARANTEED_NL_GUARANTEE_FULL =
   'If the Northern Lights cannot be captured by our professional DSLR cameras during the tour, you receive a 100% refund. If the Aurora is captured in our photographs, the tour is considered successful even if it appears faint to the naked eye.'
 
 export const GUARANTEED_NL_BENEFITS = [
-  '100% Aurora Guarantee',
-  'Free Professional Photos',
-  'Hotel Pickup & Drop-off',
-  'Expert Local Guides',
-  'Flexible 2–10 Hour Aurora Hunt',
+  'Aurora Guarantee — full refund if cameras miss the lights',
+  'Free professional photos of you with the aurora',
+  'Hotel pickup and drop-off in Rovaniemi',
+  'Small group — max 8 guests per vehicle',
+  'Flexible 2–10 hour hunt for clearer skies',
 ] as const
+
+/** Booking / email / promo aliases for tour id 1 (legacy + current titles). */
+export const GUARANTEED_NL_NAME_ALIASES = [
+  GUARANTEED_NL_PRODUCT_NAME,
+  GUARANTEED_NL_SHORT_NAME,
+  'Guaranteed Northern Lights Tour',
+  'Guaranteed Northern Lights & Photography Tour',
+  'Northern Lights Tour',
+] as const
+
+export function isGuaranteedNlTourName(tourName: string | null | undefined): boolean {
+  if (!tourName) return false
+  const n = tourName.trim()
+  return (GUARANTEED_NL_NAME_ALIASES as readonly string[]).includes(n)
+}
 
 export const guaranteedNlMeta = {
   path: GUARANTEED_NL_PATH,
-  title: 'Guaranteed Northern Lights Tour Rovaniemi | Royal Nordic',
+  title: 'Small Group Northern Lights & Photography Tour Rovaniemi | Royal Nordic',
   description:
-    'Book a guaranteed Northern Lights tour from Rovaniemi from €99: small-group aurora hunt, hotel pickup, expert guides, and free professional photos of you with the aurora. See the Aurora or get your money back. Free cancellation 24h.',
+    'Book a small-group Northern Lights & photography tour from Rovaniemi from €99: hotel pickup, expert guides, free professional photos, and a 100% camera-capture aurora guarantee. Free cancellation 24h.',
   ogImage: `${SITE}/nortti1.jpg`,
-  h1: 'Guaranteed Northern Lights Tour',
-  productName: 'Guaranteed Northern Lights Tour',
+  h1: GUARANTEED_NL_PRODUCT_NAME,
+  productName: GUARANTEED_NL_PRODUCT_NAME,
   productDescription:
-    'Guaranteed Northern Lights (aurora) tour from Rovaniemi, Finnish Lapland: small-group hunt with hotel pickup, English and Finnish guides, flexible 2–10 hour duration, and free professional photos of you with the aurora. If the Northern Lights cannot be captured by our professional DSLR cameras, you receive a 100% refund (see Terms).',
+    'Small-group Northern Lights & photography tour from Rovaniemi, Finnish Lapland: hotel pickup, English and Finnish guides, flexible 2–10 hour duration, and free professional photos of you with the aurora. If the Northern Lights cannot be captured by our professional DSLR cameras, you receive a 100% refund (see Terms).',
 }
 
 export const guaranteedNlFaqs = [
@@ -121,7 +143,7 @@ export const guaranteedNlFaqs = [
 export const guaranteedNlBreadcrumbs = [
   { name: 'Home', path: '/' },
   { name: 'Northern Lights Tours', path: '/northern-lights-tours' },
-  { name: 'Guaranteed Northern Lights Tour', path: GUARANTEED_NL_PATH },
+  { name: GUARANTEED_NL_SHORT_NAME, path: GUARANTEED_NL_PATH },
 ] as const
 
 /** True when `date` falls in the Northern Lights booking season (cross-year). */

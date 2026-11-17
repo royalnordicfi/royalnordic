@@ -169,7 +169,7 @@ const Blog: React.FC = () => {
             <p className="text-sm text-text-muted">Ready to experience Lapland in person?</p>
             <div className="mt-4 flex flex-wrap gap-3">
               <Link to="/northern-lights-tour" className="rn-btn-primary">
-                Guaranteed Northern Lights
+                Small Group Northern Lights
               </Link>
               <Link to="/daytime-experiences" className="rn-btn-secondary">
                 Day tours

@@ -6,15 +6,15 @@ type Props = {
 
 export default function ExperienceInclusions({ included, notIncluded = [], className = '' }: Props) {
   return (
-    <div className={`grid gap-8 sm:grid-cols-2 ${className}`}>
+    <div className={`rn-inclusions grid gap-8 sm:grid-cols-2 ${className}`}>
       <div>
-        <h3 className="font-display text-xl font-semibold text-white">Included</h3>
+        <h3 className="font-display text-lg font-semibold tracking-tight text-white sm:text-xl">
+          Included
+        </h3>
         <ul className="mt-4 space-y-2.5">
           {included.map((item) => (
-            <li key={item} className="flex gap-2.5 text-sm leading-relaxed text-text-muted sm:text-[15px]">
-              <span className="mt-0.5 shrink-0 text-aurora" aria-hidden>
-                ✓
-              </span>
+            <li key={item} className="rn-inclusions__item">
+              <span className="rn-inclusions__dot rn-inclusions__dot--in" aria-hidden />
               <span>{item}</span>
             </li>
           ))}
@@ -22,13 +22,13 @@ export default function ExperienceInclusions({ included, notIncluded = [], class
       </div>
       {notIncluded.length > 0 && (
         <div>
-          <h3 className="font-display text-xl font-semibold text-white">Not included</h3>
+          <h3 className="font-display text-lg font-semibold tracking-tight text-white sm:text-xl">
+            Not included
+          </h3>
           <ul className="mt-4 space-y-2.5">
             {notIncluded.map((item) => (
-              <li key={item} className="flex gap-2.5 text-sm leading-relaxed text-text-muted sm:text-[15px]">
-                <span className="mt-0.5 shrink-0 text-white/35" aria-hidden>
-                  —
-                </span>
+              <li key={item} className="rn-inclusions__item">
+                <span className="rn-inclusions__dot rn-inclusions__dot--out" aria-hidden />
                 <span>{item}</span>
               </li>
             ))}

@@ -46,7 +46,7 @@ const FALLBACK: TourPageFallback = {
     {
       question: 'Are the Northern Lights guaranteed on this tour?',
       answer:
-        'No. This is a shorter family-friendly evening and aurora sightings are never 100% guaranteed. If you want our guaranteed product, book the Guaranteed Northern Lights Tour.',
+        'No. This is a shorter family-friendly evening and aurora sightings are never 100% guaranteed. If you want our guaranteed product, book the Small Group Northern Lights Tour.',
     },
     {
       question: 'What time does the tour start?',
@@ -101,6 +101,17 @@ const FamilyFriendlyNorthernLights = () => {
         eyebrow="Rovaniemi · Family aurora"
         title={cms.title}
         lede={cms.lede}
+        benefits={cms.benefits.slice(0, 3)}
+        proof={
+          <p>
+            <strong>Family format</strong> · Shorter evening · All ages welcome
+          </p>
+        }
+        heroAction={
+          <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
+            Check availability
+          </button>
+        }
         images={cms.gallery}
         facts={[
           { label: 'Duration', value: cms.duration || '2 hours' },
@@ -114,12 +125,7 @@ const FamilyFriendlyNorthernLights = () => {
               priceFrom={cms.pricing.current}
               referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}
               offerLine={cms.pricing.saleActive ? undefined : 'WINTER20 · Save 20% at checkout'}
-              trustLines={[
-                'Free cancellation',
-                'Secure payment',
-                'Hotel pickup',
-                'Family format',
-              ]}
+              trustLines={['Free cancellation 24h', 'Secure payment', 'Hotel pickup']}
             >
               {cms.loading && !cms.tour ? (
                 <p className="py-10 text-center text-sm text-panel-muted">Loading availability…</p>
@@ -148,7 +154,7 @@ const FamilyFriendlyNorthernLights = () => {
             {cms.fullDescription || FALLBACK.description}{' '}
             For our 100% camera-capture Aurora guarantee, see the{' '}
             <Link to="/northern-lights-tour" className="font-medium text-aurora-soft hover:underline">
-              Guaranteed Northern Lights Tour
+              Small Group Northern Lights Tour
             </Link>
             .
           </p>
@@ -176,7 +182,7 @@ const FamilyFriendlyNorthernLights = () => {
                     Northern Lights are a natural phenomenon and cannot be guaranteed on this tour. For a
                     guaranteed product, see our{' '}
                     <Link to="/northern-lights-tour" className="font-medium text-aurora-soft hover:underline">
-                      Guaranteed Northern Lights Tour
+                      Small Group Northern Lights Tour
                     </Link>
                     .
                   </>
@@ -200,7 +206,12 @@ const FamilyFriendlyNorthernLights = () => {
       </ExperienceProductLayout>
 
       <Footer />
-      <MobileBookingBar priceFrom={cms.pricing.current} onBook={scrollToBook} />
+      <MobileBookingBar
+        priceFrom={cms.pricing.current}
+        referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}
+        onBook={scrollToBook}
+        label="Check availability"
+      />
     </div>
   )
 }

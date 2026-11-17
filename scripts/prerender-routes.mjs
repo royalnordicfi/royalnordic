@@ -21,9 +21,11 @@ const distDir = path.join(root, 'dist')
 
 const SITE = 'https://royalnordic.fi'
 const PATH = '/northern-lights-tour'
-const TITLE = 'Guaranteed Northern Lights Tour Rovaniemi | Royal Nordic'
+const PRODUCT_NAME = 'Small Group Northern Lights & Photography Tour'
+const SHORT_NAME = 'Small Group Northern Lights Tour'
+const TITLE = 'Small Group Northern Lights & Photography Tour Rovaniemi | Royal Nordic'
 const DESCRIPTION =
-  'Book a guaranteed Northern Lights tour from Rovaniemi from €99: small-group aurora hunt, hotel pickup, expert guides, and free professional photos of you with the aurora. See the Aurora or get your money back. Free cancellation 24h.'
+  'Book a small-group Northern Lights & photography tour from Rovaniemi from €99: hotel pickup, expert guides, free professional photos, and a 100% camera-capture aurora guarantee. Free cancellation 24h.'
 const OG_IMAGE = `${SITE}/nortti1.jpg`
 const CATALOG_ADULT_PRICE = 99 // mirrors GUARANTEED_NL_CATALOG_ADULT_PRICE; live price from Admin/DB
 
@@ -129,9 +131,9 @@ function buildNlJsonLd() {
   const product = {
     '@context': 'https://schema.org',
     '@type': 'Product',
-    name: 'Guaranteed Northern Lights Tour',
+    name: PRODUCT_NAME,
     description:
-      'Guaranteed Northern Lights (aurora) tour from Rovaniemi, Finnish Lapland: small-group hunt with hotel pickup, English and Finnish guides, flexible 2–10 hour duration, and free professional photos of you with the aurora. If the Northern Lights cannot be captured by our professional DSLR cameras, you receive a 100% refund (see Terms).',
+      'Small-group Northern Lights & photography tour from Rovaniemi, Finnish Lapland: hotel pickup, English and Finnish guides, flexible 2–10 hour duration, and free professional photos of you with the aurora. If the Northern Lights cannot be captured by our professional DSLR cameras, you receive a 100% refund (see Terms).',
     image: OG_IMAGE,
     url: `${SITE}${PATH}`,
     brand: { '@type': 'Brand', name: 'Royal Nordic' },
@@ -153,7 +155,7 @@ function buildNlJsonLd() {
       {
         '@type': 'ListItem',
         position: 3,
-        name: 'Guaranteed Northern Lights Tour',
+        name: SHORT_NAME,
         item: `${SITE}${PATH}`,
       },
     ],
@@ -222,10 +224,10 @@ export function renderMoneyPageHtml(baseHtml) {
       `<div id="root"></div>
     <noscript>
       <article id="prerender-nl-landmark">
-        <h1>Guaranteed Northern Lights Tour</h1>
+        <h1>${PRODUCT_NAME}</h1>
         <p>${DESCRIPTION}</p>
         <p>Small-group aurora hunt from Rovaniemi with hotel pickup, professional photos of you with the aurora, and a 100% camera-capture guarantee. Special offer from €${CATALOG_ADULT_PRICE} per adult.</p>
-        <p><a href="${canonical}#book">Book the Guaranteed Northern Lights Tour in Rovaniemi</a></p>
+        <p><a href="${canonical}#book">Book the ${PRODUCT_NAME} in Rovaniemi</a></p>
       </article>
     </noscript>`,
     )

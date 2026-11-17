@@ -13,7 +13,7 @@ export const TOUR_PUBLIC_PAGES: Record<
   1: {
     path: '/northern-lights-tour',
     fallbackPath: '/northern-lights-tours',
-    label: 'Guaranteed Northern Lights Tour',
+    label: 'Small Group Northern Lights Tour',
   },
   2: {
     path: '/snowshoe-rental',

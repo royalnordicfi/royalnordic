@@ -66,6 +66,8 @@ export const WINTER20_EXCLUDED_TOUR_NAMES = new Set<string>([
   'Guaranteed Northern Lights Tour',
   'Northern Lights Tour',
   'Guaranteed Northern Lights & Photography Tour',
+  'Small Group Northern Lights & Photography Tour',
+  'Small Group Northern Lights Tour',
   'Rovaniemi Saariselkä Private Transfer',
   'Rovaniemi ⇄ Saariselkä Private Transfer',
   'Northern Lights Standard Group – 100% Guarantee',

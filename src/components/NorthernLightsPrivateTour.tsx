@@ -147,6 +147,17 @@ const NorthernLightsPrivateTour = () => {
         eyebrow="Rovaniemi · Private exclusive"
         title={cms.title}
         lede={cms.lede}
+        benefits={cms.benefits.slice(0, 4)}
+        proof={
+          <p>
+            <strong>Private group</strong> · Max {capacity} · Hotel pickup
+          </p>
+        }
+        heroAction={
+          <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
+            Check availability
+          </button>
+        }
         images={cms.gallery}
         facts={[
           { label: 'Duration', value: cms.duration || 'About 5 hours' },
@@ -158,12 +169,7 @@ const NorthernLightsPrivateTour = () => {
           <BookingAside
             priceFrom={groupPrice}
             priceNote="/ private group"
-            trustLines={[
-              'Your own private group',
-              `Up to ${capacity} guests`,
-              'Hotel pickup included',
-              'Free cancellation 24h',
-            ]}
+            trustLines={['Private group', 'Hotel pickup', 'Free cancellation 24h']}
             offerLine="Your own private Northern Lights experience · Up to 8 guests"
           >
             {cms.loading && !cms.tour ? (
@@ -237,9 +243,9 @@ const NorthernLightsPrivateTour = () => {
         <TourSection eyebrow="Other aurora tours" title="Compare Northern Lights experiences">
           <p className="leading-relaxed text-text-muted">
             <Link to="/northern-lights-tour" className="font-medium text-aurora-soft hover:underline">
-              Guaranteed Northern Lights & Photography
+              Small Group Northern Lights Tour
             </Link>{' '}
-            is the small-group shared tour with hotel pickup.{' '}
+            is the shared aurora hunt with hotel pickup.{' '}
             <Link
               to="/northern-lights-standard-group"
               className="font-medium text-aurora-soft hover:underline"

@@ -23,7 +23,7 @@ const Footer = () => {
             </h3>
             <ul className="space-y-2 text-[13px]">
               <li><Link className="rn-footer-link" to="/northern-lights-tours">Northern Lights</Link></li>
-              <li><Link className="rn-footer-link" to="/northern-lights-tour">Guaranteed Northern Lights</Link></li>
+              <li><Link className="rn-footer-link" to="/northern-lights-tour">Small Group Northern Lights</Link></li>
               <li><Link className="rn-footer-link" to="/northern-lights-private-tour">Private Northern Lights</Link></li>
               <li><Link className="rn-footer-link" to="/northern-lights-standard-group">Standard Group Northern Lights</Link></li>
               <li><Link className="rn-footer-link" to="/daytime-experiences">Day Tours</Link></li>

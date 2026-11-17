@@ -47,7 +47,13 @@ const SITE_URL = 'https://royalnordic.fi'
 
 /** Map DB tour names to the customer-facing product names used on the site. */
 export function displayTourName(tourName: string): string {
-  if (tourName === 'Northern Lights Tour') return 'Guaranteed Northern Lights Tour'
+  if (
+    tourName === 'Northern Lights Tour' ||
+    tourName === 'Guaranteed Northern Lights Tour' ||
+    tourName === 'Guaranteed Northern Lights & Photography Tour'
+  ) {
+    return 'Small Group Northern Lights & Photography Tour'
+  }
   if (isRanuaTour(null, tourName)) return RANUA_PUBLIC_NAME
   if (isPrivateSantaTour(null, tourName)) return PRIVATE_SANTA_PUBLIC_NAME
   return tourName

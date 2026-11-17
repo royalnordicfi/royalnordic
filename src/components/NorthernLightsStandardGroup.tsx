@@ -138,12 +138,18 @@ const NorthernLightsStandardGroup = () => {
         eyebrow="Rovaniemi · Large group bus"
         title={cms.title}
         lede={cms.lede}
-        images={cms.gallery}
+        benefits={cms.benefits.slice(0, 4)}
         proof={
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-aurora-soft">
-            Large group bus tour · Maximum {capacity} guests · Meeting point departure
+          <p>
+            <strong>Bus tour</strong> · Max {capacity} · Meeting point departure
           </p>
         }
+        heroAction={
+          <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
+            Check availability
+          </button>
+        }
+        images={cms.gallery}
         facts={[
           { label: 'Duration', value: cms.duration || 'About 5 hours' },
           { label: 'Group', value: cms.groupSize || `Large group · max ${capacity}` },
@@ -155,12 +161,7 @@ const NorthernLightsStandardGroup = () => {
             priceFrom={cms.pricing.current}
             referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}
             priceNote="/ adult"
-            trustLines={[
-              'Free cancellation 24h',
-              'Secure payment',
-              `Departs ${departure}`,
-              'Meeting point only',
-            ]}
+            trustLines={['Free cancellation 24h', 'Secure payment', `Departs ${departure}`]}
           >
             <BookingWidget
               tourId={STANDARD_GROUP_TOUR_ID}
@@ -235,7 +236,7 @@ const NorthernLightsStandardGroup = () => {
         <TourSection eyebrow="Other aurora tours" title="Choose the right evening">
           <p className="leading-relaxed text-text-muted">
             <Link to="/northern-lights-tour" className="font-medium text-aurora-soft hover:underline">
-              Guaranteed Northern Lights & Photography
+              Small Group Northern Lights Tour
             </Link>{' '}
             is the small-group tour with hotel pickup.{' '}
             <Link

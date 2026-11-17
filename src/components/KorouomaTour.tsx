@@ -115,6 +115,12 @@ const KorouomaTour = () => {
         eyebrow="Korouoma · Canyon hike"
         title={cms.title}
         lede={cms.lede}
+        benefits={cms.benefits.slice(0, 4)}
+        heroAction={
+          <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
+            Check availability
+          </button>
+        }
         images={cms.gallery}
         facts={[
           { label: 'Duration', value: cms.duration || '6 hours' },
@@ -127,12 +133,7 @@ const KorouomaTour = () => {
             priceFrom={cms.pricing.current}
             referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}
             offerLine={cms.pricing.saleActive ? undefined : 'WINTER20 · Save 20% at checkout'}
-            trustLines={[
-              'Free cancellation',
-              'Secure payment',
-              'Hotel pickup',
-              'Campfire picnic',
-            ]}
+            trustLines={['Free cancellation 24h', 'Secure payment', 'Hotel pickup']}
           >
             {cms.loading && !cms.tour ? (
               <p className="py-10 text-center text-sm text-panel-muted">Loading availability…</p>
@@ -185,7 +186,11 @@ const KorouomaTour = () => {
       </ExperienceProductLayout>
 
       <Footer />
-      <MobileBookingBar priceFrom={cms.pricing.current} onBook={scrollToBook} />
+      <MobileBookingBar
+        priceFrom={cms.pricing.current}
+        referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}
+        onBook={scrollToBook}
+      />
     </div>
   )
 }

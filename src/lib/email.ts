@@ -229,6 +229,9 @@ function getAdultPrice(tourName: string): number {
   const prices: Record<string, number> = {
     'Northern Lights Tour': 99,
     'Guaranteed Northern Lights Tour': 99,
+    'Guaranteed Northern Lights & Photography Tour': 99,
+    'Small Group Northern Lights & Photography Tour': 99,
+    'Small Group Northern Lights Tour': 99,
     'Quality Snowshoe Rental': 59,
     'Customized Tour': 200
   }
@@ -239,6 +242,9 @@ function getChildPrice(tourName: string): number {
   const prices: Record<string, number> = {
     'Northern Lights Tour': 99,
     'Guaranteed Northern Lights Tour': 99,
+    'Guaranteed Northern Lights & Photography Tour': 99,
+    'Small Group Northern Lights & Photography Tour': 99,
+    'Small Group Northern Lights Tour': 99,
     'Quality Snowshoe Rental': 49,
     'Customized Tour': 150
   }
@@ -247,7 +253,13 @@ function getChildPrice(tourName: string): number {
 
 /** Keep in sync with supabase/functions/_shared/bookingEmails.ts */
 function displayTourName(tourName: string): string {
-  if (tourName === 'Northern Lights Tour') return 'Guaranteed Northern Lights Tour'
+  if (
+    tourName === 'Northern Lights Tour' ||
+    tourName === 'Guaranteed Northern Lights Tour' ||
+    tourName === 'Guaranteed Northern Lights & Photography Tour'
+  ) {
+    return 'Small Group Northern Lights & Photography Tour'
+  }
   if (/ranua/i.test(tourName)) {
     return 'Ranua Wildlife Park – Entry Ticket & Round-Trip Transfer'
   }
@@ -272,6 +284,8 @@ function tourTimeSuffix(tourName: string): string {
   if (
     name === 'Northern Lights Tour' ||
     name === 'Guaranteed Northern Lights Tour' ||
+    name === 'Small Group Northern Lights & Photography Tour' ||
+    name === 'Small Group Northern Lights Tour' ||
     name.includes('Northern Lights')
   ) {
     return ' at 18:30'

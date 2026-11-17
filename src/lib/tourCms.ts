@@ -233,6 +233,16 @@ export function getDisplayPricing(tour: TourCms, now = new Date()): DisplayPrici
 
 export function displayName(tour: Pick<TourCms, 'id' | 'public_name' | 'name'>): string {
   const raw = (tour.public_name || tour.name || 'Tour').trim()
+  // Flagship NL: prefer short listing label until CMS public_name is updated.
+  if (
+    tour.id === 1 ||
+    /^guaranteed northern lights/i.test(raw) ||
+    raw === 'Northern Lights Tour'
+  ) {
+    if (!/small group/i.test(raw)) {
+      return 'Small Group Northern Lights Tour'
+    }
+  }
   // Ranua is entry + round-trip transfer (self-guided). Prefer the locked customer title
   // until Admin CMS public_name is updated to the same wording.
   if (

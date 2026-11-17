@@ -142,6 +142,12 @@ const RanuaZooTour = () => {
         eyebrow="Ranua · Entry & transfer"
         title={cms.title}
         lede={cms.lede}
+        benefits={cms.benefits.slice(0, 4)}
+        heroAction={
+          <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
+            Check availability
+          </button>
+        }
         images={cms.gallery}
         facts={[
           { label: 'Duration', value: cms.duration || '~5 hours' },
@@ -154,12 +160,7 @@ const RanuaZooTour = () => {
             priceFrom={cms.pricing.current}
             referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}
             offerLine={cms.pricing.saleActive ? undefined : 'WINTER20 · Save 20% at checkout'}
-            trustLines={[
-              `Starts ${departure}`,
-              'Tickets included',
-              'Self-guided visit',
-              'Free cancellation',
-            ]}
+            trustLines={[`Starts ${departure}`, 'Tickets included', 'Free cancellation 24h']}
           >
             {cms.loading && !cms.tour ? (
               <p className="py-10 text-center text-sm text-panel-muted">Loading availability…</p>
@@ -260,7 +261,11 @@ const RanuaZooTour = () => {
       </ExperienceProductLayout>
 
       <Footer />
-      <MobileBookingBar priceFrom={cms.pricing.current} onBook={scrollToBook} />
+      <MobileBookingBar
+        priceFrom={cms.pricing.current}
+        referencePrice={cms.pricing.saleActive ? cms.pricing.reference ?? undefined : undefined}
+        onBook={scrollToBook}
+      />
     </div>
   )
 }

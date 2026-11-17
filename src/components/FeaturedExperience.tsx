@@ -5,6 +5,7 @@ import { RN_SNOWMOBILE_PROMO } from '../lib/bokun'
 import {
   GUARANTEED_NL_CATALOG_ADULT_PRICE,
   GUARANTEED_NL_REFERENCE_ADULT_PRICE,
+  GUARANTEED_NL_SHORT_NAME,
 } from '../seo/guaranteedNorthernLightsTour'
 
 type OfferCard = {
@@ -63,7 +64,7 @@ const FeaturedExperience = () => {
       image: tour?.hero_image_url || tour?.gallery?.[0]?.url || '/nordicci1.jpg',
       imageAlt: 'Guests under the Northern Lights in Finnish Lapland',
       eyebrow: 'Rovaniemi · Aurora',
-      title: tour ? displayName(tour) : 'Guaranteed Northern Lights Tour',
+      title: tour ? displayName(tour) : GUARANTEED_NL_SHORT_NAME,
       description: '100% aurora guarantee, hotel pickup, and free professional photos.',
       badge: tour?.badge || 'Special offer',
       current: nlCurrent,

@@ -145,7 +145,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
     setLiveChildPrice(childPrice)
   }, [adultPrice, childPrice])
 
-  const isNorthernLightsTour = tourName === 'Guaranteed Northern Lights Tour'
+  const isNorthernLightsTour =
+    tourName === 'Guaranteed Northern Lights Tour' ||
+    tourName === 'Small Group Northern Lights & Photography Tour' ||
+    tourName === 'Small Group Northern Lights Tour' ||
+    tourName === 'Guaranteed Northern Lights & Photography Tour'
 
   // Check if Stripe is configured
   const isStripeConfigured = !!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
