@@ -120,17 +120,22 @@ const NorthernLightsTour = () => {
         title={GUARANTEED_NL_PRODUCT_NAME}
         lede={cms.lede}
         benefits={cms.benefits.slice(0, 4)}
+        cinematic={{
+          image: cms.gallery[0]?.src || '/nortti1.jpg',
+          imageAlt: cms.gallery[0]?.alt || 'Northern Lights over Finnish Lapland',
+          imageSecondary: cms.gallery[1]?.src,
+        }}
         proof={
           <p>
             <strong>★★★★★</strong> Guest reviews · Small groups · Free professional photos
           </p>
         }
         heroAction={
-          <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[48px] px-8">
+          <button type="button" onClick={scrollToBook} className="rn-btn-primary min-h-[50px] px-8">
             Check availability
           </button>
         }
-        images={cms.gallery}
+        images={cms.gallery.slice(1)}
         facts={[
           { label: 'Duration', value: cms.duration || '2–10 hours' },
           { label: 'Group', value: cms.groupSize || 'Max 8 / vehicle' },

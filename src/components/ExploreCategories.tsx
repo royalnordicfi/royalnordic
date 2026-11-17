@@ -25,14 +25,18 @@ const ExploreCategories = () => {
   return (
     <section
       id="experiences"
-      className="relative bg-midnight pb-12 pt-8 sm:pb-14 sm:pt-10 lg:pb-16 lg:pt-11"
+      className="relative bg-midnight pb-16 pt-12 sm:pb-20 sm:pt-14 lg:pb-24 lg:pt-16"
       aria-label="Explore experiences"
     >
       <div className="rn-container relative z-10">
-        <div className="rn-reveal mb-5 flex flex-wrap items-end justify-between gap-3 sm:mb-6">
-          <div>
+        <div className="rn-reveal mb-7 flex flex-wrap items-end justify-between gap-3 sm:mb-9">
+          <div className="max-w-xl">
             <p className="rn-eyebrow">Experiences</p>
-            <h2 className="rn-h2-tight mt-2 text-white">Explore Lapland with us</h2>
+            <h2 className="rn-h2-tight mt-2.5 text-white">Explore Lapland with us</h2>
+            <p className="mt-3 max-w-md text-[15px] leading-relaxed text-text-muted">
+              Photography-led evenings under the aurora, daytime wilderness, private itineraries, and
+              transfers across Finnish Lapland.
+            </p>
           </div>
           <Link
             to="/northern-lights-tours"
@@ -42,10 +46,10 @@ const ExploreCategories = () => {
           </Link>
         </div>
 
-        <div className="grid gap-3 lg:grid-cols-12 lg:gap-3.5">
+        <div className="rn-stagger grid gap-3.5 lg:grid-cols-12 lg:gap-4">
           <Link
             to="/northern-lights-tours"
-            className="group rn-reveal rn-explore-tile rn-explore-tile--lead relative min-h-[200px] overflow-hidden rounded-rn-lg border border-white/[0.07] sm:min-h-[260px] lg:col-span-7 lg:min-h-[360px]"
+            className="group rn-reveal rn-explore-tile rn-explore-tile--lead relative min-h-[240px] overflow-hidden rounded-rn-lg border border-white/[0.07] sm:min-h-[320px] lg:col-span-7 lg:min-h-[420px]"
           >
             <img
               src="/nordicci1.jpg"

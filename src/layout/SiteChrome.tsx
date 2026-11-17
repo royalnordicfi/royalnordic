@@ -1,6 +1,7 @@
 import { useLocation } from 'react-router-dom'
 import Header from '../components/Header'
 import PromotionAnnouncementBar from '../components/PromotionAnnouncementBar'
+import SiteIntro from '../components/SiteIntro'
 import WhatsAppWidget from '../components/WhatsAppWidget'
 import WinterPromoPopup from '../components/WinterPromoPopup'
 import { isMinimalChromePath } from './shell'
@@ -12,6 +13,7 @@ export default function SiteChrome() {
 
   return (
     <>
+      <SiteIntro />
       <PromotionAnnouncementBar />
       <Header />
       <WinterPromoPopup />

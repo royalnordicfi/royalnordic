@@ -2,6 +2,13 @@ import ExperienceBreadcrumb, { type BreadcrumbItem } from './ExperienceBreadcrum
 import ExperienceGallery, { type GalleryImage } from '../ExperienceGallery'
 import ExperienceFacts, { type FactItem } from './ExperienceFacts'
 
+export type CinematicHeroConfig = {
+  image: string
+  imageAlt: string
+  /** Optional second image for subtle crossfade on desktop */
+  imageSecondary?: string
+}
+
 type Props = {
   breadcrumbs: BreadcrumbItem[]
   eyebrow: string
@@ -20,6 +27,11 @@ type Props = {
   proof?: React.ReactNode
   benefits?: readonly string[]
   heroAction?: React.ReactNode
+  /**
+   * Full-bleed cinematic product hero (flagship standard).
+   * When set, title/lede/benefits render in the hero; the content column starts with gallery.
+   */
+  cinematic?: CinematicHeroConfig
 }
 
 /**
@@ -42,33 +54,43 @@ export default function ExperienceProductLayout({
   proof,
   benefits,
   heroAction,
+  cinematic,
 }: Props) {
-  return (
-    <div className="rn-product">
-      <div className="rn-product__glow" aria-hidden />
-      <div className="rn-container-product rn-shell-pad rn-shell-pad--product pb-16 sm:pb-24">
-        <ExperienceBreadcrumb items={breadcrumbs} />
+  const cinema = Boolean(cinematic)
 
-        {/* items-stretch so the booking aside is as tall as content — required for sticky */}
-        <div
-          className={
-            booking
-              ? 'mt-4 grid gap-7 sm:gap-8 lg:mt-8 lg:grid-cols-12 lg:items-stretch lg:gap-x-10 xl:gap-x-14'
-              : 'mt-4 lg:mt-8'
-          }
-        >
-          <div className={booking ? 'min-w-0 lg:col-span-7' : 'min-w-0'}>
-            <header className="rn-product__intro rn-reveal max-w-rn-narrow">
-              <p className="rn-eyebrow">{eyebrow}</p>
-              <h1 className="rn-product__title mt-2.5 font-display font-semibold text-white sm:mt-3">
+  return (
+    <div className={`rn-product ${cinema ? 'rn-product--cinema' : ''}`}>
+      {cinematic ? (
+        <header className="rn-exp-cinema relative flex items-end overflow-hidden">
+          <img
+            src={cinematic.image}
+            alt={cinematic.imageAlt}
+            className="absolute inset-0 h-full w-full object-cover object-center"
+            fetchPriority="high"
+          />
+          {cinematic.imageSecondary ? (
+            <img
+              src={cinematic.imageSecondary}
+              alt=""
+              className="rn-exp-cinema__ghost absolute inset-0 h-full w-full object-cover"
+              aria-hidden
+            />
+          ) : null}
+          <div className="rn-exp-cinema__veil" aria-hidden />
+          <div className="rn-hero-chrome-veil pointer-events-none absolute inset-x-0 top-0 h-28 sm:h-36" aria-hidden />
+          <div className="rn-container relative z-10 w-full pb-10 pt-[calc(var(--rn-chrome-h)+1.5rem)] sm:pb-12 sm:pt-[calc(var(--rn-chrome-h)+1.85rem)]">
+            <ExperienceBreadcrumb items={breadcrumbs} tone="onMedia" />
+            <div className="rn-exp-cinema__copy mt-6 max-w-rn-narrow sm:mt-8">
+              <p className="rn-eyebrow text-aurora-soft">{eyebrow}</p>
+              <h1 className="rn-exp-cinema__title mt-2.5 font-display font-semibold text-white">
                 {title}
               </h1>
-              <p className="rn-product__lede mt-3.5 text-[15px] leading-relaxed text-text-muted sm:mt-4 sm:text-[16.5px] sm:leading-[1.65]">
+              <p className="mt-4 max-w-2xl text-[15.5px] leading-relaxed text-white/80 sm:mt-4.5 sm:text-[17px] sm:leading-[1.6]">
                 {lede}
               </p>
-              {proof ? <div className="rn-product__proof mt-4">{proof}</div> : null}
+              {proof ? <div className="rn-product__proof rn-product__proof--on-media mt-4">{proof}</div> : null}
               {benefits && benefits.length > 0 ? (
-                <ul className="rn-benefit-rail mt-6 sm:mt-7" aria-label="Key benefits">
+                <ul className="rn-benefit-rail rn-benefit-rail--on-media mt-6 sm:mt-7" aria-label="Key benefits">
                   {benefits.slice(0, 4).map((item) => (
                     <li key={item}>
                       <span className="rn-benefit-rail__icon" aria-hidden />
@@ -78,17 +100,66 @@ export default function ExperienceProductLayout({
                 </ul>
               ) : null}
               {heroAction ? (
-                <div className="mt-7 flex flex-wrap items-center gap-3 lg:hidden">{heroAction}</div>
+                <div className="mt-8 flex flex-wrap items-center gap-3">{heroAction}</div>
               ) : null}
-              {heroAction ? (
-                <div className="mt-8 hidden lg:block">
-                  <div className="flex flex-wrap items-center gap-3">{heroAction}</div>
-                </div>
-              ) : null}
-            </header>
+            </div>
+          </div>
+        </header>
+      ) : null}
+
+      <div className="rn-product__glow" aria-hidden />
+      <div
+        className={`rn-container-product pb-16 sm:pb-24 ${
+          cinema ? 'rn-product__body-pad' : 'rn-shell-pad rn-shell-pad--product'
+        }`}
+      >
+        {!cinema ? <ExperienceBreadcrumb items={breadcrumbs} /> : null}
+
+        <div
+          className={
+            booking
+              ? `grid gap-7 sm:gap-8 lg:grid-cols-12 lg:items-stretch lg:gap-x-10 xl:gap-x-14 ${
+                  cinema ? 'mt-8 lg:mt-10' : 'mt-4 lg:mt-8'
+                }`
+              : cinema
+                ? 'mt-8 lg:mt-10'
+                : 'mt-4 lg:mt-8'
+          }
+        >
+          <div className={booking ? 'min-w-0 lg:col-span-7' : 'min-w-0'}>
+            {!cinema ? (
+              <header className="rn-product__intro rn-reveal max-w-rn-narrow">
+                <p className="rn-eyebrow">{eyebrow}</p>
+                <h1 className="rn-product__title mt-2.5 font-display font-semibold text-white sm:mt-3">
+                  {title}
+                </h1>
+                <p className="rn-product__lede mt-3.5 text-[15px] leading-relaxed text-text-muted sm:mt-4 sm:text-[16.5px] sm:leading-[1.65]">
+                  {lede}
+                </p>
+                {proof ? <div className="rn-product__proof mt-4">{proof}</div> : null}
+                {benefits && benefits.length > 0 ? (
+                  <ul className="rn-benefit-rail mt-6 sm:mt-7" aria-label="Key benefits">
+                    {benefits.slice(0, 4).map((item) => (
+                      <li key={item}>
+                        <span className="rn-benefit-rail__icon" aria-hidden />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                {heroAction ? (
+                  <div className="mt-7 flex flex-wrap items-center gap-3 lg:hidden">{heroAction}</div>
+                ) : null}
+                {heroAction ? (
+                  <div className="mt-8 hidden lg:block">
+                    <div className="flex flex-wrap items-center gap-3">{heroAction}</div>
+                  </div>
+                ) : null}
+              </header>
+            ) : null}
 
             {images.length > 0 ? (
-              <div className="rn-product__gallery mt-7 sm:mt-10">
+              <div className={`rn-product__gallery ${cinema ? 'mt-0' : 'mt-7 sm:mt-10'}`}>
                 <ExperienceGallery images={images} />
               </div>
             ) : null}

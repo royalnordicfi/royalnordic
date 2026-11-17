@@ -23,10 +23,11 @@ const OVERLAY_EXACT = new Set([
   '/referralprogram',
   '/privacy-policy',
   '/terms-conditions',
+  /** Flagship product uses cinematic overlay hero */
+  '/northern-lights-tour',
 ])
 
 const PRODUCT_EXACT = new Set([
-  '/northern-lights-tour',
   '/family-friendly-northern-lights',
   '/northern-lights-standard-group',
   '/northern-lights-private-tour',
