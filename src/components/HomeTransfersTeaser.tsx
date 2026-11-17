@@ -9,7 +9,7 @@ const HomeTransfersTeaser = () => {
     >
       <div className="grid lg:grid-cols-12 lg:items-stretch">
         <div className="rn-reveal-img relative lg:col-span-6 xl:col-span-7">
-          <div className="relative h-[220px] overflow-hidden sm:h-[320px] lg:h-full lg:min-h-[420px]">
+          <div className="relative h-[200px] overflow-hidden sm:h-[280px] lg:h-full lg:min-h-[340px]">
             <img
               src="/royal-trans-1.jpg"
               alt="Royal Nordic private transfer vehicle in Finnish Lapland"
@@ -25,16 +25,16 @@ const HomeTransfersTeaser = () => {
         </div>
 
         <div className="relative flex items-center lg:col-span-6 xl:col-span-5">
-          <div className="rn-reveal relative w-full px-4 py-10 sm:px-6 sm:py-12 lg:py-16 lg:pl-10 lg:pr-8 xl:pl-14">
+          <div className="rn-reveal relative w-full px-4 py-8 sm:px-6 sm:py-10 lg:py-12 lg:pl-10 lg:pr-8 xl:pl-12">
             <p className="rn-eyebrow">Transfers</p>
             <h2 className="rn-h2-tight mt-2.5 text-white">
               Private transfers across Finnish Lapland
             </h2>
-            <p className="mt-4 max-w-md text-[15px] leading-relaxed text-text-muted">
+            <p className="mt-3.5 max-w-md text-[15px] leading-relaxed text-text-muted">
               Door-to-door rides between Rovaniemi, Levi, Kittilä, Saariselkä and other destinations —
               timed around flights and hotel check-ins.
             </p>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Link to="/transportation" className="rn-btn-primary min-h-[48px] w-full justify-center px-7 sm:w-auto">
                 Book transfer
               </Link>

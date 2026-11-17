@@ -789,15 +789,19 @@
   }
 
   .rn-hero-video {
-    transform: scale(1.045);
-    animation: rn-hero-video-in 28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform: scale(1.02);
     /* Moodier grade — less blown lime wash, more cinematic Lapland night */
     filter: brightness(0.86) saturate(1.05) contrast(1.1);
     object-position: 50% 78%;
   }
+  @media (prefers-reduced-motion: no-preference) {
+    .rn-hero-video {
+      animation: rn-hero-video-in 32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  }
   @keyframes rn-hero-video-in {
     to {
-      transform: scale(1.01);
+      transform: scale(1);
     }
   }
 

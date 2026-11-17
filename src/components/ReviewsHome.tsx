@@ -7,7 +7,7 @@ const ReviewsHome = () => {
       reviews={reviewsFor('general', 10)}
       eyebrow="Guest stories"
       title="What travellers remember"
-      className="bg-[#040807]"
+      className="bg-midnight border-t border-white/[0.06]"
     />
   )
 }

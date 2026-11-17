@@ -3,8 +3,8 @@ import { CONTACT } from '../lib/contactInfo'
 
 const Footer = () => {
   return (
-    <footer className="relative border-t border-white/[0.06] bg-[#020504] text-snow">
-      <div className="rn-container py-16 sm:py-20 lg:py-24">
+    <footer className="relative border-t border-white/[0.06] bg-midnight text-snow">
+      <div className="rn-container py-12 sm:py-14 lg:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-5">
             <div className="mb-3.5 flex items-center gap-2.5">

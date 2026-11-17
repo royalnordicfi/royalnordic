@@ -90,30 +90,25 @@ const FeaturedExperience = () => {
 
   return (
     <section
-      className="rn-offers relative overflow-hidden bg-midnight pb-12 pt-8 sm:pb-14 sm:pt-10 lg:pb-16 lg:pt-12"
+      className="rn-offers relative overflow-hidden bg-midnight pb-10 pt-7 sm:pb-12 sm:pt-9 lg:pb-14 lg:pt-10"
       aria-labelledby="rn-offers-heading"
     >
-      <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
+      <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-70" aria-hidden />
       <div className="rn-container relative">
         <header className="rn-reveal max-w-2xl">
           <p className="rn-eyebrow">This season</p>
-          <h2 id="rn-offers-heading" className="rn-h2 mt-2.5 text-white">
+          <h2 id="rn-offers-heading" className="rn-h2-tight mt-2 text-white">
             Offers & discounts
           </h2>
-          <p className="mt-3 max-w-xl text-[14.5px] leading-relaxed text-text-muted sm:text-[15px]">
+          <p className="mt-2.5 max-w-xl text-[14.5px] leading-relaxed text-text-muted sm:text-[15px]">
             Clear savings on our flagship aurora evening and partner snowmobile safari — discount
             shown up front, final total confirmed at checkout.
           </p>
         </header>
 
-        <div className="rn-offers__grid mt-8 sm:mt-9">
-          {offers.map((offer, i) => (
-            <Link
-              key={offer.to}
-              to={offer.to}
-              className="rn-offer-card rn-reveal group"
-              style={{ ['--rn-offer-delay' as string]: `${i * 90}ms` }}
-            >
+        <div className="rn-offers__grid mt-6 sm:mt-7">
+          {offers.map((offer) => (
+            <Link key={offer.to} to={offer.to} className="rn-offer-card rn-reveal group">
               <div className="rn-offer-card__media">
                 <img
                   src={offer.image}
@@ -135,7 +130,10 @@ const FeaturedExperience = () => {
                 <p className="rn-offer-card__desc">{offer.description}</p>
 
                 <div className="rn-offer-card__foot">
-                  <div className="rn-offer-card__price" aria-label={`Was €${formatMoney(offer.reference)}, now €${formatMoney(offer.current)}`}>
+                  <div
+                    className="rn-offer-card__price"
+                    aria-label={`Was €${formatMoney(offer.reference)}, now €${formatMoney(offer.current)}`}
+                  >
                     <span className="rn-offer-card__was">€{formatMoney(offer.reference)}</span>
                     <span className="rn-offer-card__now">€{formatMoney(offer.current)}</span>
                     <span className="rn-offer-card__unit">/ adult</span>
