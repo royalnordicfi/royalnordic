@@ -53,7 +53,10 @@ const Header = () => {
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   const hasHero = isHeroShell(pathname)
+  const isHome = pathname === '/'
   const transparent = hasHero && !scrolled
+  /** Quiet-luxury floating glass pill on the homepage */
+  const floating = isHome
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10)
@@ -243,6 +246,7 @@ const Header = () => {
       <header
         className={[
           'rn-header',
+          floating ? 'rn-header--float' : '',
           transparent ? 'rn-header--transparent' : 'rn-header--solid',
           scrolled ? 'rn-header--scrolled' : '',
         ]
@@ -250,7 +254,7 @@ const Header = () => {
           .join(' ')}
         style={{ top: 'var(--rn-promo-bar-height, 0px)' }}
       >
-        <div className="rn-header__inner rn-container">
+        <div className={`rn-header__inner ${floating ? 'rn-header__inner--float' : 'rn-container'}`}>
           <Link to="/" className="rn-header__brand" aria-label="Royal Nordic home">
             <img src="/logo.png" alt="" className="rn-header__brand-mark" width={28} height={28} />
             <span className="rn-header__brand-name">Royal Nordic</span>

@@ -1,18 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { SHOW_MONSTER_TRUCK_NORTHERN_LIGHTS } from './lib/productVisibility';
 import ActiveTourGate from './components/ActiveTourGate';
-import Hero from './components/Hero';
-import EditorialMoment from './components/EditorialMoment';
-import TrustStrip from './components/TrustStrip';
-import FeaturedExperience from './components/FeaturedExperience';
-import ExploreCategories from './components/ExploreCategories';
-import ReviewsHome from './components/ReviewsHome';
-import PrivateCustomSection from './components/PrivateCustomSection';
-import GuidesTeaser from './components/GuidesTeaser';
-import HomeTransfersTeaser from './components/HomeTransfersTeaser';
-import FinalCta from './components/FinalCta';
+import HomePage from './components/home/HomePage';
 import ContactPage from './components/ContactPage';
-import Footer from './components/Footer';
 import NorthernLightsTour from './components/NorthernLightsTour';
 import SnowshoeRental from './components/SnowshoeRental';
 import IceFishingTour from './components/IceFishingTour';
@@ -97,21 +87,7 @@ function App() {
         
         <Routes>
           {/* Homepage */}
-          <Route path="/" element={
-            <>
-              <Hero />
-              <TrustStrip />
-              <FeaturedExperience />
-              <ExploreCategories />
-              <EditorialMoment />
-              <PrivateCustomSection />
-              <HomeTransfersTeaser />
-              <ReviewsHome />
-              <GuidesTeaser />
-              <FinalCta />
-              <Footer />
-            </>
-          } />
+          <Route path="/" element={<HomePage />} />
           
           {/* Tour Category Pages */}
             <Route path="/northern-lights-tours" element={<NorthernLightsTours />} />
