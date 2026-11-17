@@ -21,6 +21,7 @@ const TRANSFERS = [
     pickup: true,
     badge: 'Book online',
     priceFrom: SAARISELKA_VEHICLE_PRICE,
+    pricePrefix: undefined as string | undefined,
     priceUnit: '/ vehicle · one way',
     ctaLabel: 'Book transfer',
   },
@@ -33,10 +34,11 @@ const TRANSFERS = [
     duration: '2–3 hours',
     groupSize: FIXED_TRANSFER_CAPACITY_LABEL,
     pickup: true,
-    badge: 'On request',
+    badge: 'Request a quote',
     priceFrom: LEVI_VEHICLE_PRICE,
+    pricePrefix: 'From',
     priceUnit: '/ vehicle (indicative)',
-    ctaLabel: 'Request transfer',
+    ctaLabel: 'Request a transfer',
   },
   {
     to: '/transportation-customized',
@@ -45,30 +47,68 @@ const TRANSFERS = [
     title: 'Customized Transportation',
     description:
       'Airport pickups, multi-stop days, and routes for groups of any size — we arrange suitable vehicles.',
-    duration: 'Flexible group sizes',
-    groupSize: 'Custom routes · Private transportation',
+    duration: 'Flexible timing',
+    groupSize: 'Any group size · custom routes',
     pickup: false,
-    badge: 'On request',
+    logistics: 'Quote on request',
+    badge: 'Request a quote',
     priceFrom: undefined as number | undefined,
-    priceUnit: '/ quote',
-    ctaLabel: 'Request quote',
+    pricePrefix: undefined as string | undefined,
+    priceUnit: undefined as string | undefined,
+    ctaLabel: 'Get a quote',
   },
 ]
+
+const BENEFITS = [
+  {
+    title: 'Private, door-to-door',
+    text: 'Travel directly between your chosen locations.',
+  },
+  {
+    title: 'Flexible schedules',
+    text: 'Transfers arranged around your travel plans.',
+  },
+  {
+    title: 'Clear pricing',
+    text: 'Rates quoted per vehicle, with custom routes available on request.',
+  },
+] as const
 
 const TransportationCategory = () => {
   return (
     <div className="rn-page">
       <CategoryHero
-        title="Private Transfers in Finnish Lapland"
-        subtitle="Door-to-door rides between Rovaniemi, Saariselkä, Levi, Kittilä and custom routes — timed around flights and hotels."
+        title="Private Transfers Across Finnish Lapland"
+        subtitle="Comfortable, private journeys between Rovaniemi, Lapland's resorts and airports — tailored to your schedule."
         image="/royal-trans-4.jpg"
         compact
+        eyebrow="Royal Nordic · Transfers"
+        actions={
+          <a href="#transfers" className="rn-btn-primary min-h-[48px] px-7">
+            Explore transfers
+          </a>
+        }
       />
 
-      <section className="rn-section-tight rn-hero-follow relative pt-0 pb-10 sm:pb-12">
-        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
-        <div className="rn-container relative space-y-10">
-          <div className="rn-card-grid sm:!grid-cols-2 lg:!grid-cols-3">
+      <section
+        id="transfers"
+        className="rn-section-tight rn-hero-follow relative scroll-mt-[calc(var(--rn-chrome-h)+1rem)] pt-0 pb-8 sm:pb-10"
+        aria-labelledby="rn-transfers-heading"
+      >
+        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-60" aria-hidden />
+        <div className="rn-container relative">
+          <header className="mb-6 max-w-rn-measure sm:mb-7">
+            <p className="rn-eyebrow">Routes</p>
+            <h2 id="rn-transfers-heading" className="rn-h2-tight mt-2 text-white">
+              Choose your transfer
+            </h2>
+            <p className="mt-2.5 text-[15px] leading-relaxed text-text-muted">
+              Fixed routes with clear per-vehicle rates, plus custom transportation when you need a different
+              destination or larger group.
+            </p>
+          </header>
+
+          <div className="rn-card-grid rn-card-grid--transfers">
             {TRANSFERS.map((item) => (
               <TourCard
                 key={item.to}
@@ -81,30 +121,51 @@ const TransportationCategory = () => {
                 duration={item.duration}
                 groupSize={item.groupSize}
                 pickup={item.pickup}
+                logistics={'logistics' in item ? item.logistics : undefined}
                 badge={item.badge}
                 priceFrom={item.priceFrom}
+                pricePrefix={item.pricePrefix}
                 priceUnit={item.priceUnit}
                 ctaLabel={item.ctaLabel}
               />
             ))}
           </div>
+        </div>
+      </section>
 
-          <div className="mx-auto max-w-rn-measure border-y border-white/[0.08] py-8 sm:py-9">
-            <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">How pricing works</h2>
-            <p className="mt-3 text-sm leading-relaxed text-text-muted sm:text-[15px]">
-              Fixed-route transfers are priced per vehicle, not per passenger. The Saariselkä route can be
-              booked and paid online at €{SAARISELKA_VEHICLE_PRICE} one way. Levi/Kittilä (from €
-              {LEVI_VEHICLE_PRICE}) and custom routes for any group size are confirmed by request so we can
-              match your flight, luggage and fleet needs.
+      <section
+        className="border-t border-white/[0.06] bg-midnight py-10 sm:py-12"
+        aria-labelledby="rn-transfer-benefits-heading"
+      >
+        <div className="rn-container">
+          <header className="max-w-rn-measure">
+            <p className="rn-eyebrow">Why book with us</p>
+            <h2 id="rn-transfer-benefits-heading" className="rn-h2-tight mt-2 text-white">
+              Travel comfortably. Arrive effortlessly.
+            </h2>
+            <p className="mt-2.5 text-[15px] leading-relaxed text-text-muted">
+              Saariselkä is bookable online at €{SAARISELKA_VEHICLE_PRICE} one way per vehicle. Levi/Kittilä
+              (from €{LEVI_VEHICLE_PRICE}) and custom routes are confirmed by request so we can match flights,
+              luggage and fleet needs.
             </p>
-          </div>
+          </header>
+
+          <ul className="rn-transfer-benefits mt-8">
+            {BENEFITS.map((item) => (
+              <li key={item.title} className="rn-transfer-benefits__item">
+                <h3 className="rn-transfer-benefits__title">{item.title}</h3>
+                <p className="rn-transfer-benefits__text">{item.text}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
       <CategoryPageEnd
-        lede="Need a custom route or airport timing?"
+        title="Going somewhere else in Lapland?"
+        lede="Tell us your destination, travel date and group size. We'll help arrange the right private transportation."
         links={[
-          { to: '/transportation-customized', label: 'Request a quote', primary: true },
+          { to: '/transportation-customized', label: 'Request a custom transfer', primary: true },
           { to: '/contact', label: 'Contact us' },
         ]}
       />
