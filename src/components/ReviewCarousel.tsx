@@ -116,7 +116,7 @@ export default function ReviewCarousel({
         </div>
 
         <figure
-          className={`rn-reveal rn-review-editorial mt-5 max-w-2xl transition duration-300 ${
+          className={`rn-reveal rn-review-editorial mt-4 max-w-xl sm:mt-5 sm:max-w-2xl transition duration-300 ${
             fade ? 'opacity-100' : 'opacity-0'
           }`}
           onTouchStart={(e) => {
@@ -131,8 +131,8 @@ export default function ReviewCarousel({
           }}
         >
           <FiveYellowStars />
-          <blockquote className="rn-review-quote mt-2.5">“{review.quote}”</blockquote>
-          <figcaption className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[12px] sm:text-[12.5px]">
+          <blockquote className="rn-review-quote mt-2">“{review.quote}”</blockquote>
+          <figcaption className="mt-3.5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[12.5px] sm:text-[13px]">
             <span className="font-medium text-white">{review.name}</span>
             {review.location && (
               <>

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import CategoryHero from './CategoryHero'
 import CategoryPageEnd from './CategoryPageEnd'
 import Footer from './Footer'
@@ -11,7 +12,6 @@ import { mergeTourCardCms, tourCmsMap } from '../lib/mergeTourCardCms'
 import {
   GUARANTEED_NL_CATALOG_ADULT_PRICE,
   GUARANTEED_NL_GUARANTEE_SHORT,
-  GUARANTEED_NL_HERO_PROMISE,
   GUARANTEED_NL_REFERENCE_ADULT_PRICE,
 } from '../seo/guaranteedNorthernLightsTour'
 import {
@@ -21,6 +21,7 @@ import {
   PRIVATE_NL_TOUR_ID,
   STANDARD_GROUP_ADULT_PRICE,
   STANDARD_GROUP_LISTING_TITLE,
+  STANDARD_GROUP_MEETING_POINT,
   STANDARD_GROUP_PATH,
   STANDARD_GROUP_TOUR_ID,
 } from '../lib/tourBookingRules'
@@ -32,7 +33,8 @@ const ALL_TOURS = [
     image: '/nortti1.jpg',
     imageAlt: 'Guaranteed Northern Lights and photography, small group',
     title: 'Guaranteed Northern Lights & Photography — Small Group',
-    description: `${GUARANTEED_NL_HERO_PROMISE} Hotel pickup and free professional photos included.`,
+    description:
+      'Small-group aurora hunt with hotel pickup and free professional photos. Camera-capture refund guarantee.',
     duration: '2–10 hours',
     groupSize: 'Small group · max 8',
     pickup: true,
@@ -48,7 +50,7 @@ const ALL_TOURS = [
     imageAlt: 'Private Northern Lights tour for an exclusive group',
     title: PRIVATE_NL_LISTING_TITLE,
     description:
-      'Exclusive private aurora experience for your group of up to eight guests. Hotel pickup, professional photography, €1,349 per private group.',
+      'Exclusive private aurora evening for your group of up to eight. Hotel pickup and professional photography included.',
     duration: 'About 5 hours',
     groupSize: 'Private · max 8',
     pickup: true,
@@ -65,7 +67,7 @@ const ALL_TOURS = [
     imageAlt: 'Northern Lights Standard Group bus tour',
     title: STANDARD_GROUP_LISTING_TITLE,
     description:
-      'Large shared bus tour for up to 50 guests. Departs Ruokasenkatu 3 at 20:00. Hotel pickup is not included.',
+      'Shared bus departure for up to 50 guests. Meet at Ruokasenkatu 3 at 20:00 — hotel pickup is not included.',
     duration: 'About 5 hours',
     groupSize: 'Large group · max 50',
     pickup: false,
@@ -82,7 +84,8 @@ const ALL_TOURS = [
     image: '/family1.jpg',
     imageAlt: 'Family-Friendly Northern Lights Tour',
     title: 'Family-Friendly Northern Lights Tour',
-    description: 'Shorter 2-hour evening format for families and mixed-age groups. Aurora is not guaranteed.',
+    description:
+      'Shorter two-hour evening format for families and mixed-age groups. Aurora is not guaranteed.',
     duration: '2 hours',
     groupSize: 'Family format',
     pickup: true,
@@ -109,6 +112,63 @@ const ALL_TOURS = [
     : []),
 ]
 
+/** Comparison columns sourced only from existing listing / booking constants. */
+const COMPARE_COLUMNS = [
+  {
+    to: '/northern-lights-tour',
+    tourId: 1 as number | null,
+    short: 'Guaranteed Small Group',
+    groupSize: 'Max 8',
+    duration: '2–10 hours',
+    pickup: 'Hotel pickup',
+    photography: 'Free professional photos',
+    guarantee: 'Camera-capture refund',
+    price: `€${GUARANTEED_NL_CATALOG_ADULT_PRICE} / adult`,
+  },
+  {
+    to: PRIVATE_NL_PATH,
+    tourId: PRIVATE_NL_TOUR_ID as number | null,
+    short: 'Private Northern Lights',
+    groupSize: 'Private · max 8',
+    duration: 'About 5 hours',
+    pickup: 'Hotel pickup',
+    photography: 'Professional photography',
+    guarantee: '100% guarantee',
+    price: `€${PRIVATE_NL_GROUP_PRICE} / private group`,
+  },
+  {
+    to: STANDARD_GROUP_PATH,
+    tourId: STANDARD_GROUP_TOUR_ID as number | null,
+    short: 'Standard Group Bus',
+    groupSize: 'Max 50',
+    duration: 'About 5 hours',
+    pickup: `Meeting point · ${STANDARD_GROUP_MEETING_POINT.split(',')[0]}`,
+    photography: '—',
+    guarantee: '100% guarantee',
+    price: `€${STANDARD_GROUP_ADULT_PRICE} / person`,
+  },
+  {
+    to: '/family-friendly-northern-lights',
+    tourId: 8 as number | null,
+    short: 'Family-Friendly Tour',
+    groupSize: 'Family format',
+    duration: '2 hours',
+    pickup: 'Hotel pickup',
+    photography: '—',
+    guarantee: 'Aurora not guaranteed',
+    price: '€79 / adult',
+  },
+] as const
+
+const COMPARE_ROW_KEYS = [
+  { label: 'Group size', key: 'groupSize' },
+  { label: 'Duration', key: 'duration' },
+  { label: 'Pickup', key: 'pickup' },
+  { label: 'Photography', key: 'photography' },
+  { label: 'Guarantee', key: 'guarantee' },
+  { label: 'Price', key: 'price' },
+] as const
+
 const NorthernLightsTours: React.FC = () => {
   const [activeIds, setActiveIds] = useState<Set<number> | null>(null)
   const [cmsById, setCmsById] = useState<Map<number, TourCms>>(() => new Map())
@@ -133,27 +193,38 @@ const NorthernLightsTours: React.FC = () => {
         ...merged,
         title: t.title,
         pickup: t.pickup,
-        // Keep curated banner photos distinct — do not let CMS homogenize cards.
+        duration: t.duration,
+        groupSize: t.groupSize,
+        badge: t.badge,
+        logistics: 'logistics' in t ? t.logistics : undefined,
+        // Keep curated listing copy and photos — do not let CMS homogenize cards.
         image: t.image,
         imageAlt: t.imageAlt,
+        description: t.description,
       }
     })
   }, [activeIds, cmsById])
+
+  const compareColumns = useMemo(() => {
+    const visibleTos = new Set(tours.map((t) => t.to))
+    return COMPARE_COLUMNS.filter((col) => visibleTos.has(col.to))
+  }, [tours])
 
   return (
     <div className="rn-page">
       <CategoryHero
         title="Northern Lights Tours in Rovaniemi"
-        subtitle={`Small-group, private exclusive, and large-group bus departures — plus a shorter family evening. ${GUARANTEED_NL_GUARANTEE_SHORT}`}
+        subtitle={`Small-group, private, bus, and family evenings from a local Rovaniemi team. ${GUARANTEED_NL_GUARANTEE_SHORT}`}
         image="/nortti5.jpg"
         compact
+        eyebrow="Royal Nordic · Aurora"
       />
 
-      <section className="rn-section-tight rn-hero-follow relative pt-0 pb-10 sm:pb-12">
-        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle" aria-hidden />
+      <section className="rn-section-tight rn-hero-follow relative pt-0 pb-8 sm:pb-10" aria-label="Northern Lights experiences">
+        <div className="pointer-events-none absolute inset-0 rn-ambient-subtle opacity-70" aria-hidden />
         <div className="rn-container relative">
           <div className="rn-card-grid rn-card-grid--balanced">
-            {tours.map((tour, i) => (
+            {tours.map((tour) => (
               <TourCard
                 key={tour.to}
                 to={tour.to}
@@ -177,45 +248,68 @@ const NorthernLightsTours: React.FC = () => {
                       ? 'Check availability'
                       : 'Request availability'
                 }
-                className={`rn-stagger-${(i % 4) + 1}`}
               />
             ))}
           </div>
 
-          <div className="mx-auto mt-12 max-w-rn-measure border-t border-white/[0.08] pt-8 sm:mt-14 sm:pt-10">
-            <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">
-              Which tour is right for me?
-            </h2>
-            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-text-muted sm:text-[15px]">
-              <li>
-                <span className="font-medium text-white">Guaranteed Northern Lights & Photography</span>{' '}
-                — small group, hotel pickup, professional photos, and a camera-capture refund guarantee.
-              </li>
-              <li>
-                <span className="font-medium text-white">Private Tour</span> — exclusive experience for
-                one group of up to eight guests, hotel pickup included, €1,349 per private group.
-              </li>
-              <li>
-                <span className="font-medium text-white">Standard Group</span> — large shared bus,
-                up to 50 guests, meeting point at Ruokasenkatu 3. Hotel pickup is not included.
-              </li>
-              <li>
-                <span className="font-medium text-white">Family-Friendly</span> — a shorter evening
-                format for mixed ages. Aurora is not guaranteed on this tour.
-              </li>
-            </ul>
-          </div>
+          {compareColumns.length > 1 ? (
+            <div className="rn-nl-compare mt-10 sm:mt-12" aria-labelledby="rn-nl-compare-heading">
+              <header className="max-w-rn-measure">
+                <p className="rn-eyebrow">Compare</p>
+                <h2 id="rn-nl-compare-heading" className="rn-h2-tight mt-2 text-white">
+                  Which tour is right for me?
+                </h2>
+                <p className="mt-2.5 text-[14.5px] leading-relaxed text-text-muted sm:text-[15px]">
+                  Scan group size, logistics, photography, and guarantee terms before you book.
+                </p>
+              </header>
+
+              <div className="rn-nl-compare__scroll mt-6" role="region" aria-label="Tour comparison table" tabIndex={0}>
+                <table className="rn-nl-compare__table">
+                  <thead>
+                    <tr>
+                      <th scope="col" className="rn-nl-compare__corner">
+                        <span className="sr-only">Attribute</span>
+                      </th>
+                      {compareColumns.map((col) => (
+                        <th key={col.to} scope="col" className="rn-nl-compare__head">
+                          <Link to={col.to} className="rn-nl-compare__head-link">
+                            {col.short}
+                          </Link>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {COMPARE_ROW_KEYS.map((row) => (
+                      <tr key={row.label}>
+                        <th scope="row" className="rn-nl-compare__row-label">
+                          {row.label}
+                        </th>
+                        {compareColumns.map((col) => (
+                          <td key={`${row.label}-${col.to}`} className="rn-nl-compare__cell">
+                            {col[row.key]}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : null}
         </div>
       </section>
 
       <ReviewCarousel
         reviews={reviewsFor('northern-lights', 8)}
-        className="border-t border-white/[0.06] !pb-6 sm:!pb-10"
+        className="border-t border-white/[0.06] !pb-6 sm:!pb-8"
       />
       <CategoryPageEnd
-        lede="Fill your days between aurora evenings with Lapland experiences."
+        title="Ready to book your aurora evening?"
+        lede="Start with our Guaranteed Small Group tour, or choose private, bus, or family formats from the catalogue above."
         links={[
-          { to: '/northern-lights-tour', label: 'Small-group tour', primary: true },
+          { to: '/northern-lights-tour', label: 'Check Guaranteed availability', primary: true },
           { to: PRIVATE_NL_PATH, label: 'Private tour' },
           { to: STANDARD_GROUP_PATH, label: 'Standard Group bus' },
           { to: '/daytime-experiences', label: 'Day tours' },
