@@ -16,13 +16,17 @@ import TourGuarantee from './tour/TourGuarantee'
 import { reviewsFor } from '../data/reviews'
 import { useCmsTourPresentation, type TourPageFallback } from '../hooks/useCmsTourPresentation'
 import {
+  GUARANTEED_NL_ADULT_SAVE_PERCENT,
   GUARANTEED_NL_BENEFITS,
   GUARANTEED_NL_CATALOG_ADULT_PRICE,
+  GUARANTEED_NL_CATALOG_CHILD_PRICE,
+  GUARANTEED_NL_CHILD_SAVE_PERCENT,
   GUARANTEED_NL_GUARANTEE_FULL,
   GUARANTEED_NL_HERO_PROMISE,
   GUARANTEED_NL_MAX_PER_VEHICLE,
   GUARANTEED_NL_PRODUCT_NAME,
   GUARANTEED_NL_REFERENCE_ADULT_PRICE,
+  GUARANTEED_NL_REFERENCE_CHILD_PRICE,
   GUARANTEED_NL_SEASON_END,
   GUARANTEED_NL_SEASON_START,
   GUARANTEED_NL_SHORT_NAME,
@@ -33,7 +37,7 @@ const FALLBACK: TourPageFallback = {
   title: GUARANTEED_NL_PRODUCT_NAME,
   lede: GUARANTEED_NL_HERO_PROMISE,
   adultPrice: GUARANTEED_NL_CATALOG_ADULT_PRICE,
-  childPrice: GUARANTEED_NL_CATALOG_ADULT_PRICE,
+  childPrice: GUARANTEED_NL_CATALOG_CHILD_PRICE,
   maxCapacity: GUARANTEED_NL_MAX_PER_VEHICLE,
   duration: '2–10 hours',
   groupSize: 'Max 8 / vehicle',
@@ -73,13 +77,19 @@ const NorthernLightsTour = () => {
     if (cms.tour) return cms.pricing
     return {
       current: GUARANTEED_NL_CATALOG_ADULT_PRICE,
-      child: GUARANTEED_NL_CATALOG_ADULT_PRICE,
+      child: GUARANTEED_NL_CATALOG_CHILD_PRICE,
       saleActive: true,
       reference: GUARANTEED_NL_REFERENCE_ADULT_PRICE,
       saveAmount: GUARANTEED_NL_REFERENCE_ADULT_PRICE - GUARANTEED_NL_CATALOG_ADULT_PRICE,
       label: 'Special offer',
     }
   }, [cms.tour, cms.pricing])
+
+  const saleActive = pricing.saleActive
+  const adultRef = saleActive ? GUARANTEED_NL_REFERENCE_ADULT_PRICE : undefined
+  const childRef = saleActive ? GUARANTEED_NL_REFERENCE_CHILD_PRICE : undefined
+  const adultSave = saleActive ? `Save ${GUARANTEED_NL_ADULT_SAVE_PERCENT}%` : undefined
+  const childSave = saleActive ? `Save ${GUARANTEED_NL_CHILD_SAVE_PERCENT}%` : undefined
 
   const scrollToBook = () => {
     document.getElementById('book')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -145,8 +155,13 @@ const NorthernLightsTour = () => {
         booking={
           <BookingAside
             priceFrom={pricing.current}
-            referencePrice={pricing.saleActive ? pricing.reference ?? undefined : undefined}
+            referencePrice={saleActive ? pricing.reference ?? adultRef : undefined}
             priceNote="/ adult"
+            childPriceFrom={cms.childPrice || GUARANTEED_NL_CATALOG_CHILD_PRICE}
+            childReferencePrice={childRef}
+            childPriceNote="/ child"
+            adultSaveLabel={adultSave}
+            childSaveLabel={childSave}
             trustLines={['Free cancellation 24h', 'Secure payment', 'Aurora Guarantee']}
           >
             {cms.loading && !cms.tour ? (
@@ -160,6 +175,10 @@ const NorthernLightsTour = () => {
                 maxCapacity={cms.maxCapacity}
                 seasonStart={cms.seasonStart || GUARANTEED_NL_SEASON_START}
                 seasonEnd={cms.seasonEnd || GUARANTEED_NL_SEASON_END}
+                adultReferencePrice={adultRef}
+                childReferencePrice={childRef}
+                adultSaveLabel={adultSave}
+                childSaveLabel={childSave}
               />
             )}
           </BookingAside>
@@ -231,7 +250,7 @@ const NorthernLightsTour = () => {
       <Footer />
       <MobileBookingBar
         priceFrom={pricing.current}
-        referencePrice={pricing.saleActive ? pricing.reference ?? undefined : undefined}
+        referencePrice={saleActive ? pricing.reference ?? adultRef : undefined}
         onBook={scrollToBook}
         label="Check availability"
       />

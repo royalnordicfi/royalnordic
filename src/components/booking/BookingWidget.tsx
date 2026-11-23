@@ -35,6 +35,11 @@ export type BookingWidgetProps = {
   totalNote?: string
   /** Override guest-stepper note for flat group pricing. */
   guestPriceNote?: string
+  /** Catalogue reference prices for sale display (not charged). */
+  adultReferencePrice?: number
+  childReferencePrice?: number
+  adultSaveLabel?: string
+  childSaveLabel?: string
 }
 
 export default function BookingWidget({
@@ -55,6 +60,10 @@ export default function BookingWidget({
   requiresHotelPickup = false,
   totalNote,
   guestPriceNote,
+  adultReferencePrice,
+  childReferencePrice,
+  adultSaveLabel,
+  childSaveLabel,
 }: BookingWidgetProps) {
   const navigate = useNavigate()
   const location = useLocation()
@@ -206,6 +215,10 @@ export default function BookingWidget({
             formatMoney={formatEuroAmount}
             priceNote={guestPriceNote}
             partyNoun={requiresHotelPickup || !perVehicle ? 'guests' : 'passengers'}
+            adultReferencePrice={adultReferencePrice}
+            childReferencePrice={childReferencePrice}
+            adultSaveLabel={adultSaveLabel}
+            childSaveLabel={childSaveLabel}
             onChange={({ adults: a, children: c }) => {
               setAdults(a)
               setChildren(c)

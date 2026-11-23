@@ -5,6 +5,12 @@ type Props = {
   priceFrom?: number
   referencePrice?: number
   priceNote?: string
+  /** Optional child catalogue price (shown under adult when on sale). */
+  childPriceFrom?: number
+  childReferencePrice?: number
+  childPriceNote?: string
+  adultSaveLabel?: string
+  childSaveLabel?: string
   /** Replaces the “From €X” row when priceFrom is omitted */
   quoteLabel?: string
   trustLines?: string[]
@@ -21,6 +27,11 @@ export default function BookingAside({
   priceFrom,
   referencePrice,
   priceNote = '/ adult',
+  childPriceFrom,
+  childReferencePrice,
+  childPriceNote = '/ child',
+  adultSaveLabel,
+  childSaveLabel,
   quoteLabel,
   trustLines = [
     'Free cancellation 24h',
@@ -35,6 +46,10 @@ export default function BookingAside({
     typeof priceFrom === 'number' &&
     typeof referencePrice === 'number' &&
     referencePrice > priceFrom
+  const showChildSale =
+    typeof childPriceFrom === 'number' &&
+    typeof childReferencePrice === 'number' &&
+    childReferencePrice > childPriceFrom
   const trust = trustLines.slice(0, 3)
 
   return (
@@ -48,6 +63,9 @@ export default function BookingAside({
             size="sm"
             tone="light"
             compact
+            saveAsPercent={!adultSaveLabel}
+            saveLabel={adultSaveLabel}
+            saveTone="green"
           />
         ) : typeof priceFrom === 'number' ? (
           <>
@@ -72,6 +90,27 @@ export default function BookingAside({
             </p>
           </>
         )}
+        {showChildSale ? (
+          <div className="mt-2">
+            <SalePrice
+              current={childPriceFrom!}
+              reference={childReferencePrice!}
+              note={childPriceNote}
+              size="sm"
+              tone="light"
+              compact
+              showBadge={false}
+              saveAsPercent={!childSaveLabel}
+              saveLabel={childSaveLabel}
+              saveTone="green"
+            />
+          </div>
+        ) : typeof childPriceFrom === 'number' && !showSale ? (
+          <p className="mt-1.5 text-[12px] text-panel-muted">
+            Children from €{childPriceFrom}
+            {childPriceNote ? ` ${childPriceNote.replace(/^\//, '').trim()}` : ''}
+          </p>
+        ) : null}
         {offerLine && !showSale ? (
           <p className="mt-1.5 text-[11px] leading-snug text-panel-muted">
             <span className="font-medium text-panel-ink">Direct booking · </span>

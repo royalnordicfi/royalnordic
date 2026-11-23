@@ -1750,15 +1750,15 @@
     display: inline-flex;
     align-items: center;
     min-height: 1.25rem;
-    padding: 0.15rem 0.42rem;
+    padding: 0.15rem 0.45rem;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: rgba(8, 12, 10, 0.72);
+    border: 1px solid color-mix(in srgb, var(--rn-aurora-soft) 35%, transparent);
+    background: color-mix(in srgb, #0b5c41 72%, rgba(8, 12, 10, 0.55));
     backdrop-filter: blur(8px);
     font-size: 10px;
     font-weight: 650;
     letter-spacing: 0.04em;
-    color: #fff;
+    color: #e8faf2;
     box-shadow: none;
   }
   .rn-tour-card__cta {
@@ -1980,11 +1980,21 @@
     margin-top: 0.4rem;
     display: inline-flex;
     align-items: center;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
     font-size: 11px;
     font-weight: 650;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--rn-sale);
+    background: color-mix(in srgb, var(--rn-sale) 12%, transparent);
+  }
+  .rn-sale-price__save--green {
+    color: #0f6b4c;
+    background: color-mix(in srgb, var(--rn-aurora-soft) 28%, transparent);
+  }
+  .rn-sale-price--light .rn-sale-price__save--green {
+    color: #0b5c41;
   }
   .rn-sale-price--compact .rn-sale-price__badge {
     margin-bottom: 0;
@@ -4559,6 +4569,27 @@
 .rn-book-aside__price {
   font-size: 1.4rem;
 }
+.rn-guest-steppers__was {
+  text-decoration: line-through;
+  color: color-mix(in srgb, var(--rn-panel-muted, #6b7a72) 90%, transparent);
+}
+.rn-guest-steppers__now {
+  font-weight: 650;
+  color: var(--rn-panel-ink, #0c1410);
+}
+.rn-guest-steppers__save {
+  display: inline-flex;
+  margin-left: 0.35rem;
+  padding: 0.08rem 0.4rem;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #0b5c41;
+  background: color-mix(in srgb, var(--rn-aurora-soft) 30%, transparent);
+  vertical-align: middle;
+}
 .rn-book-widget {
   display: flex;
   flex-direction: column;
@@ -5121,6 +5152,11 @@ html[data-rn-shell='checkout'] .App {
   font-size: 0.8125rem;
   line-height: 1.45;
   color: #5b6b63;
+}
+.rn-checkout__was {
+  color: #6b7a72;
+  text-decoration: line-through;
+  font-weight: 450;
 }
 .rn-checkout__promo-ok {
   margin: 0;

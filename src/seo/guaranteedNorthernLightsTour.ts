@@ -15,10 +15,22 @@ export const GUARANTEED_NL_PRODUCT_NAME = 'Small Group Northern Lights & Photogr
 export const GUARANTEED_NL_SHORT_NAME = 'Small Group Northern Lights Tour'
 
 /** Current bookable adult price (EUR). Must match tours.adult_price for tour id 1. */
-export const GUARANTEED_NL_CATALOG_ADULT_PRICE = 99
+export const GUARANTEED_NL_CATALOG_ADULT_PRICE = 139
 
-/** Reference / was price shown with strikethrough (EUR). */
-export const GUARANTEED_NL_REFERENCE_ADULT_PRICE = 129
+/** Reference / was adult price shown with strikethrough (EUR). */
+export const GUARANTEED_NL_REFERENCE_ADULT_PRICE = 179
+
+/** Current bookable child price (EUR). Must match tours.child_price for tour id 1. */
+export const GUARANTEED_NL_CATALOG_CHILD_PRICE = 119
+
+/** Reference / was child price shown with strikethrough (EUR). */
+export const GUARANTEED_NL_REFERENCE_CHILD_PRICE = 159
+
+/** Rounded adult catalogue savings percentage for badges (179 → 139). */
+export const GUARANTEED_NL_ADULT_SAVE_PERCENT = 22
+
+/** Rounded child catalogue savings percentage for badges (159 → 119). */
+export const GUARANTEED_NL_CHILD_SAVE_PERCENT = 25
 
 /** Matches product copy: max 8 people per vehicle */
 export const GUARANTEED_NL_MAX_PER_VEHICLE = 8
@@ -65,7 +77,7 @@ export const guaranteedNlMeta = {
   path: GUARANTEED_NL_PATH,
   title: 'Small Group Northern Lights & Photography Tour Rovaniemi | Royal Nordic',
   description:
-    'Book a small-group Northern Lights & photography tour from Rovaniemi from €99: hotel pickup, expert guides, free professional photos, and a 100% camera-capture aurora guarantee. Free cancellation 24h.',
+    'Book a small-group Northern Lights & photography tour from Rovaniemi from €139: hotel pickup, expert guides, free professional photos, and a 100% camera-capture aurora guarantee. Free cancellation 24h.',
   ogImage: `${SITE}/nortti1.jpg`,
   h1: GUARANTEED_NL_PRODUCT_NAME,
   productName: GUARANTEED_NL_PRODUCT_NAME,

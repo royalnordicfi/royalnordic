@@ -39,14 +39,14 @@ export type WinterPromotionConfig = {
 }
 
 export const WINTER_PROMOTION: WinterPromotionConfig = {
-  // Bar advertises the live NL catalogue sale (€129 → €99). Do NOT stack WINTER20 on that product.
+  // Bar advertises the live NL catalogue sale (€179 → €139). Do NOT stack WINTER20 on that product.
   enabled: true,
-  campaignVersion: 'nl-sale-99-v1',
+  campaignVersion: 'nl-sale-139-v1',
   title: 'Northern Lights special',
-  announcementText: 'Northern Lights special · Was €129 → now €99',
-  popupHeading: 'Northern Lights from €99',
+  announcementText: 'Northern Lights special · Was €179 → now €139',
+  popupHeading: 'Northern Lights from €139',
   popupBody:
-    'Guaranteed Aurora tour special offer: was €129, now €99 per adult. Book direct — no code needed.',
+    'Small Group Northern Lights special offer: was €179, now €139 per adult (children €119). Book direct — no code needed.',
   discountPercent: 20,
   discountCode: 'WINTER20',
   destinationPath: '/northern-lights-tour',

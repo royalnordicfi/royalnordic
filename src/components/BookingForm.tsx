@@ -1160,7 +1160,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           />
         </div>
 
-        {/* Discount Code — blocked when tour already has a catalogue sale (e.g. NL €99) */}
+        {/* Discount Code — blocked when tour already has a catalogue sale (e.g. NL €139) */}
         {!perVehicle ? (
           <div>
             <h4 className={ui.heading}>Discount Code</h4>

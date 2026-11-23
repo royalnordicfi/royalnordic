@@ -25,9 +25,9 @@ const PRODUCT_NAME = 'Small Group Northern Lights & Photography Tour'
 const SHORT_NAME = 'Small Group Northern Lights Tour'
 const TITLE = 'Small Group Northern Lights & Photography Tour Rovaniemi | Royal Nordic'
 const DESCRIPTION =
-  'Book a small-group Northern Lights & photography tour from Rovaniemi from €99: hotel pickup, expert guides, free professional photos, and a 100% camera-capture aurora guarantee. Free cancellation 24h.'
+  'Book a small-group Northern Lights & photography tour from Rovaniemi from €139: hotel pickup, expert guides, free professional photos, and a 100% camera-capture aurora guarantee. Free cancellation 24h.'
 const OG_IMAGE = `${SITE}/nortti1.jpg`
-const CATALOG_ADULT_PRICE = 99 // mirrors GUARANTEED_NL_CATALOG_ADULT_PRICE; live price from Admin/DB
+const CATALOG_ADULT_PRICE = 139 // mirrors GUARANTEED_NL_CATALOG_ADULT_PRICE; live price from Admin/DB
 
 function isInSeason(date = new Date()) {
   const md = `${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`

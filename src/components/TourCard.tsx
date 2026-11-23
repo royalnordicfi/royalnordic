@@ -87,8 +87,8 @@ const TourCard = ({
         />
         <div className="rn-tour-card__shade" aria-hidden />
         {pct > 0 ? (
-          <span className="rn-tour-card__pct" aria-label={`${pct}% off`}>
-            −{pct}%
+          <span className="rn-tour-card__pct" aria-label={`Save ${pct}%`}>
+            Save {pct}%
           </span>
         ) : null}
       </div>

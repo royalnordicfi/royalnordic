@@ -11,6 +11,11 @@ type Props = {
   priceNote?: string
   /** Private groups use “guests”; transfers use “passengers”. */
   partyNoun?: 'guests' | 'passengers'
+  /** Optional catalogue reference (strikethrough) for adult/child. */
+  adultReferencePrice?: number
+  childReferencePrice?: number
+  adultSaveLabel?: string
+  childSaveLabel?: string
 }
 
 export default function GuestSteppers({
@@ -24,11 +29,39 @@ export default function GuestSteppers({
   formatMoney,
   priceNote,
   partyNoun = 'guests',
+  adultReferencePrice,
+  childReferencePrice,
+  adultSaveLabel,
+  childSaveLabel,
 }: Props) {
   const perVehicle = pricingModel === 'per_vehicle'
   const usePassengers = perVehicle && partyNoun === 'passengers'
   const party = adults + children
   const room = Math.max(0, maxGuests - party)
+  const adultOnSale =
+    !perVehicle &&
+    typeof adultReferencePrice === 'number' &&
+    adultReferencePrice > adultPrice
+  const childOnSale =
+    !perVehicle &&
+    typeof childReferencePrice === 'number' &&
+    childReferencePrice > childPrice
+
+  const priceMeta = (
+    current: number,
+    reference: number | undefined,
+    onSale: boolean,
+    saveLabel?: string,
+  ) => {
+    if (!onSale || reference == null) return `€${formatMoney(current)}`
+    return (
+      <>
+        <span className="rn-guest-steppers__was">€{formatMoney(reference)}</span>{' '}
+        <span className="rn-guest-steppers__now">€{formatMoney(current)}</span>
+        {saveLabel ? <span className="rn-guest-steppers__save">{saveLabel}</span> : null}
+      </>
+    )
+  }
 
   const bumpAdults = (delta: number) => {
     const next = Math.max(1, adults + delta)
@@ -50,7 +83,14 @@ export default function GuestSteppers({
             {usePassengers ? 'Passengers (adults)' : perVehicle ? 'Adults in your group' : 'Adults'}
           </p>
           <p className="rn-guest-steppers__meta">
-            {perVehicle ? 'Age 18+' : `Age 18+ · €${formatMoney(adultPrice)}`}
+            {perVehicle
+              ? 'Age 18+'
+              : (
+                  <>
+                    Age 18+ ·{' '}
+                    {priceMeta(adultPrice, adultReferencePrice, adultOnSale, adultSaveLabel)}
+                  </>
+                )}
           </p>
         </div>
         <div className="rn-guest-steppers__controls">
@@ -75,7 +115,14 @@ export default function GuestSteppers({
             {usePassengers ? 'Passengers (children)' : perVehicle ? 'Children in your group' : 'Children'}
           </p>
           <p className="rn-guest-steppers__meta">
-            {perVehicle ? 'Age 0–17' : `Age 0–17 · €${formatMoney(childPrice)}`}
+            {perVehicle
+              ? 'Age 0–17'
+              : (
+                  <>
+                    Age 0–17 ·{' '}
+                    {priceMeta(childPrice, childReferencePrice, childOnSale, childSaveLabel)}
+                  </>
+                )}
           </p>
         </div>
         <div className="rn-guest-steppers__controls">

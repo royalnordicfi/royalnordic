@@ -15,6 +15,8 @@ type Props = {
   saveLabel?: string
   /** Inline save cue on the price row — denser booking widgets */
   compact?: boolean
+  /** Emerald save badge (catalogue promotions) */
+  saveTone?: 'sale' | 'green'
   className?: string
 }
 
@@ -47,11 +49,18 @@ export default function SalePrice({
   saveAsPercent = false,
   saveLabel,
   compact = false,
+  saveTone = 'sale',
   className = '',
 }: Props) {
   const light = tone === 'light'
   const label = showSave ? saveLabel ?? defaultSaveLabel(reference, current, saveAsPercent) : null
-  const saveEl = label ? <span className="rn-sale-price__save">{label}</span> : null
+  const saveEl = label ? (
+    <span
+      className={`rn-sale-price__save${saveTone === 'green' ? ' rn-sale-price__save--green' : ''}`}
+    >
+      {label}
+    </span>
+  ) : null
 
   return (
     <div

@@ -21,6 +21,12 @@ import {
 import { WINTER_PROMOTION } from '../config/winterPromotion'
 import { getDisplayPricing } from '../lib/tourCms'
 import {
+  GUARANTEED_NL_CATALOG_ADULT_PRICE,
+  GUARANTEED_NL_CATALOG_CHILD_PRICE,
+  GUARANTEED_NL_REFERENCE_ADULT_PRICE,
+  GUARANTEED_NL_REFERENCE_CHILD_PRICE,
+} from '../seo/guaranteedNorthernLightsTour'
+import {
   isRewardsCreditRedemptionUiEnabled,
   isRewardsDiscountUiEnabled,
 } from '../config/rewardsBooking'
@@ -200,6 +206,17 @@ export default function CheckoutPage() {
     cmsTour?.seo_image ||
     ''
   const catalogueSaleActive = Boolean(cmsTour && getDisplayPricing(cmsTour).saleActive)
+  const adultUnit = liveAdultPrice || draft?.adultPrice || 0
+  const childUnit = liveChildPrice || draft?.childPrice || 0
+  const nlCatalogueSale = draft?.tourId === 1
+  const adultWas =
+    nlCatalogueSale && Math.abs(adultUnit - GUARANTEED_NL_CATALOG_ADULT_PRICE) < 0.02
+      ? GUARANTEED_NL_REFERENCE_ADULT_PRICE
+      : null
+  const childWas =
+    nlCatalogueSale && Math.abs(childUnit - GUARANTEED_NL_CATALOG_CHILD_PRICE) < 0.02
+      ? GUARANTEED_NL_REFERENCE_CHILD_PRICE
+      : null
 
   // Sync live prices into draft when availability returns.
   useEffect(() => {
@@ -956,28 +973,40 @@ export default function CheckoutPage() {
                 {perVehicle ? (
                   <div>
                     <dt>{needsPickup ? 'Private group' : 'Vehicle'}</dt>
-                    <dd>€{formatEuroAmount(liveAdultPrice || draft.adultPrice)}</dd>
+                    <dd>€{formatEuroAmount(adultUnit)}</dd>
                   </div>
                 ) : (
                   <>
                     <div>
                       <dt>Adults</dt>
                       <dd>
-                        {draft.adults} × €{formatEuroAmount(liveAdultPrice || draft.adultPrice)}
+                        {draft.adults} × €{formatEuroAmount(adultUnit)}
+                        {adultWas ? (
+                          <span className="rn-checkout__was">
+                            {' '}
+                            (was €{formatEuroAmount(adultWas)})
+                          </span>
+                        ) : null}
                       </dd>
                     </div>
                     {draft.children > 0 ? (
                       <div>
                         <dt>Children</dt>
                         <dd>
-                          {draft.children} × €{formatEuroAmount(liveChildPrice || draft.childPrice)}
+                          {draft.children} × €{formatEuroAmount(childUnit)}
+                          {childWas ? (
+                            <span className="rn-checkout__was">
+                              {' '}
+                              (was €{formatEuroAmount(childWas)})
+                            </span>
+                          ) : null}
                         </dd>
                       </div>
                     ) : null}
                   </>
                 )}
                 <div>
-                  <dt>Original price</dt>
+                  <dt>{nlCatalogueSale ? 'Subtotal' : 'Original price'}</dt>
                   <dd>€{formatEuroAmount(subtotal)}</dd>
                 </div>
                 {discount > 0 ? (
