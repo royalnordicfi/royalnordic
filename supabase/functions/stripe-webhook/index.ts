@@ -192,6 +192,13 @@ serve(async (req) => {
         const customerOk = await sendEmailNotification(emailData, 'customer')
         await markEmailStatus(supabase, pending.id, pending.customer_email, customerOk, adminOk)
 
+        // Best-effort calendar/reminder outbox — never fails the webhook
+        try {
+          await supabase.rpc('enqueue_booking_ops_sync', { p_booking_id: pending.id })
+        } catch (e) {
+          console.error('enqueue_booking_ops_sync failed (payment-link):', e)
+        }
+
         return json({
           success: true,
           booking_id: pending.id,
@@ -402,6 +409,13 @@ serve(async (req) => {
         const adminOk = await sendEmailNotification(emailData, 'admin')
         const customerOk = await sendEmailNotification(emailData, 'customer')
         await markEmailStatus(supabase, booking.id, customerEmail, customerOk, adminOk)
+      }
+
+      // Best-effort calendar/reminder outbox — never fails the webhook
+      try {
+        await supabase.rpc('enqueue_booking_ops_sync', { p_booking_id: booking.id })
+      } catch (e) {
+        console.error('enqueue_booking_ops_sync failed:', e)
       }
 
       return json({ success: true, booking_id: booking.id, booking_ref: bookingRef })

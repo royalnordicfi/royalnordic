@@ -95,3 +95,18 @@ entrypoint = "./functions/shared-bookings-external/index.ts"
 enabled = true
 verify_jwt = false
 entrypoint = "./functions/process-notification-outbox/index.ts"
+
+[functions.google-calendar-oauth]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/google-calendar-oauth/index.ts"
+
+[functions.process-calendar-sync]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/process-calendar-sync/index.ts"
+
+[functions.process-booking-reminders]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/process-booking-reminders/index.ts"

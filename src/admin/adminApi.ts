@@ -45,6 +45,16 @@ async function requireAdmin() {
   return data.session
 }
 
+/** Best-effort calendar + reminder outbox. Never throws to callers. */
+async function enqueueBookingOpsSync(bookingId: number): Promise<void> {
+  try {
+    const { error } = await supabase.rpc('enqueue_booking_ops_sync', { p_booking_id: bookingId })
+    if (error) console.error('enqueue_booking_ops_sync', error.message)
+  } catch (e) {
+    console.error('enqueue_booking_ops_sync', e)
+  }
+}
+
 async function actorEmail() {
   const session = await requireAdmin()
   return session.user.email || 'admin'
@@ -411,6 +421,21 @@ async function finishUpdate(
     // customers optional until migration 016
   }
 
+  const calendarRelevant =
+    patch.status !== undefined ||
+    patch.tour_time !== undefined ||
+    patch.pickup_location !== undefined ||
+    patch.customer_name !== undefined ||
+    patch.customer_email !== undefined ||
+    patch.customer_phone !== undefined ||
+    patch.adults !== undefined ||
+    patch.children !== undefined ||
+    patch.internal_notes !== undefined ||
+    patch.special_requests !== undefined
+  if (calendarRelevant) {
+    await enqueueBookingOpsSync(id)
+  }
+
   return normalizeBooking(data)
 }
 
@@ -469,6 +494,8 @@ export async function removeBooking(
   } catch {
     /* optional */
   }
+
+  await enqueueBookingOpsSync(id)
 }
 
 /** @deprecated Use removeBooking */
@@ -500,6 +527,7 @@ export async function restoreBooking(id: number): Promise<OpsBooking> {
   } catch {
     /* optional */
   }
+  await enqueueBookingOpsSync(id)
   return fetchBooking(id)
 }
 
@@ -510,6 +538,7 @@ export async function hardDeleteBooking(id: number): Promise<void> {
   if (current.status !== 'cancelled' && !current.deleted_at) {
     await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', id)
   }
+  await enqueueBookingOpsSync(id)
   const { error } = await supabase.from('bookings').delete().eq('id', id)
   if (error) throw new Error(error.message)
 }
@@ -703,6 +732,10 @@ export async function createManualBooking(input: {
       // Booking stays; email failure is recorded on the row when migration 018 applied
       console.error(e)
     }
+  }
+
+  if (booking.status === 'confirmed') {
+    await enqueueBookingOpsSync(bookingId)
   }
 
   return booking
@@ -2508,4 +2541,119 @@ export async function retryGygAvailabilityOutbox(
   })
   if (error) throw new Error(error.message)
   return data as { ok: boolean; error?: string; status?: string }
+}
+
+// ---------------------------------------------------------------------------
+// Google Calendar (ops) — connection + dry-run. Production sync stays off until flags enabled.
+// ---------------------------------------------------------------------------
+
+export type GoogleCalendarStatus = {
+  id: number
+  calendar_id: string | null
+  connected_email: string | null
+  connected: boolean
+  calendar_sync_enabled: boolean
+  reminders_enabled: boolean
+  admin_reminder_email: string | null
+  connected_at: string | null
+  last_sync_at: string | null
+  last_error: string | null
+  updated_at: string | null
+  sync_pending: number
+  sync_dead: number
+  reminders_pending: number
+}
+
+export type GoogleCalendarDryRunRow = {
+  booking_id: number
+  booking_ref: string | null
+  tour_name: string | null
+  tour_date: string
+  tour_time: string | null
+  departure_time_source: string | null
+  can_sync: boolean
+  reason: string
+  has_google_event: boolean
+}
+
+export async function fetchGoogleCalendarStatus(): Promise<GoogleCalendarStatus | null> {
+  await requireAdmin()
+  const { data, error } = await supabase.rpc('admin_get_google_calendar_status')
+  if (error) {
+    if (/does not exist|function .*admin_get_google_calendar/i.test(error.message)) return null
+    throw new Error(error.message)
+  }
+  const row = Array.isArray(data) ? data[0] : data
+  return (row as GoogleCalendarStatus) || null
+}
+
+export async function setGoogleCalendarFlags(input: {
+  calendar_sync_enabled?: boolean
+  reminders_enabled?: boolean
+  admin_reminder_email?: string | null
+  calendar_id?: string | null
+}): Promise<GoogleCalendarStatus> {
+  await requireAdmin()
+  const { data, error } = await supabase.rpc('admin_set_google_calendar_flags', {
+    p_calendar_sync_enabled: input.calendar_sync_enabled ?? null,
+    p_reminders_enabled: input.reminders_enabled ?? null,
+    p_admin_reminder_email: input.admin_reminder_email ?? null,
+    p_calendar_id: input.calendar_id ?? null,
+  })
+  if (error) throw new Error(error.message)
+  return data as GoogleCalendarStatus
+}
+
+export async function googleCalendarDryRun(limit = 100): Promise<GoogleCalendarDryRunRow[]> {
+  await requireAdmin()
+  const { data, error } = await supabase.rpc('admin_google_calendar_dry_run', { p_limit: limit })
+  if (error) throw new Error(error.message)
+  return (data || []) as GoogleCalendarDryRunRow[]
+}
+
+export async function enqueueUpcomingCalendarSync(limit = 100): Promise<number> {
+  await requireAdmin()
+  const { data, error } = await supabase.rpc('admin_enqueue_upcoming_calendar_sync', {
+    p_limit: limit,
+  })
+  if (error) throw new Error(error.message)
+  return Number(data) || 0
+}
+
+async function googleCalendarOAuthFetch(body: Record<string, unknown>) {
+  const session = await requireAdmin()
+  const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/google-calendar-oauth`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify(body),
+  })
+  const payload = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(payload.error || `Google OAuth request failed (${res.status})`)
+  return payload
+}
+
+export async function getGoogleCalendarAuthUrl(): Promise<{ url: string; redirect_uri: string }> {
+  const payload = await googleCalendarOAuthFetch({ action: 'auth_url' })
+  return { url: String(payload.url), redirect_uri: String(payload.redirect_uri || '') }
+}
+
+export async function exchangeGoogleCalendarCode(code: string, calendarId?: string) {
+  return googleCalendarOAuthFetch({
+    action: 'exchange',
+    code,
+    calendar_id: calendarId || undefined,
+  })
+}
+
+export async function disconnectGoogleCalendar() {
+  return googleCalendarOAuthFetch({ action: 'disconnect' })
+}
+
+export async function listGoogleCalendars(): Promise<Array<{ id: string; summary?: string; primary?: boolean }>> {
+  const payload = await googleCalendarOAuthFetch({ action: 'list_calendars' })
+  return Array.isArray(payload.calendars) ? payload.calendars : []
 }
