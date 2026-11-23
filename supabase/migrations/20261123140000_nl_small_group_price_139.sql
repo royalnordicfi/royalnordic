@@ -9,5 +9,5 @@ SET
   sale_enabled = true,
   sale_label = 'Special offer',
   seo_description = 'Book a small-group Northern Lights & photography tour from Rovaniemi from €139: hotel pickup, expert guides, free professional photos, and a 100% camera-capture aurora guarantee. Free cancellation 24h.',
-  updated_at = now()
+  cms_updated_at = now()
 WHERE id = 1;
