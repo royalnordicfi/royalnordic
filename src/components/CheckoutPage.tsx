@@ -11,12 +11,15 @@ import { formatTourDateLong } from '../lib/tourDate'
 import { formatEuroAmount } from '../lib/tourPricing'
 import { departureSuffixForTour } from '../lib/tourBookingRules'
 import {
+  ALREADY_DISCOUNTED_PROMO_MESSAGE,
+  evaluateWinterPromoCode,
   getWinterDiscountAmount,
   isTourExcludedFromWinterPromo,
   markCodeAppliedThisSession,
   trackWinterPromoEvent,
 } from '../lib/winterPromotion'
 import { WINTER_PROMOTION } from '../config/winterPromotion'
+import { getDisplayPricing } from '../lib/tourCms'
 import {
   isRewardsCreditRedemptionUiEnabled,
   isRewardsDiscountUiEnabled,
@@ -56,7 +59,11 @@ export default function CheckoutPage() {
   const [phone, setPhone] = useState(draft?.phone || '')
   const [specialRequests, setSpecialRequests] = useState(draft?.specialRequests || '')
   const [pickupLocation, setPickupLocation] = useState(draft?.pickupLocation || '')
-  const [discountCode, setDiscountCode] = useState(draft?.discountCode || '')
+  const [discountCodeInput, setDiscountCodeInput] = useState(draft?.discountCode || '')
+  const [appliedDiscountCode, setAppliedDiscountCode] = useState(
+    () => (draft?.discountCode || '').trim().toUpperCase(),
+  )
+  const [discountFeedback, setDiscountFeedback] = useState('')
   const [referralCode, setReferralCode] = useState(
     () => draft?.referralCode || readPersistedReferralCode() || '',
   )
@@ -192,6 +199,7 @@ export default function CheckoutPage() {
     cmsTour?.gallery?.[0]?.url ||
     cmsTour?.seo_image ||
     ''
+  const catalogueSaleActive = Boolean(cmsTour && getDisplayPricing(cmsTour).saleActive)
 
   // Sync live prices into draft when availability returns.
   useEffect(() => {
@@ -211,8 +219,21 @@ export default function CheckoutPage() {
   }, [liveAdultPrice, liveChildPrice])
 
   const perVehicle = draft?.pricingModel === 'per_vehicle'
-  const promoAllowed =
-    !!draft && !perVehicle && !isTourExcludedFromWinterPromo(draft.tourId, draft.tourName)
+  const promoOpts = {
+    tourId: draft?.tourId,
+    tourName: draft?.tourName,
+    hasCatalogueSale: catalogueSaleActive,
+    pricingModel: draft?.pricingModel || 'per_person',
+  }
+  const promoBlocked = Boolean(
+    draft &&
+      (perVehicle ||
+        isTourExcludedFromWinterPromo(draft.tourId, draft.tourName, {
+          hasCatalogueSale: catalogueSaleActive,
+          pricingModel: draft.pricingModel,
+        })),
+  )
+  const promoAllowed = Boolean(draft && !promoBlocked)
   const referralUiEligible =
     rewardsDiscountsOn &&
     !!draft &&
@@ -230,18 +251,24 @@ export default function CheckoutPage() {
     )
   }, [draft, liveAdultPrice, liveChildPrice])
 
+  // Clear a previously applied code if this tour cannot take promos.
+  useEffect(() => {
+    if (!promoBlocked) return
+    setAppliedDiscountCode((prev) => (prev ? '' : prev))
+    setDiscountCodeInput((prev) => (prev ? '' : prev))
+    setDiscountFeedback('')
+  }, [promoBlocked])
+
   const winterDiscount = promoAllowed
-    ? getWinterDiscountAmount(subtotal, discountCode, undefined, undefined, {
-        tourId: draft!.tourId,
-        tourName: draft!.tourName,
-      })
+    ? getWinterDiscountAmount(subtotal, appliedDiscountCode, undefined, undefined, promoOpts)
     : 0
+  const discountCode = winterDiscount > 0 ? appliedDiscountCode : ''
 
   const referralPricing = computeReferralAwareTotal({
     subtotal,
     tourId: draft?.tourId || 0,
     pricingModel: draft?.pricingModel || 'per_person',
-    promoCode: winterDiscount > 0 ? discountCode : '',
+    promoCode: discountCode,
     referralCode,
     discountsEnabled: rewardsDiscountsOn,
     referralCodeValid: referralResolved?.ok === true,
@@ -254,6 +281,46 @@ export default function CheckoutPage() {
   const usingReferral = referralPricing.referralApplied && winterDiscount <= 0
   const discount = usingReferral ? referralPricing.referralDiscount : winterDiscount
   const payableAfterDiscount = Math.max(0, subtotal - discount)
+
+  const applyDiscountCode = () => {
+    setDiscountFeedback('')
+    if (!draft || perVehicle) return
+    if (promoBlocked) {
+      setAppliedDiscountCode('')
+      setDiscountFeedback(ALREADY_DISCOUNTED_PROMO_MESSAGE)
+      return
+    }
+    if (usingReferral || normalizeReferralCode(referralCode)) {
+      setDiscountFeedback('Referral and promotional discounts cannot be combined.')
+      return
+    }
+    const result = evaluateWinterPromoCode(
+      discountCodeInput,
+      subtotal,
+      undefined,
+      undefined,
+      promoOpts,
+    )
+    if (result.status === 'applied') {
+      setAppliedDiscountCode(result.code)
+      setDiscountCodeInput(result.code)
+      setDiscountFeedback(result.message)
+      markCodeAppliedThisSession()
+      trackWinterPromoEvent('winter20_code_applied', {
+        tour_name: draft.tourName,
+        discount: result.discount,
+      })
+      return
+    }
+    setAppliedDiscountCode('')
+    setDiscountFeedback(result.message || 'Invalid discount code.')
+  }
+
+  const clearDiscountCode = () => {
+    setAppliedDiscountCode('')
+    setDiscountCodeInput('')
+    setDiscountFeedback('')
+  }
   const payableCents = Math.round(payableAfterDiscount * 100)
   const maxCreditCents =
     creditRedemptionOn && creditUserId
@@ -621,28 +688,82 @@ export default function CheckoutPage() {
               </label>
             </section>
 
-            {promoAllowed ? (
+            {!perVehicle ? (
               <section className="rn-checkout__card">
-                <h2 className="rn-checkout__section-title">Promo code</h2>
-                <label className="rn-checkout__field">
-                  <span>{WINTER_PROMOTION.discountCode}</span>
-                  <input
-                    type="text"
-                    value={discountCode}
-                    onChange={(e) => setDiscountCode(e.target.value)}
-                    placeholder="Enter code"
-                    autoCapitalize="characters"
-                    disabled={usingReferral}
-                  />
-                </label>
-                {winterDiscount > 0 ? (
-                  <p className="rn-checkout__promo-ok">
-                    Code applied − €{formatEuroAmount(winterDiscount)}
+                <h2 className="rn-checkout__section-title">Discount code</h2>
+                {promoBlocked ? (
+                  <p className="rn-checkout__field-hint" role="status">
+                    {ALREADY_DISCOUNTED_PROMO_MESSAGE}
                   </p>
-                ) : null}
-                {usingReferral ? (
-                  <p className="rn-checkout__field-hint">Clear the referral code to use a promo instead.</p>
-                ) : null}
+                ) : (
+                  <>
+                    <div className="rn-checkout__discount-row">
+                      <label className="rn-checkout__field rn-checkout__field--grow">
+                        <span>Code</span>
+                        <input
+                          type="text"
+                          value={discountCodeInput}
+                          onChange={(e) => {
+                            setDiscountCodeInput(e.target.value)
+                            if (appliedDiscountCode) setAppliedDiscountCode('')
+                            if (discountFeedback) setDiscountFeedback('')
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault()
+                              applyDiscountCode()
+                            }
+                          }}
+                          placeholder="Enter code"
+                          autoCapitalize="characters"
+                          autoComplete="off"
+                          spellCheck={false}
+                          disabled={usingReferral}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        className="rn-checkout__discount-apply"
+                        onClick={applyDiscountCode}
+                        disabled={usingReferral || !discountCodeInput.trim()}
+                      >
+                        Apply
+                      </button>
+                    </div>
+                    {winterDiscount > 0 ? (
+                      <p className="rn-checkout__promo-ok" role="status">
+                        {WINTER_PROMOTION.discountCode} applied − €
+                        {formatEuroAmount(winterDiscount)} (
+                        {WINTER_PROMOTION.discountPercent}% off)
+                        {' · '}
+                        <button
+                          type="button"
+                          className="rn-checkout__discount-clear"
+                          onClick={clearDiscountCode}
+                        >
+                          Remove
+                        </button>
+                      </p>
+                    ) : null}
+                    {discountFeedback && winterDiscount <= 0 ? (
+                      <p
+                        className={
+                          discountFeedback === ALREADY_DISCOUNTED_PROMO_MESSAGE
+                            ? 'rn-checkout__field-hint'
+                            : 'rn-checkout__promo-bad'
+                        }
+                        role="status"
+                      >
+                        {discountFeedback}
+                      </p>
+                    ) : null}
+                    {usingReferral ? (
+                      <p className="rn-checkout__field-hint">
+                        Clear the referral code to use a promo instead.
+                      </p>
+                    ) : null}
+                  </>
+                )}
               </section>
             ) : null}
 
@@ -856,12 +977,16 @@ export default function CheckoutPage() {
                   </>
                 )}
                 <div>
-                  <dt>Subtotal</dt>
+                  <dt>Original price</dt>
                   <dd>€{formatEuroAmount(subtotal)}</dd>
                 </div>
                 {discount > 0 ? (
                   <div>
-                    <dt>{usingReferral ? 'Referral (10% off)' : 'Discount'}</dt>
+                    <dt>
+                      {usingReferral
+                        ? 'Referral (10% off)'
+                        : `Discount (${discountCode || WINTER_PROMOTION.discountCode})`}
+                    </dt>
                     <dd>− €{formatEuroAmount(discount)}</dd>
                   </div>
                 ) : null}
@@ -873,7 +998,7 @@ export default function CheckoutPage() {
                 ) : null}
               </dl>
               <div className="rn-checkout__summary-total">
-                <span>{appliedCreditCents > 0 ? 'Amount due' : 'Total'}</span>
+                <span>{appliedCreditCents > 0 ? 'Amount due' : 'Final total'}</span>
                 <strong>€{formatEuroAmount(cashDue)}</strong>
               </div>
               {appliedCreditCents > 0 ? (

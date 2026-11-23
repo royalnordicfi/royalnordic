@@ -1160,37 +1160,45 @@ const BookingForm: React.FC<BookingFormProps> = ({
           />
         </div>
 
-        {/* Discount Code — hidden when tour already has a catalogue sale (e.g. NL €99) */}
-        {promoAllowed ? (
+        {/* Discount Code — blocked when tour already has a catalogue sale (e.g. NL €99) */}
+        {!perVehicle ? (
           <div>
             <h4 className={ui.heading}>Discount Code</h4>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                name="discountCode"
-                value={formData.discountCode}
-                onChange={handleChange}
-                placeholder={`Enter code (e.g. ${WINTER_PROMOTION.discountCode})`}
-                className={
-                  dark
-                    ? `${ui.input} flex-1 uppercase`
-                    : 'flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm uppercase'
-                }
-                style={{ textTransform: 'uppercase' }}
-                autoComplete="off"
-              />
-              {isDiscountValid() && (
-                <div className={ui.validBox}>
-                  <span className={ui.validText}>✓ Valid</span>
+            {promoAllowed ? (
+              <>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    name="discountCode"
+                    value={formData.discountCode}
+                    onChange={handleChange}
+                    placeholder={`Enter code (e.g. ${WINTER_PROMOTION.discountCode})`}
+                    className={
+                      dark
+                        ? `${ui.input} flex-1 uppercase`
+                        : 'flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm uppercase'
+                    }
+                    style={{ textTransform: 'uppercase' }}
+                    autoComplete="off"
+                  />
+                  {isDiscountValid() && (
+                    <div className={ui.validBox}>
+                      <span className={ui.validText}>✓ Valid</span>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            {formData.discountCode && !isDiscountValid() && (
-              <p className={ui.discountBad}>Invalid code or promotion is not active</p>
-            )}
-            {isDiscountValid() && (
-              <p className={ui.discountOk}>
-                {WINTER_PROMOTION.discountPercent}% off eligible direct booking
+                {formData.discountCode && !isDiscountValid() && (
+                  <p className={ui.discountBad}>Invalid code or promotion is not active</p>
+                )}
+                {isDiscountValid() && (
+                  <p className={ui.discountOk}>
+                    {WINTER_PROMOTION.discountPercent}% off eligible direct booking
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className={ui.discountBad}>
+                This tour already has a special offer. Additional discount codes cannot be combined.
               </p>
             )}
           </div>

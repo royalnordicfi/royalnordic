@@ -55,21 +55,84 @@ export function normalizePromoCode(code: string): string {
   return code.trim().toUpperCase()
 }
 
-export function isTourExcludedFromWinterPromo(tourId?: number, tourName?: string): boolean {
+export const ALREADY_DISCOUNTED_PROMO_MESSAGE =
+  'This tour already has a special offer. Additional discount codes cannot be combined.'
+
+export type WinterPromoApplyOpts = {
+  tourId?: number
+  tourName?: string
+  /** Live catalogue sale (reference_price > adult_price with sale_enabled). */
+  hasCatalogueSale?: boolean
+  /** Flat per-vehicle / private group fares never take guest codes. */
+  pricingModel?: 'per_person' | 'per_vehicle' | string
+}
+
+export function isTourExcludedFromWinterPromo(
+  tourId?: number,
+  tourName?: string,
+  opts?: Pick<WinterPromoApplyOpts, 'hasCatalogueSale' | 'pricingModel'>,
+): boolean {
+  if (opts?.pricingModel === 'per_vehicle') return true
+  if (opts?.hasCatalogueSale) return true
   if (tourId != null && WINTER20_EXCLUDED_TOUR_IDS.has(tourId)) return true
   if (tourName && WINTER20_EXCLUDED_TOUR_NAMES.has(tourName)) return true
   return false
+}
+
+export type WinterPromoEval =
+  | { status: 'empty'; discount: 0; message: '' }
+  | { status: 'applied'; discount: number; message: string; code: string }
+  | { status: 'ineligible'; discount: 0; message: string }
+  | { status: 'inactive'; discount: 0; message: string }
+  | { status: 'invalid'; discount: 0; message: string }
+
+/** Evaluate a guest-entered code for UI feedback. Server still re-validates. */
+export function evaluateWinterPromoCode(
+  code: string,
+  subtotal: number,
+  config: WinterPromotionConfig = WINTER_PROMOTION,
+  now: Date = new Date(),
+  opts?: WinterPromoApplyOpts,
+): WinterPromoEval {
+  const normalized = normalizePromoCode(code)
+  if (!normalized) return { status: 'empty', discount: 0, message: '' }
+
+  if (isTourExcludedFromWinterPromo(opts?.tourId, opts?.tourName, opts)) {
+    return { status: 'ineligible', discount: 0, message: ALREADY_DISCOUNTED_PROMO_MESSAGE }
+  }
+  if (!isCampaignActive(config, now)) {
+    return {
+      status: 'inactive',
+      discount: 0,
+      message: 'This discount code is not active or has expired.',
+    }
+  }
+  if (normalized !== normalizePromoCode(config.discountCode)) {
+    return {
+      status: 'invalid',
+      discount: 0,
+      message: 'Invalid discount code. Check the spelling and try again.',
+    }
+  }
+  if (!Number.isFinite(subtotal) || subtotal <= 0) {
+    return { status: 'invalid', discount: 0, message: 'Unable to apply a discount to this total.' }
+  }
+  const discount = Math.round(subtotal * (config.discountPercent / 100) * 100) / 100
+  return {
+    status: 'applied',
+    discount,
+    code: normalized,
+    message: `${config.discountCode} applied − ${config.discountPercent}% off`,
+  }
 }
 
 export function isValidWinterPromoCode(
   code: string,
   config: WinterPromotionConfig = WINTER_PROMOTION,
   now: Date = new Date(),
-  opts?: { tourId?: number; tourName?: string },
+  opts?: WinterPromoApplyOpts,
 ): boolean {
-  if (!isCampaignActive(config, now)) return false
-  if (isTourExcludedFromWinterPromo(opts?.tourId, opts?.tourName)) return false
-  return normalizePromoCode(code) === normalizePromoCode(config.discountCode)
+  return evaluateWinterPromoCode(code, 100, config, now, opts).status === 'applied'
 }
 
 /** Discount amount in euros for a subtotal. Only one promo; no stacking. */
@@ -78,12 +141,10 @@ export function getWinterDiscountAmount(
   code: string,
   config: WinterPromotionConfig = WINTER_PROMOTION,
   now: Date = new Date(),
-  opts?: { tourId?: number; tourName?: string },
+  opts?: WinterPromoApplyOpts,
 ): number {
-  if (!Number.isFinite(subtotal) || subtotal <= 0) return 0
-  if (!isValidWinterPromoCode(code, config, now, opts)) return 0
-  const raw = subtotal * (config.discountPercent / 100)
-  return Math.round(raw * 100) / 100
+  const result = evaluateWinterPromoCode(code, subtotal, config, now, opts)
+  return result.status === 'applied' ? result.discount : 0
 }
 
 export function getExpectedTotalAfterPromo(
@@ -235,6 +296,8 @@ export function validateCheckoutDiscount(input: {
   now?: Date
   tourId?: number
   tourName?: string
+  hasCatalogueSale?: boolean
+  pricingModel?: string
 }): string | null {
   const config = input.config ?? WINTER_PROMOTION
   const now = input.now ?? new Date()
@@ -242,7 +305,12 @@ export function validateCheckoutDiscount(input: {
   const amount = Number(input.amount)
   const claimedDiscount = Number(input.discount) || 0
   const code = input.discountCode || ''
-  const opts = { tourId: input.tourId, tourName: input.tourName }
+  const opts: WinterPromoApplyOpts = {
+    tourId: input.tourId,
+    tourName: input.tourName,
+    hasCatalogueSale: input.hasCatalogueSale,
+    pricingModel: input.pricingModel,
+  }
 
   if (!Number.isFinite(subtotal) || subtotal < 0) return 'Invalid subtotal'
   if (!Number.isFinite(amount) || amount < 0) return 'Invalid amount'
@@ -251,6 +319,9 @@ export function validateCheckoutDiscount(input: {
   const expectedTotal = Math.round((subtotal - expectedDiscount) * 100) / 100
 
   if (Math.abs(claimedDiscount - expectedDiscount) > 0.02) {
+    if (claimedDiscount > 0.02 && isTourExcludedFromWinterPromo(opts.tourId, opts.tourName, opts)) {
+      return ALREADY_DISCOUNTED_PROMO_MESSAGE
+    }
     return 'Discount does not match campaign rules'
   }
   if (Math.abs(amount - expectedTotal) > 0.02) {

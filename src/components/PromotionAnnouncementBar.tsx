@@ -74,8 +74,7 @@ const PromotionAnnouncementBar = () => {
         aria-label={`${config.announcementText}. Book now.`}
       >
         <span className="rn-promo-bar__static">
-          Direct booking · Save 20% with{' '}
-          <span className="rn-promo-bar__code">{config.discountCode}</span>
+          {config.announcementText}
           <span className="rn-promo-bar__cta">Book →</span>
         </span>
 

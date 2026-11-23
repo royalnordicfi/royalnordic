@@ -5127,6 +5127,45 @@ html[data-rn-shell='checkout'] .App {
   font-size: 0.8125rem;
   color: #047857;
 }
+.rn-checkout__promo-bad {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  color: #991b1b;
+}
+.rn-checkout__discount-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.55rem;
+}
+.rn-checkout__field--grow {
+  flex: 1;
+  margin-bottom: 0;
+}
+.rn-checkout__discount-apply {
+  flex-shrink: 0;
+  min-height: 2.45rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 8px;
+  border: 1px solid rgba(12, 20, 16, 0.16);
+  background: #0c1410;
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.rn-checkout__discount-apply:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.rn-checkout__discount-clear {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: #047857;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
 .rn-checkout__error {
   margin: 0;
   padding: 0.65rem 0.75rem;

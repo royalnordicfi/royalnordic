@@ -5,6 +5,8 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import type { WinterPromotionConfig } from '../config/winterPromotion.ts'
 import {
+  ALREADY_DISCOUNTED_PROMO_MESSAGE,
+  evaluateWinterPromoCode,
   getWinterDiscountAmount,
   isCampaignActive,
   isValidWinterPromoCode,
@@ -130,5 +132,31 @@ describe('winterPromotion', () => {
       getWinterDiscountAmount(100, 'WINTER20', base, new Date(), { tourId: 4 }),
       20,
     )
+  })
+
+  it('rejects stacking when a catalogue sale is active', () => {
+    const result = evaluateWinterPromoCode('WINTER20', 119, base, new Date(), {
+      tourId: 4,
+      hasCatalogueSale: true,
+    })
+    assert.equal(result.status, 'ineligible')
+    assert.equal(result.message, ALREADY_DISCOUNTED_PROMO_MESSAGE)
+    assert.equal(
+      getWinterDiscountAmount(119, 'WINTER20', base, new Date(), {
+        tourId: 4,
+        hasCatalogueSale: true,
+      }),
+      0,
+    )
+  })
+
+  it('rejects invalid codes with a clear message', () => {
+    const result = evaluateWinterPromoCode('FAKE10', 100, base)
+    assert.equal(result.status, 'invalid')
+  })
+
+  it('rejects multiple / wrong codes while accepting a single valid apply', () => {
+    assert.equal(evaluateWinterPromoCode('WINTER20', 100, base).status, 'applied')
+    assert.equal(evaluateWinterPromoCode('WINTER20 SUMMER10', 100, base).status, 'invalid')
   })
 })

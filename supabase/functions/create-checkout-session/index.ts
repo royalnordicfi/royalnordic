@@ -66,6 +66,7 @@ serve(async (req) => {
     let dbAdultPrice: number | null = null
     let dbChildPrice: number | null = null
     let tourBadge: string | null = null
+    let catalogueSaleActive = false
     if (tourId) {
       const supabaseUrl = Deno.env.get('SUPABASE_URL')
       const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
@@ -75,8 +76,15 @@ serve(async (req) => {
       if (supabaseUrl && supabaseServiceKey) {
         const supabase = createClient(supabaseUrl, supabaseServiceKey)
         const fullSelect =
-          'id, name, is_active, adult_price, child_price, max_capacity, pricing_model, season_start, season_end, departure_time, meeting_point, badge'
+          'id, name, is_active, adult_price, child_price, max_capacity, pricing_model, season_start, season_end, departure_time, meeting_point, badge, sale_enabled, reference_price, sale_starts_at, sale_ends_at'
         let tourResult = await supabase.from('tours').select(fullSelect).eq('id', tourId).maybeSingle()
+        if (tourResult.error && /column|schema cache/i.test(tourResult.error.message || '')) {
+          tourResult = await supabase
+            .from('tours')
+            .select('id, name, is_active, adult_price, child_price, max_capacity, pricing_model, badge, sale_enabled, reference_price, sale_starts_at, sale_ends_at')
+            .eq('id', tourId)
+            .maybeSingle()
+        }
         if (tourResult.error && /column|schema cache/i.test(tourResult.error.message || '')) {
           tourResult = await supabase
             .from('tours')
@@ -103,6 +111,19 @@ serve(async (req) => {
         if (tourRow.adult_price != null) dbAdultPrice = Number(tourRow.adult_price)
         if (tourRow.child_price != null) dbChildPrice = Number(tourRow.child_price)
         if ('badge' in tourRow && tourRow.badge != null) tourBadge = String(tourRow.badge)
+        // Detect live catalogue sale so guest codes cannot stack on already-reduced prices.
+        if ('sale_enabled' in tourRow && tourRow.sale_enabled) {
+          const ref = Number(tourRow.reference_price)
+          const adult = Number(tourRow.adult_price)
+          if (Number.isFinite(ref) && Number.isFinite(adult) && ref > adult) {
+            const now = new Date()
+            const starts = tourRow.sale_starts_at ? new Date(String(tourRow.sale_starts_at)) : null
+            const ends = tourRow.sale_ends_at ? new Date(String(tourRow.sale_ends_at)) : null
+            const afterStart = !starts || Number.isNaN(starts.getTime()) || now >= starts
+            const beforeEnd = !ends || Number.isNaN(ends.getTime()) || now <= ends
+            if (afterStart && beforeEnd) catalogueSaleActive = true
+          }
+        }
 
         const tourDateId = parseInt(String(metadata?.tour_date_id || ''), 10)
         const adults = parseInt(String(metadata?.adults || '0'), 10)
@@ -170,12 +191,15 @@ serve(async (req) => {
     }
 
     // Server-side discount validation (WINTER20 XOR referral — never stack).
-    // Tour id 1 (Guaranteed NL) already has a catalogue sale — never stack WINTER20.
+    // Catalogue-sale tours and hardcoded exclusions never take WINTER20.
     // Per-vehicle products never take guest discounts.
+    // Keep in sync with src/config/winterPromotion.ts
     const PROMO_ENABLED = true
     const PROMO_CODE = 'WINTER20'
     const PROMO_PERCENT = 20
     const PROMO_EXCLUDED_TOUR_IDS = new Set([1, 9, STANDARD_GROUP_TOUR_ID, 11])
+    const ALREADY_DISCOUNTED_MSG =
+      'This tour already has a special offer. Additional discount codes cannot be combined.'
     const subtotal = Number(metadata?.subtotal)
     const claimedDiscount = Number(metadata?.discount || 0)
     const promoCode = String(metadata?.discount_code || '').trim().toUpperCase()
@@ -184,7 +208,9 @@ serve(async (req) => {
     const charged = Number(amount)
     const promoTourId = parseInt(String(metadata?.tour_id || ''), 10)
     const promoAllowed =
-      pricingModel !== 'per_vehicle' && !PROMO_EXCLUDED_TOUR_IDS.has(promoTourId)
+      pricingModel !== 'per_vehicle' &&
+      !PROMO_EXCLUDED_TOUR_IDS.has(promoTourId) &&
+      !catalogueSaleActive
     const rewardsEnabled = rewardsDiscountsEnabledFromEnv()
 
     if (pricingModel === 'per_vehicle' && dbAdultPrice != null) {
@@ -255,6 +281,8 @@ serve(async (req) => {
             metadata.discount_code = ''
           }
         }
+      } else if (promoCode === PROMO_CODE && !promoAllowed) {
+        throw new Error(ALREADY_DISCOUNTED_MSG)
       } else if (PROMO_ENABLED && promoAllowed && promoCode === PROMO_CODE) {
         if (referralCodeRaw) {
           throw new Error('Referral and promotional discounts cannot be combined')
@@ -262,6 +290,8 @@ serve(async (req) => {
         expectedDiscount = roundMoney(subtotal * (PROMO_PERCENT / 100))
         if (metadata) metadata.discount_type = 'winter_promo'
       } else if (promoCode && claimedDiscount > 0.02) {
+        throw new Error('Invalid discount code or discount amount')
+      } else if (promoCode && promoCode !== PROMO_CODE) {
         throw new Error('Invalid discount code or discount amount')
       } else if (referralCodeRaw && claimedDiscount > 0.02) {
         throw new Error('Referral discounts are not active yet')

@@ -44,11 +44,12 @@ serve(async (req) => {
     }
 
     // Server-side promo validation (must match src/config/winterPromotion.ts)
-    // Tour id 1 (Guaranteed NL) has a catalogue sale — never stack WINTER20.
     const PROMO_ENABLED = true
     const PROMO_CODE = 'WINTER20'
     const PROMO_PERCENT = 20
     const PROMO_EXCLUDED_TOUR_IDS = new Set([1, 9, 10, 11])
+    const ALREADY_DISCOUNTED_MSG =
+      'This tour already has a special offer. Additional discount codes cannot be combined.'
     const promoTourId = parseInt(String(tour_id || ''), 10)
     const isPerVehicle =
       String(pricing_model || '') === 'per_vehicle' || promoTourId === 9
@@ -64,6 +65,12 @@ serve(async (req) => {
         }
       } else {
         const promoAllowed = !PROMO_EXCLUDED_TOUR_IDS.has(promoTourId)
+        if (code === PROMO_CODE && !promoAllowed) {
+          throw new Error(ALREADY_DISCOUNTED_MSG)
+        }
+        if (code && code !== PROMO_CODE && claimedDiscount > 0.02) {
+          throw new Error('Invalid discount code or discount amount')
+        }
         const expectedDiscount =
           PROMO_ENABLED && promoAllowed && code === PROMO_CODE
             ? Math.round(sub * (PROMO_PERCENT / 100) * 100) / 100
